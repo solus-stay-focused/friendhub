@@ -694,23 +694,59 @@
   </div>
 </div>
 
-<script>
+<script type="module">
 /* ============================================================
-   FriendHub — front-end demo
-   This is a fully working UI/UX shell. The "stranger" you're
-   matched with is simulated locally — there is no live user on
-   the other end. To make matching real, you'd wire this up to
-   a backend that pairs two waiting sockets together, e.g.:
-     - A small Node/WebSocket (or Socket.io) server that holds a
-       "waiting" queue and pairs the next two people who join, or
-     - Firebase Realtime Database / Firestore: write a "waiting"
-       doc when someone clicks Find a Stranger, have a Cloud
-       Function (or client listener) pair up the two oldest
-       waiting docs into a shared "rooms/{roomId}" doc, then have
-       both clients subscribe to that room's messages collection.
-   Everywhere marked with // BACKEND HOOK is where that logic
-   would plug in.
+   FriendHub — now wired to a live Firebase backend.
+   Firestore handles: anonymous auth, random-stranger matching,
+   real-time chat messages, WebRTC signaling (offer/answer/ICE)
+   for peer-to-peer video, and a real (not simulated) report log.
+   Actual audio/video streams flow directly between browsers via
+   WebRTC — Firestore only carries the signaling handshake.
+
+   IMPORTANT — before pointing this at real public users you
+   still need: real age verification (not just a text claim),
+   and a person/process actually reviewing the "reports"
+   collection this now writes to. Those are not optional.
    ============================================================ */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDoc, getDocs,
+  query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction, updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
+  authDomain: "friendhub-9f934.firebaseapp.com",
+  projectId: "friendhub-9f934",
+  storageBucket: "friendhub-9f934.firebasestorage.app",
+  messagingSenderId: "97544296104",
+  appId: "1:97544296104:web:d7f7d27e86f1af748e949d",
+  measurementId: "G-BNRRLS7TSJ"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+
+let myUid = null;
+const authReady = new Promise((resolve) => {
+  onAuthStateChanged(auth, (user) => {
+    if (user) { myUid = user.uid; resolve(user.uid); }
+  });
+});
+signInAnonymously(auth).catch((err) => console.error('Anonymous sign-in failed:', err));
+
+// active call state
+let currentCallId = null;
+let isCaller = false;
+let otherUid = null;
+let unsubMessages = null;
+let unsubCallDoc = null;
+let unsubMyCandidates = null;
+let unsubWaitingWatch = null;
+let peerConnection = null;
 
 const HERO_BLIP_TAGS = ["night owl","music","travel","gamer","coffee","college","art","late shift"];
 const heroBlips = document.getElementById('heroBlips');
@@ -876,55 +912,115 @@ const SCAN_MESSAGES = [
   "ALMOST THERE…"
 ];
 
-function openLobby(){
+let lobbyCycle = null;
+let lobbyLeft = false;
+
+async function openLobby(){
   document.getElementById('site').style.display = 'none';
   const lobby = document.getElementById('lobby');
   lobby.classList.add('active');
   document.getElementById('lobbyHeadline').textContent = 'Looking for someone to talk to';
+  lobbyLeft = false;
   let i = 0;
   const statusEl = document.getElementById('lobbyStatus');
   statusEl.textContent = SCAN_MESSAGES[0];
-  const cycle = setInterval(() => {
+  lobbyCycle = setInterval(() => {
     i = (i+1) % SCAN_MESSAGES.length;
     statusEl.textContent = SCAN_MESSAGES[i];
   }, 900);
 
-  // BACKEND HOOK: instead of setTimeout, this is where you'd
-  // register the user in a "waiting" queue and listen for a
-  // pairing event from the server.
-  matchTimeout = setTimeout(() => {
-    clearInterval(cycle);
-    startChat();
-  }, 2600 + Math.random()*1400);
+  await authReady;
+  findMatch();
 }
 
 function closeLobby(){
-  clearTimeout(matchTimeout);
+  lobbyLeft = true;
+  clearInterval(lobbyCycle);
+  if (unsubWaitingWatch) { unsubWaitingWatch(); unsubWaitingWatch = null; }
+  if (myUid) deleteDoc(doc(db, 'waitingPool', myUid)).catch(()=>{});
   document.getElementById('lobby').classList.remove('active');
   document.getElementById('site').style.display = 'block';
 }
 
-function startChat(chosenPerson){
+// Simplified client-side matchmaking. Two people can end up racing for
+// the same candidate under real concurrency — for a production app,
+// move this pairing logic into a Cloud Function so it's atomic and
+// server-trusted instead of client-trusted.
+async function findMatch(){
+  const waitingRef = collection(db, 'waitingPool');
+  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(5));
+  const snap = await getDocs(q);
+  const candidate = snap.docs.find(d => d.id !== myUid);
+
+  if (candidate){
+    try {
+      const callId = [myUid, candidate.id].sort().join('_') + '_' + Date.now();
+      await runTransaction(db, async (tx) => {
+        const candRef = doc(db, 'waitingPool', candidate.id);
+        const candSnap = await tx.get(candRef);
+        if (!candSnap.exists()) throw new Error('candidate already taken');
+        tx.delete(candRef);
+        tx.set(doc(db, 'calls', callId), {
+          users: [myUid, candidate.id],
+          status: 'active',
+          createdAt: serverTimestamp()
+        });
+        tx.set(doc(db, 'matches', candidate.id), { callId, with: myUid });
+      });
+      if (lobbyLeft) return;
+      clearInterval(lobbyCycle);
+      const caller = [myUid, candidate.id].sort()[0] === myUid;
+      startChat(null, callId, caller, candidate.id);
+    } catch(e){
+      // lost the race — go back to waiting
+      registerAsWaiting();
+    }
+  } else {
+    registerAsWaiting();
+  }
+}
+
+function registerAsWaiting(){
+  setDoc(doc(db, 'waitingPool', myUid), {
+    tags: userTags, createdAt: serverTimestamp()
+  }).then(() => {
+    const myMatchRef = doc(db, 'matches', myUid);
+    unsubWaitingWatch = onSnapshot(myMatchRef, (snap) => {
+      if (lobbyLeft) return;
+      if (snap.exists()){
+        const { callId, with: partnerUid } = snap.data();
+        deleteDoc(myMatchRef).catch(()=>{});
+        unsubWaitingWatch();
+        clearInterval(lobbyCycle);
+        const caller = [myUid, partnerUid].sort()[0] === myUid;
+        startChat(null, callId, caller, partnerUid);
+      }
+    });
+  });
+}
+
+function startChat(chosenPerson, callId, callerFlag, partnerUid){
   document.getElementById('lobby').classList.remove('active');
   document.getElementById('chatScreen').classList.add('active');
 
+  currentCallId = callId || null;
+  isCaller = !!callerFlag;
+  otherUid = partnerUid || null;
+
   if(chosenPerson){
-    // Came from the "who do you want to call" directory — this
-    // is a specific person who just accepted your call request,
-    // not a random stranger.
+    // Came from the "who do you want to call" directory. This part
+    // of the demo (choosing a specific "online" person) is still
+    // simulated — PEOPLE_POOL isn't backed by real presence data,
+    // so there's no live otherUid/callId for this path yet.
     strangerId = null;
     document.getElementById('chatStrangerName').textContent = chosenPerson.name;
     document.getElementById('chatAvatarInitial').textContent = chosenPerson.name[0];
     strangerTags = chosenPerson.tags || [];
   } else {
-    strangerId = Math.floor(1000 + Math.random()*8999);
+    strangerId = (partnerUid || '0000').slice(-4);
     document.getElementById('chatStrangerName').textContent = 'Stranger #' + strangerId;
     document.getElementById('chatAvatarInitial').textContent = 'S' + String(strangerId).slice(-1);
-
-    const pool = ["night owl","music","travel","gamer","coffee","college","art","late shift","movies","hiking"];
-    strangerTags = userTags.length
-      ? userTags.filter(() => Math.random() > 0.4).slice(0,2)
-      : [pool[Math.floor(Math.random()*pool.length)]];
+    strangerTags = userTags;
   }
 
   document.getElementById('chatStrangerTags').textContent = strangerTags.length
@@ -938,24 +1034,38 @@ function startChat(chosenPerson){
 
   if(chosenPerson){
     addSystemMessage(chosenPerson.name + ' accepted your call.');
-    // Both sides opted into video by making/accepting the call,
-    // so it's fine to bring the video panel straight up here —
-    // requestVideo() still asks the browser for camera/mic
-    // permission, it just skips the extra button tap.
     botTimeout = setTimeout(() => {
       requestVideo();
       botTyping(() => addMessage(`hey! good to actually see you 👋`, 'them'));
     }, 500);
-  } else {
-    addSystemMessage('You\'re now chatting with a random stranger.');
-    botTimeout = setTimeout(() => {
-      botTyping(() => {
-        const opener = strangerTags.length
-          ? `hey! saw we're both into ${strangerTags[0]} — what got you into that?`
-          : `hey, random question but... window seat or aisle seat person?`;
-        addMessage(opener, 'them');
+    return;
+  }
+
+  addSystemMessage('You\'re now chatting with a random stranger.');
+
+  if (currentCallId){
+    const msgsRef = collection(db, 'calls', currentCallId, 'messages');
+    const q = query(msgsRef, orderBy('createdAt', 'asc'));
+    let firstLoad = true;
+    unsubMessages = onSnapshot(q, (snap) => {
+      if (firstLoad){ body.innerHTML = ''; firstLoad = false; }
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added'){
+          const m = change.doc.data();
+          if (m.sender === myUid) addMessage(m.text, 'me');
+          else addMessage(m.text, 'them');
+        }
       });
-    }, 1100);
+    });
+
+    // Watch the call doc so if the other person disconnects/ends,
+    // we find out and reflect it in the UI instead of hanging.
+    unsubCallDoc = onSnapshot(doc(db, 'calls', currentCallId), (snap) => {
+      const data = snap.data();
+      if (data && data.status === 'ended' && data.endedBy !== myUid){
+        addSystemMessage('The other person disconnected.');
+      }
+    });
   }
 }
 
@@ -990,50 +1100,54 @@ function botTyping(callback){
   }, 900 + Math.random()*900);
 }
 
-const REPLY_POOL = [
-  "haha fair enough. so where are you chatting in from?",
-  "honestly same. what do you do when you're not on here?",
-  "that's a really good point actually",
-  "wait no way, tell me more about that",
-  "lol okay that's a mood",
-  "I feel like everyone says that but never actually does it",
-  "what's the last thing that made you laugh out loud?",
-  "okay unpopular opinion time — go"
-];
-
 function sendMessage(){
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if(!text) return;
-  addMessage(text, 'me');
   input.value = '';
 
-  // BACKEND HOOK: send `text` to the shared room/channel here
-  // instead of generating a canned reply locally.
-  clearTimeout(botTimeout);
-  botTimeout = setTimeout(() => {
-    botTyping(() => {
-      const reply = REPLY_POOL[Math.floor(Math.random()*REPLY_POOL.length)];
-      addMessage(reply, 'them');
-    });
-  }, 500);
+  if (currentCallId){
+    // Real send — onSnapshot above will render it (for both sides)
+    // once Firestore confirms the write.
+    addDoc(collection(db, 'calls', currentCallId, 'messages'), {
+      text, sender: myUid, createdAt: serverTimestamp()
+    }).catch(() => addSystemMessage('Message failed to send — check your connection.'));
+  } else {
+    // No live call (e.g. the simulated "call a specific person" demo path)
+    addMessage(text, 'me');
+    botTimeout = setTimeout(() => botTyping(() => addMessage("(this contact isn't wired to a live backend yet)", 'them')), 600);
+  }
 }
 
 document.getElementById('chatInput').addEventListener('keydown', (e) => {
   if(e.key === 'Enter') sendMessage();
 });
 
-function newStranger(){
+async function endCurrentCall(){
+  if (unsubMessages){ unsubMessages(); unsubMessages = null; }
+  if (unsubCallDoc){ unsubCallDoc(); unsubCallDoc = null; }
+  if (currentCallId){
+    await updateDoc(doc(db, 'calls', currentCallId), { status: 'ended', endedBy: myUid }).catch(()=>{});
+  }
+  currentCallId = null;
+  otherUid = null;
+  isCaller = false;
+}
+
+async function newStranger(){
   clearTimeout(botTimeout);
   calledPerson = null; // a "new stranger" is always random, never a chosen call
   endVideo(); // never carry a live camera over to the next match
+  await endCurrentCall();
   addSystemMessage('You disconnected. Looking for someone new…');
-  setTimeout(() => startChat(), 900);
+  document.getElementById('chatScreen').classList.remove('active');
+  openLobby();
 }
 
-function disconnectChat(){
+async function disconnectChat(){
   clearTimeout(botTimeout);
   endVideo(); // release the camera/mic as soon as the chat ends
+  await endCurrentCall();
   document.getElementById('chatScreen').classList.remove('active');
   document.getElementById('site').style.display = 'block';
   calledPerson = null;
@@ -1041,7 +1155,16 @@ function disconnectChat(){
 }
 
 function reportStranger(){
+  if (currentCallId && otherUid){
+    addDoc(collection(db, 'reports'), {
+      reporterUid: myUid, reportedUid: otherUid, callId: currentCallId,
+      createdAt: serverTimestamp()
+    }).catch(() => console.error('Report failed to save'));
+  }
   addSystemMessage('Report received — thanks for helping keep FriendHub safe. You can disconnect anytime.');
+  // Reports land in the "reports" collection in Firestore. Nothing
+  // reviews them automatically — that still needs a real moderation
+  // process on your end before this goes anywhere public.
 }
 
 /* ============================================================
@@ -1075,6 +1198,15 @@ let localStream = null;
 let micOn = true;
 let camOn = true;
 
+const RTC_CONFIG = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' }
+    // Add a TURN server here before relying on this for users behind
+    // strict NATs/firewalls — STUN alone won't get everyone connected.
+    // Firebase doesn't provide TURN; e.g. Twilio/Cloudflare offer it.
+  ]
+};
+
 async function requestVideo(){
   const stage = document.getElementById('videoStage');
   const localVideo = document.getElementById('localVideo');
@@ -1083,6 +1215,11 @@ async function requestVideo(){
 
   if(stage.classList.contains('active')){
     endVideo();
+    return;
+  }
+
+  if (!currentCallId){
+    addSystemMessage("Video isn't wired up for this contact yet.");
     return;
   }
 
@@ -1098,24 +1235,67 @@ async function requestVideo(){
   localOff.style.display = 'none';
   stage.classList.add('active');
   document.getElementById('videoToggleBtn').textContent = 'Hide video panel';
+  remoteText.textContent = 'connecting…';
 
-  // BACKEND HOOK: at this point, send an "I'm ready for video"
-  // signal to the other person over the shared signaling channel,
-  // then begin the RTCPeerConnection offer/answer exchange
-  // described above once they accept too.
-  const remoteAvatar = document.querySelector('#remotePlaceholder .avatar-ring');
-  if(calledPerson){
-    addSystemMessage('Camera on. Connecting you and ' + calledPerson.name + '\u2019s video — see the code comments for wiring up a real peer connection.');
-    remoteAvatar.textContent = calledPerson.name[0];
-    remoteText.textContent = "connecting to " + calledPerson.name + "'s camera…";
-    setTimeout(() => {
-      remoteText.textContent = calledPerson.name + " is connected (demo: no live peer, see code comments)";
-    }, 1400);
+  await startWebRTC();
+}
+
+async function startWebRTC(){
+  peerConnection = new RTCPeerConnection(RTC_CONFIG);
+  const remoteVideo = document.getElementById('remoteVideo');
+  const remotePlaceholder = document.getElementById('remotePlaceholder');
+  const remoteText = document.getElementById('remoteStatusText');
+
+  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+  const remoteStream = new MediaStream();
+  peerConnection.ontrack = (event) => {
+    event.streams[0].getTracks().forEach(t => remoteStream.addTrack(t));
+    remoteVideo.srcObject = remoteStream;
+    remoteVideo.style.display = 'block';
+    remotePlaceholder.style.display = 'none';
+    addSystemMessage("You're now video connected.");
+  };
+
+  const callDocRef = doc(db, 'calls', currentCallId);
+  const myCandidates = collection(callDocRef, isCaller ? 'callerCandidates' : 'calleeCandidates');
+  const theirCandidates = collection(callDocRef, isCaller ? 'calleeCandidates' : 'callerCandidates');
+
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) addDoc(myCandidates, event.candidate.toJSON());
+  };
+
+  if (isCaller){
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    await updateDoc(callDocRef, { offer: { type: offer.type, sdp: offer.sdp } });
+
+    onSnapshot(callDocRef, async (snap) => {
+      const data = snap.data();
+      if (data?.answer && peerConnection.currentRemoteDescription === null){
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+      }
+    });
   } else {
-    addSystemMessage('You enabled your camera. Video is one-directional in this demo — see the code comments for wiring up a real peer connection.');
-    remoteAvatar.textContent = '?';
-    remoteText.textContent = "waiting for stranger's camera… (demo: no live peer connected)";
+    remoteText.textContent = "waiting for the other person's video…";
+    onSnapshot(callDocRef, async (snap) => {
+      const data = snap.data();
+      if (data?.offer && peerConnection.currentRemoteDescription === null){
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        await updateDoc(callDocRef, { answer: { type: answer.type, sdp: answer.sdp } });
+      }
+    });
   }
+
+  onSnapshot(theirCandidates, (snap) => {
+    snap.docChanges().forEach(change => {
+      if (change.type === 'added'){
+        peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{});
+      }
+    });
+  });
 }
 
 function toggleMic(){
@@ -1144,6 +1324,14 @@ function endVideo(){
     localStream.getTracks().forEach(t => t.stop());
     localStream = null;
   }
+  if(peerConnection){
+    peerConnection.close();
+    peerConnection = null;
+  }
+  const remoteVideo = document.getElementById('remoteVideo');
+  remoteVideo.srcObject = null;
+  remoteVideo.style.display = 'none';
+  document.getElementById('remotePlaceholder').style.display = 'flex';
   document.getElementById('videoStage').classList.remove('active');
   document.getElementById('videoToggleBtn').textContent = 'Enable video';
   document.getElementById('localVideo').srcObject = null;
@@ -1153,6 +1341,15 @@ function endVideo(){
   document.getElementById('camBtn').textContent = '📷';
   document.getElementById('camBtn').classList.remove('off');
 }
+
+// Module scripts don't expose top-level functions on window the way
+// classic scripts do — but the HTML uses onclick="..." attributes,
+// which need them there. Wiring that up explicitly:
+Object.assign(window, {
+  openPeople, closePeople, callPerson, cancelCall,
+  openLobby, closeLobby, sendMessage, reportStranger,
+  requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo
+});
 </script>
 </body>
 </html>
