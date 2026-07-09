@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FriendHub — Meet someone new, right now</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#14152B;
+    --void-deep:#0D0E1F;
+    --amber:#FFB84D;
+    --amber-dim:#8A6428;
+    --mint:#5EEAD4;
+    --coral:#FF6B5B;
+    --paper:#EDE7DA;
+    --paper-dim:#DCD4C2;
+    --ink:#1F1B2E;
+    --ink-soft:#4B4760;
+    --line:rgba(237,231,218,0.14);
+    --line-soft:rgba(31,27,46,0.12);
+    --radius-s:10px;
+    --radius-m:16px;
+    --radius-l:28px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Space Grotesk',sans-serif;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  ::selection{background:var(--amber);color:var(--ink);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 6vw;
+    background:rgba(20,21,43,0.92);
+    backdrop-filter:blur(10px);
+    color:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-size:19px; font-weight:700; color:var(--paper);
+  }
+  .logo-dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--mint);
+    box-shadow:0 0 0 4px rgba(94,234,212,0.18);
+    animation:blink 2.4s ease-in-out infinite;
+  }
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+  .nav-links{display:flex; gap:28px; align-items:center; font-size:14px;}
+  .nav-links a{text-decoration:none; color:var(--paper-dim); transition:color .2s;}
+  .nav-links a:hover{color:var(--paper);}
+  .btn{
+    border:none; border-radius:999px; padding:11px 22px;
+    font-weight:600; font-size:14px; transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .btn:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
+  .btn-amber{background:var(--amber); color:var(--ink);}
+  .btn-amber:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(255,184,77,0.35);}
+  .btn-ghost{background:transparent; border:1px solid var(--line); color:var(--paper);}
+  .btn-ghost:hover{background:rgba(237,231,218,0.08);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:radial-gradient(120% 100% at 80% 0%, #1B1D3D 0%, var(--void) 45%, var(--void-deep) 100%);
+    color:var(--paper);
+    overflow:hidden;
+    padding:80px 6vw 60px;
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:40px;
+    align-items:center;
+    min-height:640px;
+  }
+  @media (max-width:880px){
+    .hero{grid-template-columns:1fr; padding-top:56px; min-height:auto;}
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
+    color:var(--mint); text-transform:uppercase;
+    border:1px solid rgba(94,234,212,0.35); border-radius:999px;
+    padding:6px 14px; margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(38px, 5.2vw, 64px);
+    line-height:1.03;
+    font-weight:700;
+  }
+  .hero h1 em{
+    font-style:normal; color:var(--amber);
+  }
+  .hero p.lede{
+    font-size:18px; line-height:1.6; color:var(--paper-dim);
+    max-width:480px; margin:22px 0 34px;
+  }
+  .hero-cta-row{display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+  .hero-note{
+    margin-top:18px; font-size:13px; color:rgba(237,231,218,0.55);
+  }
+
+  /* ---------- SIGNATURE RADAR ---------- */
+  .radar-wrap{
+    position:relative;
+    aspect-ratio:1/1;
+    max-width:460px;
+    justify-self:center;
+    width:100%;
+  }
+  .radar-ring{
+    position:absolute; inset:0; margin:auto;
+    border-radius:50%;
+    border:1px solid rgba(94,234,212,0.18);
+  }
+  .r1{inset:0;}
+  .r2{inset:12%;}
+  .r3{inset:24%;}
+  .r4{inset:36%;}
+  .radar-sweep{
+    position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(from 0deg, rgba(94,234,212,0.32), rgba(94,234,212,0) 28%);
+    animation:spin 5.5s linear infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .radar-core{
+    position:absolute; inset:0; margin:auto;
+    width:16px; height:16px; border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 0 0 rgba(255,184,77,0.55);
+    animation:pulse-core 2.6s ease-out infinite;
+  }
+  @keyframes pulse-core{
+    0%{box-shadow:0 0 0 0 rgba(255,184,77,0.55);}
+    70%{box-shadow:0 0 0 40px rgba(255,184,77,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,184,77,0);}
+  }
+  .blip{
+    position:absolute;
+    width:10px; height:10px; border-radius:50%;
+    background:var(--mint);
+    box-shadow:0 0 10px rgba(94,234,212,0.8);
+    animation:blip-fade 4s ease-in-out infinite;
+  }
+  .blip-tag{
+    position:absolute;
+    transform:translate(-50%, -140%);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    background:rgba(13,14,31,0.85);
+    color:var(--mint);
+    border:1px solid rgba(94,234,212,0.3);
+    padding:3px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+    opacity:0;
+    animation:tag-fade 4s ease-in-out infinite;
+  }
+  @keyframes blip-fade{
+    0%,100%{opacity:0; transform:scale(0.6);}
+    15%,70%{opacity:1; transform:scale(1);}
+  }
+  @keyframes tag-fade{
+    0%,100%{opacity:0;}
+    20%,65%{opacity:1;}
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .section{padding:100px 6vw;}
+  .section-head{max-width:640px; margin-bottom:56px;}
+  .section-head .kicker{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--amber-dim); margin-bottom:14px; display:block;
+  }
+  .section-head h2{font-size:clamp(28px,3.4vw,42px); line-height:1.1;}
+  .steps{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:28px;
+  }
+  @media (max-width:860px){.steps{grid-template-columns:1fr;}}
+  .step{
+    background:#fff; border:1px solid var(--line-soft); border-radius:var(--radius-m);
+    padding:32px 26px;
+  }
+  .step-num{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--amber-dim);
+    margin-bottom:18px; display:block;
+  }
+  .step h3{font-size:20px; margin-bottom:10px;}
+  .step p{font-size:15px; line-height:1.6; color:var(--ink-soft); margin:0;}
+
+  /* ---------- SAFETY BANNER ---------- */
+  .safety{
+    background:var(--void-deep); color:var(--paper);
+    padding:90px 6vw;
+    display:grid; grid-template-columns:1fr 1fr; gap:56px;
+  }
+  @media (max-width:860px){.safety{grid-template-columns:1fr;}}
+  .safety h2{font-size:clamp(26px,3vw,36px); margin-bottom:18px;}
+  .safety p.lede{color:var(--paper-dim); font-size:16px; line-height:1.6; max-width:440px;}
+  .safety-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:20px;}
+  .safety-list li{display:flex; gap:14px; align-items:flex-start; font-size:15px; line-height:1.55; color:var(--paper-dim);}
+  .safety-list .ico{
+    flex:none; width:34px; height:34px; border-radius:9px;
+    background:rgba(255,184,77,0.12); border:1px solid rgba(255,184,77,0.3);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--amber); font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .safety-list strong{color:var(--paper); display:block; margin-bottom:2px; font-weight:600;}
+
+  /* ---------- LOBBY / MATCHING ---------- */
+  .lobby{
+    display:none;
+    min-height:100vh;
+    background:radial-gradient(120% 100% at 50% 0%, #1B1D3D 0%, var(--void) 40%, var(--void-deep) 100%);
+    color:var(--paper);
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    text-align:center;
+  }
+  .lobby.active{display:flex;}
+  .lobby-radar{position:relative; width:220px; height:220px; margin-bottom:34px;}
+  .lobby-status{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--mint);
+    letter-spacing:0.03em; margin-bottom:10px; min-height:20px;
+  }
+  .lobby h2{font-size:clamp(24px,3.4vw,34px); margin-bottom:14px;}
+  .lobby-tags{
+    display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:420px;
+    margin:6px 0 30px;
+  }
+  .tag-chip{
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+    background:rgba(94,234,212,0.1); border:1px solid rgba(94,234,212,0.3);
+    color:var(--mint); padding:5px 12px; border-radius:999px;
+  }
+  .tag-input-row{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+    margin-bottom:26px; max-width:420px;
+  }
+  .tag-input{
+    background:rgba(237,231,218,0.06);
+    border:1px solid var(--line);
+    color:var(--paper);
+    border-radius:999px;
+    padding:10px 16px;
+    font-size:14px;
+    font-family:inherit;
+    min-width:220px;
+  }
+  .tag-input::placeholder{color:rgba(237,231,218,0.4);}
+  .tag-input:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
+
+  /* ---------- CHAT ---------- */
+  .chat{
+    display:none;
+    min-height:100vh;
+    background:var(--paper);
+    flex-direction:column;
+  }
+  .chat.active{display:flex;}
+  .chat-top{
+    background:var(--void); color:var(--paper);
+    padding:16px 5vw; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .chat-who{display:flex; align-items:center; gap:12px;}
+  .chat-avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg, var(--mint), var(--amber));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px; color:var(--void);
+  }
+  .chat-name{font-weight:600; font-size:15px;}
+  .chat-sub{font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(237,231,218,0.55);}
+  .chat-actions{display:flex; gap:10px;}
+  .icon-btn{
+    background:transparent; border:1px solid var(--line); color:var(--paper-dim);
+    border-radius:999px; padding:8px 16px; font-size:13px; transition:all .15s;
+  }
+  .icon-btn:hover{border-color:var(--mint); color:var(--paper);}
+  .icon-btn.danger:hover{border-color:var(--coral); color:var(--coral);}
+
+  .chat-body{
+    flex:1; overflow-y:auto; padding:28px 5vw;
+    display:flex; flex-direction:column; gap:14px;
+    max-width:760px; margin:0 auto; width:100%;
+  }
+  .msg{
+    max-width:72%; padding:12px 16px; border-radius:16px; font-size:15px; line-height:1.5;
+    animation:msg-in .25s ease;
+  }
+  @keyframes msg-in{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .msg.me{
+    align-self:flex-end; background:var(--ink); color:var(--paper); border-bottom-right-radius:4px;
+  }
+  .msg.them{
+    align-self:flex-start; background:#fff; border:1px solid var(--line-soft); border-bottom-left-radius:4px;
+  }
+  .msg.system{
+    align-self:center; background:transparent; color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace; font-size:12px; text-align:center; max-width:100%;
+  }
+  .typing-dots{display:inline-flex; gap:4px; align-items:center; padding:4px 2px;}
+  .typing-dots span{
+    width:6px;height:6px;border-radius:50%;background:var(--ink-soft);
+    animation:tdot 1.2s infinite ease-in-out;
+  }
+  .typing-dots span:nth-child(2){animation-delay:.15s;}
+  .typing-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes tdot{0%,60%,100%{opacity:.3; transform:translateY(0);}30%{opacity:1; transform:translateY(-3px);}}
+
+  .chat-input-row{
+    border-top:1px solid var(--line-soft);
+    padding:16px 5vw 22px;
+    display:flex; gap:12px; align-items:center;
+    max-width:760px; margin:0 auto; width:100%;
+  }
+  .chat-input{
+    flex:1; border:1px solid var(--line-soft); border-radius:999px;
+    padding:13px 20px; font-size:15px; font-family:inherit;
+  }
+  .chat-input:focus-visible{outline:2px solid var(--ink); outline-offset:1px;}
+  .send-btn{
+    background:var(--ink); color:var(--paper); border:none; border-radius:999px;
+    width:46px; height:46px; display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .send-btn:hover{background:#000;}
+
+  /* ---------- VIDEO ---------- */
+  .video-stage{
+    display:none;
+    max-width:760px; margin:18px auto 0; width:calc(100% - 10vw);
+    background:var(--void-deep); border-radius:var(--radius-m);
+    position:relative; overflow:hidden;
+    aspect-ratio:16/9;
+  }
+  .video-stage.active{display:block;}
+  .video-remote{
+    width:100%; height:100%; object-fit:cover;
+    background:linear-gradient(135deg,#1B1D3D,#0D0E1F);
+  }
+  .video-remote-placeholder{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:10px;
+    color:rgba(237,231,218,0.55); font-family:'IBM Plex Mono',monospace; font-size:12px;
+    text-align:center; padding:0 20px;
+  }
+  .video-remote-placeholder .avatar-ring{
+    width:56px; height:56px; border-radius:50%;
+    border:2px solid rgba(94,234,212,0.4);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--mint); font-size:20px;
+  }
+  .video-local{
+    position:absolute; bottom:14px; right:14px;
+    width:110px; height:82px; border-radius:10px;
+    object-fit:cover; transform:scaleX(-1);
+    border:2px solid rgba(237,231,218,0.25);
+    background:#000;
+  }
+  .video-local-off{
+    position:absolute; bottom:14px; right:14px;
+    width:110px; height:82px; border-radius:10px;
+    border:2px solid rgba(237,231,218,0.25);
+    background:var(--void);
+    display:flex; align-items:center; justify-content:center;
+    color:rgba(237,231,218,0.4); font-family:'IBM Plex Mono',monospace; font-size:10px;
+  }
+  .video-controls{
+    position:absolute; top:14px; left:14px; right:14px;
+    display:flex; justify-content:space-between; align-items:flex-start;
+  }
+  .video-consent-note{
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:rgba(237,231,218,0.7);
+    background:rgba(13,14,31,0.6);
+    padding:6px 12px; border-radius:999px;
+    border:1px solid rgba(237,231,218,0.15);
+  }
+  .video-bar{
+    display:flex; gap:8px;
+  }
+  .vbtn{
+    width:34px; height:34px; border-radius:50%;
+    border:1px solid rgba(237,231,218,0.25);
+    background:rgba(13,14,31,0.6);
+    color:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; transition:all .15s;
+  }
+  .vbtn:hover{background:rgba(237,231,218,0.15);}
+  .vbtn.off{background:var(--coral); border-color:var(--coral); color:#fff;}
+  .vbtn.end{background:var(--coral); border-color:var(--coral); color:#fff; width:auto; padding:0 16px; border-radius:999px; font-family:'IBM Plex Mono',monospace; font-size:11px;}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    background:var(--void-deep); color:rgba(237,231,218,0.5);
+    padding:40px 6vw; display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;
+    font-size:13px; border-top:1px solid var(--line);
+  }
+  footer strong{color:var(--paper);}
+</style>
+</head>
+<body>
+
+<!-- ================= MAIN SITE ================= -->
+<div id="site">
+  <nav class="nav">
+    <div class="logo"><span class="logo-dot"></span> FriendHub</div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#safety">Safety</a>
+      <button class="btn btn-amber" onclick="openLobby()">Start chatting</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <span class="eyebrow"><span class="mono">●</span> 4,213 people online now</span>
+      <h1>Somewhere out there,<br>someone's <em>online</em> too.</h1>
+      <p class="lede">FriendHub pairs you with a random stranger for a one-on-one text chat. No profiles, no follower counts — just a real conversation with someone new.</p>
+      <div class="hero-cta-row">
+        <button class="btn btn-amber" onclick="openLobby()">Find a stranger →</button>
+        <a href="#how" class="btn btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
+    </div>
+
+    <div class="radar-wrap" aria-hidden="true">
+      <div class="radar-ring r1"></div>
+      <div class="radar-ring r2"></div>
+      <div class="radar-ring r3"></div>
+      <div class="radar-ring r4"></div>
+      <div class="radar-sweep"></div>
+      <div class="radar-core"></div>
+      <!-- blips generated by JS -->
+      <div id="heroBlips"></div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="section-head">
+      <span class="kicker">How it works</span>
+      <h2>Three steps between you and a new conversation.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">01 / Enter the lobby</span>
+        <h3>Drop in a few interests</h3>
+        <p>Type a word or two — "movies," "night owl," "startups" — or skip it and go in completely blind.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">02 / We find a match</span>
+        <h3>The radar finds someone</h3>
+        <p>We pair you with another person online right now. No swiping, no waiting for approval — it just happens.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">03 / Start talking</span>
+        <h3>Say hi, see where it goes</h3>
+        <p>Chat as long as you want. Not feeling it? Tap "New stranger" and the radar starts sweeping again.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="safety" id="safety">
+    <div>
+      <h2>Anonymous doesn't mean unsafe.</h2>
+      <p class="lede">FriendHub is built for spontaneous, low-stakes conversation — not for anything else. A few ground rules keep it that way.</p>
+    </div>
+    <ul class="safety-list">
+      <li><span class="ico">18+</span><div><strong>Adults only</strong>FriendHub is restricted to users 18 and older. No exceptions.</div></li>
+      <li><span class="ico">⛔</span><div><strong>One tap to leave</strong>Disconnect from any conversation instantly, no explanation needed.</div></li>
+      <li><span class="ico">▲</span><div><strong>Report & block</strong>Every chat has a report button. Reported accounts are reviewed and can be banned.</div></li>
+      <li><span class="ico">✎</span><div><strong>Nothing is saved</strong>Conversations aren't stored once a chat ends — there's no history to leak.</div></li>
+    </ul>
+  </section>
+
+  <footer>
+    <div><strong>FriendHub</strong> — a random meetup, minus the algorithm.</div>
+    <div>Demo build · not connected to a live matching backend</div>
+  </footer>
+</div>
+
+<!-- ================= LOBBY (matching screen) ================= -->
+<div class="lobby" id="lobby">
+  <div class="lobby-radar">
+    <div class="radar-ring r1" style="border-color:rgba(94,234,212,0.25)"></div>
+    <div class="radar-ring r2" style="border-color:rgba(94,234,212,0.25)"></div>
+    <div class="radar-ring r3" style="border-color:rgba(94,234,212,0.25)"></div>
+    <div class="radar-sweep"></div>
+    <div class="radar-core"></div>
+  </div>
+  <div class="lobby-status mono" id="lobbyStatus">SCANNING…</div>
+  <h2 id="lobbyHeadline">Looking for someone to talk to</h2>
+  <div class="lobby-tags" id="lobbyTagDisplay"></div>
+  <div class="tag-input-row">
+    <input class="tag-input" id="tagInput" type="text" placeholder="interests (optional) — press Enter to add" maxlength="20">
+  </div>
+  <div class="hero-cta-row">
+    <button class="btn btn-ghost" onclick="closeLobby()">Cancel</button>
+  </div>
+</div>
+
+<!-- ================= CHAT ================= -->
+<div class="chat" id="chatScreen">
+  <div class="chat-top">
+    <div class="chat-who">
+      <div class="chat-avatar" id="chatAvatarInitial">S</div>
+      <div>
+        <div class="chat-name" id="chatStrangerName">Stranger #0000</div>
+        <div class="chat-sub" id="chatStrangerTags">no shared interests listed</div>
+      </div>
+    </div>
+    <div class="chat-actions">
+      <button class="icon-btn danger" onclick="reportStranger()">Report</button>
+      <button class="icon-btn" id="videoToggleBtn" onclick="requestVideo()">Enable video</button>
+      <button class="icon-btn" onclick="newStranger()">New stranger</button>
+      <button class="icon-btn" onclick="disconnectChat()">Disconnect</button>
+    </div>
+  </div>
+
+  <div class="video-stage" id="videoStage">
+    <div class="video-remote-placeholder" id="remotePlaceholder">
+      <div class="avatar-ring">?</div>
+      <span id="remoteStatusText">waiting for stranger's camera…</span>
+    </div>
+    <video class="video-remote" id="remoteVideo" autoplay playsinline style="display:none;"></video>
+
+    <div class="video-controls">
+      <span class="video-consent-note">Both people chose to enable video · off anytime</span>
+      <div class="video-bar">
+        <button class="vbtn" id="micBtn" onclick="toggleMic()" title="Mute microphone">🎙</button>
+        <button class="vbtn" id="camBtn" onclick="toggleCam()" title="Turn off camera">📷</button>
+        <button class="vbtn end" onclick="endVideo()">End video</button>
+      </div>
+    </div>
+
+    <video class="video-local" id="localVideo" autoplay playsinline muted style="display:none;"></video>
+    <div class="video-local-off" id="localVideoOff">camera off</div>
+  </div>
+
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" type="text" placeholder="Say something…" autocomplete="off">
+    <button class="send-btn" onclick="sendMessage()" aria-label="Send message">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 11L21 3L13 21L11 13L3 11Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   FriendHub — front-end demo
+   This is a fully working UI/UX shell. The "stranger" you're
+   matched with is simulated locally — there is no live user on
+   the other end. To make matching real, you'd wire this up to
+   a backend that pairs two waiting sockets together, e.g.:
+     - A small Node/WebSocket (or Socket.io) server that holds a
+       "waiting" queue and pairs the next two people who join, or
+     - Firebase Realtime Database / Firestore: write a "waiting"
+       doc when someone clicks Find a Stranger, have a Cloud
+       Function (or client listener) pair up the two oldest
+       waiting docs into a shared "rooms/{roomId}" doc, then have
+       both clients subscribe to that room's messages collection.
+   Everywhere marked with // BACKEND HOOK is where that logic
+   would plug in.
+   ============================================================ */
+
+const HERO_BLIP_TAGS = ["night owl","music","travel","gamer","coffee","college","art","late shift"];
+const heroBlips = document.getElementById('heroBlips');
+HERO_BLIP_TAGS.forEach((tag, i) => {
+  const angle = (i / HERO_BLIP_TAGS.length) * 2 * Math.PI;
+  const radius = 40 + Math.random()*8; // percent
+  const x = 50 + radius * Math.cos(angle);
+  const y = 50 + radius * Math.sin(angle);
+  const dot = document.createElement('div');
+  dot.className = 'blip';
+  dot.style.left = x + '%';
+  dot.style.top = y + '%';
+  dot.style.animationDelay = (i * 0.5) + 's';
+  const label = document.createElement('div');
+  label.className = 'blip-tag';
+  label.textContent = tag;
+  label.style.left = x + '%';
+  label.style.top = y + '%';
+  label.style.animationDelay = (i * 0.5) + 's';
+  heroBlips.appendChild(dot);
+  heroBlips.appendChild(label);
+});
+
+let userTags = [];
+let strangerId = null;
+let strangerTags = [];
+let matchTimeout = null;
+let botTimeout = null;
+
+const tagInput = document.getElementById('tagInput');
+tagInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && tagInput.value.trim()){
+    if(userTags.length < 5){
+      userTags.push(tagInput.value.trim().toLowerCase());
+      renderLobbyTags();
+    }
+    tagInput.value = '';
+  }
+});
+
+function renderLobbyTags(){
+  const wrap = document.getElementById('lobbyTagDisplay');
+  wrap.innerHTML = '';
+  userTags.forEach(t => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.textContent = t;
+    wrap.appendChild(chip);
+  });
+}
+
+const SCAN_MESSAGES = [
+  "SCANNING…",
+  "CHECKING THE LOBBY…",
+  "LOOKING FOR A MATCH…",
+  "ALMOST THERE…"
+];
+
+function openLobby(){
+  document.getElementById('site').style.display = 'none';
+  const lobby = document.getElementById('lobby');
+  lobby.classList.add('active');
+  document.getElementById('lobbyHeadline').textContent = 'Looking for someone to talk to';
+  let i = 0;
+  const statusEl = document.getElementById('lobbyStatus');
+  statusEl.textContent = SCAN_MESSAGES[0];
+  const cycle = setInterval(() => {
+    i = (i+1) % SCAN_MESSAGES.length;
+    statusEl.textContent = SCAN_MESSAGES[i];
+  }, 900);
+
+  // BACKEND HOOK: instead of setTimeout, this is where you'd
+  // register the user in a "waiting" queue and listen for a
+  // pairing event from the server.
+  matchTimeout = setTimeout(() => {
+    clearInterval(cycle);
+    startChat();
+  }, 2600 + Math.random()*1400);
+}
+
+function closeLobby(){
+  clearTimeout(matchTimeout);
+  document.getElementById('lobby').classList.remove('active');
+  document.getElementById('site').style.display = 'block';
+}
+
+function startChat(){
+  document.getElementById('lobby').classList.remove('active');
+  document.getElementById('chatScreen').classList.add('active');
+
+  strangerId = Math.floor(1000 + Math.random()*8999);
+  document.getElementById('chatStrangerName').textContent = 'Stranger #' + strangerId;
+  document.getElementById('chatAvatarInitial').textContent = 'S' + String(strangerId).slice(-1);
+
+  const pool = ["night owl","music","travel","gamer","coffee","college","art","late shift","movies","hiking"];
+  strangerTags = userTags.length
+    ? userTags.filter(() => Math.random() > 0.4).slice(0,2)
+    : [pool[Math.floor(Math.random()*pool.length)]];
+  document.getElementById('chatStrangerTags').textContent = strangerTags.length
+    ? 'shares interest in ' + strangerTags.join(', ')
+    : 'no shared interests listed';
+
+  const body = document.getElementById('chatBody');
+  body.innerHTML = '';
+  addSystemMessage('You\'re now chatting with a random stranger.');
+  document.getElementById('chatInput').value = '';
+  document.getElementById('chatInput').focus();
+
+  botTimeout = setTimeout(() => {
+    botTyping(() => {
+      const opener = strangerTags.length
+        ? `hey! saw we're both into ${strangerTags[0]} — what got you into that?`
+        : `hey, random question but... window seat or aisle seat person?`;
+      addMessage(opener, 'them');
+    });
+  }, 1100);
+}
+
+function addMessage(text, who){
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function addSystemMessage(text){
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'msg system';
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function botTyping(callback){
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'msg them';
+  div.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  setTimeout(() => {
+    div.remove();
+    callback();
+  }, 900 + Math.random()*900);
+}
+
+const REPLY_POOL = [
+  "haha fair enough. so where are you chatting in from?",
+  "honestly same. what do you do when you're not on here?",
+  "that's a really good point actually",
+  "wait no way, tell me more about that",
+  "lol okay that's a mood",
+  "I feel like everyone says that but never actually does it",
+  "what's the last thing that made you laugh out loud?",
+  "okay unpopular opinion time — go"
+];
+
+function sendMessage(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  addMessage(text, 'me');
+  input.value = '';
+
+  // BACKEND HOOK: send `text` to the shared room/channel here
+  // instead of generating a canned reply locally.
+  clearTimeout(botTimeout);
+  botTimeout = setTimeout(() => {
+    botTyping(() => {
+      const reply = REPLY_POOL[Math.floor(Math.random()*REPLY_POOL.length)];
+      addMessage(reply, 'them');
+    });
+  }, 500);
+}
+
+document.getElementById('chatInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') sendMessage();
+});
+
+function newStranger(){
+  clearTimeout(botTimeout);
+  endVideo(); // never carry a live camera over to the next match
+  addSystemMessage('You disconnected. Looking for someone new…');
+  setTimeout(startChat, 900);
+}
+
+function disconnectChat(){
+  clearTimeout(botTimeout);
+  endVideo(); // release the camera/mic as soon as the chat ends
+  document.getElementById('chatScreen').classList.remove('active');
+  document.getElementById('site').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function reportStranger(){
+  addSystemMessage('Report received — thanks for helping keep FriendHub safe. You can disconnect anytime.');
+}
+
+/* ============================================================
+   VIDEO — opt-in only, never auto-starts.
+   This demo shows your own camera locally and simulates the
+   stranger's side, since there's no signaling server here to
+   actually connect two browsers. To make it real:
+
+   1. Keep video OFF by default and require an explicit click
+      from BOTH people before any camera turns on for either side.
+   2. Add a signaling channel (the same backend used for chat
+      pairing can carry this) so each browser can exchange:
+        - SDP offer/answer   (RTCPeerConnection.createOffer /
+          createAnswer, setLocalDescription/setRemoteDescription)
+        - ICE candidates      (peerConnection.onicecandidate ->
+          send to the other peer -> peerConnection.addIceCandidate)
+   3. Use a STUN server (e.g. stun:stun.l.google.com:19302) for
+      NAT traversal, and a TURN server as fallback for networks
+      that block direct peer connections.
+   4. On peerConnection.ontrack, attach the incoming stream to
+      #remoteVideo instead of the placeholder below.
+
+   If this ever goes to real users: random video with strangers
+   carries real legal and safety obligations (age verification,
+   CSAM mandatory-reporting under US law for platforms enabling
+   this, moderation/reporting pipelines). Treat that as required
+   infrastructure before launch, not a follow-up task.
+   ============================================================ */
+
+let localStream = null;
+let micOn = true;
+let camOn = true;
+
+async function requestVideo(){
+  const stage = document.getElementById('videoStage');
+  const localVideo = document.getElementById('localVideo');
+  const localOff = document.getElementById('localVideoOff');
+  const remoteText = document.getElementById('remoteStatusText');
+
+  if(stage.classList.contains('active')){
+    endVideo();
+    return;
+  }
+
+  try{
+    localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+  }catch(err){
+    addSystemMessage('Camera/mic permission was denied or unavailable — video stays off.');
+    return;
+  }
+
+  localVideo.srcObject = localStream;
+  localVideo.style.display = 'block';
+  localOff.style.display = 'none';
+  stage.classList.add('active');
+  document.getElementById('videoToggleBtn').textContent = 'Hide video panel';
+  addSystemMessage('You enabled your camera. Video is one-directional in this demo — see the code comments for wiring up a real peer connection.');
+
+  // BACKEND HOOK: at this point, send an "I'm ready for video"
+  // signal to the stranger over the shared signaling channel,
+  // then begin the RTCPeerConnection offer/answer exchange
+  // described above once they accept too.
+  remoteText.textContent = "waiting for stranger's camera… (demo: no live peer connected)";
+}
+
+function toggleMic(){
+  if(!localStream) return;
+  micOn = !micOn;
+  localStream.getAudioTracks().forEach(t => t.enabled = micOn);
+  const btn = document.getElementById('micBtn');
+  btn.textContent = micOn ? '🎙' : '🔇';
+  btn.classList.toggle('off', !micOn);
+}
+
+function toggleCam(){
+  if(!localStream) return;
+  camOn = !camOn;
+  localStream.getVideoTracks().forEach(t => t.enabled = camOn);
+  const btn = document.getElementById('camBtn');
+  const localVideo = document.getElementById('localVideo');
+  const localOff = document.getElementById('localVideoOff');
+  btn.classList.toggle('off', !camOn);
+  localVideo.style.display = camOn ? 'block' : 'none';
+  localOff.style.display = camOn ? 'none' : 'flex';
+}
+
+function endVideo(){
+  if(localStream){
+    localStream.getTracks().forEach(t => t.stop());
+    localStream = null;
+  }
+  document.getElementById('videoStage').classList.remove('active');
+  document.getElementById('videoToggleBtn').textContent = 'Enable video';
+  document.getElementById('localVideo').srcObject = null;
+  micOn = true; camOn = true;
+  document.getElementById('micBtn').textContent = '🎙';
+  document.getElementById('micBtn').classList.remove('off');
+  document.getElementById('camBtn').textContent = '📷';
+  document.getElementById('camBtn').classList.remove('off');
+}
+</script>
+</body>
+</html>
