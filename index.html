@@ -457,9 +457,6 @@
   .call-action-btn.cancel:hover{background:#e5503f;}
   .call-action-btn.accept{background:var(--mint); color:var(--void);}
   .call-action-btn.accept:hover{background:#4dd0ba;}
-  #incomingCallScreen{position:fixed; inset:0; z-index:200;}
-  #incomingCallScreen.active{display:flex;}
-
   /* ---------- VIDEO ---------- */
   .video-stage{
     display:none;
@@ -526,6 +523,64 @@
   .vbtn.off{background:var(--coral); border-color:var(--coral); color:#fff;}
   .vbtn.end{background:var(--coral); border-color:var(--coral); color:#fff; width:auto; padding:0 16px; border-radius:999px; font-family:'IBM Plex Mono',monospace; font-size:11px;}
 
+  /* ---------- INSTANT VIDEO MATCH (searching) ---------- */
+  .vlobby{
+    display:none;
+    min-height:100vh;
+    background:radial-gradient(120% 100% at 50% 0%, #1B1D3D 0%, var(--void) 40%, var(--void-deep) 100%);
+    color:var(--paper);
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    text-align:center;
+  }
+  .vlobby.active{display:flex;}
+
+  /* ---------- INSTANT VIDEO MATCH (live call) ---------- */
+  .vcall{
+    display:none;
+    min-height:100vh;
+    background:var(--void-deep);
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px 20px 34px;
+  }
+  .vcall.active{display:flex;}
+  .vcall-stage{
+    width:100%; max-width:820px;
+    aspect-ratio:16/9;
+    background:var(--void-deep);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    position:relative;
+    overflow:hidden;
+  }
+  .vcall-status{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mint);
+    letter-spacing:0.03em; margin-bottom:14px;
+  }
+  .vcall-actions{
+    display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; justify-content:center;
+  }
+  .vcall-btn{
+    border:none; border-radius:999px; padding:14px 26px;
+    font-weight:600; font-size:14px; display:flex; align-items:center; gap:8px;
+    transition:transform .15s ease;
+  }
+  .vcall-btn:hover{transform:translateY(-1px);}
+  .vcall-btn.report{background:rgba(255,107,91,0.12); color:var(--coral); border:1px solid rgba(255,107,91,0.4);}
+  .vcall-btn.report:hover{background:rgba(255,107,91,0.2);}
+  .vcall-btn.skip{background:rgba(94,234,212,0.12); color:var(--mint); border:1px solid rgba(94,234,212,0.4);}
+  .vcall-btn.skip:hover{background:rgba(94,234,212,0.2);}
+  .vcall-btn.leave{background:var(--coral); color:#fff;}
+  .vcall-btn.leave:hover{background:#e5503f;}
+  .vcall-note{
+    margin-top:18px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:rgba(237,231,218,0.45);
+  }
+
   /* ---------- FOOTER ---------- */
   footer{
     background:var(--hp-black); color:rgba(255,255,255,0.45);
@@ -544,7 +599,7 @@
     <div class="nav-links">
       <a href="#how">How it works</a>
       <a href="#safety">Safety</a>
-      <button class="btn btn-ghost" onclick="openPeople()">Video call</button>
+      <button class="btn btn-ghost" onclick="openVideoCall()">Video call</button>
       <button class="btn btn-amber" onclick="openLobby()">Start chatting</button>
     </div>
   </nav>
@@ -623,45 +678,40 @@
   </div>
 </div>
 
-<!-- ================= PEOPLE DIRECTORY (choose who to call) ================= -->
-<div class="people" id="peopleScreen">
-  <div class="people-top">
-    <div>
-      <h2>Who do you want to call?</h2>
-      <div class="sub">Everyone below is online right now · you choose, they get a request</div>
+<!-- ================= INSTANT VIDEO MATCH — searching ================= -->
+<div class="vlobby" id="videoLobby">
+  <div class="lobby-radar">
+    <div class="radar-ring r1" style="border-color:rgba(94,234,212,0.25)"></div>
+    <div class="radar-ring r2" style="border-color:rgba(94,234,212,0.25)"></div>
+    <div class="radar-ring r3" style="border-color:rgba(94,234,212,0.25)"></div>
+    <div class="radar-sweep"></div>
+    <div class="radar-core"></div>
+  </div>
+  <div class="lobby-status mono" id="videoLobbyStatus">SCANNING…</div>
+  <h2 id="videoLobbyHeadline">Finding someone for video</h2>
+  <div class="hero-cta-row">
+    <button class="btn btn-ghost" onclick="closeVideoLobby()">Cancel</button>
+  </div>
+</div>
+
+<!-- ================= INSTANT VIDEO MATCH — live call ================= -->
+<div class="vcall" id="videoCallScreen">
+  <div class="vcall-status mono" id="vcallStatus">CONNECTING…</div>
+  <div class="vcall-stage" id="vcallStage">
+    <div class="video-remote-placeholder" id="vcRemotePlaceholder">
+      <div class="avatar-ring">?</div>
+      <span id="vcRemoteStatusText">waiting for the other person's camera…</span>
     </div>
-    <button class="btn btn-ghost" onclick="closePeople()">Close</button>
+    <video class="video-remote" id="vcRemoteVideo" autoplay playsinline style="display:none;"></video>
+    <video class="video-local" id="vcLocalVideo" autoplay playsinline muted style="display:none;"></video>
+    <div class="video-local-off" id="vcLocalVideoOff" style="display:none;">camera off</div>
   </div>
-  <div class="people-grid" id="peopleGrid"></div>
-</div>
-
-<!-- ================= OUTGOING CALL ================= -->
-<div class="calling" id="callingScreen">
-  <div class="calling-avatar-wrap">
-    <div class="ring-pulse"></div>
-    <div class="ring-pulse delay"></div>
-    <div class="calling-avatar" id="callingAvatarInitial">?</div>
+  <div class="vcall-actions">
+    <button class="vcall-btn report" onclick="reportStranger()">🚩 Report</button>
+    <button class="vcall-btn skip" onclick="skipVideoStranger()">⟳ Skip</button>
+    <button class="vcall-btn leave" onclick="leaveVideoCall()">✕ Leave</button>
   </div>
-  <div class="calling-status mono" id="callingStatus">CALLING…</div>
-  <h2 id="callingName">Calling someone</h2>
-  <div class="calling-actions">
-    <button class="call-action-btn cancel" onclick="cancelCall()" title="Cancel call">✕</button>
-  </div>
-</div>
-
-<!-- ================= INCOMING CALL (shows on top of any screen) ================= -->
-<div class="calling" id="incomingCallScreen">
-  <div class="calling-avatar-wrap">
-    <div class="ring-pulse"></div>
-    <div class="ring-pulse delay"></div>
-    <div class="calling-avatar" id="incomingAvatarInitial">?</div>
-  </div>
-  <div class="calling-status mono">INCOMING VIDEO CALL</div>
-  <h2 id="incomingCallerName">Someone is calling you</h2>
-  <div class="calling-actions">
-    <button class="call-action-btn cancel" onclick="declineIncomingCall()" title="Decline">✕</button>
-    <button class="call-action-btn accept" onclick="acceptIncomingCallReal()" title="Accept">📹</button>
-  </div>
+  <div class="vcall-note">Random 1:1 video · leave anytime · 18+ only</div>
 </div>
 
 <!-- ================= CHAT ================= -->
@@ -714,20 +764,21 @@
 <script type="module">
 /* ============================================================
    FriendHub — now wired to a live Firebase backend.
-   Firestore handles: anonymous auth, online presence (heartbeat
-   in presence/{uid}), random-stranger matching, direct call
-   invites (calls/{callId} with status ringing/accepted/declined),
-   real-time chat messages, WebRTC signaling (offer/answer/ICE)
-   for peer-to-peer video, and a real (not simulated) report log.
-   Actual audio/video streams flow directly between browsers via
-   WebRTC — Firestore only carries the signaling handshake.
-   Only people whose presence heartbeat is fresh show up as
-   "online" in the call directory, and only they can be called.
+   Firestore handles: anonymous auth, random-stranger matching
+   for both text chat (waitingPool/matches) and instant video
+   (videoWaitingPool/videoMatches, kept separate so the two
+   never cross-match), calls/{callId} docs, real-time chat
+   messages, WebRTC signaling (offer/answer/ICE) for peer-to-peer
+   video, and a real (not simulated) report log. Actual audio/
+   video streams flow directly between browsers via WebRTC —
+   Firestore only ever carries the signaling handshake.
 
    IMPORTANT — before pointing this at real public users you
    still need: real age verification (not just a text claim),
    and a person/process actually reviewing the "reports"
-   collection this now writes to. Those are not optional.
+   collection this now writes to. Those are not optional —
+   anonymous random video pairing is the highest-risk surface
+   for minor safety on a product like this.
    ============================================================ */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -768,6 +819,8 @@ let unsubCallDoc = null;
 let unsubMyCandidates = null;
 let unsubWaitingWatch = null;
 let peerConnection = null;
+let ivcLocalStream = null;
+let ivcPeerConnection = null;
 
 let userTags = [];
 let strangerId = null;
@@ -776,214 +829,252 @@ let matchTimeout = null;
 let botTimeout = null;
 
 /* ============================================================
-   VIDEO CALL DIRECTORY — real presence + real call invites.
+   INSTANT RANDOM VIDEO MATCH — no directory, no choosing.
 
-   Presence: every signed-in tab writes presence/{uid} with a
-   name + lastSeen heartbeat every 20s. Anyone whose heartbeat
-   is older than 40s is treated as offline and filtered out
-   client-side — there's no separate "who's online" service,
-   the heartbeat freshness IS the online signal.
+   Tapping "Video call" drops you into a separate video waiting
+   pool (videoWaitingPool/videoMatches — kept apart from the
+   text-chat waitingPool so the two intents never cross-match).
+   As soon as two people are waiting, they're paired atomically
+   (same race-safe transaction pattern as the text matcher) into
+   a calls/{callId} doc and dropped straight into a live video
+   call — camera/mic requested immediately, no extra opt-in step,
+   since choosing "Video call" already is the opt-in. WebRTC
+   offer/answer/ICE signaling flows through that same call doc;
+   the audio/video itself is peer-to-peer.
 
-   Calling: tapping "Video call" writes calls/{callId} with
-   status:"ringing". The callee has a GLOBAL listener (set up
-   once, right after sign-in) watching for calls addressed to
-   them, so the incoming-call popup can appear no matter what
-   screen they're currently on. Accept -> status:"accepted" ->
-   both sides call startChat() + requestVideo(), which already
-   does the real WebRTC offer/answer/ICE handshake through that
-   same call doc. Decline/cancel/timeout -> status updates the
-   other side's listener so their UI clears too.
+   IMPORTANT — exactly like the text flow, this still needs real
+   age verification and someone actually reviewing the "reports"
+   collection before this goes anywhere near real public users.
+   Anonymous random video pairing is the single highest-risk
+   surface for minor safety on a product like this, so treat
+   that infrastructure as a launch blocker, not a follow-up.
    ============================================================ */
 
-function ensureGuestName(){
-  let n = localStorage.getItem('friendhub_name');
-  if (!n){
-    const adjectives = ['Quiet','Bright','Lucky','Amber','Coastal','Velvet','Northern','Solar','Rainy','Golden'];
-    const nouns = ['Fox','Otter','Sparrow','Comet','Willow','Harbor','Ember','Maple','Falcon','River'];
-    n = adjectives[Math.floor(Math.random()*adjectives.length)] + ' ' + nouns[Math.floor(Math.random()*nouns.length)];
-    localStorage.setItem('friendhub_name', n);
-  }
-  return n;
+const VIDEO_SCAN_MESSAGES = [
+  "SCANNING…",
+  "CHECKING WHO'S FREE…",
+  "LOOKING FOR A MATCH…",
+  "ALMOST THERE…"
+];
+
+let videoLobbyCycle = null;
+let videoLobbyLeft = false;
+let unsubVideoWaitingWatch = null;
+
+async function openVideoCall(){
+  document.getElementById('site').style.display = 'none';
+  const vlobby = document.getElementById('videoLobby');
+  vlobby.classList.add('active');
+  document.getElementById('videoLobbyHeadline').textContent = 'Finding someone for video';
+  videoLobbyLeft = false;
+  let i = 0;
+  const statusEl = document.getElementById('videoLobbyStatus');
+  statusEl.textContent = VIDEO_SCAN_MESSAGES[0];
+  videoLobbyCycle = setInterval(() => {
+    i = (i+1) % VIDEO_SCAN_MESSAGES.length;
+    statusEl.textContent = VIDEO_SCAN_MESSAGES[i];
+  }, 900);
+
+  await authReady;
+  findVideoMatch();
 }
-const myName = ensureGuestName();
 
-// ---- presence heartbeat ----
-let presenceInterval = null;
-authReady.then((uid) => {
-  const presRef = doc(db, 'presence', uid);
-  const beat = () => setDoc(presRef, { name: myName, lastSeen: serverTimestamp() }).catch(() => {});
-  beat();
-  presenceInterval = setInterval(beat, 20000);
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') beat(); });
-  window.addEventListener('beforeunload', () => { deleteDoc(presRef).catch(() => {}); });
-});
+function closeVideoLobby(){
+  videoLobbyLeft = true;
+  clearInterval(videoLobbyCycle);
+  if (unsubVideoWaitingWatch) { unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
+  if (myUid) deleteDoc(doc(db, 'videoWaitingPool', myUid)).catch(()=>{});
+  document.getElementById('videoLobby').classList.remove('active');
+  document.getElementById('site').style.display = 'block';
+}
 
-// ---- global incoming-call listener (active on every screen) ----
-let pendingIncomingCallId = null;
-let pendingIncomingFrom = null;
+// Same simplified client-side matchmaking caveat as the text matcher:
+// move this into a Cloud Function before trusting it at real scale.
+async function findVideoMatch(){
+  const waitingRef = collection(db, 'videoWaitingPool');
+  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(5));
+  const snap = await getDocs(q);
+  const candidate = snap.docs.find(d => d.id !== myUid);
 
-authReady.then((uid) => {
-  const incomingQ = query(collection(db, 'calls'), where('to', '==', uid), where('status', '==', 'ringing'));
-  onSnapshot(incomingQ, (snap) => {
-    snap.docChanges().forEach((change) => {
-      const data = change.doc.data();
-      if (change.type === 'added'){
-        showIncomingCall(change.doc.id, data);
-      } else if (change.doc.id === pendingIncomingCallId && (!data || data.status !== 'ringing')){
-        hideIncomingCall(); // caller cancelled, or it timed out on their end
+  if (candidate){
+    try {
+      const callId = 'v_' + [myUid, candidate.id].sort().join('_') + '_' + Date.now();
+      await runTransaction(db, async (tx) => {
+        const candRef = doc(db, 'videoWaitingPool', candidate.id);
+        const candSnap = await tx.get(candRef);
+        if (!candSnap.exists()) throw new Error('candidate already taken');
+        tx.delete(candRef);
+        tx.set(doc(db, 'calls', callId), {
+          users: [myUid, candidate.id],
+          status: 'active',
+          createdAt: serverTimestamp()
+        });
+        tx.set(doc(db, 'videoMatches', candidate.id), { callId, with: myUid });
+      });
+      if (videoLobbyLeft) return;
+      clearInterval(videoLobbyCycle);
+      const caller = [myUid, candidate.id].sort()[0] === myUid;
+      startVideoCall(callId, caller, candidate.id);
+    } catch(e){
+      // lost the race — go back to waiting
+      registerAsVideoWaiting();
+    }
+  } else {
+    registerAsVideoWaiting();
+  }
+}
+
+function registerAsVideoWaiting(){
+  setDoc(doc(db, 'videoWaitingPool', myUid), { createdAt: serverTimestamp() }).then(() => {
+    const myMatchRef = doc(db, 'videoMatches', myUid);
+    unsubVideoWaitingWatch = onSnapshot(myMatchRef, (snap) => {
+      if (videoLobbyLeft) return;
+      if (snap.exists()){
+        const { callId, with: partnerUid } = snap.data();
+        deleteDoc(myMatchRef).catch(()=>{});
+        unsubVideoWaitingWatch();
+        clearInterval(videoLobbyCycle);
+        const caller = [myUid, partnerUid].sort()[0] === myUid;
+        startVideoCall(callId, caller, partnerUid);
       }
     });
   });
-});
+}
 
-function showIncomingCall(callId, data){
-  if (currentCallId){
-    // Already in a call — auto-decline so the caller isn't left hanging.
-    updateDoc(doc(db, 'calls', callId), { status: 'declined' }).catch(() => {});
+async function startVideoCall(callId, callerFlag, partnerUid){
+  document.getElementById('videoLobby').classList.remove('active');
+  document.getElementById('videoCallScreen').classList.add('active');
+  document.getElementById('vcallStatus').textContent = 'CONNECTING…';
+
+  currentCallId = callId;
+  isCaller = !!callerFlag;
+  otherUid = partnerUid;
+
+  // Watch the call doc so if the other person leaves/skips, we find
+  // out and can react instead of sitting on a dead connection.
+  unsubCallDoc = onSnapshot(doc(db, 'calls', currentCallId), (snap) => {
+    const data = snap.data();
+    if (data && data.status === 'ended' && data.endedBy !== myUid){
+      document.getElementById('vcRemoteStatusText').textContent = 'the other person left — finding someone new…';
+      skipVideoStranger();
+    }
+  });
+
+  try{
+    ivcLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+  }catch(err){
+    document.getElementById('vcallStatus').textContent = 'CAMERA/MIC BLOCKED';
+    document.getElementById('vcRemoteStatusText').textContent = "camera/mic permission was denied — can't start video.";
     return;
   }
-  pendingIncomingCallId = callId;
-  pendingIncomingFrom = data.from;
-  document.getElementById('incomingAvatarInitial').textContent = (data.fromName || '?')[0];
-  document.getElementById('incomingCallerName').textContent = (data.fromName || 'Someone') + ' is calling you';
-  document.getElementById('incomingCallScreen').classList.add('active');
+
+  const localVideo = document.getElementById('vcLocalVideo');
+  localVideo.srcObject = ivcLocalStream;
+  localVideo.style.display = 'block';
+  document.getElementById('vcRemoteStatusText').textContent = "waiting for the other person's camera…";
+
+  await startInstantVideoWebRTC();
 }
 
-function hideIncomingCall(){
-  document.getElementById('incomingCallScreen').classList.remove('active');
-  pendingIncomingCallId = null;
-  pendingIncomingFrom = null;
-}
+async function startInstantVideoWebRTC(){
+  ivcPeerConnection = new RTCPeerConnection(RTC_CONFIG);
+  const remoteVideo = document.getElementById('vcRemoteVideo');
+  const remotePlaceholder = document.getElementById('vcRemotePlaceholder');
 
-async function acceptIncomingCallReal(){
-  if (!pendingIncomingCallId) return;
-  const callId = pendingIncomingCallId;
-  const fromUid = pendingIncomingFrom;
-  const fromName = document.getElementById('incomingCallerName').textContent.replace(' is calling you', '');
-  hideIncomingCall();
-  await updateDoc(doc(db, 'calls', callId), { status: 'accepted' }).catch(() => {});
-  startChat({ name: fromName }, callId, false, fromUid);
-  botTimeout = setTimeout(() => requestVideo(), 400);
-}
+  ivcLocalStream.getTracks().forEach(track => ivcPeerConnection.addTrack(track, ivcLocalStream));
 
-function declineIncomingCall(){
-  if (!pendingIncomingCallId) return;
-  updateDoc(doc(db, 'calls', pendingIncomingCallId), { status: 'declined' }).catch(() => {});
-  hideIncomingCall();
-}
+  const remoteStream = new MediaStream();
+  ivcPeerConnection.ontrack = (event) => {
+    event.streams[0].getTracks().forEach(t => remoteStream.addTrack(t));
+    remoteVideo.srcObject = remoteStream;
+    remoteVideo.style.display = 'block';
+    remotePlaceholder.style.display = 'none';
+    document.getElementById('vcallStatus').textContent = 'CONNECTED';
+  };
 
-// ---- people directory: live presence, not a static list ----
-let unsubPresence = null;
+  const callDocRef = doc(db, 'calls', currentCallId);
+  const myCandidates = collection(callDocRef, isCaller ? 'callerCandidates' : 'calleeCandidates');
+  const theirCandidates = collection(callDocRef, isCaller ? 'calleeCandidates' : 'callerCandidates');
 
-function openPeople(){
-  document.getElementById('site').style.display = 'none';
-  document.getElementById('peopleScreen').classList.add('active');
-  const grid = document.getElementById('peopleGrid');
-  grid.innerHTML = '<div class="person-status mono" style="padding:20px;">looking for who\'s online…</div>';
+  ivcPeerConnection.onicecandidate = (event) => {
+    if (event.candidate) addDoc(myCandidates, event.candidate.toJSON());
+  };
 
-  authReady.then((uid) => {
-    unsubPresence = onSnapshot(collection(db, 'presence'), (snap) => {
-      const now = Date.now();
-      const people = [];
-      snap.forEach((d) => {
-        if (d.id === uid) return; // don't show yourself in your own directory
-        const data = d.data();
-        const seenAt = data.lastSeen ? data.lastSeen.toMillis() : 0;
-        if (now - seenAt < 40000) people.push({ uid: d.id, name: data.name || 'Guest' });
-      });
-      renderPeople(people);
+  if (isCaller){
+    const offer = await ivcPeerConnection.createOffer();
+    await ivcPeerConnection.setLocalDescription(offer);
+    await updateDoc(callDocRef, { offer: { type: offer.type, sdp: offer.sdp } });
+
+    onSnapshot(callDocRef, async (snap) => {
+      const data = snap.data();
+      if (data?.answer && ivcPeerConnection && ivcPeerConnection.currentRemoteDescription === null){
+        await ivcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+      }
+    });
+  } else {
+    onSnapshot(callDocRef, async (snap) => {
+      const data = snap.data();
+      if (data?.offer && ivcPeerConnection && ivcPeerConnection.currentRemoteDescription === null){
+        await ivcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await ivcPeerConnection.createAnswer();
+        await ivcPeerConnection.setLocalDescription(answer);
+        await updateDoc(callDocRef, { answer: { type: answer.type, sdp: answer.sdp } });
+      }
+    });
+  }
+
+  onSnapshot(theirCandidates, (snap) => {
+    snap.docChanges().forEach(change => {
+      if (change.type === 'added' && ivcPeerConnection){
+        ivcPeerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{});
+      }
     });
   });
 }
 
-function closePeople(){
-  if (unsubPresence){ unsubPresence(); unsubPresence = null; }
-  document.getElementById('peopleScreen').classList.remove('active');
+function stopInstantVideo(){
+  if (ivcLocalStream){
+    ivcLocalStream.getTracks().forEach(t => t.stop());
+    ivcLocalStream = null;
+  }
+  if (ivcPeerConnection){
+    ivcPeerConnection.close();
+    ivcPeerConnection = null;
+  }
+  const remoteVideo = document.getElementById('vcRemoteVideo');
+  remoteVideo.srcObject = null;
+  remoteVideo.style.display = 'none';
+  document.getElementById('vcRemotePlaceholder').style.display = 'flex';
+  document.getElementById('vcLocalVideo').srcObject = null;
+  document.getElementById('vcLocalVideo').style.display = 'none';
+}
+
+async function endCurrentInstantCall(){
+  if (unsubCallDoc){ unsubCallDoc(); unsubCallDoc = null; }
+  if (currentCallId){
+    await updateDoc(doc(db, 'calls', currentCallId), { status: 'ended', endedBy: myUid }).catch(()=>{});
+  }
+  currentCallId = null;
+  otherUid = null;
+  isCaller = false;
+}
+
+// "Skip" — leave this stranger and immediately look for the next one,
+// without ever leaving the video-call flow.
+async function skipVideoStranger(){
+  stopInstantVideo();
+  await endCurrentInstantCall();
+  document.getElementById('videoCallScreen').classList.remove('active');
+  openVideoCall();
+}
+
+// "Leave" — end the call entirely and go back to the homepage.
+async function leaveVideoCall(){
+  stopInstantVideo();
+  await endCurrentInstantCall();
+  document.getElementById('videoCallScreen').classList.remove('active');
   document.getElementById('site').style.display = 'block';
   window.scrollTo(0,0);
-}
-
-function renderPeople(people){
-  const grid = document.getElementById('peopleGrid');
-  grid.innerHTML = '';
-  if (!people.length){
-    grid.innerHTML = '<div class="person-status mono" style="padding:20px;">nobody else is online right now — leave this open and it\'ll update live.</div>';
-    return;
-  }
-  people.forEach((person) => {
-    const card = document.createElement('div');
-    card.className = 'person-card';
-    const safeName = person.name.replace(/'/g, '');
-    card.innerHTML = `
-      <div class="person-card-head">
-        <div class="person-avatar">${person.name[0]}<span class="online-dot"></span></div>
-        <div>
-          <div class="person-name">${person.name}</div>
-          <div class="person-status">online now</div>
-        </div>
-      </div>
-      <button class="call-btn" onclick="callPerson('${person.uid}','${safeName}')">📹 Video call</button>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-let callTimeout = null;
-let calledPerson = null;
-let outgoingCallId = null;
-let unsubOutgoingCall = null;
-
-async function callPerson(targetUid, targetName){
-  calledPerson = { uid: targetUid, name: targetName };
-  document.getElementById('peopleScreen').classList.remove('active');
-  document.getElementById('callingScreen').classList.add('active');
-  document.getElementById('callingAvatarInitial').textContent = targetName[0];
-  document.getElementById('callingName').textContent = 'Calling ' + targetName + '…';
-  document.getElementById('callingStatus').textContent = 'RINGING…';
-
-  const callId = [myUid, targetUid].sort().join('_') + '_' + Date.now();
-  outgoingCallId = callId;
-  await setDoc(doc(db, 'calls', callId), {
-    from: myUid, to: targetUid, fromName: myName, toName: targetName,
-    status: 'ringing', createdAt: serverTimestamp()
-  });
-
-  unsubOutgoingCall = onSnapshot(doc(db, 'calls', callId), (snap) => {
-    const data = snap.data();
-    if (!data) return;
-    if (data.status === 'accepted'){
-      document.getElementById('callingStatus').textContent = targetName.toUpperCase() + ' ACCEPTED';
-      clearTimeout(callTimeout);
-      if (unsubOutgoingCall){ unsubOutgoingCall(); unsubOutgoingCall = null; }
-      setTimeout(() => {
-        document.getElementById('callingScreen').classList.remove('active');
-        startChat(calledPerson, callId, true, targetUid);
-        botTimeout = setTimeout(() => requestVideo(), 400);
-      }, 500);
-    } else if (data.status === 'declined' || data.status === 'missed'){
-      clearTimeout(callTimeout);
-      if (unsubOutgoingCall){ unsubOutgoingCall(); unsubOutgoingCall = null; }
-      document.getElementById('callingStatus').textContent = data.status === 'declined'
-        ? targetName.toUpperCase() + ' DECLINED' : 'NO ANSWER';
-      setTimeout(() => cancelCall(true), 900);
-    }
-  });
-
-  callTimeout = setTimeout(() => {
-    updateDoc(doc(db, 'calls', callId), { status: 'missed' }).catch(() => {});
-  }, 30000);
-}
-
-function cancelCall(skipStatusUpdate){
-  clearTimeout(callTimeout);
-  if (unsubOutgoingCall){ unsubOutgoingCall(); unsubOutgoingCall = null; }
-  if (outgoingCallId && !skipStatusUpdate){
-    updateDoc(doc(db, 'calls', outgoingCallId), { status: 'cancelled' }).catch(() => {});
-  }
-  outgoingCallId = null;
-  document.getElementById('callingScreen').classList.remove('active');
-  document.getElementById('peopleScreen').classList.add('active');
-  calledPerson = null;
 }
 
 const tagInput = document.getElementById('tagInput');
@@ -1227,7 +1318,6 @@ async function endCurrentCall(){
 
 async function newStranger(){
   clearTimeout(botTimeout);
-  calledPerson = null; // a "new stranger" is always random, never a chosen call
   endVideo(); // never carry a live camera over to the next match
   await endCurrentCall();
   addSystemMessage('You disconnected. Looking for someone new…');
@@ -1241,7 +1331,6 @@ async function disconnectChat(){
   await endCurrentCall();
   document.getElementById('chatScreen').classList.remove('active');
   document.getElementById('site').style.display = 'block';
-  calledPerson = null;
   window.scrollTo(0,0);
 }
 
@@ -1428,8 +1517,7 @@ function endVideo(){
 // classic scripts do — but the HTML uses onclick="..." attributes,
 // which need them there. Wiring that up explicitly:
 Object.assign(window, {
-  openPeople, closePeople, callPerson, cancelCall,
-  acceptIncomingCallReal, declineIncomingCall,
+  openVideoCall, closeVideoLobby, skipVideoStranger, leaveVideoCall,
   openLobby, closeLobby, sendMessage, reportStranger,
   requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo
 });
