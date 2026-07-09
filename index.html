@@ -444,6 +444,10 @@
   }
   .call-action-btn.cancel{background:var(--coral); color:#fff;}
   .call-action-btn.cancel:hover{background:#e5503f;}
+  .call-action-btn.accept{background:var(--mint); color:var(--void);}
+  .call-action-btn.accept:hover{background:#4dd0ba;}
+  #incomingCallScreen{position:fixed; inset:0; z-index:200;}
+  #incomingCallScreen.active{display:flex;}
 
   /* ---------- VIDEO ---------- */
   .video-stage{
@@ -647,6 +651,21 @@
   </div>
 </div>
 
+<!-- ================= INCOMING CALL (shows on top of any screen) ================= -->
+<div class="calling" id="incomingCallScreen">
+  <div class="calling-avatar-wrap">
+    <div class="ring-pulse"></div>
+    <div class="ring-pulse delay"></div>
+    <div class="calling-avatar" id="incomingAvatarInitial">?</div>
+  </div>
+  <div class="calling-status mono">INCOMING VIDEO CALL</div>
+  <h2 id="incomingCallerName">Someone is calling you</h2>
+  <div class="calling-actions">
+    <button class="call-action-btn cancel" onclick="declineIncomingCall()" title="Decline">✕</button>
+    <button class="call-action-btn accept" onclick="acceptIncomingCallReal()" title="Accept">📹</button>
+  </div>
+</div>
+
 <!-- ================= CHAT ================= -->
 <div class="chat" id="chatScreen">
   <div class="chat-top">
@@ -697,11 +716,15 @@
 <script type="module">
 /* ============================================================
    FriendHub — now wired to a live Firebase backend.
-   Firestore handles: anonymous auth, random-stranger matching,
+   Firestore handles: anonymous auth, online presence (heartbeat
+   in presence/{uid}), random-stranger matching, direct call
+   invites (calls/{callId} with status ringing/accepted/declined),
    real-time chat messages, WebRTC signaling (offer/answer/ICE)
    for peer-to-peer video, and a real (not simulated) report log.
    Actual audio/video streams flow directly between browsers via
    WebRTC — Firestore only carries the signaling handshake.
+   Only people whose presence heartbeat is fresh show up as
+   "online" in the call directory, and only they can be called.
 
    IMPORTANT — before pointing this at real public users you
    still need: real age verification (not just a text claim),
@@ -777,65 +800,144 @@ let matchTimeout = null;
 let botTimeout = null;
 
 /* ============================================================
-   VIDEO CALL DIRECTORY — pick a specific person, they get a
-   call request, and if they accept, both sides can see each
-   other. This demo simulates the other person locally (there's
-   no live backend here), but every spot that would need a real
-   server is marked // BACKEND HOOK. To make it real:
+   VIDEO CALL DIRECTORY — real presence + real call invites.
 
-   1. Replace PEOPLE_POOL with a live "who's online" list, e.g.
-      a Firestore collection of users with a `status:"online"`
-      field, kept in sync with an onSnapshot listener.
-   2. When someone taps "Call", write a call-invite doc such as
-      calls/{callId} = { from, to, status:"ringing" } instead of
-      just simulating acceptance.
-   3. The callee's client listens for invites addressed to them
-      (onSnapshot on calls where to == myId && status == "ringing")
-      and shows an incoming-call UI with Accept/Decline.
-   4. On Accept, update the call doc to status:"accepted" and
-      have BOTH sides start an RTCPeerConnection, exchanging SDP
-      offer/answer + ICE candidates through that same call doc
-      (or a subcollection), same as noted further down near
-      requestVideo(). On Decline/timeout, mark status:"declined".
-   5. On peerConnection.ontrack, attach the incoming stream to
-      #remoteVideo so both people actually see each other live.
+   Presence: every signed-in tab writes presence/{uid} with a
+   name + lastSeen heartbeat every 20s. Anyone whose heartbeat
+   is older than 40s is treated as offline and filtered out
+   client-side — there's no separate "who's online" service,
+   the heartbeat freshness IS the online signal.
+
+   Calling: tapping "Video call" writes calls/{callId} with
+   status:"ringing". The callee has a GLOBAL listener (set up
+   once, right after sign-in) watching for calls addressed to
+   them, so the incoming-call popup can appear no matter what
+   screen they're currently on. Accept -> status:"accepted" ->
+   both sides call startChat() + requestVideo(), which already
+   does the real WebRTC offer/answer/ICE handshake through that
+   same call doc. Decline/cancel/timeout -> status updates the
+   other side's listener so their UI clears too.
    ============================================================ */
 
-const PEOPLE_POOL = [
-  { name:"Nadia",  tags:["music","night owl"] },
-  { name:"Rafiq",  tags:["gamer","coffee"] },
-  { name:"Priya",  tags:["travel","art"] },
-  { name:"Tomas",  tags:["hiking","movies"] },
-  { name:"Lena",   tags:["college","late shift"] },
-  { name:"Kwame",  tags:["startups","music"] },
-  { name:"Ines",   tags:["art","coffee"] },
-  { name:"Omar",   tags:["gamer","night owl"] }
-];
+function ensureGuestName(){
+  let n = localStorage.getItem('friendhub_name');
+  if (!n){
+    const adjectives = ['Quiet','Bright','Lucky','Amber','Coastal','Velvet','Northern','Solar','Rainy','Golden'];
+    const nouns = ['Fox','Otter','Sparrow','Comet','Willow','Harbor','Ember','Maple','Falcon','River'];
+    n = adjectives[Math.floor(Math.random()*adjectives.length)] + ' ' + nouns[Math.floor(Math.random()*nouns.length)];
+    localStorage.setItem('friendhub_name', n);
+  }
+  return n;
+}
+const myName = ensureGuestName();
 
-let callTimeout = null;
-let calledPerson = null;
+// ---- presence heartbeat ----
+let presenceInterval = null;
+authReady.then((uid) => {
+  const presRef = doc(db, 'presence', uid);
+  const beat = () => setDoc(presRef, { name: myName, lastSeen: serverTimestamp() }).catch(() => {});
+  beat();
+  presenceInterval = setInterval(beat, 20000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') beat(); });
+  window.addEventListener('beforeunload', () => { deleteDoc(presRef).catch(() => {}); });
+});
+
+// ---- global incoming-call listener (active on every screen) ----
+let pendingIncomingCallId = null;
+let pendingIncomingFrom = null;
+
+authReady.then((uid) => {
+  const incomingQ = query(collection(db, 'calls'), where('to', '==', uid), where('status', '==', 'ringing'));
+  onSnapshot(incomingQ, (snap) => {
+    snap.docChanges().forEach((change) => {
+      const data = change.doc.data();
+      if (change.type === 'added'){
+        showIncomingCall(change.doc.id, data);
+      } else if (change.doc.id === pendingIncomingCallId && (!data || data.status !== 'ringing')){
+        hideIncomingCall(); // caller cancelled, or it timed out on their end
+      }
+    });
+  });
+});
+
+function showIncomingCall(callId, data){
+  if (currentCallId){
+    // Already in a call — auto-decline so the caller isn't left hanging.
+    updateDoc(doc(db, 'calls', callId), { status: 'declined' }).catch(() => {});
+    return;
+  }
+  pendingIncomingCallId = callId;
+  pendingIncomingFrom = data.from;
+  document.getElementById('incomingAvatarInitial').textContent = (data.fromName || '?')[0];
+  document.getElementById('incomingCallerName').textContent = (data.fromName || 'Someone') + ' is calling you';
+  document.getElementById('incomingCallScreen').classList.add('active');
+}
+
+function hideIncomingCall(){
+  document.getElementById('incomingCallScreen').classList.remove('active');
+  pendingIncomingCallId = null;
+  pendingIncomingFrom = null;
+}
+
+async function acceptIncomingCallReal(){
+  if (!pendingIncomingCallId) return;
+  const callId = pendingIncomingCallId;
+  const fromUid = pendingIncomingFrom;
+  const fromName = document.getElementById('incomingCallerName').textContent.replace(' is calling you', '');
+  hideIncomingCall();
+  await updateDoc(doc(db, 'calls', callId), { status: 'accepted' }).catch(() => {});
+  startChat({ name: fromName }, callId, false, fromUid);
+  botTimeout = setTimeout(() => requestVideo(), 400);
+}
+
+function declineIncomingCall(){
+  if (!pendingIncomingCallId) return;
+  updateDoc(doc(db, 'calls', pendingIncomingCallId), { status: 'declined' }).catch(() => {});
+  hideIncomingCall();
+}
+
+// ---- people directory: live presence, not a static list ----
+let unsubPresence = null;
 
 function openPeople(){
   document.getElementById('site').style.display = 'none';
   document.getElementById('peopleScreen').classList.add('active');
-  renderPeople();
+  const grid = document.getElementById('peopleGrid');
+  grid.innerHTML = '<div class="person-status mono" style="padding:20px;">looking for who\'s online…</div>';
 
-  // BACKEND HOOK: instead of the static PEOPLE_POOL, subscribe
-  // to a live "online users" source here and re-render on change.
+  authReady.then((uid) => {
+    unsubPresence = onSnapshot(collection(db, 'presence'), (snap) => {
+      const now = Date.now();
+      const people = [];
+      snap.forEach((d) => {
+        if (d.id === uid) return; // don't show yourself in your own directory
+        const data = d.data();
+        const seenAt = data.lastSeen ? data.lastSeen.toMillis() : 0;
+        if (now - seenAt < 40000) people.push({ uid: d.id, name: data.name || 'Guest' });
+      });
+      renderPeople(people);
+    });
+  });
 }
 
 function closePeople(){
+  if (unsubPresence){ unsubPresence(); unsubPresence = null; }
   document.getElementById('peopleScreen').classList.remove('active');
   document.getElementById('site').style.display = 'block';
   window.scrollTo(0,0);
 }
 
-function renderPeople(){
+function renderPeople(people){
   const grid = document.getElementById('peopleGrid');
   grid.innerHTML = '';
-  PEOPLE_POOL.forEach((person, idx) => {
+  if (!people.length){
+    grid.innerHTML = '<div class="person-status mono" style="padding:20px;">nobody else is online right now — leave this open and it\'ll update live.</div>';
+    return;
+  }
+  people.forEach((person) => {
     const card = document.createElement('div');
     card.className = 'person-card';
+    const safeName = person.name.replace(/'/g, '');
     card.innerHTML = `
       <div class="person-card-head">
         <div class="person-avatar">${person.name[0]}<span class="online-dot"></span></div>
@@ -844,43 +946,68 @@ function renderPeople(){
           <div class="person-status">online now</div>
         </div>
       </div>
-      <div class="person-tags">${person.tags.map(t => `<span class="tag-chip">${t}</span>`).join('')}</div>
-      <button class="call-btn" onclick="callPerson(${idx})">📹 Video call</button>
+      <button class="call-btn" onclick="callPerson('${person.uid}','${safeName}')">📹 Video call</button>
     `;
     grid.appendChild(card);
   });
 }
 
-function callPerson(idx){
-  calledPerson = PEOPLE_POOL[idx];
+let callTimeout = null;
+let calledPerson = null;
+let outgoingCallId = null;
+let unsubOutgoingCall = null;
+
+async function callPerson(targetUid, targetName){
+  calledPerson = { uid: targetUid, name: targetName };
   document.getElementById('peopleScreen').classList.remove('active');
   document.getElementById('callingScreen').classList.add('active');
-  document.getElementById('callingAvatarInitial').textContent = calledPerson.name[0];
-  document.getElementById('callingName').textContent = 'Calling ' + calledPerson.name + '…';
+  document.getElementById('callingAvatarInitial').textContent = targetName[0];
+  document.getElementById('callingName').textContent = 'Calling ' + targetName + '…';
   document.getElementById('callingStatus').textContent = 'RINGING…';
 
-  // BACKEND HOOK: write the call-invite doc described above
-  // instead of the setTimeout below, then listen for the
-  // callee's response (accepted / declined / no answer).
+  const callId = [myUid, targetUid].sort().join('_') + '_' + Date.now();
+  outgoingCallId = callId;
+  await setDoc(doc(db, 'calls', callId), {
+    from: myUid, to: targetUid, fromName: myName, toName: targetName,
+    status: 'ringing', createdAt: serverTimestamp()
+  });
+
+  unsubOutgoingCall = onSnapshot(doc(db, 'calls', callId), (snap) => {
+    const data = snap.data();
+    if (!data) return;
+    if (data.status === 'accepted'){
+      document.getElementById('callingStatus').textContent = targetName.toUpperCase() + ' ACCEPTED';
+      clearTimeout(callTimeout);
+      if (unsubOutgoingCall){ unsubOutgoingCall(); unsubOutgoingCall = null; }
+      setTimeout(() => {
+        document.getElementById('callingScreen').classList.remove('active');
+        startChat(calledPerson, callId, true, targetUid);
+        botTimeout = setTimeout(() => requestVideo(), 400);
+      }, 500);
+    } else if (data.status === 'declined' || data.status === 'missed'){
+      clearTimeout(callTimeout);
+      if (unsubOutgoingCall){ unsubOutgoingCall(); unsubOutgoingCall = null; }
+      document.getElementById('callingStatus').textContent = data.status === 'declined'
+        ? targetName.toUpperCase() + ' DECLINED' : 'NO ANSWER';
+      setTimeout(() => cancelCall(true), 900);
+    }
+  });
+
   callTimeout = setTimeout(() => {
-    document.getElementById('callingStatus').textContent = calledPerson.name.toUpperCase() + ' ACCEPTED';
-    setTimeout(() => acceptIncomingCall(), 700);
-  }, 2200 + Math.random()*1200);
+    updateDoc(doc(db, 'calls', callId), { status: 'missed' }).catch(() => {});
+  }, 30000);
 }
 
-function cancelCall(){
+function cancelCall(skipStatusUpdate){
   clearTimeout(callTimeout);
+  if (unsubOutgoingCall){ unsubOutgoingCall(); unsubOutgoingCall = null; }
+  if (outgoingCallId && !skipStatusUpdate){
+    updateDoc(doc(db, 'calls', outgoingCallId), { status: 'cancelled' }).catch(() => {});
+  }
+  outgoingCallId = null;
   document.getElementById('callingScreen').classList.remove('active');
   document.getElementById('peopleScreen').classList.add('active');
   calledPerson = null;
-
-  // BACKEND HOOK: update the call doc to status:"cancelled" so
-  // the callee's ringing UI clears on their end too.
-}
-
-function acceptIncomingCall(){
-  document.getElementById('callingScreen').classList.remove('active');
-  startChat(calledPerson);
 }
 
 const tagInput = document.getElementById('tagInput');
@@ -1008,40 +1135,28 @@ function startChat(chosenPerson, callId, callerFlag, partnerUid){
   otherUid = partnerUid || null;
 
   if(chosenPerson){
-    // Came from the "who do you want to call" directory. This part
-    // of the demo (choosing a specific "online" person) is still
-    // simulated — PEOPLE_POOL isn't backed by real presence data,
-    // so there's no live otherUid/callId for this path yet.
     strangerId = null;
     document.getElementById('chatStrangerName').textContent = chosenPerson.name;
     document.getElementById('chatAvatarInitial').textContent = chosenPerson.name[0];
-    strangerTags = chosenPerson.tags || [];
+    document.getElementById('chatStrangerTags').textContent = 'connected by direct call';
   } else {
     strangerId = (partnerUid || '0000').slice(-4);
     document.getElementById('chatStrangerName').textContent = 'Stranger #' + strangerId;
     document.getElementById('chatAvatarInitial').textContent = 'S' + String(strangerId).slice(-1);
     strangerTags = userTags;
+    document.getElementById('chatStrangerTags').textContent = strangerTags.length
+      ? 'shares interest in ' + strangerTags.join(', ')
+      : 'no shared interests listed';
   }
-
-  document.getElementById('chatStrangerTags').textContent = strangerTags.length
-    ? 'shares interest in ' + strangerTags.join(', ')
-    : 'no shared interests listed';
 
   const body = document.getElementById('chatBody');
   body.innerHTML = '';
   document.getElementById('chatInput').value = '';
   document.getElementById('chatInput').focus();
 
-  if(chosenPerson){
-    addSystemMessage(chosenPerson.name + ' accepted your call.');
-    botTimeout = setTimeout(() => {
-      requestVideo();
-      botTyping(() => addMessage(`hey! good to actually see you 👋`, 'them'));
-    }, 500);
-    return;
-  }
-
-  addSystemMessage('You\'re now chatting with a random stranger.');
+  addSystemMessage(chosenPerson
+    ? (chosenPerson.name + (isCaller ? ' accepted your call.' : ' is calling — say hi!'))
+    : 'You\'re now chatting with a random stranger.');
 
   if (currentCallId){
     const msgsRef = collection(db, 'calls', currentCallId, 'messages');
@@ -1169,23 +1284,14 @@ function reportStranger(){
 
 /* ============================================================
    VIDEO — opt-in only, never auto-starts.
-   This demo shows your own camera locally and simulates the
-   stranger's side, since there's no signaling server here to
-   actually connect two browsers. To make it real:
-
-   1. Keep video OFF by default and require an explicit click
-      from BOTH people before any camera turns on for either side.
-   2. Add a signaling channel (the same backend used for chat
-      pairing can carry this) so each browser can exchange:
-        - SDP offer/answer   (RTCPeerConnection.createOffer /
-          createAnswer, setLocalDescription/setRemoteDescription)
-        - ICE candidates      (peerConnection.onicecandidate ->
-          send to the other peer -> peerConnection.addIceCandidate)
-   3. Use a STUN server (e.g. stun:stun.l.google.com:19302) for
-      NAT traversal, and a TURN server as fallback for networks
-      that block direct peer connections.
-   4. On peerConnection.ontrack, attach the incoming stream to
-      #remoteVideo instead of the placeholder below.
+   Video is opt-in only — it never auto-starts, and only turns on
+   when someone taps "Enable video" (random-stranger chat) or after
+   a direct call is accepted. The signaling itself is real: SDP
+   offer/answer and ICE candidates are exchanged through the
+   calls/{callId} doc and its callerCandidates/calleeCandidates
+   subcollections (see startWebRTC() below), and Firestore only
+   ever carries that handshake — the actual audio/video streams
+   flow peer-to-peer between the two browsers once connected.
 
    If this ever goes to real users: random video with strangers
    carries real legal and safety obligations (age verification,
@@ -1347,6 +1453,7 @@ function endVideo(){
 // which need them there. Wiring that up explicitly:
 Object.assign(window, {
   openPeople, closePeople, callPerson, cancelCall,
+  acceptIncomingCallReal, declineIncomingCall,
   openLobby, closeLobby, sendMessage, reportStranger,
   requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo
 });
