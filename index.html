@@ -350,6 +350,101 @@
   }
   .send-btn:hover{background:#000;}
 
+  /* ---------- PEOPLE DIRECTORY (choose who to call) ---------- */
+  .people{
+    display:none;
+    min-height:100vh;
+    background:var(--paper);
+    flex-direction:column;
+  }
+  .people.active{display:flex;}
+  .people-top{
+    background:var(--void); color:var(--paper);
+    padding:20px 5vw; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .people-top h2{font-size:19px;}
+  .people-top .sub{font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(237,231,218,0.55); margin-top:4px;}
+  .people-grid{
+    flex:1; overflow-y:auto;
+    max-width:900px; margin:0 auto; width:100%;
+    padding:28px 5vw 40px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px;
+  }
+  .person-card{
+    background:#fff; border:1px solid var(--line-soft); border-radius:var(--radius-m);
+    padding:20px; display:flex; flex-direction:column; gap:12px;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .person-card:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(31,27,46,0.08);}
+  .person-card-head{display:flex; align-items:center; gap:12px;}
+  .person-avatar{
+    width:44px; height:44px; border-radius:50%; flex:none;
+    background:linear-gradient(135deg, var(--mint), var(--amber));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:15px; color:var(--void);
+    position:relative;
+  }
+  .online-dot{
+    position:absolute; bottom:-1px; right:-1px;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--mint); border:2px solid #fff;
+  }
+  .person-name{font-weight:600; font-size:15px;}
+  .person-status{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
+  .person-tags{display:flex; gap:6px; flex-wrap:wrap;}
+  .person-tags .tag-chip{
+    background:rgba(31,27,46,0.05); border:1px solid var(--line-soft); color:var(--ink-soft);
+    font-size:11px; padding:4px 10px;
+  }
+  .call-btn{
+    background:var(--ink); color:var(--paper); border:none; border-radius:999px;
+    padding:10px 16px; font-size:13px; font-weight:600; display:flex; align-items:center;
+    justify-content:center; gap:6px; transition:background .15s;
+  }
+  .call-btn:hover{background:#000;}
+
+  /* ---------- OUTGOING CALL ---------- */
+  .calling{
+    display:none;
+    min-height:100vh;
+    background:radial-gradient(120% 100% at 50% 0%, #1B1D3D 0%, var(--void) 40%, var(--void-deep) 100%);
+    color:var(--paper);
+    flex-direction:column; align-items:center; justify-content:center;
+    padding:40px 20px; text-align:center;
+  }
+  .calling.active{display:flex;}
+  .calling-avatar-wrap{position:relative; width:140px; height:140px; margin-bottom:30px;}
+  .calling-avatar{
+    width:100%; height:100%; border-radius:50%;
+    background:linear-gradient(135deg, var(--mint), var(--amber));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:44px; color:var(--void);
+    position:relative; z-index:2;
+  }
+  .ring-pulse{
+    position:absolute; inset:0; border-radius:50%;
+    border:2px solid rgba(94,234,212,0.5);
+    animation:ring-out 1.8s ease-out infinite;
+  }
+  .ring-pulse.delay{animation-delay:.6s;}
+  @keyframes ring-out{
+    0%{transform:scale(1); opacity:0.8;}
+    100%{transform:scale(1.6); opacity:0;}
+  }
+  .calling-status{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--mint);
+    letter-spacing:0.03em; margin-bottom:8px;
+  }
+  .calling h2{font-size:clamp(22px,3vw,30px); margin-bottom:34px;}
+  .calling-actions{display:flex; gap:16px;}
+  .call-action-btn{
+    width:56px; height:56px; border-radius:50%; border:none;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+  }
+  .call-action-btn.cancel{background:var(--coral); color:#fff;}
+  .call-action-btn.cancel:hover{background:#e5503f;}
+
   /* ---------- VIDEO ---------- */
   .video-stage{
     display:none;
@@ -434,6 +529,7 @@
     <div class="nav-links">
       <a href="#how">How it works</a>
       <a href="#safety">Safety</a>
+      <button class="btn btn-ghost" onclick="openPeople()">Video call</button>
       <button class="btn btn-amber" onclick="openLobby()">Start chatting</button>
     </div>
   </nav>
@@ -522,6 +618,32 @@
   </div>
   <div class="hero-cta-row">
     <button class="btn btn-ghost" onclick="closeLobby()">Cancel</button>
+  </div>
+</div>
+
+<!-- ================= PEOPLE DIRECTORY (choose who to call) ================= -->
+<div class="people" id="peopleScreen">
+  <div class="people-top">
+    <div>
+      <h2>Who do you want to call?</h2>
+      <div class="sub">Everyone below is online right now · you choose, they get a request</div>
+    </div>
+    <button class="btn btn-ghost" onclick="closePeople()">Close</button>
+  </div>
+  <div class="people-grid" id="peopleGrid"></div>
+</div>
+
+<!-- ================= OUTGOING CALL ================= -->
+<div class="calling" id="callingScreen">
+  <div class="calling-avatar-wrap">
+    <div class="ring-pulse"></div>
+    <div class="ring-pulse delay"></div>
+    <div class="calling-avatar" id="callingAvatarInitial">?</div>
+  </div>
+  <div class="calling-status mono" id="callingStatus">CALLING…</div>
+  <h2 id="callingName">Calling someone</h2>
+  <div class="calling-actions">
+    <button class="call-action-btn cancel" onclick="cancelCall()" title="Cancel call">✕</button>
   </div>
 </div>
 
@@ -618,6 +740,113 @@ let strangerTags = [];
 let matchTimeout = null;
 let botTimeout = null;
 
+/* ============================================================
+   VIDEO CALL DIRECTORY — pick a specific person, they get a
+   call request, and if they accept, both sides can see each
+   other. This demo simulates the other person locally (there's
+   no live backend here), but every spot that would need a real
+   server is marked // BACKEND HOOK. To make it real:
+
+   1. Replace PEOPLE_POOL with a live "who's online" list, e.g.
+      a Firestore collection of users with a `status:"online"`
+      field, kept in sync with an onSnapshot listener.
+   2. When someone taps "Call", write a call-invite doc such as
+      calls/{callId} = { from, to, status:"ringing" } instead of
+      just simulating acceptance.
+   3. The callee's client listens for invites addressed to them
+      (onSnapshot on calls where to == myId && status == "ringing")
+      and shows an incoming-call UI with Accept/Decline.
+   4. On Accept, update the call doc to status:"accepted" and
+      have BOTH sides start an RTCPeerConnection, exchanging SDP
+      offer/answer + ICE candidates through that same call doc
+      (or a subcollection), same as noted further down near
+      requestVideo(). On Decline/timeout, mark status:"declined".
+   5. On peerConnection.ontrack, attach the incoming stream to
+      #remoteVideo so both people actually see each other live.
+   ============================================================ */
+
+const PEOPLE_POOL = [
+  { name:"Nadia",  tags:["music","night owl"] },
+  { name:"Rafiq",  tags:["gamer","coffee"] },
+  { name:"Priya",  tags:["travel","art"] },
+  { name:"Tomas",  tags:["hiking","movies"] },
+  { name:"Lena",   tags:["college","late shift"] },
+  { name:"Kwame",  tags:["startups","music"] },
+  { name:"Ines",   tags:["art","coffee"] },
+  { name:"Omar",   tags:["gamer","night owl"] }
+];
+
+let callTimeout = null;
+let calledPerson = null;
+
+function openPeople(){
+  document.getElementById('site').style.display = 'none';
+  document.getElementById('peopleScreen').classList.add('active');
+  renderPeople();
+
+  // BACKEND HOOK: instead of the static PEOPLE_POOL, subscribe
+  // to a live "online users" source here and re-render on change.
+}
+
+function closePeople(){
+  document.getElementById('peopleScreen').classList.remove('active');
+  document.getElementById('site').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function renderPeople(){
+  const grid = document.getElementById('peopleGrid');
+  grid.innerHTML = '';
+  PEOPLE_POOL.forEach((person, idx) => {
+    const card = document.createElement('div');
+    card.className = 'person-card';
+    card.innerHTML = `
+      <div class="person-card-head">
+        <div class="person-avatar">${person.name[0]}<span class="online-dot"></span></div>
+        <div>
+          <div class="person-name">${person.name}</div>
+          <div class="person-status">online now</div>
+        </div>
+      </div>
+      <div class="person-tags">${person.tags.map(t => `<span class="tag-chip">${t}</span>`).join('')}</div>
+      <button class="call-btn" onclick="callPerson(${idx})">📹 Video call</button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function callPerson(idx){
+  calledPerson = PEOPLE_POOL[idx];
+  document.getElementById('peopleScreen').classList.remove('active');
+  document.getElementById('callingScreen').classList.add('active');
+  document.getElementById('callingAvatarInitial').textContent = calledPerson.name[0];
+  document.getElementById('callingName').textContent = 'Calling ' + calledPerson.name + '…';
+  document.getElementById('callingStatus').textContent = 'RINGING…';
+
+  // BACKEND HOOK: write the call-invite doc described above
+  // instead of the setTimeout below, then listen for the
+  // callee's response (accepted / declined / no answer).
+  callTimeout = setTimeout(() => {
+    document.getElementById('callingStatus').textContent = calledPerson.name.toUpperCase() + ' ACCEPTED';
+    setTimeout(() => acceptIncomingCall(), 700);
+  }, 2200 + Math.random()*1200);
+}
+
+function cancelCall(){
+  clearTimeout(callTimeout);
+  document.getElementById('callingScreen').classList.remove('active');
+  document.getElementById('peopleScreen').classList.add('active');
+  calledPerson = null;
+
+  // BACKEND HOOK: update the call doc to status:"cancelled" so
+  // the callee's ringing UI clears on their end too.
+}
+
+function acceptIncomingCall(){
+  document.getElementById('callingScreen').classList.remove('active');
+  startChat(calledPerson);
+}
+
 const tagInput = document.getElementById('tagInput');
 tagInput.addEventListener('keydown', (e) => {
   if(e.key === 'Enter' && tagInput.value.trim()){
@@ -675,36 +904,59 @@ function closeLobby(){
   document.getElementById('site').style.display = 'block';
 }
 
-function startChat(){
+function startChat(chosenPerson){
   document.getElementById('lobby').classList.remove('active');
   document.getElementById('chatScreen').classList.add('active');
 
-  strangerId = Math.floor(1000 + Math.random()*8999);
-  document.getElementById('chatStrangerName').textContent = 'Stranger #' + strangerId;
-  document.getElementById('chatAvatarInitial').textContent = 'S' + String(strangerId).slice(-1);
+  if(chosenPerson){
+    // Came from the "who do you want to call" directory — this
+    // is a specific person who just accepted your call request,
+    // not a random stranger.
+    strangerId = null;
+    document.getElementById('chatStrangerName').textContent = chosenPerson.name;
+    document.getElementById('chatAvatarInitial').textContent = chosenPerson.name[0];
+    strangerTags = chosenPerson.tags || [];
+  } else {
+    strangerId = Math.floor(1000 + Math.random()*8999);
+    document.getElementById('chatStrangerName').textContent = 'Stranger #' + strangerId;
+    document.getElementById('chatAvatarInitial').textContent = 'S' + String(strangerId).slice(-1);
 
-  const pool = ["night owl","music","travel","gamer","coffee","college","art","late shift","movies","hiking"];
-  strangerTags = userTags.length
-    ? userTags.filter(() => Math.random() > 0.4).slice(0,2)
-    : [pool[Math.floor(Math.random()*pool.length)]];
+    const pool = ["night owl","music","travel","gamer","coffee","college","art","late shift","movies","hiking"];
+    strangerTags = userTags.length
+      ? userTags.filter(() => Math.random() > 0.4).slice(0,2)
+      : [pool[Math.floor(Math.random()*pool.length)]];
+  }
+
   document.getElementById('chatStrangerTags').textContent = strangerTags.length
     ? 'shares interest in ' + strangerTags.join(', ')
     : 'no shared interests listed';
 
   const body = document.getElementById('chatBody');
   body.innerHTML = '';
-  addSystemMessage('You\'re now chatting with a random stranger.');
   document.getElementById('chatInput').value = '';
   document.getElementById('chatInput').focus();
 
-  botTimeout = setTimeout(() => {
-    botTyping(() => {
-      const opener = strangerTags.length
-        ? `hey! saw we're both into ${strangerTags[0]} — what got you into that?`
-        : `hey, random question but... window seat or aisle seat person?`;
-      addMessage(opener, 'them');
-    });
-  }, 1100);
+  if(chosenPerson){
+    addSystemMessage(chosenPerson.name + ' accepted your call.');
+    // Both sides opted into video by making/accepting the call,
+    // so it's fine to bring the video panel straight up here —
+    // requestVideo() still asks the browser for camera/mic
+    // permission, it just skips the extra button tap.
+    botTimeout = setTimeout(() => {
+      requestVideo();
+      botTyping(() => addMessage(`hey! good to actually see you 👋`, 'them'));
+    }, 500);
+  } else {
+    addSystemMessage('You\'re now chatting with a random stranger.');
+    botTimeout = setTimeout(() => {
+      botTyping(() => {
+        const opener = strangerTags.length
+          ? `hey! saw we're both into ${strangerTags[0]} — what got you into that?`
+          : `hey, random question but... window seat or aisle seat person?`;
+        addMessage(opener, 'them');
+      });
+    }, 1100);
+  }
 }
 
 function addMessage(text, who){
@@ -773,9 +1025,10 @@ document.getElementById('chatInput').addEventListener('keydown', (e) => {
 
 function newStranger(){
   clearTimeout(botTimeout);
+  calledPerson = null; // a "new stranger" is always random, never a chosen call
   endVideo(); // never carry a live camera over to the next match
   addSystemMessage('You disconnected. Looking for someone new…');
-  setTimeout(startChat, 900);
+  setTimeout(() => startChat(), 900);
 }
 
 function disconnectChat(){
@@ -783,6 +1036,7 @@ function disconnectChat(){
   endVideo(); // release the camera/mic as soon as the chat ends
   document.getElementById('chatScreen').classList.remove('active');
   document.getElementById('site').style.display = 'block';
+  calledPerson = null;
   window.scrollTo(0,0);
 }
 
@@ -844,13 +1098,24 @@ async function requestVideo(){
   localOff.style.display = 'none';
   stage.classList.add('active');
   document.getElementById('videoToggleBtn').textContent = 'Hide video panel';
-  addSystemMessage('You enabled your camera. Video is one-directional in this demo — see the code comments for wiring up a real peer connection.');
 
   // BACKEND HOOK: at this point, send an "I'm ready for video"
-  // signal to the stranger over the shared signaling channel,
+  // signal to the other person over the shared signaling channel,
   // then begin the RTCPeerConnection offer/answer exchange
   // described above once they accept too.
-  remoteText.textContent = "waiting for stranger's camera… (demo: no live peer connected)";
+  const remoteAvatar = document.querySelector('#remotePlaceholder .avatar-ring');
+  if(calledPerson){
+    addSystemMessage('Camera on. Connecting you and ' + calledPerson.name + '\u2019s video — see the code comments for wiring up a real peer connection.');
+    remoteAvatar.textContent = calledPerson.name[0];
+    remoteText.textContent = "connecting to " + calledPerson.name + "'s camera…";
+    setTimeout(() => {
+      remoteText.textContent = calledPerson.name + " is connected (demo: no live peer, see code comments)";
+    }, 1400);
+  } else {
+    addSystemMessage('You enabled your camera. Video is one-directional in this demo — see the code comments for wiring up a real peer connection.');
+    remoteAvatar.textContent = '?';
+    remoteText.textContent = "waiting for stranger's camera… (demo: no live peer connected)";
+  }
 }
 
 function toggleMic(){
