@@ -893,7 +893,15 @@ function closeVideoLobby(){
 async function findVideoMatch(){
   const waitingRef = collection(db, 'videoWaitingPool');
   const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(5));
-  const snap = await getDocs(q);
+  let snap;
+  try{
+    snap = await getDocs(q);
+  }catch(err){
+    console.error('findVideoMatch getDocs failed:', err);
+    document.getElementById('videoLobbyStatus').textContent = 'CONNECTION ERROR';
+    document.getElementById('videoLobbyHeadline').textContent = "Couldn't reach the matching service";
+    return;
+  }
   const candidate = snap.docs.find(d => d.id !== myUid);
 
   if (candidate){
@@ -937,7 +945,17 @@ function registerAsVideoWaiting(){
         const caller = [myUid, partnerUid].sort()[0] === myUid;
         startVideoCall(callId, caller, partnerUid);
       }
+    }, (err) => {
+      console.error('videoMatches listener failed:', err);
+      if (videoLobbyLeft) return;
+      document.getElementById('videoLobbyStatus').textContent = 'CONNECTION ERROR';
+      document.getElementById('videoLobbyHeadline').textContent = "Couldn't reach the matching service";
     });
+  }).catch((err) => {
+    console.error('registerAsVideoWaiting setDoc failed:', err);
+    if (videoLobbyLeft) return;
+    document.getElementById('videoLobbyStatus').textContent = 'CONNECTION ERROR';
+    document.getElementById('videoLobbyHeadline').textContent = "Couldn't reach the matching service";
   });
 }
 
