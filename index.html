@@ -523,21 +523,8 @@
   .vbtn.off{background:var(--coral); border-color:var(--coral); color:#fff;}
   .vbtn.end{background:var(--coral); border-color:var(--coral); color:#fff; width:auto; padding:0 16px; border-radius:999px; font-family:'IBM Plex Mono',monospace; font-size:11px;}
 
-  /* ---------- INSTANT VIDEO MATCH (searching) ---------- */
-  .vlobby{
-    display:none;
-    min-height:100vh;
-    background:radial-gradient(120% 100% at 50% 0%, #1B1D3D 0%, var(--void) 40%, var(--void-deep) 100%);
-    color:var(--paper);
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:40px 20px;
-    text-align:center;
-  }
-  .vlobby.active{display:flex;}
-
-  /* ---------- INSTANT VIDEO MATCH (live call) ---------- */
+  /* ---------- INSTANT VIDEO MATCH ---------- */
+  .avatar-ring.spin{animation:spin 1.1s linear infinite; border-top-color:var(--mint);}
   .vcall{
     display:none;
     min-height:100vh;
@@ -678,41 +665,26 @@
   </div>
 </div>
 
-<!-- ================= INSTANT VIDEO MATCH — searching ================= -->
-<div class="vlobby" id="videoLobby">
-  <div class="lobby-radar">
-    <div class="radar-ring r1" style="border-color:rgba(94,234,212,0.25)"></div>
-    <div class="radar-ring r2" style="border-color:rgba(94,234,212,0.25)"></div>
-    <div class="radar-ring r3" style="border-color:rgba(94,234,212,0.25)"></div>
-    <div class="radar-sweep"></div>
-    <div class="radar-core"></div>
-  </div>
-  <div class="lobby-status mono" id="videoLobbyStatus">SCANNING…</div>
-  <h2 id="videoLobbyHeadline">Finding someone for video</h2>
-  <div class="hero-cta-row">
-    <button class="btn btn-ghost" onclick="closeVideoLobby()">Cancel</button>
-  </div>
-</div>
-
-<!-- ================= INSTANT VIDEO MATCH — live call ================= -->
+<!-- ================= INSTANT VIDEO MATCH ================= -->
 <div class="vcall" id="videoCallScreen">
-  <div class="vcall-status mono" id="vcallStatus">CONNECTING…</div>
+  <div class="vcall-status mono" id="vcallStatus">SEARCHING…</div>
   <div class="vcall-stage" id="vcallStage">
     <div class="video-remote-placeholder" id="vcRemotePlaceholder">
-      <div class="avatar-ring">?</div>
-      <span id="vcRemoteStatusText">waiting for the other person's camera…</span>
+      <div class="avatar-ring spin" id="vcSpinner">◌</div>
+      <span id="vcRemoteStatusText">looking for someone for video…</span>
     </div>
     <video class="video-remote" id="vcRemoteVideo" autoplay playsinline style="display:none;"></video>
     <video class="video-local" id="vcLocalVideo" autoplay playsinline muted style="display:none;"></video>
     <div class="video-local-off" id="vcLocalVideoOff" style="display:none;">camera off</div>
   </div>
   <div class="vcall-actions">
-    <button class="vcall-btn report" onclick="reportStranger()">🚩 Report</button>
-    <button class="vcall-btn skip" onclick="skipVideoStranger()">⟳ Skip</button>
+    <button class="vcall-btn report" id="vcReportBtn" onclick="reportStranger()" style="display:none;">🚩 Report</button>
+    <button class="vcall-btn skip" id="vcSkipBtn" onclick="skipVideoStranger()" style="display:none;">⟳ Skip</button>
     <button class="vcall-btn leave" onclick="leaveVideoCall()">✕ Leave</button>
   </div>
   <div class="vcall-note">Random 1:1 video · leave anytime · 18+ only</div>
 </div>
+
 
 <!-- ================= CHAT ================= -->
 <div class="chat" id="chatScreen">
@@ -850,42 +822,42 @@ let botTimeout = null;
    that infrastructure as a launch blocker, not a follow-up.
    ============================================================ */
 
-const VIDEO_SCAN_MESSAGES = [
-  "SCANNING…",
-  "CHECKING WHO'S FREE…",
-  "LOOKING FOR A MATCH…",
-  "ALMOST THERE…"
-];
-
-let videoLobbyCycle = null;
-let videoLobbyLeft = false;
+let videoFlowActive = false;   // true whenever the video-call screen is open (searching or connected)
 let unsubVideoWaitingWatch = null;
 
 async function openVideoCall(){
   document.getElementById('site').style.display = 'none';
-  const vlobby = document.getElementById('videoLobby');
-  vlobby.classList.add('active');
-  document.getElementById('videoLobbyHeadline').textContent = 'Finding someone for video';
-  videoLobbyLeft = false;
-  let i = 0;
-  const statusEl = document.getElementById('videoLobbyStatus');
-  statusEl.textContent = VIDEO_SCAN_MESSAGES[0];
-  videoLobbyCycle = setInterval(() => {
-    i = (i+1) % VIDEO_SCAN_MESSAGES.length;
-    statusEl.textContent = VIDEO_SCAN_MESSAGES[i];
-  }, 900);
+  document.getElementById('videoCallScreen').classList.add('active');
+  videoFlowActive = true;
+  setVideoSearchingUI();
+
+  if (!ivcLocalStream){
+    try{
+      ivcLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+    }catch(err){
+      document.getElementById('vcallStatus').textContent = 'CAMERA/MIC BLOCKED';
+      document.getElementById('vcRemoteStatusText').textContent = "camera/mic permission was denied — can't start video.";
+      return;
+    }
+    if (!videoFlowActive){ ivcLocalStream.getTracks().forEach(t => t.stop()); ivcLocalStream = null; return; }
+    const localVideo = document.getElementById('vcLocalVideo');
+    localVideo.srcObject = ivcLocalStream;
+    localVideo.style.display = 'block';
+  }
 
   await authReady;
+  if (!videoFlowActive) return; // left while camera/auth was still loading
   findVideoMatch();
 }
 
-function closeVideoLobby(){
-  videoLobbyLeft = true;
-  clearInterval(videoLobbyCycle);
-  if (unsubVideoWaitingWatch) { unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
-  if (myUid) deleteDoc(doc(db, 'videoWaitingPool', myUid)).catch(()=>{});
-  document.getElementById('videoLobby').classList.remove('active');
-  document.getElementById('site').style.display = 'block';
+function setVideoSearchingUI(msg){
+  document.getElementById('vcallStatus').textContent = 'SEARCHING…';
+  document.getElementById('vcRemoteStatusText').textContent = msg || 'looking for someone for video…';
+  document.getElementById('vcRemotePlaceholder').style.display = 'flex';
+  document.getElementById('vcSpinner').classList.add('spin');
+  document.getElementById('vcRemoteVideo').style.display = 'none';
+  document.getElementById('vcReportBtn').style.display = 'none';
+  document.getElementById('vcSkipBtn').style.display = 'none';
 }
 
 // Same simplified client-side matchmaking caveat as the text matcher:
@@ -898,10 +870,12 @@ async function findVideoMatch(){
     snap = await getDocs(q);
   }catch(err){
     console.error('findVideoMatch getDocs failed:', err);
-    document.getElementById('videoLobbyStatus').textContent = 'CONNECTION ERROR';
-    document.getElementById('videoLobbyHeadline').textContent = "Couldn't reach the matching service";
+    if (!videoFlowActive) return;
+    document.getElementById('vcallStatus').textContent = 'CONNECTION ERROR';
+    document.getElementById('vcRemoteStatusText').textContent = "couldn't reach the matching service";
     return;
   }
+  if (!videoFlowActive) return;
   const candidate = snap.docs.find(d => d.id !== myUid);
 
   if (candidate){
@@ -919,8 +893,7 @@ async function findVideoMatch(){
         });
         tx.set(doc(db, 'videoMatches', candidate.id), { callId, with: myUid });
       });
-      if (videoLobbyLeft) return;
-      clearInterval(videoLobbyCycle);
+      if (!videoFlowActive) return;
       const caller = [myUid, candidate.id].sort()[0] === myUid;
       startVideoCall(callId, caller, candidate.id);
     } catch(e){
@@ -936,60 +909,52 @@ function registerAsVideoWaiting(){
   setDoc(doc(db, 'videoWaitingPool', myUid), { createdAt: serverTimestamp() }).then(() => {
     const myMatchRef = doc(db, 'videoMatches', myUid);
     unsubVideoWaitingWatch = onSnapshot(myMatchRef, (snap) => {
-      if (videoLobbyLeft) return;
+      if (!videoFlowActive) return;
       if (snap.exists()){
         const { callId, with: partnerUid } = snap.data();
         deleteDoc(myMatchRef).catch(()=>{});
-        unsubVideoWaitingWatch();
-        clearInterval(videoLobbyCycle);
+        if (unsubVideoWaitingWatch){ unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
         const caller = [myUid, partnerUid].sort()[0] === myUid;
         startVideoCall(callId, caller, partnerUid);
       }
     }, (err) => {
       console.error('videoMatches listener failed:', err);
-      if (videoLobbyLeft) return;
-      document.getElementById('videoLobbyStatus').textContent = 'CONNECTION ERROR';
-      document.getElementById('videoLobbyHeadline').textContent = "Couldn't reach the matching service";
+      if (!videoFlowActive) return;
+      document.getElementById('vcallStatus').textContent = 'CONNECTION ERROR';
+      document.getElementById('vcRemoteStatusText').textContent = "couldn't reach the matching service";
     });
   }).catch((err) => {
     console.error('registerAsVideoWaiting setDoc failed:', err);
-    if (videoLobbyLeft) return;
-    document.getElementById('videoLobbyStatus').textContent = 'CONNECTION ERROR';
-    document.getElementById('videoLobbyHeadline').textContent = "Couldn't reach the matching service";
+    if (!videoFlowActive) return;
+    document.getElementById('vcallStatus').textContent = 'CONNECTION ERROR';
+    document.getElementById('vcRemoteStatusText').textContent = "couldn't reach the matching service";
   });
 }
 
 async function startVideoCall(callId, callerFlag, partnerUid){
-  document.getElementById('videoLobby').classList.remove('active');
-  document.getElementById('videoCallScreen').classList.add('active');
+  if (!videoFlowActive){
+    // user already left while this match was being set up server-side
+    updateDoc(doc(db, 'calls', callId), { status: 'ended', endedBy: myUid }).catch(()=>{});
+    return;
+  }
   document.getElementById('vcallStatus').textContent = 'CONNECTING…';
+  document.getElementById('vcRemoteStatusText').textContent = "waiting for the other person's camera…";
 
   currentCallId = callId;
   isCaller = !!callerFlag;
   otherUid = partnerUid;
+
+  document.getElementById('vcReportBtn').style.display = 'flex';
+  document.getElementById('vcSkipBtn').style.display = 'flex';
 
   // Watch the call doc so if the other person leaves/skips, we find
   // out and can react instead of sitting on a dead connection.
   unsubCallDoc = onSnapshot(doc(db, 'calls', currentCallId), (snap) => {
     const data = snap.data();
     if (data && data.status === 'ended' && data.endedBy !== myUid){
-      document.getElementById('vcRemoteStatusText').textContent = 'the other person left — finding someone new…';
-      skipVideoStranger();
+      skipVideoStranger('the other person left — finding someone new…');
     }
   });
-
-  try{
-    ivcLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-  }catch(err){
-    document.getElementById('vcallStatus').textContent = 'CAMERA/MIC BLOCKED';
-    document.getElementById('vcRemoteStatusText').textContent = "camera/mic permission was denied — can't start video.";
-    return;
-  }
-
-  const localVideo = document.getElementById('vcLocalVideo');
-  localVideo.srcObject = ivcLocalStream;
-  localVideo.style.display = 'block';
-  document.getElementById('vcRemoteStatusText').textContent = "waiting for the other person's camera…";
 
   await startInstantVideoWebRTC();
 }
@@ -1007,6 +972,7 @@ async function startInstantVideoWebRTC(){
     remoteVideo.srcObject = remoteStream;
     remoteVideo.style.display = 'block';
     remotePlaceholder.style.display = 'none';
+    document.getElementById('vcSpinner').classList.remove('spin');
     document.getElementById('vcallStatus').textContent = 'CONNECTED';
   };
 
@@ -1050,23 +1016,6 @@ async function startInstantVideoWebRTC(){
   });
 }
 
-function stopInstantVideo(){
-  if (ivcLocalStream){
-    ivcLocalStream.getTracks().forEach(t => t.stop());
-    ivcLocalStream = null;
-  }
-  if (ivcPeerConnection){
-    ivcPeerConnection.close();
-    ivcPeerConnection = null;
-  }
-  const remoteVideo = document.getElementById('vcRemoteVideo');
-  remoteVideo.srcObject = null;
-  remoteVideo.style.display = 'none';
-  document.getElementById('vcRemotePlaceholder').style.display = 'flex';
-  document.getElementById('vcLocalVideo').srcObject = null;
-  document.getElementById('vcLocalVideo').style.display = 'none';
-}
-
 async function endCurrentInstantCall(){
   if (unsubCallDoc){ unsubCallDoc(); unsubCallDoc = null; }
   if (currentCallId){
@@ -1077,20 +1026,33 @@ async function endCurrentInstantCall(){
   isCaller = false;
 }
 
-// "Skip" — leave this stranger and immediately look for the next one,
-// without ever leaving the video-call flow.
-async function skipVideoStranger(){
-  stopInstantVideo();
+// "Skip" — leave this stranger and immediately look for the next one.
+// The camera/mic stay on the whole time; only the peer connection
+// for the old match gets torn down.
+async function skipVideoStranger(message){
+  if (ivcPeerConnection){ ivcPeerConnection.close(); ivcPeerConnection = null; }
+  document.getElementById('vcRemoteVideo').srcObject = null;
   await endCurrentInstantCall();
-  document.getElementById('videoCallScreen').classList.remove('active');
-  openVideoCall();
+  if (!videoFlowActive) return;
+  setVideoSearchingUI(message || 'looking for someone new…');
+  findVideoMatch();
 }
 
-// "Leave" — end the call entirely and go back to the homepage.
+// "Leave" — end the call entirely, release the camera, and go home.
 async function leaveVideoCall(){
-  stopInstantVideo();
+  videoFlowActive = false;
+  if (unsubVideoWaitingWatch){ unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
+  if (myUid) deleteDoc(doc(db, 'videoWaitingPool', myUid)).catch(()=>{});
+  if (ivcPeerConnection){ ivcPeerConnection.close(); ivcPeerConnection = null; }
+  if (ivcLocalStream){ ivcLocalStream.getTracks().forEach(t => t.stop()); ivcLocalStream = null; }
   await endCurrentInstantCall();
+
   document.getElementById('videoCallScreen').classList.remove('active');
+  document.getElementById('vcRemoteVideo').srcObject = null;
+  document.getElementById('vcRemoteVideo').style.display = 'none';
+  document.getElementById('vcRemotePlaceholder').style.display = 'flex';
+  document.getElementById('vcLocalVideo').srcObject = null;
+  document.getElementById('vcLocalVideo').style.display = 'none';
   document.getElementById('site').style.display = 'block';
   window.scrollTo(0,0);
 }
@@ -1535,7 +1497,7 @@ function endVideo(){
 // classic scripts do — but the HTML uses onclick="..." attributes,
 // which need them there. Wiring that up explicitly:
 Object.assign(window, {
-  openVideoCall, closeVideoLobby, skipVideoStranger, leaveVideoCall,
+  openVideoCall, skipVideoStranger, leaveVideoCall,
   openLobby, closeLobby, sendMessage, reportStranger,
   requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo
 });
