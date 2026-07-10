@@ -685,7 +685,7 @@
       <a href="#how">How it works</a>
       <a href="#safety">Safety</a>
       <button class="btn btn-ghost" onclick="openVideoCall()">Video call</button>
-      <button class="btn btn-ghost" onclick="openGroupLobby()">Group call</button>
+      <button class="btn btn-ghost" onclick="openGroupCall()">Group call</button>
       <button class="btn btn-amber" onclick="openLobby()">Start chatting</button>
     </div>
   </nav>
@@ -784,26 +784,6 @@
   <div class="vcall-note">Random 1:1 video · leave anytime · 18+ only</div>
 </div>
 
-<!-- ================= GROUP CALL — pick up to 3 people (4 total) ================= -->
-<div class="globby" id="groupLobby">
-  <h2>Start a group call</h2>
-  <p class="globby-sub">Pick up to 3 people who are online right now. They'll get an invite to join — the call starts as soon as at least one accepts.</p>
-  <div class="glist" id="groupPickerList"></div>
-  <div class="globby-actions">
-    <button class="btn btn-ghost" onclick="closeGroupLobby()">Cancel</button>
-    <button class="btn btn-amber" id="groupStartBtn" onclick="startGroupCall()" disabled>Start group call (0/3 picked)</button>
-  </div>
-</div>
-
-<!-- ================= GROUP CALL INVITE (appears anywhere on the site) ================= -->
-<div class="group-invite-banner" id="groupInviteBanner">
-  <span id="groupInviteText"></span>
-  <div class="group-invite-actions">
-    <button class="ginvite-btn accept" onclick="acceptGroupInvite()">Join</button>
-    <button class="ginvite-btn decline" onclick="declineGroupInvite()">Decline</button>
-  </div>
-</div>
-
 <!-- ================= GROUP VIDEO CALL (up to 4-person, vote-to-remove) ================= -->
 <div class="gcall" id="groupCallScreen">
   <div class="gcall-status mono" id="gcallStatus">CONNECTING…</div>
@@ -815,7 +795,7 @@
     <button class="vcall-btn skip" id="gCamBtn" onclick="toggleGroupCam()">📷 Camera off</button>
     <button class="vcall-btn leave" onclick="leaveGroupCall()">✕ Leave</button>
   </div>
-  <div class="gcall-note">Group video · up to 4 people · anyone can be removed by majority vote · 18+ only</div>
+  <div class="gcall-note">Group video · anyone can be removed by majority vote · 18+ only</div>
 </div>
 
 <!-- ================= CHAT ================= -->
@@ -1627,32 +1607,35 @@ function endVideo(){
 }
 
 /* ============================================================
-   GROUP CALLS — up to 4 people, mesh WebRTC, vote-to-remove.
+   GROUP CALLS — fully automatic matchmaking, mesh WebRTC,
+   vote-to-remove. No picking, no invites: tapping "Group call"
+   drops you straight into search.
 
-   Presence: while the group lobby is open, your uid is written to
-   presence/{uid} every 8s (a plain client-timestamp heartbeat, not
-   Firestore's serverTimestamp — good enough to say "seen in the
-   last 20s", not something to trust for anything security-sensitive)
-   so other open lobbies can see you're around.
+   Matching unit: groupWaitingPool/{groupId} — its mere existence
+   means "the group at groupCalls/{id} has room for more and wants
+   to be found." A lone searcher creates both docs at once (a
+   1-member group that's also advertising itself). Anyone else who
+   searches joins the oldest open group via an atomic transaction,
+   growing it — 2, then 3, then 4. The moment a join brings a group
+   up to GROUP_CAP (4), that same transaction deletes its waiting-pool
+   doc so nobody else piles on; the next person searching starts a
+   brand-new group instead (so a 5th, 6th... person online kicks off
+   group #2, and so on).
 
-   Starting a call creates groupCalls/{id} with you as the only
-   member and drops a groupInvites/{targetUid} doc for each person
-   you picked. Every client listens to its own invite doc the whole
-   time it's on the site, so picked people get a Join/Decline banner
-   without needing to have the lobby open. Joining adds your uid
-   into the shared members array (capped at 4 by a transaction).
-
-   Every client mesh-connects — offer/answer/ICE — to every other
-   uid currently in that members array (up to 6 peer connections
-   for a full group of 4), using the same signaling-through-Firestore
-   pattern as the 1:1 calls above, just keyed per pair under
+   Every client mesh-connects — offer/answer/ICE — to every other uid
+   currently in the members array (up to 6 peer connections for a full
+   group of 4), using the same signaling-through-Firestore pattern as
+   the 1:1 calls above, just keyed per pair under
    groupCalls/{id}/signals/{sortedUidA_sortedUidB}.
 
    Voting: groupCalls/{id}/votes/{targetUid} holds an array of voter
    uids. Once that reaches a majority of the OTHER current members,
-   any client watching removes the target from the members array —
-   the target's own onSnapshot listener then notices it's no longer
-   a member and leaves automatically.
+   any client watching removes the target from the members array. The
+   target's own onSnapshot listener notices it's no longer a member
+   and drops straight back into search for a new group — and since
+   the remaining members are now under GROUP_CAP, their group's
+   waiting-pool doc is recreated too, so it automatically resumes
+   searching for a replacement.
 
    IMPORTANT — same caveats as the rest of this file: matching and
    membership logic run entirely client-side (fine for a demo, not
@@ -1660,208 +1643,152 @@ function endVideo(){
    still no real age verification or moderation pipeline.
    ============================================================ */
 
-let presenceInterval = null;
-let unsubOnlineUsers = null;
-const onlineUsersMap = new Map(); // uid -> lastActiveMs
-const pickedMembers = new Set();
 
-function startPresenceHeartbeat(){
-  const beat = () => {
-    if (!myUid) return;
-    setDoc(doc(db, 'presence', myUid), { lastActiveMs: Date.now() }).catch(()=>{});
-  };
-  beat();
-  presenceInterval = setInterval(beat, 8000);
-}
-
-function stopPresenceHeartbeat(){
-  if (presenceInterval){ clearInterval(presenceInterval); presenceInterval = null; }
-  if (myUid) deleteDoc(doc(db, 'presence', myUid)).catch(()=>{});
-}
-
-function listenOnlineUsers(){
-  unsubOnlineUsers = onSnapshot(collection(db, 'presence'), (snap) => {
-    onlineUsersMap.clear();
-    const now = Date.now();
-    snap.forEach(d => {
-      if (d.id === myUid) return;
-      const data = d.data();
-      if (data.lastActiveMs && (now - data.lastActiveMs) < 20000){
-        onlineUsersMap.set(d.id, data.lastActiveMs);
-      }
-    });
-    renderGroupPicker();
-  }, (err) => console.error('presence listener failed:', err));
-}
-
-function renderGroupPicker(){
-  const list = document.getElementById('groupPickerList');
-  if (onlineUsersMap.size === 0){
-    list.innerHTML = '<div class="glist-empty">No one else is online right now — leave this open and they\'ll show up here.</div>';
-    return;
-  }
-  list.innerHTML = '';
-  Array.from(onlineUsersMap.keys()).forEach(uid => {
-    const picked = pickedMembers.has(uid);
-    const atCap = pickedMembers.size >= 3 && !picked;
-    const item = document.createElement('div');
-    item.className = 'gitem' + (picked ? ' picked' : '') + (atCap ? ' disabled' : '');
-    item.innerHTML =
-      '<span class="gdot"></span>' +
-      '<span class="gname">Guest #' + uid.slice(-4) + '</span>' +
-      '<span class="gcheck">' + (picked ? '✓' : '') + '</span>';
-    item.onclick = () => toggleGroupPick(uid);
-    list.appendChild(item);
-  });
-}
-
-function toggleGroupPick(uid){
-  if (pickedMembers.has(uid)) pickedMembers.delete(uid);
-  else if (pickedMembers.size < 3) pickedMembers.add(uid);
-  renderGroupPicker();
-  const btn = document.getElementById('groupStartBtn');
-  btn.textContent = 'Start group call (' + pickedMembers.size + '/3 picked)';
-  btn.disabled = pickedMembers.size === 0;
-}
-
-async function openGroupLobby(){
-  document.getElementById('site').style.display = 'none';
-  document.getElementById('groupLobby').classList.add('active');
-  pickedMembers.clear();
-  renderGroupPicker();
-  document.getElementById('groupStartBtn').textContent = 'Start group call (0/3 picked)';
-  document.getElementById('groupStartBtn').disabled = true;
-  await authReady;
-  startPresenceHeartbeat();
-  listenOnlineUsers();
-}
-
-function closeGroupLobby(){
-  stopPresenceHeartbeat();
-  if (unsubOnlineUsers){ unsubOnlineUsers(); unsubOnlineUsers = null; }
-  document.getElementById('groupLobby').classList.remove('active');
-  document.getElementById('site').style.display = 'block';
-}
-
-async function startGroupCall(){
-  if (pickedMembers.size === 0) return;
-  await authReady;
-  const groupId = 'g_' + myUid.slice(-4) + '_' + Date.now();
-  const invited = Array.from(pickedMembers);
-  try{
-    await setDoc(doc(db, 'groupCalls', groupId), {
-      members: [myUid],
-      hostUid: myUid,
-      createdAt: serverTimestamp()
-    });
-    await Promise.all(invited.map(uid => setDoc(doc(db, 'groupInvites', uid), {
-      groupId, fromUid: myUid, memberCount: invited.length + 1, createdAt: serverTimestamp()
-    })));
-  }catch(err){
-    console.error('startGroupCall failed:', err);
-    alert("Couldn't start the group call — check your connection and try again.");
-    return;
-  }
-  closeGroupLobby();
-  await enterGroupCallScreen(groupId, true);
-}
-
-/* ---- incoming invites: listened to app-wide once auth is ready ---- */
-let unsubMyGroupInvite = null;
-let pendingInvite = null;
-
-authReady.then((uid) => {
-  unsubMyGroupInvite = onSnapshot(doc(db, 'groupInvites', uid), (snap) => {
-    if (snap.exists()){
-      pendingInvite = snap.data();
-      document.getElementById('groupInviteText').innerHTML =
-        '<strong>Guest #' + pendingInvite.fromUid.slice(-4) + '</strong> invited you to a group call (' + pendingInvite.memberCount + ' people).';
-      document.getElementById('groupInviteBanner').classList.add('active');
-    } else {
-      pendingInvite = null;
-      document.getElementById('groupInviteBanner').classList.remove('active');
-    }
-  }, (err) => console.error('group invite listener failed:', err));
-});
-
-async function acceptGroupInvite(){
-  if (!pendingInvite) return;
-  const { groupId } = pendingInvite;
-  document.getElementById('groupInviteBanner').classList.remove('active');
-  await deleteDoc(doc(db, 'groupInvites', myUid)).catch(()=>{});
-  document.getElementById('site').style.display = 'none';
-  document.getElementById('lobby').classList.remove('active');
-  document.getElementById('chatScreen').classList.remove('active');
-  document.getElementById('videoCallScreen').classList.remove('active');
-
-  let joined = false;
-  try{
-    await runTransaction(db, async (tx) => {
-      const ref = doc(db, 'groupCalls', groupId);
-      const snap = await tx.get(ref);
-      if (!snap.exists()) throw new Error('call ended');
-      const members = snap.data().members || [];
-      if (members.includes(myUid)){ joined = true; return; }
-      if (members.length >= 4) throw new Error('call is full');
-      tx.update(ref, { members: [...members, myUid] });
-      joined = true;
-    });
-  }catch(err){
-    console.error('acceptGroupInvite failed:', err);
-    alert("Couldn't join that call — it may have already ended or filled up.");
-    document.getElementById('site').style.display = 'block';
-    return;
-  }
-  if (!joined) return;
-  await enterGroupCallScreen(groupId, false);
-}
-
-async function declineGroupInvite(){
-  document.getElementById('groupInviteBanner').classList.remove('active');
-  await deleteDoc(doc(db, 'groupInvites', myUid)).catch(()=>{});
-}
-
-/* ---- the live group call itself ---- */
 let currentGroupId = null;
 let groupLocalStream = null;
 let groupMicOn = true;
 let groupCamOn = true;
 let voluntaryLeave = false;
+let groupCallActive = false; // true whenever the group call screen is open (searching or connected)
 const groupPeers = {};        // uid -> RTCPeerConnection
 const groupPeerUnsubs = {};   // uid -> [unsub fns]
 const removalInFlight = new Set();
 let unsubGroupCallDoc = null;
 let unsubGroupVotes = null;
 
+const GROUP_CAP = 4;
+
 function groupPairKey(a, b){ return [a, b].sort().join('_'); }
+
+async function openGroupCall(){
+  document.getElementById('site').style.display = 'none';
+  document.getElementById('groupCallScreen').classList.add('active');
+  document.getElementById('gcallGrid').innerHTML = '';
+  document.getElementById('gcallStatus').textContent = 'SEARCHING FOR A GROUP…';
+  groupCallActive = true;
+  voluntaryLeave = false;
+
+  if (!groupLocalStream){
+    try{
+      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+    }catch(err){
+      document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
+      alert("Camera/mic permission was denied — can't start a group call.");
+      groupCallActive = false;
+      document.getElementById('groupCallScreen').classList.remove('active');
+      document.getElementById('site').style.display = 'block';
+      return;
+    }
+  }
+
+  await authReady;
+  if (!groupCallActive) return; // left while camera/auth was still loading
+  findGroupMatch();
+}
+
+async function findGroupMatch(){
+  const waitingRef = collection(db, 'groupWaitingPool');
+  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(5));
+  let snap;
+  try{
+    snap = await getDocs(q);
+  }catch(err){
+    console.error('findGroupMatch getDocs failed:', err);
+    if (!groupCallActive) return;
+    document.getElementById('gcallStatus').textContent = 'CONNECTION ERROR';
+    return;
+  }
+  if (!groupCallActive) return;
+  const candidate = snap.docs.find(d => d.id !== currentGroupId);
+
+  if (candidate){
+    const candidateGroupId = candidate.id;
+    try{
+      await runTransaction(db, async (tx) => {
+        const groupRef = doc(db, 'groupCalls', candidateGroupId);
+        const waitRef = doc(db, 'groupWaitingPool', candidateGroupId);
+        const groupSnap = await tx.get(groupRef);
+        const waitSnap = await tx.get(waitRef);
+        if (!groupSnap.exists() || !waitSnap.exists()) throw new Error('group no longer open');
+        const members = groupSnap.data().members || [];
+        if (members.includes(myUid) || members.length >= GROUP_CAP) throw new Error('group full or already in it');
+        const newMembers = [...members, myUid];
+        tx.update(groupRef, { members: newMembers });
+        if (newMembers.length >= GROUP_CAP) tx.delete(waitRef);
+      });
+      if (!groupCallActive) return;
+      await enterGroupCallScreen(candidateGroupId, false);
+    }catch(e){
+      // lost the race, or the candidate group disappeared — try again
+      if (!groupCallActive) return;
+      findGroupMatch();
+    }
+  } else {
+    await createSearchGroup();
+  }
+}
+
+async function createSearchGroup(){
+  const groupId = 'g_' + myUid.slice(-4) + '_' + Date.now();
+  try{
+    await setDoc(doc(db, 'groupCalls', groupId), {
+      members: [myUid],
+      hostUid: myUid,
+      createdAt: serverTimestamp()
+    });
+    await setDoc(doc(db, 'groupWaitingPool', groupId), { createdAt: serverTimestamp() });
+  }catch(err){
+    console.error('createSearchGroup failed:', err);
+    if (!groupCallActive) return;
+    document.getElementById('gcallStatus').textContent = 'CONNECTION ERROR';
+    return;
+  }
+  if (!groupCallActive) return;
+  await enterGroupCallScreen(groupId, true);
+}
 
 async function enterGroupCallScreen(groupId, isHost){
   currentGroupId = groupId;
   document.getElementById('groupCallScreen').classList.add('active');
-  document.getElementById('gcallStatus').textContent = isHost ? 'WAITING FOR OTHERS…' : 'CONNECTING…';
+  document.getElementById('gcallStatus').textContent = isHost ? 'SEARCHING FOR A GROUP…' : 'CONNECTING…';
 
-  try{
-    groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-  }catch(err){
-    document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
-    alert("Camera/mic permission was denied — you'll still be in the call doc, but others won't see or hear you.");
+  if (!groupLocalStream){
+    try{
+      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+    }catch(err){
+      document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
+      alert("Camera/mic permission was denied — you'll still be in the call doc, but others won't see or hear you.");
+    }
   }
 
   const groupRef = doc(db, 'groupCalls', groupId);
   unsubGroupCallDoc = onSnapshot(groupRef, (snap) => {
     if (!snap.exists()){
-      if (!voluntaryLeave) teardownGroupCall('This group call has ended.');
+      if (!voluntaryLeave) teardownGroupCall(null);
       return;
     }
     const data = snap.data();
     const members = data.members || [];
 
     if (!members.includes(myUid)){
-      if (!voluntaryLeave) teardownGroupCall('You were removed from this group call by vote.');
+      if (!voluntaryLeave){
+        // Voted out: don't dead-end the person on an alert — drop them
+        // straight back into search for a fresh group, same as the
+        // "kick and re-search" flow that reopens for the people who
+        // stayed behind.
+        teardownGroupCall(null);
+        openGroupCall();
+      }
       return;
     }
 
-    document.getElementById('gcallStatus').textContent = members.length > 1 ? 'CONNECTED' : 'WAITING FOR OTHERS…';
+    if (members.length < GROUP_CAP){
+      document.getElementById('gcallStatus').textContent = members.length > 1
+        ? 'CONNECTED · SEARCHING FOR MORE…'
+        : 'SEARCHING FOR A GROUP…';
+    } else {
+      document.getElementById('gcallStatus').textContent = 'CONNECTED';
+    }
     renderGroupTiles(members);
 
     members.forEach(uid => {
@@ -2008,7 +1935,8 @@ function updateVoteBadge(targetUid, count){
 async function handleVoteThresholds(groupId, votesSnap){
   const groupSnap = await getDoc(doc(db, 'groupCalls', groupId)).catch(() => null);
   if (!groupSnap || !groupSnap.exists()) return;
-  const members = groupSnap.data().members || [];
+  const groupData = groupSnap.data();
+  const members = groupData.members || [];
 
   votesSnap.forEach(d => {
     const targetUid = d.id;
@@ -2022,7 +1950,15 @@ async function handleVoteThresholds(groupId, votesSnap){
     if (eligibleVotes >= majority){
       removalInFlight.add(targetUid);
       updateDoc(doc(db, 'groupCalls', groupId), { members: arrayRemove(targetUid) })
-        .then(() => deleteDoc(doc(db, 'groupCalls', groupId, 'votes', targetUid)))
+        .then(async () => {
+          await deleteDoc(doc(db, 'groupCalls', groupId, 'votes', targetUid)).catch(()=>{});
+          // Kicked below the cap? Re-open this same group to the
+          // matchmaking queue so it automatically resumes searching
+          // for a replacement.
+          if ((members.length - 1) < GROUP_CAP){
+            await setDoc(doc(db, 'groupWaitingPool', groupId), { createdAt: serverTimestamp() }).catch(()=>{});
+          }
+        })
         .catch(err => console.error('vote removal failed:', err))
         .finally(() => removalInFlight.delete(targetUid));
     }
@@ -2037,6 +1973,7 @@ function teardownGroupCall(finalMessage){
   document.getElementById('groupCallScreen').classList.remove('active');
   document.getElementById('gcallGrid').innerHTML = '';
   currentGroupId = null;
+  groupCallActive = false;
   document.getElementById('site').style.display = 'block';
   window.scrollTo(0,0);
   if (finalMessage) alert(finalMessage);
@@ -2044,13 +1981,23 @@ function teardownGroupCall(finalMessage){
 
 async function leaveGroupCall(){
   voluntaryLeave = true;
+  groupCallActive = false;
   if (currentGroupId){
     try{
       const ref = doc(db, 'groupCalls', currentGroupId);
       await updateDoc(ref, { members: arrayRemove(myUid) });
       const snap = await getDoc(ref);
-      if (snap.exists() && (snap.data().members || []).length === 0){
+      const remaining = snap.exists() ? (snap.data().members || []) : [];
+      if (remaining.length === 0){
         await deleteDoc(ref).catch(()=>{});
+        // No one left — also drop the matchmaking entry so a stale
+        // group never lingers in the queue for someone else to find.
+        await deleteDoc(doc(db, 'groupWaitingPool', currentGroupId)).catch(()=>{});
+      } else if (remaining.length < GROUP_CAP){
+        // Someone left a group that still has people in it — reopen
+        // it to the queue so the rest keep searching for a
+        // replacement, same as after a vote-kick.
+        await setDoc(doc(db, 'groupWaitingPool', currentGroupId), { createdAt: serverTimestamp() }).catch(()=>{});
       }
     }catch(err){
       console.error('leaveGroupCall failed:', err);
@@ -2089,9 +2036,7 @@ Object.assign(window, {
   openVideoCall, skipVideoStranger, leaveVideoCall,
   openLobby, closeLobby, sendMessage, reportStranger,
   requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo,
-  openGroupLobby, closeGroupLobby, startGroupCall,
-  acceptGroupInvite, declineGroupInvite, voteToRemove,
-  leaveGroupCall, toggleGroupMic, toggleGroupCam
+  openGroupCall, voteToRemove, leaveGroupCall, toggleGroupMic, toggleGroupCam
 });
 </script>
 </body>
