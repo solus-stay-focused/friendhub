@@ -824,7 +824,7 @@
     <video class="video-remote" id="remoteVideo" autoplay playsinline style="display:none;"></video>
 
     <div class="video-controls">
-      <span class="video-consent-note">Both people chose to enable video · off anytime</span>
+      <span class="video-consent-note">Video starts automatically with each match · off anytime</span>
       <div class="video-bar">
         <button class="vbtn" id="micBtn" onclick="toggleMic()" title="Mute microphone">🎙</button>
         <button class="vbtn" id="camBtn" onclick="toggleCam()" title="Turn off camera">📷</button>
@@ -1341,6 +1341,12 @@ function startChat(chosenPerson, callId, callerFlag, partnerUid){
         addSystemMessage('The other person disconnected.');
       }
     });
+
+    // Video now starts automatically the moment a real match is found,
+    // instead of waiting for a manual "Enable video" click. Both sides
+    // run this same startChat() independently, so both call requestVideo()
+    // on their own — that's what gets the offer/answer handshake going.
+    requestVideo();
   }
 }
 
@@ -1441,21 +1447,32 @@ function reportStranger(){
 }
 
 /* ============================================================
-   VIDEO — opt-in only, never auto-starts.
-   Video is opt-in only — it never auto-starts, and only turns on
-   when someone taps "Enable video" (random-stranger chat) or after
-   a direct call is accepted. The signaling itself is real: SDP
-   offer/answer and ICE candidates are exchanged through the
-   calls/{callId} doc and its callerCandidates/calleeCandidates
-   subcollections (see startWebRTC() below), and Firestore only
-   ever carries that handshake — the actual audio/video streams
-   flow peer-to-peer between the two browsers once connected.
+   VIDEO — auto-starts for random-stranger matches, opt-in for
+   everything else.
+   As soon as "Start chatting" finds a real match, both sides'
+   startChat() calls trigger requestVideo() on their own, so video
+   comes up automatically alongside the text chat — no extra click
+   needed. The "Enable video" / "Hide video panel" button still lets
+   either person toggle their own camera off or back on at any time.
+   For the simulated "call a specific person" demo path (no live
+   currentCallId), video stays fully opt-in since there's no real
+   backend behind it to auto-connect to.
+
+   The signaling itself is real: SDP offer/answer and ICE candidates
+   are exchanged through the calls/{callId} doc and its
+   callerCandidates/calleeCandidates subcollections (see
+   startWebRTC() below), and Firestore only ever carries that
+   handshake — the actual audio/video streams flow peer-to-peer
+   between the two browsers once connected.
 
    If this ever goes to real users: random video with strangers
    carries real legal and safety obligations (age verification,
    CSAM mandatory-reporting under US law for platforms enabling
    this, moderation/reporting pipelines). Treat that as required
-   infrastructure before launch, not a follow-up task.
+   infrastructure before launch, not a follow-up task. Auto-starting
+   the camera the instant a match is found — rather than waiting for
+   an explicit tap — makes that consent story weaker, not stronger,
+   so this is worth reconsidering before real users ever hit it.
    ============================================================ */
 
 let localStream = null;
