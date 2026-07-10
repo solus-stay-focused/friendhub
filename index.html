@@ -563,6 +563,104 @@
   .vcall-btn.skip:hover{background:rgba(94,234,212,0.2);}
   .vcall-btn.leave{background:var(--coral); color:#fff;}
   .vcall-btn.leave:hover{background:#e5503f;}
+  /* ---------- GROUP CALL — picker lobby, invite banner, live call ---------- */
+  .globby{
+    display:none; position:fixed; inset:0; z-index:80;
+    background:var(--void-deep); color:var(--paper);
+    flex-direction:column; align-items:center;
+    padding:60px 6vw 40px; overflow-y:auto;
+  }
+  .globby.active{display:flex;}
+  .globby h2{font-size:clamp(22px,3vw,30px); margin-bottom:6px;}
+  .globby p.globby-sub{color:rgba(237,231,218,0.55); font-size:14px; margin-bottom:28px; text-align:center; max-width:420px;}
+  .glist{
+    width:100%; max-width:420px; display:flex; flex-direction:column; gap:8px;
+    margin-bottom:26px;
+  }
+  .glist-empty{
+    color:rgba(237,231,218,0.45); font-size:13px; text-align:center;
+    padding:30px 10px; border:1px dashed var(--line); border-radius:var(--radius-m);
+  }
+  .gitem{
+    display:flex; align-items:center; gap:12px;
+    padding:13px 16px; border-radius:var(--radius-m);
+    background:rgba(237,231,218,0.04); border:1px solid var(--line);
+    cursor:pointer; transition:background .15s ease, border-color .15s ease;
+  }
+  .gitem:hover{background:rgba(237,231,218,0.08);}
+  .gitem.picked{border-color:var(--mint); background:rgba(94,234,212,0.1);}
+  .gitem.disabled{opacity:0.4; cursor:not-allowed; pointer-events:none;}
+  .gdot{width:8px;height:8px;border-radius:50%; background:var(--mint); box-shadow:0 0 0 3px rgba(94,234,212,0.2); flex-shrink:0;}
+  .gname{flex:1; font-size:14px; font-weight:500;}
+  .gcheck{width:18px; text-align:center; color:var(--mint); font-weight:700;}
+  .globby-actions{display:flex; gap:12px; flex-wrap:wrap; justify-content:center;}
+
+  .group-invite-banner{
+    display:none; position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+    z-index:90; background:var(--void); color:var(--paper);
+    border:1px solid rgba(94,234,212,0.4); border-radius:var(--radius-m);
+    padding:16px 20px; box-shadow:0 12px 32px rgba(0,0,0,0.4);
+    max-width:min(90vw,420px); align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .group-invite-banner.active{display:flex;}
+  .group-invite-banner span{font-size:13.5px; line-height:1.4;}
+  .group-invite-actions{display:flex; gap:8px; margin-left:auto;}
+  .ginvite-btn{border-radius:20px; padding:8px 16px; font-size:12.5px; font-weight:600; border:none;}
+  .ginvite-btn.accept{background:var(--mint); color:var(--ink);}
+  .ginvite-btn.decline{background:transparent; border:1px solid var(--line); color:var(--paper);}
+
+  .gcall{
+    display:none; position:fixed; inset:0; z-index:80;
+    background:var(--void-deep); color:var(--paper);
+    flex-direction:column; align-items:center;
+    padding:28px 6vw 24px;
+  }
+  .gcall.active{display:flex;}
+  .gcall-status{font-size:13px; letter-spacing:0.08em; color:var(--mint); margin-bottom:18px;}
+  .gcall-grid{
+    display:grid;
+    width:100%; max-width:920px; flex:1;
+    grid-template-columns:repeat(2, 1fr);
+    gap:14px; margin:0 auto;
+    align-content:center;
+  }
+  .gtile{
+    position:relative; aspect-ratio:4/3; border-radius:var(--radius-m);
+    background:rgba(237,231,218,0.05); border:1px solid var(--line);
+    overflow:hidden; display:flex; align-items:center; justify-content:center;
+  }
+  .gtile video{width:100%; height:100%; object-fit:cover;}
+  .gplaceholder span{
+    font-family:'Space Grotesk',sans-serif; font-size:14px; color:rgba(237,231,218,0.5);
+  }
+  .gtile-label{
+    position:absolute; left:10px; bottom:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    background:rgba(5,6,11,0.55); padding:4px 9px; border-radius:20px;
+  }
+  .gtile-votecount{
+    position:absolute; left:10px; top:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--coral);
+    background:rgba(5,6,11,0.55); padding:3px 9px; border-radius:20px;
+    display:none;
+  }
+  .gtile-vote{
+    position:absolute; right:8px; top:8px;
+    border:1px solid rgba(255,107,91,0.5); background:rgba(5,6,11,0.55);
+    color:var(--coral); font-size:10.5px; font-weight:600;
+    padding:6px 10px; border-radius:20px; transition:background .15s ease;
+  }
+  .gtile-vote:hover{background:rgba(255,107,91,0.2);}
+  .gtile-vote.voted{color:var(--mint); border-color:rgba(94,234,212,0.5); opacity:0.85;}
+  .gtile-vote:disabled{cursor:default;}
+  .gcall-actions{display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; justify-content:center;}
+  .gcall-note{
+    margin-top:12px; font-size:12px; color:rgba(237,231,218,0.45); text-align:center;
+  }
+  @media (max-width:640px){
+    .gcall-grid{grid-template-columns:1fr;}
+  }
+
   .vcall-note{
     margin-top:18px; font-family:'IBM Plex Mono',monospace; font-size:11px;
     color:rgba(237,231,218,0.45);
@@ -587,6 +685,7 @@
       <a href="#how">How it works</a>
       <a href="#safety">Safety</a>
       <button class="btn btn-ghost" onclick="openVideoCall()">Video call</button>
+      <button class="btn btn-ghost" onclick="openGroupLobby()">Group call</button>
       <button class="btn btn-amber" onclick="openLobby()">Start chatting</button>
     </div>
   </nav>
@@ -685,6 +784,39 @@
   <div class="vcall-note">Random 1:1 video · leave anytime · 18+ only</div>
 </div>
 
+<!-- ================= GROUP CALL — pick up to 3 people (4 total) ================= -->
+<div class="globby" id="groupLobby">
+  <h2>Start a group call</h2>
+  <p class="globby-sub">Pick up to 3 people who are online right now. They'll get an invite to join — the call starts as soon as at least one accepts.</p>
+  <div class="glist" id="groupPickerList"></div>
+  <div class="globby-actions">
+    <button class="btn btn-ghost" onclick="closeGroupLobby()">Cancel</button>
+    <button class="btn btn-amber" id="groupStartBtn" onclick="startGroupCall()" disabled>Start group call (0/3 picked)</button>
+  </div>
+</div>
+
+<!-- ================= GROUP CALL INVITE (appears anywhere on the site) ================= -->
+<div class="group-invite-banner" id="groupInviteBanner">
+  <span id="groupInviteText"></span>
+  <div class="group-invite-actions">
+    <button class="ginvite-btn accept" onclick="acceptGroupInvite()">Join</button>
+    <button class="ginvite-btn decline" onclick="declineGroupInvite()">Decline</button>
+  </div>
+</div>
+
+<!-- ================= GROUP VIDEO CALL (up to 4-person, vote-to-remove) ================= -->
+<div class="gcall" id="groupCallScreen">
+  <div class="gcall-status mono" id="gcallStatus">CONNECTING…</div>
+
+  <div class="gcall-grid" id="gcallGrid"></div>
+
+  <div class="gcall-actions">
+    <button class="vcall-btn skip" id="gMicBtn" onclick="toggleGroupMic()">🎙 Mute</button>
+    <button class="vcall-btn skip" id="gCamBtn" onclick="toggleGroupCam()">📷 Camera off</button>
+    <button class="vcall-btn leave" onclick="leaveGroupCall()">✕ Leave</button>
+  </div>
+  <div class="gcall-note">Group video · up to 4 people · anyone can be removed by majority vote · 18+ only</div>
+</div>
 
 <!-- ================= CHAT ================= -->
 <div class="chat" id="chatScreen">
@@ -756,7 +888,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDoc, getDocs,
-  query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction, updateDoc
+  query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction, updateDoc,
+  arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -1493,13 +1626,472 @@ function endVideo(){
   document.getElementById('camBtn').classList.remove('off');
 }
 
+/* ============================================================
+   GROUP CALLS — up to 4 people, mesh WebRTC, vote-to-remove.
+
+   Presence: while the group lobby is open, your uid is written to
+   presence/{uid} every 8s (a plain client-timestamp heartbeat, not
+   Firestore's serverTimestamp — good enough to say "seen in the
+   last 20s", not something to trust for anything security-sensitive)
+   so other open lobbies can see you're around.
+
+   Starting a call creates groupCalls/{id} with you as the only
+   member and drops a groupInvites/{targetUid} doc for each person
+   you picked. Every client listens to its own invite doc the whole
+   time it's on the site, so picked people get a Join/Decline banner
+   without needing to have the lobby open. Joining adds your uid
+   into the shared members array (capped at 4 by a transaction).
+
+   Every client mesh-connects — offer/answer/ICE — to every other
+   uid currently in that members array (up to 6 peer connections
+   for a full group of 4), using the same signaling-through-Firestore
+   pattern as the 1:1 calls above, just keyed per pair under
+   groupCalls/{id}/signals/{sortedUidA_sortedUidB}.
+
+   Voting: groupCalls/{id}/votes/{targetUid} holds an array of voter
+   uids. Once that reaches a majority of the OTHER current members,
+   any client watching removes the target from the members array —
+   the target's own onSnapshot listener then notices it's no longer
+   a member and leaves automatically.
+
+   IMPORTANT — same caveats as the rest of this file: matching and
+   membership logic run entirely client-side (fine for a demo, not
+   trustworthy against a malicious client at real scale), and there's
+   still no real age verification or moderation pipeline.
+   ============================================================ */
+
+let presenceInterval = null;
+let unsubOnlineUsers = null;
+const onlineUsersMap = new Map(); // uid -> lastActiveMs
+const pickedMembers = new Set();
+
+function startPresenceHeartbeat(){
+  const beat = () => {
+    if (!myUid) return;
+    setDoc(doc(db, 'presence', myUid), { lastActiveMs: Date.now() }).catch(()=>{});
+  };
+  beat();
+  presenceInterval = setInterval(beat, 8000);
+}
+
+function stopPresenceHeartbeat(){
+  if (presenceInterval){ clearInterval(presenceInterval); presenceInterval = null; }
+  if (myUid) deleteDoc(doc(db, 'presence', myUid)).catch(()=>{});
+}
+
+function listenOnlineUsers(){
+  unsubOnlineUsers = onSnapshot(collection(db, 'presence'), (snap) => {
+    onlineUsersMap.clear();
+    const now = Date.now();
+    snap.forEach(d => {
+      if (d.id === myUid) return;
+      const data = d.data();
+      if (data.lastActiveMs && (now - data.lastActiveMs) < 20000){
+        onlineUsersMap.set(d.id, data.lastActiveMs);
+      }
+    });
+    renderGroupPicker();
+  }, (err) => console.error('presence listener failed:', err));
+}
+
+function renderGroupPicker(){
+  const list = document.getElementById('groupPickerList');
+  if (onlineUsersMap.size === 0){
+    list.innerHTML = '<div class="glist-empty">No one else is online right now — leave this open and they\'ll show up here.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  Array.from(onlineUsersMap.keys()).forEach(uid => {
+    const picked = pickedMembers.has(uid);
+    const atCap = pickedMembers.size >= 3 && !picked;
+    const item = document.createElement('div');
+    item.className = 'gitem' + (picked ? ' picked' : '') + (atCap ? ' disabled' : '');
+    item.innerHTML =
+      '<span class="gdot"></span>' +
+      '<span class="gname">Guest #' + uid.slice(-4) + '</span>' +
+      '<span class="gcheck">' + (picked ? '✓' : '') + '</span>';
+    item.onclick = () => toggleGroupPick(uid);
+    list.appendChild(item);
+  });
+}
+
+function toggleGroupPick(uid){
+  if (pickedMembers.has(uid)) pickedMembers.delete(uid);
+  else if (pickedMembers.size < 3) pickedMembers.add(uid);
+  renderGroupPicker();
+  const btn = document.getElementById('groupStartBtn');
+  btn.textContent = 'Start group call (' + pickedMembers.size + '/3 picked)';
+  btn.disabled = pickedMembers.size === 0;
+}
+
+async function openGroupLobby(){
+  document.getElementById('site').style.display = 'none';
+  document.getElementById('groupLobby').classList.add('active');
+  pickedMembers.clear();
+  renderGroupPicker();
+  document.getElementById('groupStartBtn').textContent = 'Start group call (0/3 picked)';
+  document.getElementById('groupStartBtn').disabled = true;
+  await authReady;
+  startPresenceHeartbeat();
+  listenOnlineUsers();
+}
+
+function closeGroupLobby(){
+  stopPresenceHeartbeat();
+  if (unsubOnlineUsers){ unsubOnlineUsers(); unsubOnlineUsers = null; }
+  document.getElementById('groupLobby').classList.remove('active');
+  document.getElementById('site').style.display = 'block';
+}
+
+async function startGroupCall(){
+  if (pickedMembers.size === 0) return;
+  await authReady;
+  const groupId = 'g_' + myUid.slice(-4) + '_' + Date.now();
+  const invited = Array.from(pickedMembers);
+  try{
+    await setDoc(doc(db, 'groupCalls', groupId), {
+      members: [myUid],
+      hostUid: myUid,
+      createdAt: serverTimestamp()
+    });
+    await Promise.all(invited.map(uid => setDoc(doc(db, 'groupInvites', uid), {
+      groupId, fromUid: myUid, memberCount: invited.length + 1, createdAt: serverTimestamp()
+    })));
+  }catch(err){
+    console.error('startGroupCall failed:', err);
+    alert("Couldn't start the group call — check your connection and try again.");
+    return;
+  }
+  closeGroupLobby();
+  await enterGroupCallScreen(groupId, true);
+}
+
+/* ---- incoming invites: listened to app-wide once auth is ready ---- */
+let unsubMyGroupInvite = null;
+let pendingInvite = null;
+
+authReady.then((uid) => {
+  unsubMyGroupInvite = onSnapshot(doc(db, 'groupInvites', uid), (snap) => {
+    if (snap.exists()){
+      pendingInvite = snap.data();
+      document.getElementById('groupInviteText').innerHTML =
+        '<strong>Guest #' + pendingInvite.fromUid.slice(-4) + '</strong> invited you to a group call (' + pendingInvite.memberCount + ' people).';
+      document.getElementById('groupInviteBanner').classList.add('active');
+    } else {
+      pendingInvite = null;
+      document.getElementById('groupInviteBanner').classList.remove('active');
+    }
+  }, (err) => console.error('group invite listener failed:', err));
+});
+
+async function acceptGroupInvite(){
+  if (!pendingInvite) return;
+  const { groupId } = pendingInvite;
+  document.getElementById('groupInviteBanner').classList.remove('active');
+  await deleteDoc(doc(db, 'groupInvites', myUid)).catch(()=>{});
+  document.getElementById('site').style.display = 'none';
+  document.getElementById('lobby').classList.remove('active');
+  document.getElementById('chatScreen').classList.remove('active');
+  document.getElementById('videoCallScreen').classList.remove('active');
+
+  let joined = false;
+  try{
+    await runTransaction(db, async (tx) => {
+      const ref = doc(db, 'groupCalls', groupId);
+      const snap = await tx.get(ref);
+      if (!snap.exists()) throw new Error('call ended');
+      const members = snap.data().members || [];
+      if (members.includes(myUid)){ joined = true; return; }
+      if (members.length >= 4) throw new Error('call is full');
+      tx.update(ref, { members: [...members, myUid] });
+      joined = true;
+    });
+  }catch(err){
+    console.error('acceptGroupInvite failed:', err);
+    alert("Couldn't join that call — it may have already ended or filled up.");
+    document.getElementById('site').style.display = 'block';
+    return;
+  }
+  if (!joined) return;
+  await enterGroupCallScreen(groupId, false);
+}
+
+async function declineGroupInvite(){
+  document.getElementById('groupInviteBanner').classList.remove('active');
+  await deleteDoc(doc(db, 'groupInvites', myUid)).catch(()=>{});
+}
+
+/* ---- the live group call itself ---- */
+let currentGroupId = null;
+let groupLocalStream = null;
+let groupMicOn = true;
+let groupCamOn = true;
+let voluntaryLeave = false;
+const groupPeers = {};        // uid -> RTCPeerConnection
+const groupPeerUnsubs = {};   // uid -> [unsub fns]
+const removalInFlight = new Set();
+let unsubGroupCallDoc = null;
+let unsubGroupVotes = null;
+
+function groupPairKey(a, b){ return [a, b].sort().join('_'); }
+
+async function enterGroupCallScreen(groupId, isHost){
+  currentGroupId = groupId;
+  document.getElementById('groupCallScreen').classList.add('active');
+  document.getElementById('gcallStatus').textContent = isHost ? 'WAITING FOR OTHERS…' : 'CONNECTING…';
+
+  try{
+    groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+  }catch(err){
+    document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
+    alert("Camera/mic permission was denied — you'll still be in the call doc, but others won't see or hear you.");
+  }
+
+  const groupRef = doc(db, 'groupCalls', groupId);
+  unsubGroupCallDoc = onSnapshot(groupRef, (snap) => {
+    if (!snap.exists()){
+      if (!voluntaryLeave) teardownGroupCall('This group call has ended.');
+      return;
+    }
+    const data = snap.data();
+    const members = data.members || [];
+
+    if (!members.includes(myUid)){
+      if (!voluntaryLeave) teardownGroupCall('You were removed from this group call by vote.');
+      return;
+    }
+
+    document.getElementById('gcallStatus').textContent = members.length > 1 ? 'CONNECTED' : 'WAITING FOR OTHERS…';
+    renderGroupTiles(members);
+
+    members.forEach(uid => {
+      if (uid !== myUid && !groupPeers[uid]) connectToGroupPeer(groupId, uid);
+    });
+    Object.keys(groupPeers).forEach(uid => {
+      if (!members.includes(uid)) teardownGroupPeer(uid);
+    });
+  }, (err) => console.error('groupCalls listener failed:', err));
+
+  unsubGroupVotes = onSnapshot(collection(db, 'groupCalls', groupId, 'votes'), (snap) => {
+    snap.forEach(d => updateVoteBadge(d.id, (d.data().voters || []).length));
+    handleVoteThresholds(groupId, snap);
+  }, (err) => console.error('group votes listener failed:', err));
+}
+
+function renderGroupTiles(members){
+  const grid = document.getElementById('gcallGrid');
+  const wanted = new Set(members);
+  Array.from(grid.children).forEach(tile => {
+    if (!wanted.has(tile.dataset.uid)) tile.remove();
+  });
+  members.forEach(uid => {
+    if (document.getElementById('gtile-' + uid)) return;
+    const isMe = uid === myUid;
+    const tile = document.createElement('div');
+    tile.className = 'gtile';
+    tile.id = 'gtile-' + uid;
+    tile.dataset.uid = uid;
+    tile.innerHTML =
+      '<div class="gplaceholder" id="gph-' + uid + '"><span>' + (isMe ? 'you' : 'connecting…') + '</span></div>' +
+      '<video id="gv-' + uid + '" autoplay playsinline' + (isMe ? ' muted' : '') + ' style="display:none;"></video>' +
+      '<div class="gtile-label">' + (isMe ? 'You' : 'Guest #' + uid.slice(-4)) + '</div>' +
+      '<div class="gtile-votecount" id="gvotes-' + uid + '"></div>' +
+      (isMe ? '' : '<button class="gtile-vote" id="gvotebtn-' + uid + '" onclick="voteToRemove(\'' + uid + '\')">Vote to remove</button>');
+    grid.appendChild(tile);
+    if (isMe && groupLocalStream){
+      const v = document.getElementById('gv-' + uid);
+      v.srcObject = groupLocalStream;
+      v.style.display = 'block';
+      document.getElementById('gph-' + uid).style.display = 'none';
+    }
+  });
+}
+
+function setTileStream(uid, stream){
+  const v = document.getElementById('gv-' + uid);
+  const ph = document.getElementById('gph-' + uid);
+  if (!v) return;
+  v.srcObject = stream;
+  v.style.display = 'block';
+  if (ph) ph.style.display = 'none';
+}
+
+async function connectToGroupPeer(groupId, peerUid){
+  const amCaller = [myUid, peerUid].sort()[0] === myUid;
+  const sigRef = doc(db, 'groupCalls', groupId, 'signals', groupPairKey(myUid, peerUid));
+  const pc = new RTCPeerConnection(RTC_CONFIG);
+  groupPeers[peerUid] = pc;
+  groupPeerUnsubs[peerUid] = [];
+
+  if (groupLocalStream){
+    groupLocalStream.getTracks().forEach(t => pc.addTrack(t, groupLocalStream));
+  }
+
+  const remoteStream = new MediaStream();
+  pc.ontrack = (event) => {
+    event.streams[0].getTracks().forEach(t => remoteStream.addTrack(t));
+    setTileStream(peerUid, remoteStream);
+  };
+
+  const myCandidates = collection(sigRef, amCaller ? 'candidatesA' : 'candidatesB');
+  const theirCandidates = collection(sigRef, amCaller ? 'candidatesB' : 'candidatesA');
+  pc.onicecandidate = (event) => {
+    if (event.candidate) addDoc(myCandidates, event.candidate.toJSON());
+  };
+
+  groupPeerUnsubs[peerUid].push(onSnapshot(theirCandidates, (snap) => {
+    snap.docChanges().forEach(change => {
+      if (change.type === 'added'){
+        pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{});
+      }
+    });
+  }));
+
+  if (amCaller){
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await setDoc(sigRef, { offer: { type: offer.type, sdp: offer.sdp } }, { merge: true });
+    groupPeerUnsubs[peerUid].push(onSnapshot(sigRef, async (snap) => {
+      const data = snap.data();
+      if (data?.answer && pc.currentRemoteDescription === null){
+        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+      }
+    }));
+  } else {
+    groupPeerUnsubs[peerUid].push(onSnapshot(sigRef, async (snap) => {
+      const data = snap.data();
+      if (data?.offer && pc.currentRemoteDescription === null){
+        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await setDoc(sigRef, { answer: { type: answer.type, sdp: answer.sdp } }, { merge: true });
+      }
+    }));
+  }
+}
+
+function teardownGroupPeer(peerUid){
+  if (groupPeers[peerUid]){ groupPeers[peerUid].close(); delete groupPeers[peerUid]; }
+  if (groupPeerUnsubs[peerUid]){ groupPeerUnsubs[peerUid].forEach(fn => fn()); delete groupPeerUnsubs[peerUid]; }
+  const tile = document.getElementById('gtile-' + peerUid);
+  if (tile) tile.remove();
+}
+
+async function voteToRemove(targetUid){
+  if (!currentGroupId || targetUid === myUid) return;
+  const btn = document.getElementById('gvotebtn-' + targetUid);
+  if (btn){ btn.classList.add('voted'); btn.textContent = 'Voted ✓'; btn.disabled = true; }
+  try{
+    await setDoc(doc(db, 'groupCalls', currentGroupId, 'votes', targetUid), {
+      voters: arrayUnion(myUid)
+    }, { merge: true });
+  }catch(err){
+    console.error('voteToRemove failed:', err);
+  }
+}
+
+function updateVoteBadge(targetUid, count){
+  const badge = document.getElementById('gvotes-' + targetUid);
+  if (!badge) return;
+  if (count > 0){
+    badge.textContent = count + (count === 1 ? ' vote' : ' votes');
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Any client currently watching the votes subcollection can perform the
+// actual removal once a target has a majority of the OTHER current
+// members voting against them — arrayRemove is idempotent, so it's
+// harmless if more than one client's listener fires this at once.
+async function handleVoteThresholds(groupId, votesSnap){
+  const groupSnap = await getDoc(doc(db, 'groupCalls', groupId)).catch(() => null);
+  if (!groupSnap || !groupSnap.exists()) return;
+  const members = groupSnap.data().members || [];
+
+  votesSnap.forEach(d => {
+    const targetUid = d.id;
+    if (!members.includes(targetUid) || removalInFlight.has(targetUid)) return;
+    const voters = d.data().voters || [];
+    const otherMembers = members.filter(u => u !== targetUid);
+    if (otherMembers.length === 0) return;
+    const majority = Math.floor(otherMembers.length / 2) + 1;
+    const eligibleVotes = voters.filter(v => otherMembers.includes(v)).length;
+
+    if (eligibleVotes >= majority){
+      removalInFlight.add(targetUid);
+      updateDoc(doc(db, 'groupCalls', groupId), { members: arrayRemove(targetUid) })
+        .then(() => deleteDoc(doc(db, 'groupCalls', groupId, 'votes', targetUid)))
+        .catch(err => console.error('vote removal failed:', err))
+        .finally(() => removalInFlight.delete(targetUid));
+    }
+  });
+}
+
+function teardownGroupCall(finalMessage){
+  if (unsubGroupCallDoc){ unsubGroupCallDoc(); unsubGroupCallDoc = null; }
+  if (unsubGroupVotes){ unsubGroupVotes(); unsubGroupVotes = null; }
+  Object.keys(groupPeers).forEach(uid => teardownGroupPeer(uid));
+  if (groupLocalStream){ groupLocalStream.getTracks().forEach(t => t.stop()); groupLocalStream = null; }
+  document.getElementById('groupCallScreen').classList.remove('active');
+  document.getElementById('gcallGrid').innerHTML = '';
+  currentGroupId = null;
+  document.getElementById('site').style.display = 'block';
+  window.scrollTo(0,0);
+  if (finalMessage) alert(finalMessage);
+}
+
+async function leaveGroupCall(){
+  voluntaryLeave = true;
+  if (currentGroupId){
+    try{
+      const ref = doc(db, 'groupCalls', currentGroupId);
+      await updateDoc(ref, { members: arrayRemove(myUid) });
+      const snap = await getDoc(ref);
+      if (snap.exists() && (snap.data().members || []).length === 0){
+        await deleteDoc(ref).catch(()=>{});
+      }
+    }catch(err){
+      console.error('leaveGroupCall failed:', err);
+    }
+  }
+  teardownGroupCall();
+  voluntaryLeave = false;
+}
+
+function toggleGroupMic(){
+  if (!groupLocalStream) return;
+  groupMicOn = !groupMicOn;
+  groupLocalStream.getAudioTracks().forEach(t => t.enabled = groupMicOn);
+  const btn = document.getElementById('gMicBtn');
+  btn.textContent = groupMicOn ? '🎙 Mute' : '🔇 Unmute';
+  btn.classList.toggle('off', !groupMicOn);
+}
+
+function toggleGroupCam(){
+  if (!groupLocalStream) return;
+  groupCamOn = !groupCamOn;
+  groupLocalStream.getVideoTracks().forEach(t => t.enabled = groupCamOn);
+  const btn = document.getElementById('gCamBtn');
+  btn.textContent = groupCamOn ? '📷 Camera off' : '📷 Camera on';
+  btn.classList.toggle('off', !groupCamOn);
+  const v = document.getElementById('gv-' + myUid);
+  const ph = document.getElementById('gph-' + myUid);
+  if (v) v.style.display = groupCamOn ? 'block' : 'none';
+  if (ph) ph.style.display = groupCamOn ? 'none' : 'flex';
+}
+
 // Module scripts don't expose top-level functions on window the way
 // classic scripts do — but the HTML uses onclick="..." attributes,
 // which need them there. Wiring that up explicitly:
 Object.assign(window, {
   openVideoCall, skipVideoStranger, leaveVideoCall,
   openLobby, closeLobby, sendMessage, reportStranger,
-  requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo
+  requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo,
+  openGroupLobby, closeGroupLobby, startGroupCall,
+  acceptGroupInvite, declineGroupInvite, voteToRemove,
+  leaveGroupCall, toggleGroupMic, toggleGroupCam
 });
 </script>
 </body>
