@@ -186,6 +186,30 @@
   .hero-note{
     margin-top:22px; font-size:13px; color:var(--ink-soft); opacity:0.8;
   }
+  .home-country-row{
+    display:flex; align-items:center; gap:10px; margin-top:20px; flex-wrap:wrap;
+  }
+  .home-country-row label{
+    font-size:13px; font-weight:600; color:var(--ink-soft);
+  }
+  .country-select-home{
+    background:#fff;
+    border:1px solid rgba(31,27,46,0.14);
+    color:var(--ink);
+    border-radius:999px;
+    padding:9px 34px 9px 16px;
+    font-size:13.5px;
+    font-weight:500;
+    font-family:'Inter',sans-serif;
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236C5CE7'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    box-shadow:0 4px 12px rgba(31,27,46,0.06);
+    transition:border-color .15s ease;
+  }
+  .country-select-home:hover{border-color:rgba(108,92,231,0.4);}
+  .country-select-home:focus-visible{outline:2px solid var(--hp-blue); outline-offset:2px;}
 
   /* ---------- HERO BANNER (single image slideshow) ---------- */
   .hero-banner-dot{
@@ -416,6 +440,110 @@
   }
   .tag-input::placeholder{color:rgba(237,231,218,0.4);}
   .tag-input:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
+
+  .country-select{
+    background:rgba(237,231,218,0.06);
+    border:1px solid var(--line);
+    color:var(--paper);
+    border-radius:999px;
+    padding:10px 16px;
+    font-size:14px;
+    font-family:'IBM Plex Mono',monospace;
+    min-width:200px;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    padding-right:34px;
+  }
+  .country-select option{background:var(--void); color:var(--paper);}
+  .country-select:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
+  .country-select-row{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+    margin-bottom:14px; max-width:420px;
+  }
+  .country-select-sm{
+    background:rgba(13,14,31,0.65);
+    border:1px solid rgba(237,231,218,0.25);
+    color:var(--paper);
+    border-radius:999px;
+    padding:6px 30px 6px 12px;
+    font-size:11px;
+    font-family:'IBM Plex Mono',monospace;
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 10px center;
+  }
+  .country-select-sm option{background:var(--void); color:var(--paper);}
+
+  /* ---------- FLAG DROPDOWN (custom, shows real flag images) ----------
+     Native <select> elements can't render <img> flags, and emoji flags
+     render as plain two-letter codes on many Android WebViews — so the
+     country pickers use this custom widget instead. The original
+     <select> stays in the DOM (hidden) so all existing matching logic
+     that reads .value / .disabled keeps working unchanged. */
+  .flag-dd{position:relative; display:inline-block;}
+  .flag-dd-trigger{
+    display:inline-flex; align-items:center; gap:8px;
+    border-radius:999px; cursor:pointer; font-family:inherit; color:inherit;
+  }
+  .flag-dd-trigger:disabled{opacity:0.55; cursor:not-allowed;}
+  .flag-dd-flag-img{
+    display:block; width:20px; height:14px; object-fit:cover; border-radius:3px;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.15); vertical-align:middle; flex:none;
+  }
+  .flag-dd-emoji{font-size:16px; line-height:1; vertical-align:middle;}
+  .flag-dd-caret{font-size:10px; opacity:0.7; margin-left:2px;}
+
+  .flag-dd--home .flag-dd-trigger{
+    background:#fff; border:1px solid rgba(31,27,46,0.14); color:var(--ink);
+    padding:9px 14px; font-size:13.5px; font-weight:500; font-family:'Inter',sans-serif;
+    box-shadow:0 4px 12px rgba(31,27,46,0.06); transition:border-color .15s ease;
+  }
+  .flag-dd--home .flag-dd-trigger:hover{border-color:rgba(108,92,231,0.4);}
+  .flag-dd--home .flag-dd-trigger:focus-visible{outline:2px solid var(--hp-blue); outline-offset:2px;}
+
+  .flag-dd--lobby .flag-dd-trigger{
+    background:rgba(237,231,218,0.06); border:1px solid var(--line); color:var(--paper);
+    padding:10px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace; min-width:200px; justify-content:space-between;
+  }
+  .flag-dd--lobby .flag-dd-trigger:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
+
+  .flag-dd--video .flag-dd-trigger{
+    background:rgba(13,14,31,0.65); border:1px solid rgba(237,231,218,0.25); color:var(--paper);
+    padding:6px 12px; font-size:11px; font-family:'IBM Plex Mono',monospace;
+  }
+
+  .flag-dd-panel{
+    position:absolute; top:calc(100% + 8px); left:0; z-index:90;
+    width:240px; max-height:280px; overflow:hidden;
+    background:var(--void); border:1px solid rgba(237,231,218,0.18);
+    border-radius:14px; box-shadow:0 18px 40px rgba(0,0,0,0.35);
+    display:flex; flex-direction:column;
+  }
+  .flag-dd-panel[hidden]{display:none !important;}
+  .flag-dd--home .flag-dd-panel{background:#fff; border:1px solid rgba(31,27,46,0.12); box-shadow:0 18px 40px rgba(31,27,46,0.16);}
+  .flag-dd-search{
+    margin:10px; padding:8px 12px; border-radius:999px;
+    border:1px solid rgba(237,231,218,0.2); background:rgba(255,255,255,0.06); color:var(--paper);
+    font-family:'Inter',sans-serif; font-size:13px;
+  }
+  .flag-dd--home .flag-dd-search{border:1px solid rgba(31,27,46,0.14); background:#f6f5fc; color:var(--ink);}
+  .flag-dd-search:focus-visible{outline:2px solid var(--mint); outline-offset:1px;}
+  .flag-dd--home .flag-dd-search:focus-visible{outline-color:var(--hp-blue);}
+  .flag-dd-list{overflow-y:auto; padding:0 6px 8px;}
+  .flag-dd-item{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 10px; border-radius:10px; cursor:pointer;
+    color:var(--paper); font-family:'Inter',sans-serif; font-size:13.5px;
+  }
+  .flag-dd-item:hover, .flag-dd-item.active{background:rgba(94,234,212,0.14);}
+  .flag-dd--home .flag-dd-item{color:var(--ink);}
+  .flag-dd--home .flag-dd-item:hover, .flag-dd--home .flag-dd-item.active{background:var(--hp-card);}
+  .flag-dd-item.selected{font-weight:600;}
+  .flag-dd-empty{padding:14px; text-align:center; font-size:13px; color:var(--ink-soft);}
 
   /* ---------- CHAT ---------- */
   .chat{
@@ -927,6 +1055,10 @@
         <button class="btn btn-primary" onclick="openLobby()">💬 Start Random Chat</button>
         <a href="#safety" class="btn btn-outline">🛡️ Safety First</a>
       </div>
+      <div class="home-country-row">
+        <label for="homeCountrySelect">Match me with:</label>
+        <select class="country-select-home" id="homeCountrySelect" onchange="onHomeCountryChange()" aria-label="Preferred country to match with"></select>
+      </div>
       <div class="hero-stats">
         <div class="avatar-stack"><img src="p1.png" alt=""><img src="p2.png" alt=""><img src="p3.png" alt=""><img src="p4.png" alt=""></div>
         <div class="hero-stats-text"><strong>4,213 people</strong> are online chatting right now</div>
@@ -1008,6 +1140,9 @@
   </div>
   <h2 id="lobbyHeadline">Looking for someone to talk to</h2>
   <div class="lobby-tags" id="lobbyTagDisplay"></div>
+  <div class="country-select-row">
+    <select class="country-select" id="countrySelect" onchange="onCountryChange()" aria-label="Match by country"></select>
+  </div>
   <div class="tag-input-row">
     <input class="tag-input" id="tagInput" type="text" placeholder="interests (optional) — press Enter to add" maxlength="20">
   </div>
@@ -1019,6 +1154,9 @@
 <!-- ================= INSTANT VIDEO MATCH ================= -->
 <div class="vcall" id="videoCallScreen">
   <div class="vcall-status mono" id="vcallStatus">SEARCHING…</div>
+  <div class="vcall-actions" id="vcCountryRow" style="left:16px; right:auto; top:56px; position:absolute;">
+    <select class="country-select-sm" id="vcCountrySelect" onchange="onVideoCountryChange()" aria-label="Match by country"></select>
+  </div>
   <div class="vcall-stage" id="vcallStage">
     <div class="vcall-half" id="vcLocalHalf">
       <video class="vcall-video" id="vcLocalVideo" autoplay playsinline muted style="display:none;"></video>
@@ -1031,7 +1169,7 @@
         <span id="vcRemoteStatusText">looking for someone for video…</span>
       </div>
       <video class="vcall-video" id="vcRemoteVideo" autoplay playsinline style="display:none;"></video>
-      <div class="vcall-half-label">Stranger</div>
+      <div class="vcall-half-label">Stranger <span id="vcStrangerFlag"></span></div>
     </div>
   </div>
   <div class="vcall-actions">
@@ -1072,7 +1210,7 @@
     <div class="chat-who">
       <div class="chat-avatar" id="chatAvatarInitial">S</div>
       <div>
-        <div class="chat-name" id="chatStrangerName">Stranger #0000</div>
+        <div class="chat-name"><span id="chatStrangerName">Stranger #0000</span> <span id="chatStrangerFlag" title=""></span></div>
         <div class="chat-sub" id="chatStrangerTags">no shared interests listed</div>
       </div>
     </div>
@@ -1169,6 +1307,224 @@ const authReady = new Promise((resolve) => {
 });
 signInAnonymously(auth).catch((err) => console.error('Anonymous sign-in failed:', err));
 
+/* ------------------------------------------------------------
+   COUNTRY MATCHING
+   A small fixed list of countries plus "Any country" (the
+   default). Two people are considered country-compatible if
+   either of them has "any" selected, or if their chosen
+   countries are the same. The value is stored alongside the
+   waiting-pool doc so the matcher can filter candidates by it.
+   ------------------------------------------------------------ */
+const COUNTRIES = [
+  { code: 'any', flag: '🌍', name: 'Any country' },
+  { code: 'US', flag: '🇺🇸', name: 'United States' },
+  { code: 'CA', flag: '🇨🇦', name: 'Canada' },
+  { code: 'MX', flag: '🇲🇽', name: 'Mexico' },
+  { code: 'BR', flag: '🇧🇷', name: 'Brazil' },
+  { code: 'AR', flag: '🇦🇷', name: 'Argentina' },
+  { code: 'GB', flag: '🇬🇧', name: 'United Kingdom' },
+  { code: 'IE', flag: '🇮🇪', name: 'Ireland' },
+  { code: 'FR', flag: '🇫🇷', name: 'France' },
+  { code: 'DE', flag: '🇩🇪', name: 'Germany' },
+  { code: 'ES', flag: '🇪🇸', name: 'Spain' },
+  { code: 'IT', flag: '🇮🇹', name: 'Italy' },
+  { code: 'NL', flag: '🇳🇱', name: 'Netherlands' },
+  { code: 'SE', flag: '🇸🇪', name: 'Sweden' },
+  { code: 'PL', flag: '🇵🇱', name: 'Poland' },
+  { code: 'TR', flag: '🇹🇷', name: 'Turkey' },
+  { code: 'RU', flag: '🇷🇺', name: 'Russia' },
+  { code: 'ZA', flag: '🇿🇦', name: 'South Africa' },
+  { code: 'NG', flag: '🇳🇬', name: 'Nigeria' },
+  { code: 'EG', flag: '🇪🇬', name: 'Egypt' },
+  { code: 'AE', flag: '🇦🇪', name: 'UAE' },
+  { code: 'IN', flag: '🇮🇳', name: 'India' },
+  { code: 'PK', flag: '🇵🇰', name: 'Pakistan' },
+  { code: 'BD', flag: '🇧🇩', name: 'Bangladesh' },
+  { code: 'CN', flag: '🇨🇳', name: 'China' },
+  { code: 'JP', flag: '🇯🇵', name: 'Japan' },
+  { code: 'KR', flag: '🇰🇷', name: 'South Korea' },
+  { code: 'PH', flag: '🇵🇭', name: 'Philippines' },
+  { code: 'ID', flag: '🇮🇩', name: 'Indonesia' },
+  { code: 'VN', flag: '🇻🇳', name: 'Vietnam' },
+  { code: 'TH', flag: '🇹🇭', name: 'Thailand' },
+  { code: 'AU', flag: '🇦🇺', name: 'Australia' },
+  { code: 'NZ', flag: '🇳🇿', name: 'New Zealand' }
+];
+
+function countryInfo(code){
+  return COUNTRIES.find(c => c.code === code) || COUNTRIES[0];
+}
+
+// Flag AFTER the name everywhere it's displayed, e.g. "United States 🇺🇸"
+function countryOptionLabel(code){
+  const c = countryInfo(code);
+  return c.name + ' ' + c.flag;
+}
+
+function countryFlagOf(code){
+  return countryInfo(code || 'any').flag;
+}
+
+function countryNameOf(code){
+  return countryInfo(code || 'any').name;
+}
+
+// Keep "Any country" pinned first, then list the rest A→Z by name so
+// typing a letter in the dropdown jumps to countries in alphabetical order.
+function getSortedCountries(){
+  const anyEntry = COUNTRIES.find(c => c.code === 'any');
+  const sortedRest = COUNTRIES
+    .filter(c => c.code !== 'any')
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name));
+  return anyEntry ? [anyEntry, ...sortedRest] : sortedRest;
+}
+
+function populateCountrySelect(selectEl, defaultCode){
+  if (!selectEl) return;
+  selectEl.innerHTML = '';
+  getSortedCountries().forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.code;
+    opt.textContent = countryOptionLabel(c.code);
+    selectEl.appendChild(opt);
+  });
+  selectEl.value = defaultCode || 'any';
+}
+
+// Real, colorful flag images (flagcdn.com) instead of relying on emoji
+// flags — many Android WebViews render flag emoji as plain two-letter
+// codes instead of an actual colored flag, so images are more reliable
+// inside the wrapped app.
+function countryFlagMarkup(code){
+  if (!code || code === 'any') return '<span class="flag-dd-emoji">🌍</span>';
+  const src = 'https://flagcdn.com/w40/' + code.toLowerCase() + '.png';
+  return '<img class="flag-dd-flag-img" src="' + src + '" alt="" loading="lazy">';
+}
+
+// Custom flag-image dropdown that sits on top of a hidden native <select>.
+// The native select still holds the real value/disabled state so none of
+// the existing matching/search logic elsewhere has to change — this just
+// replaces how the picker looks and adds a type-to-search box.
+const flagDropdowns = {};
+function createFlagDropdown(selectId, variant){
+  const selectEl = document.getElementById(selectId);
+  if (!selectEl) return;
+  selectEl.style.display = 'none';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'flag-dd flag-dd--' + variant;
+  wrap.innerHTML =
+    '<button type="button" class="flag-dd-trigger" aria-haspopup="listbox" aria-expanded="false">' +
+      '<span class="flag-dd-trigger-flag"></span>' +
+      '<span class="flag-dd-trigger-name"></span>' +
+      '<span class="flag-dd-caret">▾</span>' +
+    '</button>' +
+    '<div class="flag-dd-panel" hidden>' +
+      '<input type="text" class="flag-dd-search" placeholder="Search country…" aria-label="Search country">' +
+      '<div class="flag-dd-list" role="listbox"></div>' +
+    '</div>';
+  selectEl.insertAdjacentElement('afterend', wrap);
+
+  const btn = wrap.querySelector('.flag-dd-trigger');
+  const panel = wrap.querySelector('.flag-dd-panel');
+  const search = wrap.querySelector('.flag-dd-search');
+  const list = wrap.querySelector('.flag-dd-list');
+  const triggerFlag = wrap.querySelector('.flag-dd-trigger-flag');
+  const triggerName = wrap.querySelector('.flag-dd-trigger-name');
+
+  function renderList(filterText){
+    const q = (filterText || '').trim().toLowerCase();
+    const items = getSortedCountries().filter(c => !q || c.name.toLowerCase().includes(q));
+    list.innerHTML = '';
+    if (items.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'flag-dd-empty';
+      empty.textContent = 'No countries match "' + filterText + '"';
+      list.appendChild(empty);
+      return;
+    }
+    items.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'flag-dd-item' + (c.code === selectEl.value ? ' selected' : '');
+      item.setAttribute('role', 'option');
+      item.dataset.code = c.code;
+      item.innerHTML = '<span class="flag-dd-item-flag">' + countryFlagMarkup(c.code) + '</span><span>' + c.name + '</span>';
+      item.addEventListener('click', () => {
+        selectEl.value = c.code;
+        syncTrigger();
+        closePanel();
+        selectEl.dispatchEvent(new Event('change'));
+      });
+      list.appendChild(item);
+    });
+  }
+
+  function syncTrigger(){
+    const code = selectEl.value || 'any';
+    triggerFlag.innerHTML = countryFlagMarkup(code);
+    triggerName.textContent = countryNameOf(code);
+    btn.disabled = !!selectEl.disabled;
+  }
+
+  function openPanel(){
+    panel.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    search.value = '';
+    renderList('');
+    search.focus();
+  }
+  function closePanel(){
+    panel.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  btn.addEventListener('click', () => {
+    if (btn.disabled) return;
+    if (panel.hidden) openPanel(); else closePanel();
+  });
+  search.addEventListener('input', () => renderList(search.value));
+  document.addEventListener('click', (e) => {
+    if (!wrap.contains(e.target)) closePanel();
+  });
+  wrap.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape'){ closePanel(); btn.focus(); }
+  });
+
+  syncTrigger();
+  flagDropdowns[selectId] = { sync: syncTrigger };
+}
+
+function refreshFlagDropdown(selectId){
+  const dd = flagDropdowns[selectId];
+  if (dd) dd.sync();
+}
+
+function countriesCompatible(a, b){
+  a = a || 'any'; b = b || 'any';
+  return a === 'any' || b === 'any' || a === b;
+}
+
+function countryLabel(code){
+  return countryNameOf(code);
+}
+
+populateCountrySelect(document.getElementById('countrySelect'), 'any');
+populateCountrySelect(document.getElementById('vcCountrySelect'), 'any');
+populateCountrySelect(document.getElementById('homeCountrySelect'), 'any');
+
+createFlagDropdown('countrySelect', 'lobby');
+createFlagDropdown('vcCountrySelect', 'video');
+createFlagDropdown('homeCountrySelect', 'home');
+
+// Homepage selector just sets the default that the lobby / video-call
+// screens open with — those screens each still have their own selector
+// so the choice can be changed per-search too.
+function onHomeCountryChange(){
+  const sel = document.getElementById('homeCountrySelect');
+  preferredCountry = sel ? sel.value : 'any';
+}
+
 // ---- Hero banner: alternate img1.png / img2.png, one visible at a time ----
 (() => {
   const slides = [document.getElementById('bannerImg1'), document.getElementById('bannerImg2')].filter(Boolean);
@@ -1197,6 +1553,8 @@ let ivcLocalStream = null;
 let ivcPeerConnection = null;
 
 let userTags = [];
+let myCountry = 'any';
+let preferredCountry = 'any'; // set from the homepage selector, used as the default when opening the lobby/video call
 let strangerId = null;
 let strangerTags = [];
 let matchTimeout = null;
@@ -1227,11 +1585,16 @@ let botTimeout = null;
 let videoFlowActive = false;   // true whenever the video-call screen is open (searching or connected)
 let unsubVideoWaitingWatch = null;
 let unsubVcallMessages = null;
+let myVideoCountry = 'any';
 
 async function openVideoCall(){
   document.getElementById('site').style.display = 'none';
   document.getElementById('videoCallScreen').classList.add('active');
   videoFlowActive = true;
+  myVideoCountry = preferredCountry;
+  const vcSel = document.getElementById('vcCountrySelect');
+  if (vcSel) { vcSel.value = myVideoCountry; vcSel.disabled = false; }
+  refreshFlagDropdown('vcCountrySelect');
   setVideoSearchingUI();
 
   if (!ivcLocalStream){
@@ -1253,6 +1616,16 @@ async function openVideoCall(){
   findVideoMatch();
 }
 
+async function onVideoCountryChange(){
+  const vcSel = document.getElementById('vcCountrySelect');
+  myVideoCountry = vcSel ? vcSel.value : 'any';
+  if (!videoFlowActive || currentCallId) return; // only restart search while still searching, not mid-call
+  if (unsubVideoWaitingWatch){ unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
+  if (myUid) await deleteDoc(doc(db, 'videoWaitingPool', myUid)).catch(()=>{});
+  setVideoSearchingUI('looking for someone in ' + countryLabel(myVideoCountry) + '…');
+  findVideoMatch();
+}
+
 function setVideoSearchingUI(msg){
   document.getElementById('vcallStatus').textContent = 'SEARCHING…';
   document.getElementById('vcRemoteStatusText').textContent = msg || 'looking for someone for video…';
@@ -1261,13 +1634,18 @@ function setVideoSearchingUI(msg){
   document.getElementById('vcRemoteVideo').style.display = 'none';
   document.getElementById('vcReportBtn').style.display = 'none';
   document.getElementById('vcSkipBtn').style.display = 'none';
+  const vcCountryRow = document.getElementById('vcCountryRow');
+  if (vcCountryRow) vcCountryRow.style.display = 'flex';
+  const vcSel = document.getElementById('vcCountrySelect');
+  if (vcSel) vcSel.disabled = false;
+  refreshFlagDropdown('vcCountrySelect');
 }
 
 // Same simplified client-side matchmaking caveat as the text matcher:
 // move this into a Cloud Function before trusting it at real scale.
 async function findVideoMatch(){
   const waitingRef = collection(db, 'videoWaitingPool');
-  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(5));
+  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(30));
   let snap;
   try{
     snap = await getDocs(q);
@@ -1279,7 +1657,7 @@ async function findVideoMatch(){
     return;
   }
   if (!videoFlowActive) return;
-  const candidate = snap.docs.find(d => d.id !== myUid);
+  const candidate = snap.docs.find(d => d.id !== myUid && countriesCompatible(myVideoCountry, d.data().country));
 
   if (candidate){
     try {
@@ -1288,10 +1666,12 @@ async function findVideoMatch(){
         const candRef = doc(db, 'videoWaitingPool', candidate.id);
         const candSnap = await tx.get(candRef);
         if (!candSnap.exists()) throw new Error('candidate already taken');
+        const candidateCountry = candSnap.data().country || 'any';
         tx.delete(candRef);
         tx.set(doc(db, 'calls', callId), {
           users: [myUid, candidate.id],
           status: 'active',
+          countries: { [myUid]: myVideoCountry, [candidate.id]: candidateCountry },
           createdAt: serverTimestamp()
         });
         tx.set(doc(db, 'videoMatches', candidate.id), { callId, with: myUid });
@@ -1309,7 +1689,7 @@ async function findVideoMatch(){
 }
 
 function registerAsVideoWaiting(){
-  setDoc(doc(db, 'videoWaitingPool', myUid), { createdAt: serverTimestamp() }).then(() => {
+  setDoc(doc(db, 'videoWaitingPool', myUid), { country: myVideoCountry, createdAt: serverTimestamp() }).then(() => {
     const myMatchRef = doc(db, 'videoMatches', myUid);
     unsubVideoWaitingWatch = onSnapshot(myMatchRef, (snap) => {
       if (!videoFlowActive) return;
@@ -1342,10 +1722,14 @@ async function startVideoCall(callId, callerFlag, partnerUid){
   }
   document.getElementById('vcallStatus').textContent = 'CONNECTING…';
   document.getElementById('vcRemoteStatusText').textContent = "waiting for the other person's camera…";
+  const vcCountryRow = document.getElementById('vcCountryRow');
+  if (vcCountryRow) vcCountryRow.style.display = 'none'; // lock in the filter once matched
 
   currentCallId = callId;
   isCaller = !!callerFlag;
   otherUid = partnerUid;
+
+  showPartnerCountryFlag(currentCallId, otherUid, 'vcStrangerFlag');
 
   document.getElementById('vcReportBtn').style.display = 'flex';
   document.getElementById('vcSkipBtn').style.display = 'flex';
@@ -1451,6 +1835,8 @@ async function skipVideoStranger(message){
   if (ivcPeerConnection){ ivcPeerConnection.close(); ivcPeerConnection = null; }
   document.getElementById('vcRemoteVideo').srcObject = null;
   await endCurrentInstantCall();
+  const flagEl = document.getElementById('vcStrangerFlag');
+  if (flagEl) flagEl.textContent = '';
   document.getElementById('vcallChatBody').innerHTML = '';
   if (!videoFlowActive) return;
   setVideoSearchingUI(message || 'looking for someone new…');
@@ -1473,6 +1859,8 @@ async function leaveVideoCall(){
   document.getElementById('vcLocalVideo').srcObject = null;
   document.getElementById('vcLocalVideo').style.display = 'none';
   document.getElementById('vcallChatBody').innerHTML = '';
+  const vcFlagEl = document.getElementById('vcStrangerFlag');
+  if (vcFlagEl) vcFlagEl.textContent = '';
   document.getElementById('site').style.display = 'block';
   window.scrollTo(0,0);
 }
@@ -1514,6 +1902,10 @@ async function openLobby(){
   const lobby = document.getElementById('lobby');
   lobby.classList.add('active');
   document.getElementById('lobbyHeadline').textContent = 'Looking for someone to talk to';
+  myCountry = preferredCountry;
+  const countrySel = document.getElementById('countrySelect');
+  if (countrySel) countrySel.value = myCountry;
+  refreshFlagDropdown('countrySelect');
   lobbyLeft = false;
   let i = 0;
   const statusEl = document.getElementById('lobbyStatus');
@@ -1536,15 +1928,26 @@ function closeLobby(){
   document.getElementById('site').style.display = 'block';
 }
 
+async function onCountryChange(){
+  const countrySel = document.getElementById('countrySelect');
+  myCountry = countrySel ? countrySel.value : 'any';
+  if (lobbyLeft) return; // select only affects an in-progress search
+  const statusEl = document.getElementById('lobbyStatus');
+  if (statusEl) statusEl.textContent = 'SEARCHING ' + countryLabel(myCountry).toUpperCase() + '…';
+  if (unsubWaitingWatch){ unsubWaitingWatch(); unsubWaitingWatch = null; }
+  if (myUid) await deleteDoc(doc(db, 'waitingPool', myUid)).catch(()=>{});
+  findMatch();
+}
+
 // Simplified client-side matchmaking. Two people can end up racing for
 // the same candidate under real concurrency — for a production app,
 // move this pairing logic into a Cloud Function so it's atomic and
 // server-trusted instead of client-trusted.
 async function findMatch(){
   const waitingRef = collection(db, 'waitingPool');
-  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(5));
+  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(30));
   const snap = await getDocs(q);
-  const candidate = snap.docs.find(d => d.id !== myUid);
+  const candidate = snap.docs.find(d => d.id !== myUid && countriesCompatible(myCountry, d.data().country));
 
   if (candidate){
     try {
@@ -1553,10 +1956,12 @@ async function findMatch(){
         const candRef = doc(db, 'waitingPool', candidate.id);
         const candSnap = await tx.get(candRef);
         if (!candSnap.exists()) throw new Error('candidate already taken');
+        const candidateCountry = candSnap.data().country || 'any';
         tx.delete(candRef);
         tx.set(doc(db, 'calls', callId), {
           users: [myUid, candidate.id],
           status: 'active',
+          countries: { [myUid]: myCountry, [candidate.id]: candidateCountry },
           createdAt: serverTimestamp()
         });
         tx.set(doc(db, 'matches', candidate.id), { callId, with: myUid });
@@ -1576,7 +1981,7 @@ async function findMatch(){
 
 function registerAsWaiting(){
   setDoc(doc(db, 'waitingPool', myUid), {
-    tags: userTags, createdAt: serverTimestamp()
+    tags: userTags, country: myCountry, createdAt: serverTimestamp()
   }).then(() => {
     const myMatchRef = doc(db, 'matches', myUid);
     unsubWaitingWatch = onSnapshot(myMatchRef, (snap) => {
@@ -1611,9 +2016,10 @@ function startChat(chosenPerson, callId, callerFlag, partnerUid){
     document.getElementById('chatStrangerName').textContent = 'Stranger #' + strangerId;
     document.getElementById('chatAvatarInitial').textContent = 'S' + String(strangerId).slice(-1);
     strangerTags = userTags;
-    document.getElementById('chatStrangerTags').textContent = strangerTags.length
+    const countryNote = myCountry !== 'any' ? (' · matched in ' + countryLabel(myCountry)) : '';
+    document.getElementById('chatStrangerTags').textContent = (strangerTags.length
       ? 'shares interest in ' + strangerTags.join(', ')
-      : 'no shared interests listed';
+      : 'no shared interests listed') + countryNote;
   }
 
   const body = document.getElementById('chatBody');
@@ -1626,6 +2032,7 @@ function startChat(chosenPerson, callId, callerFlag, partnerUid){
     : 'You\'re now chatting with a random stranger.');
 
   if (currentCallId){
+    showPartnerCountryFlag(currentCallId, otherUid, 'chatStrangerFlag');
     const msgsRef = collection(db, 'calls', currentCallId, 'messages');
     const q = query(msgsRef, orderBy('createdAt', 'asc'));
     let firstLoad = true;
@@ -1654,6 +2061,23 @@ function startChat(chosenPerson, callId, callerFlag, partnerUid){
     // run this same startChat() independently, so both call requestVideo()
     // on their own — that's what gets the offer/answer handshake going.
     requestVideo();
+  }
+}
+
+// Looks up the country each side picked (stored on the calls/{callId} doc
+// at match time) and renders the partner's flag next to their name.
+async function showPartnerCountryFlag(callId, partnerUid, flagElId){
+  const flagEl = document.getElementById(flagElId);
+  if (!flagEl || !callId || !partnerUid) return;
+  flagEl.innerHTML = '';
+  try{
+    const snap = await getDoc(doc(db, 'calls', callId));
+    const countries = snap.exists() ? (snap.data().countries || {}) : {};
+    const code = countries[partnerUid] || 'any';
+    flagEl.innerHTML = countryFlagMarkup(code);
+    flagEl.title = countryNameOf(code);
+  }catch(err){
+    console.error('showPartnerCountryFlag failed:', err);
   }
 }
 
@@ -1735,6 +2159,8 @@ async function newStranger(){
   clearTimeout(botTimeout);
   endVideo(); // never carry a live camera over to the next match
   await endCurrentCall();
+  const flagEl = document.getElementById('chatStrangerFlag');
+  if (flagEl) flagEl.textContent = '';
   addSystemMessage('You disconnected. Looking for someone new…');
   document.getElementById('chatScreen').classList.remove('active');
   openLobby();
@@ -2369,7 +2795,8 @@ Object.assign(window, {
   openVideoCall, skipVideoStranger, leaveVideoCall,
   openLobby, closeLobby, sendMessage, reportStranger,
   requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo,
-  openGroupCall, voteToRemove, leaveGroupCall, toggleGroupMic, toggleGroupCam
+  openGroupCall, voteToRemove, leaveGroupCall, toggleGroupMic, toggleGroupCam,
+  onCountryChange, onVideoCountryChange, onHomeCountryChange
 });
 </script>
 </body>
