@@ -1619,7 +1619,7 @@ async function openVideoCall(){
 
   if (!ivcLocalStream){
     try{
-      ivcLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+      ivcLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
     }catch(err){
       document.getElementById('vcallStatus').textContent = 'CAMERA/MIC BLOCKED';
       document.getElementById('vcRemoteStatusText').textContent = "camera/mic permission was denied — can't start video.";
@@ -1807,6 +1807,7 @@ async function startInstantVideoWebRTC(){
 
   if (isCaller){
     const offer = await ivcPeerConnection.createOffer();
+    offer.sdp = boostOpusAudio(offer.sdp);
     await ivcPeerConnection.setLocalDescription(offer);
     await updateDoc(callDocRef, { offer: { type: offer.type, sdp: offer.sdp } });
 
@@ -1822,6 +1823,7 @@ async function startInstantVideoWebRTC(){
       if (data?.offer && ivcPeerConnection && ivcPeerConnection.currentRemoteDescription === null){
         await ivcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
         const answer = await ivcPeerConnection.createAnswer();
+        answer.sdp = boostOpusAudio(answer.sdp);
         await ivcPeerConnection.setLocalDescription(answer);
         await updateDoc(callDocRef, { answer: { type: answer.type, sdp: answer.sdp } });
       }
@@ -2243,12 +2245,63 @@ let camOn = true;
 
 const RTC_CONFIG = {
   iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' }
-    // Add a TURN server here before relying on this for users behind
-    // strict NATs/firewalls — STUN alone won't get everyone connected.
-    // Firebase doesn't provide TURN; e.g. Twilio/Cloudflare offer it.
+    { urls: 'stun:stun.l.google.com:19302' },
+    // Free public TURN relay (Open Relay Project). Without a TURN fallback,
+    // peers behind strict/symmetric NATs either fail to connect at all, or
+    // limp along on a marginal path — which is what produces crackly audio
+    // and blocky/frozen video even after "connected". This free tier is
+    // fine for testing/small-scale use; swap in a paid TURN provider
+    // (Twilio, Cloudflare, Metered, etc.) before relying on this at scale.
+    { urls: 'stun:stun.relay.metered.ca:80' },
+    { urls: 'turn:global.relay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:global.relay.metered.ca:80?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turns:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
   ]
 };
+
+// Explicit mic constraints — cleans up background noise/echo instead of
+// relying on each browser/device's own default behavior.
+const MIC_CONSTRAINTS = {
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true
+};
+
+// The default Opus bitrate WebRTC negotiates (~32kbps) is tuned for low
+// bandwidth and can sound thin or noisy. Bumping the target bitrate in the
+// SDP noticeably cleans up voice quality once two peers are connected.
+function boostOpusAudio(sdp, bitrate){
+  bitrate = bitrate || 64000;
+  const lines = sdp.split('\r\n');
+  let opusPt = null;
+  for (const line of lines){
+    const m = line.match(/^a=rtpmap:(\d+) opus\/48000/);
+    if (m){ opusPt = m[1]; break; }
+  }
+  if (!opusPt) return sdp;
+  let foundFmtp = false;
+  const out = lines.map(line => {
+    const fm = line.match(new RegExp('^a=fmtp:' + opusPt + ' (.*)$'));
+    if (fm){
+      foundFmtp = true;
+      let params = fm[1];
+      if (!/maxaveragebitrate=/.test(params)) params += ';maxaveragebitrate=' + bitrate;
+      if (!/useinbandfec=/.test(params)) params += ';useinbandfec=1';
+      return 'a=fmtp:' + opusPt + ' ' + params;
+    }
+    return line;
+  });
+  if (!foundFmtp){
+    for (let i = 0; i < out.length; i++){
+      if (out[i].match(new RegExp('^a=rtpmap:' + opusPt + ' opus/48000'))){
+        out.splice(i + 1, 0, 'a=fmtp:' + opusPt + ' maxaveragebitrate=' + bitrate + ';useinbandfec=1');
+        break;
+      }
+    }
+  }
+  return out.join('\r\n');
+}
 
 async function requestVideo(){
   const stage = document.getElementById('videoStage');
@@ -2267,7 +2320,7 @@ async function requestVideo(){
   }
 
   try{
-    localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+    localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
   }catch(err){
     addSystemMessage('Camera/mic permission was denied or unavailable — video stays off.');
     return;
@@ -2310,6 +2363,7 @@ async function startWebRTC(){
 
   if (isCaller){
     const offer = await peerConnection.createOffer();
+    offer.sdp = boostOpusAudio(offer.sdp);
     await peerConnection.setLocalDescription(offer);
     await updateDoc(callDocRef, { offer: { type: offer.type, sdp: offer.sdp } });
 
@@ -2326,6 +2380,7 @@ async function startWebRTC(){
       if (data?.offer && peerConnection.currentRemoteDescription === null){
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
         const answer = await peerConnection.createAnswer();
+        answer.sdp = boostOpusAudio(answer.sdp);
         await peerConnection.setLocalDescription(answer);
         await updateDoc(callDocRef, { answer: { type: answer.type, sdp: answer.sdp } });
       }
@@ -2449,7 +2504,7 @@ async function openGroupCall(){
 
   if (!groupLocalStream){
     try{
-      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
     }catch(err){
       document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
       alert("Camera/mic permission was denied — can't start a group call.");
@@ -2533,7 +2588,7 @@ async function enterGroupCallScreen(groupId, isHost){
 
   if (!groupLocalStream){
     try{
-      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
     }catch(err){
       document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
       alert("Camera/mic permission was denied — you'll still be in the call doc, but others won't see or hear you.");
@@ -2655,6 +2710,7 @@ async function connectToGroupPeer(groupId, peerUid){
 
   if (amCaller){
     const offer = await pc.createOffer();
+    offer.sdp = boostOpusAudio(offer.sdp);
     await pc.setLocalDescription(offer);
     await setDoc(sigRef, { offer: { type: offer.type, sdp: offer.sdp } }, { merge: true });
     groupPeerUnsubs[peerUid].push(onSnapshot(sigRef, async (snap) => {
@@ -2669,6 +2725,7 @@ async function connectToGroupPeer(groupId, peerUid){
       if (data?.offer && pc.currentRemoteDescription === null){
         await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
         const answer = await pc.createAnswer();
+        answer.sdp = boostOpusAudio(answer.sdp);
         await pc.setLocalDescription(answer);
         await setDoc(sigRef, { answer: { type: answer.type, sdp: answer.sdp } }, { merge: true });
       }
