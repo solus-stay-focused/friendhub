@@ -247,6 +247,66 @@
     transition:background .3s ease, transform .3s ease;
   }
   .hero-banner-dots span.active{background:#fff; transform:scale(1.2);}
+  .hero-banner{cursor:zoom-in;}
+
+  /* ---------- BANNER LIGHTBOX ---------- */
+  .banner-lightbox{
+    display:none;
+    position:fixed; inset:0; z-index:999;
+    background:rgba(5,6,11,0.92);
+    align-items:center; justify-content:center;
+    padding:40px;
+    cursor:zoom-out;
+  }
+  .banner-lightbox.active{display:flex;}
+  .banner-lightbox img{
+    max-width:92vw; max-height:88vh;
+    width:auto; height:auto;
+    object-fit:contain;
+    border-radius:12px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  }
+  .banner-lightbox-close{
+    position:absolute; top:22px; right:28px;
+    width:42px; height:42px; border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    color:#fff; border:1px solid rgba(255,255,255,0.25);
+    font-size:20px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease;
+  }
+  .banner-lightbox-close:hover{background:rgba(255,255,255,0.22);}
+  .banner-lightbox-arrow{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:48px; height:48px; border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    color:#fff; border:1px solid rgba(255,255,255,0.25);
+    font-size:22px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease;
+    cursor:pointer;
+  }
+  .banner-lightbox-arrow:hover{background:rgba(255,255,255,0.22);}
+  .banner-lightbox-arrow.prev{left:20px;}
+  .banner-lightbox-arrow.next{right:20px;}
+  @media (max-width:600px){
+    .banner-lightbox-arrow{width:40px; height:40px; font-size:18px;}
+    .banner-lightbox-arrow.prev{left:8px;}
+    .banner-lightbox-arrow.next{right:8px;}
+  }
+  .banner-lightbox-dots{
+    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+    display:flex; gap:10px; z-index:2;
+  }
+  .banner-lightbox-dots span{
+    width:9px; height:9px; border-radius:50%;
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(255,255,255,0.5);
+    cursor:pointer;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .banner-lightbox-dots span:hover{background:rgba(255,255,255,0.6);}
+  .banner-lightbox-dots span.active{background:#fff; transform:scale(1.25);}
 
   /* ---------- FEATURE BAR ---------- */
   .feature-bar{
@@ -1121,7 +1181,7 @@
     <div class="hero-banner-wrap">
       <span class="hero-banner-dot d1"></span>
       <span class="hero-banner-dot d2"></span>
-      <div class="hero-banner">
+      <div class="hero-banner" onclick="openBannerLightbox()">
         <img class="hero-banner-img active" id="bannerImg1" src="img1.png" alt="">
         <img class="hero-banner-img" id="bannerImg2" src="img2.png" alt="">
         <img class="hero-banner-img" id="bannerImg3" src="img3.png" alt="">
@@ -1133,6 +1193,18 @@
       </div>
     </div>
   </section>
+
+  <div class="banner-lightbox" id="bannerLightbox" onclick="closeBannerLightbox(event)">
+    <button class="banner-lightbox-close" onclick="event.stopPropagation(); closeBannerLightbox();" aria-label="Close">✕</button>
+    <button class="banner-lightbox-arrow prev" onclick="event.stopPropagation(); changeLightboxSlide(-1);" aria-label="Previous image">‹</button>
+    <img id="bannerLightboxImg" src="" alt="" onclick="event.stopPropagation();">
+    <button class="banner-lightbox-arrow next" onclick="event.stopPropagation(); changeLightboxSlide(1);" aria-label="Next image">›</button>
+    <div class="banner-lightbox-dots" id="bannerLightboxDots" onclick="event.stopPropagation();">
+      <span onclick="setLightboxSlide(0)"></span>
+      <span onclick="setLightboxSlide(1)"></span>
+      <span onclick="setLightboxSlide(2)"></span>
+    </div>
+  </div>
 
   <section class="feature-bar">
     <div class="feature-item"><span class="ico">🌐</span><div><h4>Global Community</h4><p>Connect with people from around the world, any time of day.</p></div></div>
@@ -1659,19 +1731,70 @@ function onHomeCountryChange(){
 }
 
 // ---- Hero banner: alternate img1.png / img2.png / img3.png, one visible at a time ----
-(() => {
-  const slides = [document.getElementById('bannerImg1'), document.getElementById('bannerImg2'), document.getElementById('bannerImg3')].filter(Boolean);
-  const dots = document.querySelectorAll('.hero-banner-dots span');
-  if (slides.length < 2) return;
-  let i = 0;
-  setInterval(() => {
-    slides[i].classList.remove('active');
-    dots[i] && dots[i].classList.remove('active');
-    i = (i + 1) % slides.length;
-    slides[i].classList.add('active');
-    dots[i] && dots[i].classList.add('active');
-  }, 5000);
-})();
+// Slide state is shared with the lightbox below so opening/navigating the
+// lightbox stays in sync with (and can override) the small banner preview.
+const bannerSlides = [document.getElementById('bannerImg1'), document.getElementById('bannerImg2'), document.getElementById('bannerImg3')].filter(Boolean);
+const bannerDots = document.querySelectorAll('.hero-banner-dots span');
+let bannerIndex = 0;
+let bannerAutoTimer = null;
+
+function goToBannerSlide(newIndex){
+  const n = bannerSlides.length;
+  if (n === 0) return;
+  newIndex = ((newIndex % n) + n) % n; // wrap around both directions
+  bannerSlides[bannerIndex] && bannerSlides[bannerIndex].classList.remove('active');
+  bannerDots[bannerIndex] && bannerDots[bannerIndex].classList.remove('active');
+  bannerIndex = newIndex;
+  bannerSlides[bannerIndex] && bannerSlides[bannerIndex].classList.add('active');
+  bannerDots[bannerIndex] && bannerDots[bannerIndex].classList.add('active');
+
+  const lb = document.getElementById('bannerLightbox');
+  if (lb && lb.classList.contains('active')) syncLightboxToBanner();
+}
+
+function startBannerAutoRotate(){
+  if (bannerAutoTimer || bannerSlides.length < 2) return;
+  bannerAutoTimer = setInterval(() => goToBannerSlide(bannerIndex + 1), 5000);
+}
+function stopBannerAutoRotate(){
+  if (bannerAutoTimer){ clearInterval(bannerAutoTimer); bannerAutoTimer = null; }
+}
+startBannerAutoRotate();
+
+// ---- Banner lightbox: click banner to view the current slide full-size,
+// then use the arrows/dots (or ← →) to pick any image yourself ----
+function syncLightboxToBanner(){
+  const lbImg = document.getElementById('bannerLightboxImg');
+  const active = bannerSlides[bannerIndex];
+  if (lbImg && active) lbImg.src = active.src;
+  document.querySelectorAll('#bannerLightboxDots span').forEach((dot, idx) => {
+    dot.classList.toggle('active', idx === bannerIndex);
+  });
+}
+function openBannerLightbox(){
+  if (bannerSlides.length === 0) return;
+  stopBannerAutoRotate(); // pause auto-rotation while the user is browsing manually
+  syncLightboxToBanner();
+  document.getElementById('bannerLightbox').classList.add('active');
+}
+function closeBannerLightbox(e){
+  if (e && e.target && e.target.id !== 'bannerLightbox') return;
+  document.getElementById('bannerLightbox').classList.remove('active');
+  startBannerAutoRotate();
+}
+function changeLightboxSlide(delta){
+  goToBannerSlide(bannerIndex + delta);
+}
+function setLightboxSlide(idx){
+  goToBannerSlide(idx);
+}
+document.addEventListener('keydown', (e) => {
+  const lb = document.getElementById('bannerLightbox');
+  if (!lb || !lb.classList.contains('active')) return;
+  if (e.key === 'Escape') closeBannerLightbox();
+  else if (e.key === 'ArrowRight') changeLightboxSlide(1);
+  else if (e.key === 'ArrowLeft') changeLightboxSlide(-1);
+});
 
 // active call state
 let currentCallId = null;
@@ -2993,7 +3116,8 @@ Object.assign(window, {
   openLobby, closeLobby, sendMessage, reportStranger,
   requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo,
   openGroupCall, voteToRemove, leaveGroupCall, toggleGroupMic, toggleGroupCam,
-  onCountryChange, onVideoCountryChange, onHomeCountryChange
+  onCountryChange, onVideoCountryChange, onHomeCountryChange,
+  openBannerLightbox, closeBannerLightbox, changeLightboxSlide, setLightboxSlide
 });
 </script>
 </body>
