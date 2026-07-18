@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FriendHub — Meet someone new, right now</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%239C8CFB'/%3E%3Cstop offset='100%25' stop-color='%235142C4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z' fill='%23fff'/%3E%3Cpath d='M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z' fill='%235EEAD4' fill-opacity='0.88'/%3E%3Cpath d='M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z' fill='%23FFB84D'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -68,6 +69,7 @@
     display:flex; align-items:center; gap:10px;
     font-size:19px; font-weight:700; color:var(--ink);
   }
+  .logo-lockup{height:34px; width:auto; display:block;}
   .logo-icon{
     width:34px; height:34px; border-radius:10px;
     background:linear-gradient(135deg, var(--hp-blue-light), var(--hp-blue-deep));
@@ -1033,7 +1035,25 @@
 <!-- ================= MAIN SITE ================= -->
 <div id="site">
   <nav class="nav">
-    <div class="logo"><span class="logo-icon">💬</span><b>FriendHub</b></div>
+    <div class="logo">
+      <svg class="logo-lockup" viewBox="0 0 380 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FriendHub">
+        <defs>
+          <linearGradient id="navBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#9C8CFB"/>
+            <stop offset="100%" stop-color="#5142C4"/>
+          </linearGradient>
+          <linearGradient id="navTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#6C5CE7"/>
+            <stop offset="100%" stop-color="#5142C4"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#navBgGrad)"/>
+        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+        <text x="120" y="64" font-family="'Space Grotesk','Poppins',sans-serif" font-weight="700" font-size="42" fill="#1F1B2E" letter-spacing="-0.5">Friend<tspan fill="url(#navTextGrad)">Hub</tspan></text>
+      </svg>
+    </div>
     <div class="nav-links">
       <a href="#site" class="current">Home</a>
       <a href="#how">How it works</a>
