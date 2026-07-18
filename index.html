@@ -608,6 +608,19 @@
   .typing-dots span:nth-child(3){animation-delay:.3s;}
   @keyframes tdot{0%,60%,100%{opacity:.3; transform:translateY(0);}30%{opacity:1; transform:translateY(-3px);}}
 
+  .emoji-quick-row{
+    display:flex; gap:6px; padding:6px 12px; flex-wrap:wrap;
+  }
+  .emoji-quick-btn{
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px; font-size:17px; line-height:1; padding:5px 8px;
+    cursor:pointer; transition:background 0.15s, transform 0.1s;
+  }
+  .emoji-quick-btn:hover{ background:rgba(255,255,255,0.14); transform:translateY(-1px); }
+  .emoji-quick-btn:active{ transform:translateY(0); }
+  .vcall-chat .emoji-quick-row .emoji-quick-btn{
+    background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.14); color:var(--ink,#ede7da);
+  }
   .chat-input-row{
     flex:0 0 auto;
     border-top:1px solid var(--line-soft);
@@ -1197,10 +1210,17 @@
     <button class="vcall-btn skip" id="vcSkipBtn" onclick="skipVideoStranger()" style="display:none;">⟳ Skip</button>
     <button class="vcall-btn leave" onclick="leaveVideoCall()">✕ Leave</button>
   </div>
-  <div class="vcall-note">Random 1:1 video · leave anytime · 18+ only</div>
-
   <div class="vcall-chat" id="vcallChat">
     <div class="vcall-chat-body" id="vcallChatBody"></div>
+    <div class="emoji-quick-row">
+      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👋','vcallChatInput','vcallChatBody')" aria-label="Send wave emoji">👋</button>
+      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😀','vcallChatInput','vcallChatBody')" aria-label="Send smile emoji">😀</button>
+      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😂','vcallChatInput','vcallChatBody')" aria-label="Send laughing emoji">😂</button>
+      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('❤️','vcallChatInput','vcallChatBody')" aria-label="Send heart emoji">❤️</button>
+      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👍','vcallChatInput','vcallChatBody')" aria-label="Send thumbs up emoji">👍</button>
+      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('🔥','vcallChatInput','vcallChatBody')" aria-label="Send fire emoji">🔥</button>
+      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😢','vcallChatInput','vcallChatBody')" aria-label="Send sad emoji">😢</button>
+    </div>
     <div class="vcall-chat-input-row">
       <input class="chat-input" id="vcallChatInput" type="text" placeholder="Say something…" autocomplete="off">
       <button class="send-btn" onclick="sendMessage('vcallChatInput','vcallChatBody')" aria-label="Send message">
@@ -1269,6 +1289,15 @@
 
 
   <div class="chat-body" id="chatBody"></div>
+  <div class="emoji-quick-row">
+    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👋','chatInput','chatBody')" aria-label="Send wave emoji">👋</button>
+    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😀','chatInput','chatBody')" aria-label="Send smile emoji">😀</button>
+    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😂','chatInput','chatBody')" aria-label="Send laughing emoji">😂</button>
+    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('❤️','chatInput','chatBody')" aria-label="Send heart emoji">❤️</button>
+    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👍','chatInput','chatBody')" aria-label="Send thumbs up emoji">👍</button>
+    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('🔥','chatInput','chatBody')" aria-label="Send fire emoji">🔥</button>
+    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😢','chatInput','chatBody')" aria-label="Send sad emoji">😢</button>
+  </div>
   <div class="chat-input-row">
     <input class="chat-input" id="chatInput" type="text" placeholder="Say something…" autocomplete="off">
     <button class="send-btn" onclick="sendMessage()" aria-label="Send message">
@@ -2184,6 +2213,13 @@ function botTyping(callback, bodyId){
     div.remove();
     callback();
   }, 900 + Math.random()*900);
+}
+
+function quickEmoji(emoji, inputId, bodyId){
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  input.value = emoji;
+  sendMessage(inputId, bodyId);
 }
 
 function sendMessage(inputId, bodyId){
