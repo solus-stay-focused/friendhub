@@ -1081,7 +1081,7 @@
       </div>
       <div class="hero-stats">
         <div class="avatar-stack"><img src="p1.png" alt=""><img src="p2.png" alt=""><img src="p3.png" alt=""><img src="p4.png" alt=""></div>
-        <div class="hero-stats-text"><strong>4,213 people</strong> are online chatting right now</div>
+        <div class="hero-stats-text"><strong id="onlineCount">—</strong> people are online chatting right now</div>
       </div>
       <div class="hero-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
     </div>
@@ -1301,7 +1301,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
   getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDoc, getDocs,
   query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction, updateDoc,
-  arrayUnion, arrayRemove
+  arrayUnion, arrayRemove, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -1326,6 +1326,58 @@ const authReady = new Promise((resolve) => {
   });
 });
 signInAnonymously(auth).catch((err) => console.error('Anonymous sign-in failed:', err));
+
+/* ------------------------------------------------------------
+   LIVE ONLINE-USER COUNT
+   Every tab that has the site open writes a heartbeat doc to
+   presence/{uid} every 20s (and once immediately on load). The
+   homepage hero re-queries presence for docs whose lastSeen is
+   within the last 60s every 15s, and shows that count instead of
+   a hardcoded number. A doc older than 60s is treated as "gone"
+   (tab closed without a clean unload) even if it's never deleted,
+   so the count self-heals without needing a Cloud Function.
+   ------------------------------------------------------------ */
+const PRESENCE_HEARTBEAT_MS = 20000;
+const PRESENCE_STALE_MS = 60000;
+const PRESENCE_REFRESH_MS = 15000;
+
+async function startPresence(){
+  await authReady;
+  const presenceRef = doc(db, 'presence', myUid);
+
+  async function heartbeat(){
+    try{ await setDoc(presenceRef, { lastSeen: serverTimestamp() }); }
+    catch(err){ console.error('presence heartbeat failed:', err); }
+  }
+
+  await heartbeat();
+  setInterval(heartbeat, PRESENCE_HEARTBEAT_MS);
+
+  // Best-effort cleanup on tab close — not guaranteed to fire, which is
+  // exactly why the "online" query below also filters by staleness.
+  window.addEventListener('beforeunload', () => {
+    deleteDoc(presenceRef).catch(()=>{});
+  });
+
+  refreshOnlineCount();
+  setInterval(refreshOnlineCount, PRESENCE_REFRESH_MS);
+}
+
+async function refreshOnlineCount(){
+  const countEl = document.getElementById('onlineCount');
+  if (!countEl) return;
+  try{
+    const cutoff = Timestamp.fromMillis(Date.now() - PRESENCE_STALE_MS);
+    const presenceRef = collection(db, 'presence');
+    const q = query(presenceRef, where('lastSeen', '>', cutoff));
+    const snap = await getDocs(q);
+    countEl.textContent = snap.size.toLocaleString();
+  }catch(err){
+    console.error('refreshOnlineCount failed:', err);
+  }
+}
+
+startPresence();
 
 /* ------------------------------------------------------------
    COUNTRY MATCHING
