@@ -25,9 +25,12 @@
     --radius-m:16px;
     --radius-l:28px;
     /* homepage-only palette */
-    --hp-blue:#2F6FED;
-    --hp-blue-light:#7CA6FF;
+    --hp-blue:#6C5CE7;
+    --hp-blue-light:#9C8CFB;
+    --hp-blue-deep:#5142C4;
     --hp-black:#05060B;
+    --hp-bg:#F6F5FC;
+    --hp-card:#F0EEFB;
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -55,80 +58,238 @@
   .nav{
     position:sticky; top:0; z-index:50;
     display:flex; align-items:center; justify-content:space-between;
-    padding:20px 6vw;
-    background:rgba(4,6,12,0.92);
+    padding:18px 6vw;
+    background:rgba(246,245,252,0.86);
     backdrop-filter:blur(10px);
-    color:#fff;
-    border-bottom:1px solid rgba(255,255,255,0.1);
+    color:var(--ink);
+    border-bottom:1px solid rgba(31,27,46,0.07);
   }
   .logo{
     display:flex; align-items:center; gap:10px;
-    font-size:19px; font-weight:700; color:#fff;
+    font-size:19px; font-weight:700; color:var(--ink);
   }
-  .logo-dot{
-    width:10px;height:10px;border-radius:50%;
-    background:var(--hp-blue);
-    box-shadow:0 0 0 4px rgba(47,111,237,0.22);
-    animation:blink 2.4s ease-in-out infinite;
+  .logo-icon{
+    width:34px; height:34px; border-radius:10px;
+    background:linear-gradient(135deg, var(--hp-blue-light), var(--hp-blue-deep));
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+    box-shadow:0 6px 14px rgba(108,92,231,0.35);
   }
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
-  .nav-links{display:flex; gap:28px; align-items:center; font-size:14px;}
-  .nav-links a{text-decoration:none; color:rgba(255,255,255,0.65); transition:color .2s;}
-  .nav-links a:hover{color:#fff;}
+  .logo b{font-weight:700;}
+  .logo span{
+    background:linear-gradient(135deg, var(--hp-blue), var(--hp-blue-deep));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    font-weight:700;
+  }
+  .nav-links{display:flex; gap:26px; align-items:center; font-size:14px;}
+  .nav-links a{text-decoration:none; color:var(--ink-soft); transition:color .2s; font-weight:500;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a.current{color:var(--hp-blue);}
+  .nav-actions{display:flex; align-items:center; gap:10px;}
   .btn{
-    border:none; border-radius:8px; padding:11px 22px;
+    border:none; border-radius:10px; padding:11px 22px;
     font-weight:600; font-size:14px; transition:transform .15s ease, box-shadow .2s ease;
   }
   .btn:focus-visible{outline:2px solid var(--hp-blue); outline-offset:2px;}
   .btn-amber{background:var(--hp-blue); color:#fff;}
-  .btn-amber:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(47,111,237,0.4);}
+  .btn-amber:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(108,92,231,0.4);}
   .btn-ghost{background:transparent; border:1px solid var(--line); color:var(--paper);}
   .btn-ghost:hover{background:rgba(237,231,218,0.08);}
+  .btn-primary{
+    background:linear-gradient(135deg, var(--hp-blue-light), var(--hp-blue-deep));
+    color:#fff; display:inline-flex; align-items:center; gap:8px;
+    box-shadow:0 10px 24px rgba(108,92,231,0.32);
+  }
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 14px 28px rgba(108,92,231,0.42);}
+  .btn-outline{
+    background:#fff; color:var(--ink); border:1px solid rgba(31,27,46,0.14);
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-outline:hover{border-color:rgba(31,27,46,0.28); transform:translateY(-1px);}
+  .btn-nav-ghost{
+    background:transparent; color:var(--ink-soft); border:1px solid rgba(31,27,46,0.12);
+    padding:9px 16px; font-size:13px; border-radius:999px;
+  }
+  .btn-nav-ghost:hover{color:var(--ink); border-color:rgba(31,27,46,0.24);}
 
-  /* ---------- HERO (simple: black / white / blue) ---------- */
+  /* ---------- HERO (light indigo/violet) ---------- */
   .hero{
     position:relative;
-    background:#05060B;
-    color:#fff;
+    background:var(--hp-bg);
+    color:var(--ink);
     overflow:hidden;
-    padding:120px 6vw 110px;
-    display:flex;
-    flex-direction:column;
+    padding:90px 6vw 70px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:60px;
     align-items:center;
-    text-align:center;
   }
   .hero::before{
     content:'';
-    position:absolute; top:-30%; left:50%; transform:translateX(-50%);
-    width:900px; height:900px; border-radius:50%;
-    background:radial-gradient(circle, rgba(47,111,237,0.22) 0%, rgba(47,111,237,0) 60%);
+    position:absolute; top:-20%; left:8%;
+    width:520px; height:520px; border-radius:50%;
+    background:radial-gradient(circle, rgba(108,92,231,0.14) 0%, rgba(108,92,231,0) 65%);
+    pointer-events:none;
+  }
+  .hero::after{
+    content:'';
+    position:absolute; bottom:-30%; right:4%;
+    width:480px; height:480px; border-radius:50%;
+    background:radial-gradient(circle, rgba(94,234,212,0.14) 0%, rgba(94,234,212,0) 65%);
     pointer-events:none;
   }
   .hero > *{position:relative; z-index:1;}
+  .hero-copy{text-align:left;}
   .eyebrow{
     display:inline-flex; align-items:center; gap:8px;
-    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
-    color:var(--hp-blue-light); text-transform:uppercase;
-    border:1px solid rgba(47,111,237,0.4); border-radius:999px;
-    padding:6px 14px; margin-bottom:26px;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+    color:var(--hp-blue-deep);
+    background:var(--hp-card);
+    border-radius:999px;
+    padding:8px 16px; margin-bottom:22px;
   }
   .hero h1{
-    font-size:clamp(38px, 5.6vw, 68px);
-    line-height:1.05;
+    font-size:clamp(34px, 4.2vw, 54px);
+    line-height:1.08;
     font-weight:700;
-    max-width:820px;
+    max-width:560px;
+    color:var(--ink);
   }
   .hero h1 em{
-    font-style:normal; color:var(--hp-blue-light);
+    font-style:normal;
+    background:linear-gradient(135deg, var(--hp-blue), var(--hp-blue-deep));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
   }
   .hero p.lede{
-    font-size:18px; line-height:1.6; color:rgba(255,255,255,0.62);
-    max-width:520px; margin:22px 0 34px;
+    font-size:17px; line-height:1.6; color:var(--ink-soft);
+    max-width:460px; margin:20px 0 32px;
   }
-  .hero-cta-row{display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:center;}
+  .hero-cta-row{display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:flex-start;}
+  .hero-stats{
+    display:flex; align-items:center; gap:14px; margin-top:34px;
+  }
+  .avatar-stack{display:flex;}
+  .avatar-stack span{
+    width:38px; height:38px; border-radius:50%;
+    border:3px solid var(--hp-bg);
+    margin-left:-12px;
+    background:linear-gradient(135deg, var(--hp-blue-light), var(--hp-blue-deep));
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+  }
+  .avatar-stack span:first-child{margin-left:0;}
+  .avatar-stack span:nth-child(2){background:linear-gradient(135deg, var(--mint), #2FBFA8);}
+  .avatar-stack span:nth-child(3){background:linear-gradient(135deg, #FFB84D, #E08A2A);}
+  .avatar-stack span:nth-child(4){background:linear-gradient(135deg, var(--coral), #C24438);}
+  .hero-stats-text{font-size:14px; color:var(--ink-soft); line-height:1.4;}
+  .hero-stats-text strong{color:var(--ink);}
   .hero-note{
-    margin-top:22px; font-size:13px; color:rgba(255,255,255,0.4);
+    margin-top:22px; font-size:13px; color:var(--ink-soft); opacity:0.8;
   }
+
+  /* ---------- HERO MOCK CARD ---------- */
+  .hero-mock-wrap{position:relative;}
+  .hero-mock-dot{
+    position:absolute; width:10px; height:10px; border-radius:50%;
+    background:var(--hp-blue-light); opacity:0.5;
+    animation:pulse-core 3s ease-out infinite;
+  }
+  .hero-mock-dot.d1{top:-4%; left:14%;}
+  .hero-mock-dot.d2{top:6%; right:22%; background:var(--mint);}
+  .hero-mock-card{
+    background:linear-gradient(165deg, var(--void) 0%, var(--void-deep) 100%);
+    border-radius:var(--radius-l);
+    padding:16px;
+    box-shadow:0 40px 70px -25px rgba(108,92,231,0.4), 0 12px 30px rgba(5,6,11,0.2);
+    cursor:pointer;
+    border:none;
+    width:100%;
+    text-align:left;
+    font-family:inherit;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .hero-mock-card:hover{transform:translateY(-4px); box-shadow:0 46px 80px -25px rgba(108,92,231,0.5), 0 16px 34px rgba(5,6,11,0.24);}
+  .hero-mock-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:4px 6px 14px;
+  }
+  .hero-mock-online{
+    display:flex; align-items:center; gap:7px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(237,231,218,0.75);
+  }
+  .hero-mock-online .dot{width:8px; height:8px; border-radius:50%; background:var(--mint); box-shadow:0 0 8px rgba(94,234,212,0.7);}
+  .hero-mock-icons{display:flex; gap:8px;}
+  .hero-mock-icons span{
+    width:28px; height:28px; border-radius:50%;
+    background:rgba(237,231,218,0.1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:rgba(237,231,218,0.75);
+  }
+  .hero-mock-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:3px;
+    border-radius:var(--radius-m); overflow:hidden;
+    aspect-ratio:16/10;
+  }
+  .hero-mock-panel{
+    position:relative; display:flex; align-items:center; justify-content:center;
+  }
+  .hero-mock-panel.p1{background:linear-gradient(160deg, #2E2A57, #171735);}
+  .hero-mock-panel.p2{background:linear-gradient(160deg, #3A2A57, #1D1435);}
+  .hero-mock-avatar{
+    width:64px; height:64px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px;
+  }
+  .hero-mock-panel.p1 .hero-mock-avatar{background:rgba(108,92,231,0.25); border:2px solid rgba(156,140,251,0.5);}
+  .hero-mock-panel.p2 .hero-mock-avatar{background:rgba(94,234,212,0.18); border:2px solid rgba(94,234,212,0.5);}
+  .hero-mock-tag{
+    position:absolute; bottom:10px; left:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:10px;
+    background:rgba(13,14,31,0.7); color:rgba(237,231,218,0.85);
+    padding:4px 9px; border-radius:999px;
+  }
+  .hero-mock-controls{
+    display:flex; justify-content:center; gap:12px; padding:16px 6px 6px;
+  }
+  .hero-mock-btn{
+    width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(237,231,218,0.1); color:var(--paper); font-size:14px;
+  }
+  .hero-mock-btn.end{
+    width:46px; height:46px; background:var(--coral); color:#fff; font-size:16px;
+  }
+
+  /* ---------- FEATURE BAR ---------- */
+  .feature-bar{
+    position:relative; z-index:2;
+    max-width:1180px; margin:-46px auto 0;
+    background:#fff; border-radius:var(--radius-l);
+    box-shadow:0 20px 50px -20px rgba(31,27,46,0.18);
+    padding:34px 6vw;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:28px;
+  }
+  @media (max-width:900px){.feature-bar{grid-template-columns:1fr 1fr; margin:24px 6vw 0;}}
+  @media (max-width:520px){.feature-bar{grid-template-columns:1fr;}}
+  @media (max-width:980px){
+    .hero{grid-template-columns:1fr; padding:40px 6vw 60px; text-align:left;}
+    .hero-mock-wrap{max-width:460px;}
+  }
+  @media (max-width:760px){
+    .nav-links{display:none;}
+    .nav-actions{gap:8px;}
+    .btn-nav-ghost{display:none;}
+  }
+  .feature-item{display:flex; align-items:flex-start; gap:12px;}
+  .feature-item .ico{
+    flex:none; width:40px; height:40px; border-radius:11px;
+    background:var(--hp-card); border:1px solid rgba(108,92,231,0.22);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--hp-blue); font-size:17px;
+  }
+  .feature-item h4{font-size:15px; margin:0 0 4px; color:var(--ink); font-weight:700;}
+  .feature-item p{font-size:13.5px; line-height:1.5; color:var(--ink-soft); margin:0;}
+
 
 
   /* ---------- SIGNATURE RADAR ---------- */
@@ -253,10 +414,19 @@
     text-align:center;
   }
   .lobby.active{display:flex;}
-  .lobby-radar{position:relative; width:220px; height:220px; margin-bottom:34px;}
+  .lobby-stage{
+    width:100%; max-width:520px;
+    aspect-ratio:16/9;
+    background:var(--void-deep);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    position:relative;
+    overflow:hidden;
+    margin-bottom:34px;
+  }
   .lobby-status{
-    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--mint);
-    letter-spacing:0.03em; margin-bottom:10px; min-height:20px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mint);
+    letter-spacing:0.03em; min-height:20px;
   }
   .lobby h2{font-size:clamp(24px,3.4vw,34px); margin-bottom:14px;}
   .lobby-tags{
@@ -680,28 +850,72 @@
 <!-- ================= MAIN SITE ================= -->
 <div id="site">
   <nav class="nav">
-    <div class="logo"><span class="logo-dot"></span> FriendHub</div>
+    <div class="logo"><span class="logo-icon">💬</span><b>Friend</b><span>Hub</span></div>
     <div class="nav-links">
+      <a href="#site" class="current">Home</a>
       <a href="#how">How it works</a>
       <a href="#safety">Safety</a>
-      <button class="btn btn-ghost" onclick="openVideoCall()">Video call</button>
-      <button class="btn btn-ghost" onclick="openGroupCall()">Group call</button>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-nav-ghost" onclick="openVideoCall()">Video call</button>
+      <button class="btn btn-nav-ghost" onclick="openGroupCall()">Group call</button>
       <button class="btn btn-amber" onclick="openLobby()">Start chatting</button>
     </div>
   </nav>
 
   <section class="hero">
-    <span class="eyebrow"><span class="mono">●</span> 4,213 people online now</span>
-    <h1>Somewhere out there,<br>someone's <em>online</em> too.</h1>
-    <p class="lede">FriendHub pairs you with a random stranger for a one-on-one text chat. No profiles, no follower counts — just a real conversation with someone new.</p>
-    <div class="hero-cta-row">
-      <button class="btn btn-amber" onclick="openLobby()">Find a stranger →</button>
-      <a href="#how" class="btn btn-ghost">See how it works</a>
+    <div class="hero-copy">
+      <span class="eyebrow">💜 Meet. Chat. Connect.</span>
+      <h1>Meet someone new.<br>Make it a <em>real</em> conversation.</h1>
+      <p class="lede">FriendHub pairs you with a random stranger for a one-on-one text or video chat. No profiles, no follower counts — just a real conversation with someone new.</p>
+      <div class="hero-cta-row">
+        <button class="btn btn-primary" onclick="openLobby()">💬 Start Random Chat</button>
+        <a href="#safety" class="btn btn-outline">🛡️ Safety First</a>
+      </div>
+      <div class="hero-stats">
+        <div class="avatar-stack"><span></span><span></span><span></span><span></span></div>
+        <div class="hero-stats-text"><strong>4,213 people</strong> are online chatting right now</div>
+      </div>
+      <div class="hero-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
     </div>
-    <div class="hero-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
+    <div class="hero-mock-wrap">
+      <span class="hero-mock-dot d1"></span>
+      <span class="hero-mock-dot d2"></span>
+      <button class="hero-mock-card" onclick="openVideoCall()" aria-label="Preview a video call — tap to start">
+        <div class="hero-mock-head">
+          <span class="hero-mock-online"><span class="dot"></span> Online</span>
+          <div class="hero-mock-icons"><span>🛡</span><span>⋯</span></div>
+        </div>
+        <div class="hero-mock-grid">
+          <div class="hero-mock-panel p1">
+            <div class="hero-mock-avatar">🙂</div>
+            <span class="hero-mock-tag">You</span>
+          </div>
+          <div class="hero-mock-panel p2">
+            <div class="hero-mock-avatar">👋</div>
+            <span class="hero-mock-tag">Stranger</span>
+          </div>
+        </div>
+        <div class="hero-mock-controls">
+          <span class="hero-mock-btn">⟳</span>
+          <span class="hero-mock-btn">🎤</span>
+          <span class="hero-mock-btn end">✕</span>
+          <span class="hero-mock-btn">🎥</span>
+          <span class="hero-mock-btn">⏭</span>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <section class="feature-bar">
+    <div class="feature-item"><span class="ico">🌐</span><div><h4>Global Community</h4><p>Connect with people from around the world, any time of day.</p></div></div>
+    <div class="feature-item"><span class="ico">🛡</span><div><h4>Safe & Secure</h4><p>Report, block, or leave any chat instantly. Nothing is stored.</p></div></div>
+    <div class="feature-item"><span class="ico">⚡</span><div><h4>Easy to Use</h4><p>No sign-up, no profile. Tap once and you're talking.</p></div></div>
+    <div class="feature-item"><span class="ico">❤</span><div><h4>Make Friends</h4><p>Hit it off? Add each other and pick up the chat anytime.</p></div></div>
   </section>
 
   <section class="section" id="how">
+
     <div class="section-head">
       <span class="kicker">How it works</span>
       <h2>Three steps between you and a new conversation.</h2>
@@ -714,13 +928,13 @@
       </div>
       <div class="step">
         <span class="step-num">02 / We find a match</span>
-        <h3>The radar finds someone</h3>
+        <h3>We find someone</h3>
         <p>We pair you with another person online right now. No swiping, no waiting for approval — it just happens.</p>
       </div>
       <div class="step">
         <span class="step-num">03 / Start talking</span>
         <h3>Say hi, see where it goes</h3>
-        <p>Chat as long as you want. Not feeling it? Tap "New stranger" and the radar starts sweeping again.</p>
+        <p>Chat as long as you want. Not feeling it? Tap "New stranger" and we start looking again.</p>
       </div>
     </div>
   </section>
@@ -746,14 +960,12 @@
 
 <!-- ================= LOBBY (matching screen) ================= -->
 <div class="lobby" id="lobby">
-  <div class="lobby-radar">
-    <div class="radar-ring r1" style="border-color:rgba(94,234,212,0.25)"></div>
-    <div class="radar-ring r2" style="border-color:rgba(94,234,212,0.25)"></div>
-    <div class="radar-ring r3" style="border-color:rgba(94,234,212,0.25)"></div>
-    <div class="radar-sweep"></div>
-    <div class="radar-core"></div>
+  <div class="lobby-stage">
+    <div class="video-remote-placeholder">
+      <div class="avatar-ring spin">◌</div>
+      <span class="lobby-status mono" id="lobbyStatus">SCANNING…</span>
+    </div>
   </div>
-  <div class="lobby-status mono" id="lobbyStatus">SCANNING…</div>
   <h2 id="lobbyHeadline">Looking for someone to talk to</h2>
   <div class="lobby-tags" id="lobbyTagDisplay"></div>
   <div class="tag-input-row">
