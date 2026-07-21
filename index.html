@@ -1,900 +1,240 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FriendHub — Meet someone new, right now</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%239C8CFB'/%3E%3Cstop offset='100%25' stop-color='%235142C4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z' fill='%23fff'/%3E%3Cpath d='M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z' fill='%235EEAD4' fill-opacity='0.88'/%3E%3Cpath d='M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z' fill='%23FFB84D'/%3E%3C/svg%3E">
+<!-- ============================================================
+  Video Call Box — full screen
+  Same design language as before (void/paper/mint/coral, IBM Plex Mono).
+  The call window now fills the viewport (height:100vh) and the chat
+  panel is docked full-width below it instead of sitting beside it.
+============================================================= -->
+<title>FriendHub — Meet someone new today 😉</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%20role%3D%22img%22%20aria-label%3D%22FriendHub%22%3E%20%20%3Cdefs%3E%20%20%20%20%3ClinearGradient%20id%3D%22navBgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%239C8CFB%22/%3E%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235142C4%22/%3E%20%20%20%20%3C/linearGradient%3E%20%20%3C/defs%3E%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22url%28%23navBgGrad%29%22/%3E%20%20%3Cpath%20d%3D%22M14%2C44%20a22%2C22%200%201%2C1%2022%2C26%20l-7%2C10%20l-2%2C-12%20a22%2C22%200%200%2C1%20-13%2C-24%20z%22%20fill%3D%22%23FFFFFF%22/%3E%20%20%3Cpath%20d%3D%22M86%2C48%20a22%2C22%200%201%2C0%20-22%2C26%20l7%2C10%20l2%2C-12%20a22%2C22%200%200%2C0%2013%2C-24%20z%22%20fill%3D%22%235EEAD4%22%20fill-opacity%3D%220.88%22/%3E%20%20%3Cpath%20d%3D%22M79%2C17%20l2.6%2C6.4%206.4%2C2.6%20-6.4%2C2.6%20-2.6%2C6.4%20-2.6%2C-6.4%20-6.4%2C-2.6%206.4%2C-2.6%20z%22%20fill%3D%22%23FFB84D%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-  :root{
+  /* Reset so .vcapp can actually take up the full viewport height.
+     If you're dropping this into a page that already has its own
+     html/body sizing, you can remove this block and just make sure
+     the parent element .vcapp sits in has height:100vh (or similar). */
+  html, body{
+    margin:0;
+    height:100%;
+    background:#0D0E1F;
+  }
+
+  .vcapp{
     --void:#14152B;
     --void-deep:#0D0E1F;
-    --amber:#FFB84D;
-    --amber-dim:#8A6428;
+    --paper:#EDE7DA;
     --mint:#5EEAD4;
     --coral:#FF6B5B;
-    --paper:#EDE7DA;
-    --paper-dim:#DCD4C2;
-    --ink:#1F1B2E;
-    --ink-soft:#4B4760;
     --line:rgba(237,231,218,0.14);
-    --line-soft:rgba(31,27,46,0.12);
-    --radius-s:10px;
-    --radius-m:16px;
-    --radius-l:28px;
-    /* homepage-only palette */
-    --hp-blue:#6C5CE7;
-    --hp-blue-light:#9C8CFB;
-    --hp-blue-deep:#5142C4;
-    --hp-black:#05060B;
-    --hp-bg:#F6F5FC;
-    --hp-card:#F0EEFB;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3{
-    font-family:'Space Grotesk',sans-serif;
-    margin:0;
-    letter-spacing:-0.01em;
-  }
-  .mono{font-family:'IBM Plex Mono',monospace;}
-  a{color:inherit;}
-  button{font-family:inherit;cursor:pointer;}
-  ::selection{background:var(--amber);color:var(--ink);}
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
-  }
 
-  /* ---------- NAV ---------- */
-  .nav{
-    position:sticky; top:0; z-index:50;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:18px 6vw;
-    background:rgba(246,245,252,0.86);
-    backdrop-filter:blur(10px);
-    color:var(--ink);
-    border-bottom:1px solid rgba(31,27,46,0.07);
-  }
-  .logo{
-    display:flex; align-items:center; gap:10px;
-    font-size:19px; font-weight:700; color:var(--ink);
-  }
-  .logo-lockup{height:34px; width:auto; display:block;}
-  .logo-icon{
-    width:34px; height:34px; border-radius:10px;
-    background:linear-gradient(135deg, var(--hp-blue-light), var(--hp-blue-deep));
-    display:flex; align-items:center; justify-content:center;
-    font-size:16px;
-    box-shadow:0 6px 14px rgba(108,92,231,0.35);
-  }
-  .logo b{font-weight:700;}
-  .logo span{
-    background:linear-gradient(135deg, var(--hp-blue), var(--hp-blue-deep));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    font-weight:700;
-  }
-  .nav-links{display:flex; gap:26px; align-items:center; font-size:14px;}
-  .nav-links a{text-decoration:none; color:var(--ink-soft); transition:color .2s; font-weight:500;}
-  .nav-links a:hover{color:var(--ink);}
-  .nav-links a.current{color:var(--hp-blue);}
-  .nav-actions{display:flex; align-items:center; gap:10px;}
-  .btn{
-    border:none; border-radius:10px; padding:11px 22px;
-    font-weight:600; font-size:14px; transition:transform .15s ease, box-shadow .2s ease;
-  }
-  .btn:focus-visible{outline:2px solid var(--hp-blue); outline-offset:2px;}
-  .btn-amber{background:var(--hp-blue); color:#fff;}
-  .btn-amber:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(108,92,231,0.4);}
-  .btn-ghost{background:transparent; border:1px solid var(--line); color:var(--paper);}
-  .btn-ghost:hover{background:rgba(237,231,218,0.08);}
-  .btn-primary{
-    background:linear-gradient(135deg, var(--hp-blue-light), var(--hp-blue-deep));
-    color:#fff; display:inline-flex; align-items:center; gap:8px;
-    box-shadow:0 10px 24px rgba(108,92,231,0.32);
-  }
-  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 14px 28px rgba(108,92,231,0.42);}
-  .btn-outline{
-    background:#fff; color:var(--ink); border:1px solid rgba(31,27,46,0.14);
-    display:inline-flex; align-items:center; gap:8px;
-  }
-  .btn-outline:hover{border-color:rgba(31,27,46,0.28); transform:translateY(-1px);}
-  .btn-nav-ghost{
-    background:transparent; color:var(--ink-soft); border:1px solid rgba(31,27,46,0.12);
-    padding:9px 16px; font-size:13px; border-radius:999px;
-  }
-  .btn-nav-ghost:hover{color:var(--ink); border-color:rgba(31,27,46,0.24);}
-
-  /* ---------- HERO (light indigo/violet) ---------- */
-  .hero{
-    position:relative;
-    background:var(--hp-bg);
-    color:var(--ink);
-    overflow:hidden;
-    padding:90px 6vw 70px;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:60px;
-    align-items:center;
-  }
-  .hero::before{
-    content:'';
-    position:absolute; top:-20%; left:8%;
-    width:520px; height:520px; border-radius:50%;
-    background:radial-gradient(circle, rgba(108,92,231,0.14) 0%, rgba(108,92,231,0) 65%);
-    pointer-events:none;
-  }
-  .hero::after{
-    content:'';
-    position:absolute; bottom:-30%; right:4%;
-    width:480px; height:480px; border-radius:50%;
-    background:radial-gradient(circle, rgba(94,234,212,0.14) 0%, rgba(94,234,212,0) 65%);
-    pointer-events:none;
-  }
-  .hero > *{position:relative; z-index:5;}
-  .hero-copy{text-align:left;}
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:8px;
-    font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
-    color:var(--hp-blue-deep);
-    background:var(--hp-card);
-    border-radius:999px;
-    padding:8px 16px; margin-bottom:22px;
-  }
-  .hero h1{
-    font-size:clamp(34px, 4.2vw, 54px);
-    line-height:1.08;
-    font-weight:700;
-    max-width:560px;
-    color:var(--ink);
-  }
-  .hero h1 em{
-    font-style:normal;
-    background:linear-gradient(135deg, var(--hp-blue), var(--hp-blue-deep));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .hero p.lede{
-    font-size:17px; line-height:1.6; color:var(--ink-soft);
-    max-width:460px; margin:20px 0 32px;
-  }
-  .hero-cta-row{display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:flex-start;}
-  .hero-stats{
-    display:flex; align-items:center; gap:14px; margin-top:34px;
-  }
-  .avatar-stack{display:flex;}
-  .avatar-stack img{
-    width:38px; height:38px; border-radius:50%;
-    border:3px solid var(--hp-bg);
-    margin-left:-12px;
-    object-fit:cover;
-    background:linear-gradient(135deg, var(--hp-blue-light), var(--hp-blue-deep));
-    display:block;
-  }
-  .avatar-stack img:first-child{margin-left:0;}
-  .avatar-stack img:nth-child(2){background:linear-gradient(135deg, var(--mint), #2FBFA8);}
-  .avatar-stack img:nth-child(3){background:linear-gradient(135deg, #FFB84D, #E08A2A);}
-  .avatar-stack img:nth-child(4){background:linear-gradient(135deg, var(--coral), #C24438);}
-  .hero-stats-text{font-size:14px; color:var(--ink-soft); line-height:1.4;}
-  .hero-stats-text strong{color:var(--ink);}
-  .hero-note{
-    margin-top:22px; font-size:13px; color:var(--ink-soft); opacity:0.8;
-  }
-  .home-country-row{
-    display:flex; align-items:center; gap:10px; margin-top:20px; flex-wrap:wrap;
-  }
-  .home-country-row label{
-    font-size:13px; font-weight:600; color:var(--ink-soft);
-  }
-  .country-select-home{
-    background:#fff;
-    border:1px solid rgba(31,27,46,0.14);
-    color:var(--ink);
-    border-radius:999px;
-    padding:9px 34px 9px 16px;
-    font-size:13.5px;
-    font-weight:500;
-    font-family:'Inter',sans-serif;
-    appearance:none; -webkit-appearance:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236C5CE7'><path d='M5 8l5 5 5-5H5z'/></svg>");
-    background-repeat:no-repeat;
-    background-position:right 12px center;
-    box-shadow:0 4px 12px rgba(31,27,46,0.06);
-    transition:border-color .15s ease;
-  }
-  .country-select-home:hover{border-color:rgba(108,92,231,0.4);}
-  .country-select-home:focus-visible{outline:2px solid var(--hp-blue); outline-offset:2px;}
-
-  /* ---------- HERO BANNER (single image slideshow) ---------- */
-  .hero-banner-dot{
-    position:absolute; width:10px; height:10px; border-radius:50%;
-    background:var(--hp-blue-light); opacity:0.5;
-    animation:pulse-core 3s ease-out infinite;
-  }
-  .hero-banner-dot.d1{top:-4%; left:14%;}
-  .hero-banner-dot.d2{top:6%; right:22%; background:var(--mint);}
-  .hero-banner-wrap{position:relative; width:100%; max-width:520px; margin-left:auto;}
-  .hero-banner{
-    position:relative;
-    width:100%;
-    border-radius:var(--radius-l);
-    overflow:hidden;
-    aspect-ratio:16/11;
-    background:linear-gradient(160deg, #2E2A57, #171735);
-    box-shadow:0 30px 60px -25px rgba(108,92,231,0.4), 0 10px 24px rgba(5,6,11,0.2);
-  }
-  .hero-banner-img{
-    position:absolute; inset:0; width:100%; height:100%;
-    object-fit:contain; object-position:center center; opacity:0;
-    transition:opacity 1s ease;
-  }
-  .hero-banner-img.active{opacity:1;}
-  .hero-banner-dots{
-    position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
-    display:flex; gap:7px; z-index:2;
-  }
-  .hero-banner-dots span{
-    width:7px; height:7px; border-radius:50%;
-    background:rgba(255,255,255,0.4);
-    transition:background .3s ease, transform .3s ease;
-  }
-  .hero-banner-dots span.active{background:#fff; transform:scale(1.2);}
-  .hero-banner{cursor:zoom-in;}
-
-  /* ---------- BANNER LIGHTBOX ---------- */
-  .banner-lightbox{
-    display:none;
-    position:fixed; inset:0; z-index:999;
-    background:rgba(5,6,11,0.92);
-    align-items:center; justify-content:center;
-    padding:40px;
-    cursor:zoom-out;
-  }
-  .banner-lightbox.active{display:flex;}
-  .banner-lightbox img{
-    max-width:92vw; max-height:88vh;
-    width:auto; height:auto;
-    object-fit:contain;
-    border-radius:12px;
-    box-shadow:0 30px 80px rgba(0,0,0,0.5);
-  }
-  .banner-lightbox-close{
-    position:absolute; top:22px; right:28px;
-    width:42px; height:42px; border-radius:50%;
-    background:rgba(255,255,255,0.12);
-    color:#fff; border:1px solid rgba(255,255,255,0.25);
-    font-size:20px; line-height:1;
-    display:flex; align-items:center; justify-content:center;
-    transition:background .2s ease;
-  }
-  .banner-lightbox-close:hover{background:rgba(255,255,255,0.22);}
-  .banner-lightbox-arrow{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:48px; height:48px; border-radius:50%;
-    background:rgba(255,255,255,0.12);
-    color:#fff; border:1px solid rgba(255,255,255,0.25);
-    font-size:22px; line-height:1;
-    display:flex; align-items:center; justify-content:center;
-    transition:background .2s ease;
-    cursor:pointer;
-  }
-  .banner-lightbox-arrow:hover{background:rgba(255,255,255,0.22);}
-  .banner-lightbox-arrow.prev{left:20px;}
-  .banner-lightbox-arrow.next{right:20px;}
-  @media (max-width:600px){
-    .banner-lightbox-arrow{width:40px; height:40px; font-size:18px;}
-    .banner-lightbox-arrow.prev{left:8px;}
-    .banner-lightbox-arrow.next{right:8px;}
-  }
-  .banner-lightbox-dots{
-    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
-    display:flex; gap:10px; z-index:2;
-  }
-  .banner-lightbox-dots span{
-    width:9px; height:9px; border-radius:50%;
-    background:rgba(255,255,255,0.35);
-    border:1px solid rgba(255,255,255,0.5);
-    cursor:pointer;
-    transition:background .2s ease, transform .2s ease;
-  }
-  .banner-lightbox-dots span:hover{background:rgba(255,255,255,0.6);}
-  .banner-lightbox-dots span.active{background:#fff; transform:scale(1.25);}
-
-  /* ---------- FEATURE BAR ---------- */
-  .feature-bar{
-    position:relative; z-index:2;
-    max-width:1180px; margin:-46px auto 0;
-    background:#fff; border-radius:var(--radius-l);
-    box-shadow:0 20px 50px -20px rgba(31,27,46,0.18);
-    padding:34px 6vw;
-    display:grid; grid-template-columns:repeat(4,1fr); gap:28px;
-  }
-  @media (max-width:900px){.feature-bar{grid-template-columns:1fr 1fr; margin:24px 6vw 0;}}
-  @media (max-width:520px){.feature-bar{grid-template-columns:1fr;}}
-  @media (max-width:980px){
-    .hero{grid-template-columns:1fr; padding:40px 6vw 60px; text-align:left;}
-    .hero-banner-wrap{max-width:420px; margin:0 auto;}
-  }
-  @media (max-width:760px){
-    .nav-links{display:none;}
-    .nav-actions{gap:8px;}
-    .btn-nav-ghost{display:none;}
-  }
-  .feature-item{display:flex; align-items:flex-start; gap:12px;}
-  .feature-item .ico{
-    flex:none; width:40px; height:40px; border-radius:11px;
-    background:var(--hp-card); border:1px solid rgba(108,92,231,0.22);
-    display:flex; align-items:center; justify-content:center;
-    color:var(--hp-blue); font-size:17px;
-  }
-  .feature-item h4{font-size:15px; margin:0 0 4px; color:var(--ink); font-weight:700;}
-  .feature-item p{font-size:13.5px; line-height:1.5; color:var(--ink-soft); margin:0;}
-
-
-
-  /* ---------- SIGNATURE RADAR ---------- */
-  .radar-wrap{
-    position:relative;
-    aspect-ratio:1/1;
-    max-width:460px;
-    justify-self:center;
-    width:100%;
-  }
-  .radar-ring{
-    position:absolute; inset:0; margin:auto;
-    border-radius:50%;
-    border:1px solid rgba(94,234,212,0.18);
-  }
-  .r1{inset:0;}
-  .r2{inset:12%;}
-  .r3{inset:24%;}
-  .r4{inset:36%;}
-  .radar-sweep{
-    position:absolute; inset:0; border-radius:50%;
-    background:conic-gradient(from 0deg, rgba(94,234,212,0.32), rgba(94,234,212,0) 28%);
-    animation:spin 5.5s linear infinite;
-    mix-blend-mode:screen;
-  }
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .radar-core{
-    position:absolute; inset:0; margin:auto;
-    width:16px; height:16px; border-radius:50%;
-    background:var(--amber);
-    box-shadow:0 0 0 0 rgba(255,184,77,0.55);
-    animation:pulse-core 2.6s ease-out infinite;
-  }
-  @keyframes pulse-core{
-    0%{box-shadow:0 0 0 0 rgba(255,184,77,0.55);}
-    70%{box-shadow:0 0 0 40px rgba(255,184,77,0);}
-    100%{box-shadow:0 0 0 0 rgba(255,184,77,0);}
-  }
-  .blip{
-    position:absolute;
-    width:10px; height:10px; border-radius:50%;
-    background:var(--mint);
-    box-shadow:0 0 10px rgba(94,234,212,0.8);
-    animation:blip-fade 4s ease-in-out infinite;
-  }
-  .blip-tag{
-    position:absolute;
-    transform:translate(-50%, -140%);
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    background:rgba(13,14,31,0.85);
-    color:var(--mint);
-    border:1px solid rgba(94,234,212,0.3);
-    padding:3px 8px;
-    border-radius:999px;
-    white-space:nowrap;
-    opacity:0;
-    animation:tag-fade 4s ease-in-out infinite;
-  }
-  @keyframes blip-fade{
-    0%,100%{opacity:0; transform:scale(0.6);}
-    15%,70%{opacity:1; transform:scale(1);}
-  }
-  @keyframes tag-fade{
-    0%,100%{opacity:0;}
-    20%,65%{opacity:1;}
-  }
-
-  /* ---------- HOW IT WORKS (white) ---------- */
-  .section{padding:110px 6vw; background:#fff;}
-  .section-head{max-width:640px; margin-bottom:56px;}
-  .section-head .kicker{
-    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
-    text-transform:uppercase; color:var(--hp-blue); margin-bottom:14px; display:block;
-  }
-  .section-head h2{font-size:clamp(28px,3.4vw,42px); line-height:1.1; color:#0A0A0A;}
-  .steps{
-    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
-  }
-  @media (max-width:860px){.steps{grid-template-columns:1fr;}}
-  .step{
-    background:#fff; border:1px solid #E7E9EE; border-radius:var(--radius-m);
-    padding:32px 26px;
-  }
-  .step-num{
-    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--hp-blue);
-    margin-bottom:18px; display:block;
-  }
-  .step h3{font-size:20px; margin-bottom:10px; color:#0A0A0A;}
-  .step p{font-size:15px; line-height:1.6; color:#5B616E; margin:0;}
-
-  /* ---------- SAFETY BANNER (black) ---------- */
-  .safety{
-    background:var(--hp-black); color:#fff;
-    padding:100px 6vw;
-    display:grid; grid-template-columns:1fr 1fr; gap:56px;
-  }
-  @media (max-width:860px){.safety{grid-template-columns:1fr;}}
-  .safety h2{font-size:clamp(26px,3vw,36px); margin-bottom:18px;}
-  .safety p.lede{color:rgba(255,255,255,0.6); font-size:16px; line-height:1.6; max-width:440px;}
-  .safety-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:20px;}
-  .safety-list li{display:flex; gap:14px; align-items:flex-start; font-size:15px; line-height:1.55; color:rgba(255,255,255,0.6);}
-  .safety-list .ico{
-    flex:none; width:34px; height:34px; border-radius:9px;
-    background:rgba(47,111,237,0.15); border:1px solid rgba(47,111,237,0.4);
-    display:flex; align-items:center; justify-content:center;
-    color:var(--hp-blue-light); font-family:'IBM Plex Mono',monospace; font-size:13px;
-  }
-  .safety-list strong{color:#fff; display:block; margin-bottom:2px; font-weight:600;}
-
-
-  /* ---------- LOBBY / MATCHING ---------- */
-  .lobby{
-    display:none;
-    min-height:100vh;
-    background:radial-gradient(120% 100% at 50% 0%, #1B1D3D 0%, var(--void) 40%, var(--void-deep) 100%);
-    color:var(--paper);
+    display:flex;
     flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:40px 20px;
-    text-align:center;
-  }
-  .lobby.active{display:flex;}
-  .lobby-stage{
-    width:100%; max-width:520px;
-    aspect-ratio:16/9;
-    background:var(--void-deep);
-    border:1px solid var(--line);
-    border-radius:var(--radius-m);
-    position:relative;
-    overflow:hidden;
-    margin-bottom:34px;
-  }
-  .lobby-status{
-    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mint);
-    letter-spacing:0.03em; min-height:20px;
-  }
-  .lobby h2{font-size:clamp(24px,3.4vw,34px); margin-bottom:14px;}
-  .lobby-tags{
-    display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:420px;
-    margin:6px 0 30px;
-  }
-  .tag-chip{
-    font-family:'IBM Plex Mono',monospace; font-size:12px;
-    background:rgba(94,234,212,0.1); border:1px solid rgba(94,234,212,0.3);
-    color:var(--mint); padding:5px 12px; border-radius:999px;
-  }
-  .tag-input-row{
-    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
-    margin-bottom:26px; max-width:420px;
-  }
-  .tag-input{
-    background:rgba(237,231,218,0.06);
-    border:1px solid var(--line);
-    color:var(--paper);
-    border-radius:999px;
-    padding:10px 16px;
-    font-size:14px;
-    font-family:inherit;
-    min-width:220px;
-  }
-  .tag-input::placeholder{color:rgba(237,231,218,0.4);}
-  .tag-input:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
-
-  .country-select{
-    background:rgba(237,231,218,0.06);
-    border:1px solid var(--line);
-    color:var(--paper);
-    border-radius:999px;
-    padding:10px 16px;
-    font-size:14px;
-    font-family:'IBM Plex Mono',monospace;
-    min-width:200px;
-    appearance:none;
-    -webkit-appearance:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
-    background-repeat:no-repeat;
-    background-position:right 12px center;
-    padding-right:34px;
-  }
-  .country-select option{background:var(--void); color:var(--paper);}
-  .country-select:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
-  .country-select-row{
-    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
-    margin-bottom:14px; max-width:420px;
-  }
-  .country-select-sm{
-    background:rgba(13,14,31,0.65);
-    border:1px solid rgba(237,231,218,0.25);
-    color:var(--paper);
-    border-radius:999px;
-    padding:6px 30px 6px 12px;
-    font-size:11px;
-    font-family:'IBM Plex Mono',monospace;
-    appearance:none; -webkit-appearance:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
-    background-repeat:no-repeat;
-    background-position:right 10px center;
-  }
-  .country-select-sm option{background:var(--void); color:var(--paper);}
-
-  /* ---------- FLAG DROPDOWN (custom, shows real flag images) ----------
-     Native <select> elements can't render <img> flags, and emoji flags
-     render as plain two-letter codes on many Android WebViews — so the
-     country pickers use this custom widget instead. The original
-     <select> stays in the DOM (hidden) so all existing matching logic
-     that reads .value / .disabled keeps working unchanged. */
-  .flag-dd{position:relative; display:inline-block;}
-  .flag-dd-trigger{
-    display:inline-flex; align-items:center; gap:8px;
-    border-radius:999px; cursor:pointer; font-family:inherit; color:inherit;
-  }
-  .flag-dd-trigger:disabled{opacity:0.55; cursor:not-allowed;}
-  .flag-dd-flag-img{
-    display:block; width:20px; height:14px; object-fit:cover; border-radius:3px;
-    box-shadow:0 0 0 1px rgba(0,0,0,0.15); vertical-align:middle; flex:none;
-  }
-  .flag-dd-emoji{font-size:16px; line-height:1; vertical-align:middle;}
-  .flag-dd-caret{font-size:10px; opacity:0.7; margin-left:2px;}
-
-  .flag-dd--home .flag-dd-trigger{
-    background:#fff; border:1px solid rgba(31,27,46,0.14); color:var(--ink);
-    padding:9px 14px; font-size:13.5px; font-weight:500; font-family:'Inter',sans-serif;
-    box-shadow:0 4px 12px rgba(31,27,46,0.06); transition:border-color .15s ease;
-  }
-  .flag-dd--home .flag-dd-trigger:hover{border-color:rgba(108,92,231,0.4);}
-  .flag-dd--home .flag-dd-trigger:focus-visible{outline:2px solid var(--hp-blue); outline-offset:2px;}
-
-  .flag-dd--lobby .flag-dd-trigger{
-    background:rgba(237,231,218,0.06); border:1px solid var(--line); color:var(--paper);
-    padding:10px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace; min-width:200px; justify-content:space-between;
-  }
-  .flag-dd--lobby .flag-dd-trigger:focus-visible{outline:2px solid var(--mint); outline-offset:2px;}
-
-  .flag-dd--video .flag-dd-trigger{
-    background:rgba(13,14,31,0.65); border:1px solid rgba(237,231,218,0.25); color:var(--paper);
-    padding:6px 12px; font-size:11px; font-family:'IBM Plex Mono',monospace;
-  }
-
-  .flag-dd-panel{
-    position:absolute; top:calc(100% + 8px); left:0; z-index:90;
-    width:240px; max-height:280px; overflow:hidden;
-    background:var(--void); border:1px solid rgba(237,231,218,0.18);
-    border-radius:14px; box-shadow:0 18px 40px rgba(0,0,0,0.35);
-    display:flex; flex-direction:column;
-  }
-  .flag-dd-panel[hidden]{display:none !important;}
-  .flag-dd--home .flag-dd-panel{background:#fff; border:1px solid rgba(31,27,46,0.12); box-shadow:0 18px 40px rgba(31,27,46,0.16);}
-  .flag-dd-search{
-    margin:10px; padding:8px 12px; border-radius:999px;
-    border:1px solid rgba(237,231,218,0.2); background:rgba(255,255,255,0.06); color:var(--paper);
-    font-family:'Inter',sans-serif; font-size:13px;
-  }
-  .flag-dd--home .flag-dd-search{border:1px solid rgba(31,27,46,0.14); background:#f6f5fc; color:var(--ink);}
-  .flag-dd-search:focus-visible{outline:2px solid var(--mint); outline-offset:1px;}
-  .flag-dd--home .flag-dd-search:focus-visible{outline-color:var(--hp-blue);}
-  .flag-dd-list{overflow-y:auto; padding:0 6px 8px;}
-  .flag-dd-item{
-    display:flex; align-items:center; gap:10px;
-    padding:8px 10px; border-radius:10px; cursor:pointer;
-    color:var(--paper); font-family:'Inter',sans-serif; font-size:13.5px;
-  }
-  .flag-dd-item:hover, .flag-dd-item.active{background:rgba(94,234,212,0.14);}
-  .flag-dd--home .flag-dd-item{color:var(--ink);}
-  .flag-dd--home .flag-dd-item:hover, .flag-dd--home .flag-dd-item.active{background:var(--hp-card);}
-  .flag-dd-item.selected{font-weight:600;}
-  .flag-dd-empty{padding:14px; text-align:center; font-size:13px; color:var(--ink-soft);}
-
-  /* ---------- CHAT ---------- */
-  .chat{
-    display:none;
+    gap:0;
+    width:100%;
     height:100vh;
-    background:var(--paper);
-    flex-direction:column;
-    overflow:hidden;
-  }
-  .chat.active{display:flex;}
-  .chat-top{
-    background:var(--void); color:var(--paper);
-    padding:16px 5vw; display:flex; align-items:center; justify-content:space-between;
-    border-bottom:1px solid var(--line);
-    flex:0 0 auto;
-  }
-  .chat-who{display:flex; align-items:center; gap:12px;}
-  .chat-avatar{
-    width:38px;height:38px;border-radius:50%;
-    background:linear-gradient(135deg, var(--mint), var(--amber));
-    display:flex;align-items:center;justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px; color:var(--void);
-  }
-  .chat-name{font-weight:600; font-size:15px;}
-  .chat-sub{font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(237,231,218,0.55);}
-  .chat-actions{display:flex; gap:10px;}
-  .icon-btn{
-    background:transparent; border:1px solid var(--line); color:var(--paper-dim);
-    border-radius:999px; padding:8px 16px; font-size:13px; transition:all .15s;
-  }
-  .icon-btn:hover{border-color:var(--mint); color:var(--paper);}
-  .icon-btn.danger:hover{border-color:var(--coral); color:var(--coral);}
-
-  .chat-body{
-    flex:1 1 auto; min-height:0; overflow-y:auto; padding:20px 5vw;
-    display:flex; flex-direction:column; gap:14px;
-    max-width:760px; margin:0 auto; width:100%;
-  }
-  .msg{
-    max-width:72%; padding:12px 16px; border-radius:16px; font-size:15px; line-height:1.5;
-    animation:msg-in .25s ease;
-  }
-  @keyframes msg-in{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
-  .msg.me{
-    align-self:flex-end; background:var(--ink); color:var(--paper); border-bottom-right-radius:4px;
-  }
-  .msg.them{
-    align-self:flex-start; background:#fff; border:1px solid var(--line-soft); border-bottom-left-radius:4px;
-  }
-  .msg.system{
-    align-self:center; background:transparent; color:var(--ink-soft);
-    font-family:'IBM Plex Mono',monospace; font-size:12px; text-align:center; max-width:100%;
-  }
-  .typing-dots{display:inline-flex; gap:4px; align-items:center; padding:4px 2px;}
-  .typing-dots span{
-    width:6px;height:6px;border-radius:50%;background:var(--ink-soft);
-    animation:tdot 1.2s infinite ease-in-out;
-  }
-  .typing-dots span:nth-child(2){animation-delay:.15s;}
-  .typing-dots span:nth-child(3){animation-delay:.3s;}
-  @keyframes tdot{0%,60%,100%{opacity:.3; transform:translateY(0);}30%{opacity:1; transform:translateY(-3px);}}
-
-  .emoji-quick-row{
-    display:flex; gap:6px; padding:6px 12px; flex-wrap:wrap;
-  }
-  .emoji-quick-btn{
-    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-    border-radius:10px; font-size:17px; line-height:1; padding:5px 8px;
-    cursor:pointer; transition:background 0.15s, transform 0.1s;
-  }
-  .emoji-quick-btn:hover{ background:rgba(255,255,255,0.14); transform:translateY(-1px); }
-  .emoji-quick-btn:active{ transform:translateY(0); }
-  .vcall-chat .emoji-quick-row .emoji-quick-btn{
-    background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.14); color:var(--ink,#ede7da);
-  }
-  .chat-input-row{
-    flex:0 0 auto;
-    border-top:1px solid var(--line-soft);
-    padding:16px 5vw 22px;
-    display:flex; gap:12px; align-items:center;
-    max-width:760px; margin:0 auto; width:100%;
-  }
-  .chat-input{
-    flex:1; border:1px solid var(--line-soft); border-radius:999px;
-    padding:13px 20px; font-size:15px; font-family:inherit;
-  }
-  .chat-input:focus-visible{outline:2px solid var(--ink); outline-offset:1px;}
-  .send-btn{
-    background:var(--ink); color:var(--paper); border:none; border-radius:999px;
-    width:46px; height:46px; display:flex; align-items:center; justify-content:center; flex:none;
-  }
-  .send-btn:hover{background:#000;}
-
-  /* ---------- PEOPLE DIRECTORY (choose who to call) ---------- */
-  .people{
-    display:none;
-    min-height:100vh;
-    background:var(--paper);
-    flex-direction:column;
-  }
-  .people.active{display:flex;}
-  .people-top{
-    background:var(--void); color:var(--paper);
-    padding:20px 5vw; display:flex; align-items:center; justify-content:space-between;
-    border-bottom:1px solid var(--line);
-  }
-  .people-top h2{font-size:19px;}
-  .people-top .sub{font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(237,231,218,0.55); margin-top:4px;}
-  .people-grid{
-    flex:1; overflow-y:auto;
-    max-width:900px; margin:0 auto; width:100%;
-    padding:28px 5vw 40px;
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px;
-  }
-  .person-card{
-    background:#fff; border:1px solid var(--line-soft); border-radius:var(--radius-m);
-    padding:20px; display:flex; flex-direction:column; gap:12px;
-    transition:transform .15s ease, box-shadow .2s ease;
-  }
-  .person-card:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(31,27,46,0.08);}
-  .person-card-head{display:flex; align-items:center; gap:12px;}
-  .person-avatar{
-    width:44px; height:44px; border-radius:50%; flex:none;
-    background:linear-gradient(135deg, var(--mint), var(--amber));
-    display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:15px; color:var(--void);
-    position:relative;
-  }
-  .online-dot{
-    position:absolute; bottom:-1px; right:-1px;
-    width:11px; height:11px; border-radius:50%;
-    background:var(--mint); border:2px solid #fff;
-  }
-  .person-name{font-weight:600; font-size:15px;}
-  .person-status{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
-  .person-tags{display:flex; gap:6px; flex-wrap:wrap;}
-  .person-tags .tag-chip{
-    background:rgba(31,27,46,0.05); border:1px solid var(--line-soft); color:var(--ink-soft);
-    font-size:11px; padding:4px 10px;
-  }
-  .call-btn{
-    background:var(--ink); color:var(--paper); border:none; border-radius:999px;
-    padding:10px 16px; font-size:13px; font-weight:600; display:flex; align-items:center;
-    justify-content:center; gap:6px; transition:background .15s;
-  }
-  .call-btn:hover{background:#000;}
-
-  /* ---------- OUTGOING CALL ---------- */
-  .calling{
-    display:none;
-    min-height:100vh;
-    background:radial-gradient(120% 100% at 50% 0%, #1B1D3D 0%, var(--void) 40%, var(--void-deep) 100%);
+    max-width:none;
+    margin:0;
+    font-family:'IBM Plex Mono',monospace;
     color:var(--paper);
-    flex-direction:column; align-items:center; justify-content:center;
-    padding:40px 20px; text-align:center;
-  }
-  .calling.active{display:flex;}
-  .calling-avatar-wrap{position:relative; width:140px; height:140px; margin-bottom:30px;}
-  .calling-avatar{
-    width:100%; height:100%; border-radius:50%;
-    background:linear-gradient(135deg, var(--mint), var(--amber));
-    display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:44px; color:var(--void);
-    position:relative; z-index:2;
-  }
-  .ring-pulse{
-    position:absolute; inset:0; border-radius:50%;
-    border:2px solid rgba(94,234,212,0.5);
-    animation:ring-out 1.8s ease-out infinite;
-  }
-  .ring-pulse.delay{animation-delay:.6s;}
-  @keyframes ring-out{
-    0%{transform:scale(1); opacity:0.8;}
-    100%{transform:scale(1.6); opacity:0;}
-  }
-  .calling-status{
-    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--mint);
-    letter-spacing:0.03em; margin-bottom:8px;
-  }
-  .calling h2{font-size:clamp(22px,3vw,30px); margin-bottom:34px;}
-  .calling-actions{display:flex; gap:16px;}
-  .call-action-btn{
-    width:56px; height:56px; border-radius:50%; border:none;
-    display:flex; align-items:center; justify-content:center; font-size:20px;
-  }
-  .call-action-btn.cancel{background:var(--coral); color:#fff;}
-  .call-action-btn.cancel:hover{background:#e5503f;}
-  .call-action-btn.accept{background:var(--mint); color:var(--void);}
-  .call-action-btn.accept:hover{background:#4dd0ba;}
-  /* ---------- VIDEO ---------- */
-  .video-stage{
-    display:none;
-  }
-  .video-stage.active{
-    display:flex; flex-direction:row;
-    width:100%; flex:0 0 44vh; height:44vh; min-height:220px;
-    max-width:none; margin:0; border-radius:0;
     background:var(--void-deep);
-    position:relative; overflow:hidden;
   }
-  @media (max-width:700px){
-    .video-stage.active{ flex-direction:column; flex:0 0 52vh; height:52vh; }
+  .vcapp:fullscreen,
+  .vcapp:-webkit-full-screen{
+    width:100vw; height:100vh;
   }
-  .video-half{
-    flex:1 1 50%; position:relative; overflow:hidden;
+
+  /* ---------- video column: fills all remaining height ---------- */
+  .vcapp-video-col{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:10px 10px 0 10px;
+  }
+
+  .vcbox{
+    width:100%;
+    flex:1 1 auto;
+    min-height:0;
+    background:var(--void-deep);
+    border-radius:12px;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .vcbox-stage{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:row;
+    position:relative;
+    background:var(--void-deep);
+  }
+  @media (max-width:600px){
+    .vcbox-stage{ flex-direction:column; }
+  }
+
+  .vcbox-half{
+    flex:1 1 50%;
+    position:relative;
+    overflow:hidden;
     background:linear-gradient(135deg,#1B1D3D,#0D0E1F);
   }
-  .video-half + .video-half{ border-left:1px solid var(--line); }
-  @media (max-width:700px){
-    .video-half + .video-half{ border-left:none; border-top:1px solid var(--line); }
+  .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }
+  @media (max-width:600px){
+    .vcbox-half + .vcbox-half{ border-left:none; border-top:1px solid var(--line); }
   }
-  .video-half-label{
+
+  .vcbox-half-label{
     position:absolute; left:14px; bottom:14px; z-index:3;
-    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    font-size:11px;
     color:rgba(237,231,218,0.85);
     background:rgba(13,14,31,0.6);
     padding:5px 12px; border-radius:999px;
     border:1px solid rgba(237,231,218,0.15);
   }
-  .video-remote{
-    width:100%; height:100%; object-fit:cover;
-    background:linear-gradient(135deg,#1B1D3D,#0D0E1F);
+
+  .vcbox-logo{
+    position:absolute; top:16px; left:16px; z-index:10;
+    display:flex; align-items:center; gap:8px;
   }
-  .video-remote-placeholder{
-    position:absolute; inset:0; display:flex; flex-direction:column;
+  .vcbox-logo svg{ width:28px; height:28px; flex-shrink:0; }
+  .vcbox-logo span{
+    font-family:'Space Grotesk','Poppins',sans-serif;
+    font-weight:700; font-size:16px; letter-spacing:-0.3px;
+    color:#EDE7DA;
+  }
+  .vcbox-logo span em{
+    font-style:normal;
+    background:linear-gradient(90deg,#9C8CFB,#5EEAD4);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+
+  .vcbox-status{
+    position:absolute; top:56px; left:16px; z-index:10;
+    font-size:12px; color:var(--mint); letter-spacing:0.03em;
+    background:rgba(13,14,31,0.65);
+    padding:6px 14px; border-radius:999px;
+    border:1px solid rgba(94,234,212,0.25);
+    display:flex; align-items:center; gap:7px;
+  }
+  .vcbox-status .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--mint);
+  }
+  .vcbox-status.blocked{ color:var(--coral); border-color:rgba(255,107,91,0.3); }
+  .vcbox-status.blocked .dot{ background:var(--coral); }
+
+  .vcbox-leave{
+    position:absolute; top:16px; right:16px; z-index:10;
+    background:var(--coral); color:#fff; border:none;
+    padding:10px 18px; border-radius:999px;
+    font-family:inherit; font-size:12px; font-weight:600;
+    cursor:pointer; transition:background .15s, transform .15s;
+  }
+  .vcbox-leave:hover{ background:#e5503f; transform:translateY(-1px); }
+
+  /* ---------- Full screen + Settings toolbar (overlays the stranger side) ---------- */
+  .vcbox-toolbar{
+    position:absolute; top:64px; right:16px; z-index:10;
+    display:flex; flex-direction:column; gap:10px;
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .vcbox-toolbar.visible{ opacity:1; pointer-events:auto; }
+  .vcbox-toolbar-btn{
+    display:flex; align-items:center; gap:9px;
+    background:rgba(237,231,218,0.14);
+    border:1px solid rgba(237,231,218,0.18);
+    color:var(--paper);
+    padding:10px 18px;
+    border-radius:10px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    cursor:pointer;
+    transition:background .15s, transform .15s;
+    white-space:nowrap;
+  }
+  .vcbox-toolbar-btn:hover{ background:rgba(237,231,218,0.24); transform:translateY(-1px); }
+  .vcbox-toolbar-btn svg{ flex:none; }
+
+  .vcbox-snap-flash{
+    position:absolute; inset:0; z-index:40;
+    background:#fff; opacity:0; pointer-events:none;
+    transition:opacity .12s ease-out;
+  }
+  .vcbox-snap-flash.go{ opacity:0.85; transition:opacity .08s ease-out; }
+  .vcbox-snap-flash.go{ animation:vcbox-flash-fade .4s ease-out forwards; }
+  @keyframes vcbox-flash-fade{
+    0%{ opacity:0.85; }
+    100%{ opacity:0; }
+  }
+
+  .vcbox-snap-toast{
+    position:absolute; bottom:16px; left:50%; z-index:41;
+    transform:translate(-50%,10px);
+    background:rgba(13,14,31,0.9);
+    color:var(--mint);
+    border:1px solid rgba(94,234,212,0.3);
+    padding:8px 16px; border-radius:999px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    opacity:0;
+    transition:opacity .2s ease, transform .2s ease;
+    pointer-events:none;
+    white-space:nowrap;
+  }
+  .vcbox-snap-toast.show{ opacity:1; transform:translate(-50%,0); }
+
+  .vcbox-settings-panel{
+    position:absolute; top:64px; right:16px; z-index:20;
+    width:220px;
+    background:var(--void); border:1px solid rgba(237,231,218,0.18);
+    border-radius:14px; box-shadow:0 18px 40px rgba(0,0,0,0.4);
+    padding:14px;
+    display:none;
+    font-family:'Inter',sans-serif;
+  }
+  .vcbox-settings-panel.open{ display:block; }
+  .vcbox-settings-panel h4{
+    margin:0 0 10px; font-size:12px; letter-spacing:0.05em; text-transform:uppercase;
+    color:rgba(237,231,218,0.5); font-family:'IBM Plex Mono',monospace; font-weight:500;
+  }
+  .vcbox-settings-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 2px; font-size:13px; color:var(--paper);
+  }
+  .vcbox-settings-row + .vcbox-settings-row{ border-top:1px solid rgba(237,231,218,0.08); }
+  .vcbox-toggle{
+    position:relative; width:36px; height:20px; border-radius:999px;
+    background:rgba(237,231,218,0.2); border:none; cursor:pointer; flex:none;
+    transition:background .15s;
+  }
+  .vcbox-toggle::after{
+    content:''; position:absolute; top:2px; left:2px; width:16px; height:16px;
+    border-radius:50%; background:var(--paper); transition:transform .15s;
+  }
+  .vcbox-toggle.on{ background:var(--mint); }
+  .vcbox-toggle.on::after{ transform:translateX(16px); background:var(--void-deep); }
+
+  .vcbox-placeholder{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:10px;
-    color:rgba(237,231,218,0.55); font-family:'IBM Plex Mono',monospace; font-size:12px;
+    color:rgba(237,231,218,0.55); font-size:12px;
     text-align:center; padding:0 20px;
   }
-  .video-remote-placeholder .avatar-ring{
-    width:56px; height:56px; border-radius:50%;
-    border:2px solid rgba(94,234,212,0.4);
-    display:flex; align-items:center; justify-content:center;
-    color:var(--mint); font-size:20px;
-  }
-  .video-local{
-    width:100%; height:100%;
-    object-fit:cover; transform:scaleX(-1);
-    background:#000;
-  }
-  .video-local-off{
-    position:absolute; inset:0; width:100%; height:100%;
-    background:var(--void);
-    display:flex; align-items:center; justify-content:center;
-    color:rgba(237,231,218,0.4); font-family:'IBM Plex Mono',monospace; font-size:12px;
-  }
-  .video-controls{
-    position:absolute; top:14px; left:14px; right:14px;
-    z-index:10;
-    display:flex; justify-content:space-between; align-items:flex-start;
-  }
-  .video-consent-note{
-    font-family:'IBM Plex Mono',monospace; font-size:11px;
-    color:rgba(237,231,218,0.7);
-    background:rgba(13,14,31,0.6);
-    padding:6px 12px; border-radius:999px;
-    border:1px solid rgba(237,231,218,0.15);
-    display:none;
-  }
-  @media (min-width:700px){ .video-consent-note{ display:inline-block; } }
-  .video-bar{
-    display:flex; gap:8px;
-    margin-left:auto;
-  }
-  .vbtn{
-    width:34px; height:34px; border-radius:50%;
-    border:1px solid rgba(237,231,218,0.25);
-    background:rgba(13,14,31,0.6);
-    color:var(--paper);
-    display:flex; align-items:center; justify-content:center;
-    font-size:14px; transition:all .15s;
-  }
-  .vbtn:hover{background:rgba(237,231,218,0.15);}
-  .vbtn.off{background:var(--coral); border-color:var(--coral); color:#fff;}
-  .vbtn.end{background:var(--coral); border-color:var(--coral); color:#fff; width:auto; padding:0 16px; border-radius:999px; font-family:'IBM Plex Mono',monospace; font-size:11px;}
-
-  /* ---------- MOVING MAGNIFYING GLASS SEARCH ANIMATION ---------- */
-  .search-glass-wrap{
-    width:56px; height:56px;
-    display:flex; align-items:center; justify-content:center;
-    overflow:visible;
-  }
-  .search-glass{
+  .vcbox-glass-wrap{ width:56px; height:56px; display:flex; align-items:center; justify-content:center; }
+  .vcbox-glass-wrap.spin .vcbox-glass{
+    animation:vcbox-glass-scan 1.6s ease-in-out infinite;
     transform-origin:60% 60%;
   }
-  .search-glass-wrap.spin .search-glass{
-    animation:glass-scan 1.6s ease-in-out infinite;
-  }
-  @keyframes glass-scan{
+  @keyframes vcbox-glass-scan{
     0%{   transform:translate(-9px,0) rotate(-14deg); }
     25%{  transform:translate(0,-4px) rotate(0deg); }
     50%{  transform:translate(9px,0) rotate(14deg); }
@@ -902,2223 +242,1070 @@
     100%{ transform:translate(-9px,0) rotate(-14deg); }
   }
 
-  /* ---------- INSTANT VIDEO MATCH ---------- */
-  .avatar-ring.spin{animation:spin 1.1s linear infinite; border-top-color:var(--mint);}
-  .vcall{
-    display:none;
-    height:100vh;
-    background:var(--void-deep);
-    flex-direction:column;
-    align-items:stretch;
-    justify-content:flex-start;
-    padding:0;
-    overflow:hidden;
+  /* ---------- controls bar (Start/Stop, Country, I am) ---------- */
+  .vcapp-controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
   }
-  .vcall.active{display:flex;}
-  .vcall-stage{
-    width:100%; flex:1 1 auto; min-height:0; max-width:none;
-    background:var(--void-deep);
-    border:none; border-radius:0;
-    position:relative;
-    display:flex; flex-direction:row;
-    overflow:hidden;
-    z-index:1;
+  .vcbtn{
+    flex:1 1 120px;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.01em;
+    border:none;
+    border-radius:10px;
+    padding:14px 16px;
+    cursor:pointer;
+    transition:transform .15s, filter .15s;
   }
-  .vcall-half{
-    flex:1 1 50%; position:relative; overflow:hidden;
-    background:linear-gradient(135deg,#1B1D3D,#0D0E1F);
-  }
-  .vcall-half + .vcall-half{ border-top:none; border-left:1px solid var(--line); }
-  @media (max-width:700px){
-    .vcall-stage{ flex-direction:column; }
-    .vcall-half + .vcall-half{ border-left:none; border-top:1px solid var(--line); }
-  }
-  .vcall-video{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
-  #vcLocalVideo.vcall-video{ transform:scaleX(-1); }
-  .vcall-half-label{
-    position:absolute; left:14px; bottom:14px; z-index:3;
-    font-family:'IBM Plex Mono',monospace; font-size:11px;
-    color:rgba(237,231,218,0.85);
-    background:rgba(13,14,31,0.6);
-    padding:5px 12px; border-radius:999px;
-    border:1px solid rgba(237,231,218,0.15);
-  }
-  .vcall-status{
-    position:absolute; top:16px; left:16px;
-    z-index:10;
-    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mint);
-    letter-spacing:0.03em;
-    background:rgba(13,14,31,0.65);
-    padding:6px 14px; border-radius:999px;
-    border:1px solid rgba(94,234,212,0.25);
-  }
-  .vcall-actions{
-    position:absolute; top:16px; right:16px;
-    z-index:10;
-    display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
-  }
-  .vcall-btn{
-    border:none; border-radius:999px; padding:9px 16px;
-    font-weight:600; font-size:12.5px; display:flex; align-items:center; gap:6px;
-    transition:transform .15s ease;
-  }
-  .vcall-btn:hover{transform:translateY(-1px);}
-  .vcall-btn.report{background:rgba(255,107,91,0.16); color:var(--coral); border:1px solid rgba(255,107,91,0.4);}
-  .vcall-btn.report:hover{background:rgba(255,107,91,0.26);}
-  .vcall-btn.skip{background:rgba(94,234,212,0.16); color:var(--mint); border:1px solid rgba(94,234,212,0.4);}
-  .vcall-btn.skip:hover{background:rgba(94,234,212,0.26);}
-  .vcall-btn.leave{background:var(--coral); color:#fff;}
-  .vcall-btn.leave:hover{background:#e5503f;}
+  .vcbtn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  .vcbtn:active{ transform:translateY(0); }
+  .vcbtn.start{ background:var(--mint); color:var(--void-deep); }
+  .vcbtn.stop{ background:rgba(255,107,91,0.15); color:var(--coral); border:1px solid rgba(255,107,91,0.4); }
 
-  /* ---------- VCALL CHAT — sits below the video call box, not on top of it ---------- */
-  .vcall-chat{
-    flex:0 0 auto; height:34vh; min-height:200px; max-height:320px;
-    position:relative; z-index:2;
-    display:flex; flex-direction:column;
+  .vcselect-wrap{
+    flex:1 1 140px;
+    position:relative;
+    display:flex; align-items:center;
+  }
+  .vcselect-wrap select{
+    width:100%;
     background:var(--void);
+    border:1px solid var(--line);
+    color:var(--paper);
+    border-radius:10px;
+    padding:13px 30px 13px 14px;
+    font-size:13px;
+    font-family:inherit;
+    appearance:none; -webkit-appearance:none;
+    cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 10px center;
+  }
+  .vcselect-wrap select option{ background:var(--void); color:var(--paper); }
+
+  .vcselect-btn{
+    width:100%;
+    background:var(--void);
+    border:1px solid var(--line);
+    color:var(--paper);
+    border-radius:10px;
+    padding:13px 30px 13px 14px;
+    font-size:13px;
+    font-family:inherit;
+    text-align:left;
+    cursor:pointer;
+    position:relative;
+  }
+  .vcselect-btn::after{
+    content:'';
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    width:10px; height:10px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-repeat:no-repeat; background-size:contain;
+  }
+  .vcselect-btn:hover{ border-color:rgba(94,234,212,0.4); }
+
+  /* ---------- online count + report row ---------- */
+  .vcapp-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:11px;
+    color:rgba(237,231,218,0.55);
+    padding:0 2px;
+  }
+  .vcapp-online{ display:flex; align-items:center; gap:7px; }
+  .vcapp-online .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--mint);
+    box-shadow:0 0 0 3px rgba(94,234,212,0.15);
+  }
+  .vcapp-online b{ color:var(--paper); font-weight:600; }
+
+  /* ---------- bottom: chat panel, docked full-width below the call ---------- */
+  .vcapp-chat{
+    flex:0 0 220px;
+    margin:10px;
+    margin-top:0;
+    display:flex;
+    flex-direction:column;
+    background:var(--void);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  @media (max-width:700px){
+    .vcapp-chat{ flex-basis:180px; }
+  }
+  .vcapp-chat-head{
+    padding:12px 16px;
+    font-size:11px;
+    color:rgba(237,231,218,0.55);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .vcapp-chat-head span.rules{
+    color:var(--mint);
+    cursor:pointer;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .vcapp-chat-log{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    font-size:12.5px;
+    line-height:1.5;
+  }
+  .vcapp-msg{ max-width:88%; }
+  .vcapp-msg .who{
+    font-size:10px;
+    color:rgba(237,231,218,0.4);
+    margin-bottom:2px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .vcapp-msg .bubble{
+    background:rgba(237,231,218,0.06);
+    border-radius:10px;
+    padding:8px 11px;
+  }
+  .vcapp-msg.me{ align-self:flex-end; }
+  .vcapp-msg.me .bubble{ background:rgba(94,234,212,0.14); }
+  .vcapp-msg.system .bubble{
+    background:transparent;
+    color:rgba(237,231,218,0.45);
+    font-style:italic;
+    padding:0;
+  }
+
+  .vcapp-chat-input{
+    display:flex;
+    gap:8px;
+    padding:12px;
     border-top:1px solid var(--line);
   }
-  @media (max-width:700px){
-    .vcall-chat{ height:30vh; min-height:170px; }
+  .vcapp-chat-input input{
+    flex:1 1 auto;
+    background:var(--void-deep);
+    border:1px solid var(--line);
+    color:var(--paper);
+    border-radius:8px;
+    padding:10px 12px;
+    font-family:inherit;
+    font-size:12.5px;
   }
-  .vcall-chat-body{
-    flex:1 1 auto; min-height:0; overflow-y:auto;
-    display:flex; flex-direction:column; gap:8px;
-    padding:14px 16px;
-  }
-  .vcall-chat-body .msg{ max-width:80%; }
-  .vcall-chat-body .msg.me{ background:rgba(94,234,212,0.85); color:var(--void); }
-  .vcall-chat-body .msg.them{ background:rgba(255,255,255,0.1); color:var(--paper); border:1px solid rgba(237,231,218,0.2); }
-  .vcall-chat-body .msg.system{ color:rgba(237,231,218,0.6); }
-  .vcall-chat-input-row{
-    flex:0 0 auto;
-    display:flex; gap:10px; align-items:center;
-    padding:12px 16px calc(14px + env(safe-area-inset-bottom));
-    background:var(--void);
-    border-top:1px solid rgba(237,231,218,0.12);
-  }
-  .vcall-chat-input-row .chat-input{
-    background:rgba(255,255,255,0.08); color:var(--paper);
-    border-color:rgba(237,231,218,0.25);
-  }
-  .vcall-chat-input-row .chat-input::placeholder{ color:rgba(237,231,218,0.5); }
-  .vcall-chat-input-row .send-btn{ background:var(--mint); color:var(--void); }
-  .vcall-chat-input-row .send-btn:hover{ background:#4dd0ba; }
-  /* ---------- GROUP CALL — picker lobby, invite banner, live call ---------- */
-  .globby{
-    display:none; position:fixed; inset:0; z-index:80;
-    background:var(--void-deep); color:var(--paper);
-    flex-direction:column; align-items:center;
-    padding:60px 6vw 40px; overflow-y:auto;
-  }
-  .globby.active{display:flex;}
-  .globby h2{font-size:clamp(22px,3vw,30px); margin-bottom:6px;}
-  .globby p.globby-sub{color:rgba(237,231,218,0.55); font-size:14px; margin-bottom:28px; text-align:center; max-width:420px;}
-  .glist{
-    width:100%; max-width:420px; display:flex; flex-direction:column; gap:8px;
-    margin-bottom:26px;
-  }
-  .glist-empty{
-    color:rgba(237,231,218,0.45); font-size:13px; text-align:center;
-    padding:30px 10px; border:1px dashed var(--line); border-radius:var(--radius-m);
-  }
-  .gitem{
-    display:flex; align-items:center; gap:12px;
-    padding:13px 16px; border-radius:var(--radius-m);
-    background:rgba(237,231,218,0.04); border:1px solid var(--line);
-    cursor:pointer; transition:background .15s ease, border-color .15s ease;
-  }
-  .gitem:hover{background:rgba(237,231,218,0.08);}
-  .gitem.picked{border-color:var(--mint); background:rgba(94,234,212,0.1);}
-  .gitem.disabled{opacity:0.4; cursor:not-allowed; pointer-events:none;}
-  .gdot{width:8px;height:8px;border-radius:50%; background:var(--mint); box-shadow:0 0 0 3px rgba(94,234,212,0.2); flex-shrink:0;}
-  .gname{flex:1; font-size:14px; font-weight:500;}
-  .gcheck{width:18px; text-align:center; color:var(--mint); font-weight:700;}
-  .globby-actions{display:flex; gap:12px; flex-wrap:wrap; justify-content:center;}
-
-  .group-invite-banner{
-    display:none; position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
-    z-index:90; background:var(--void); color:var(--paper);
-    border:1px solid rgba(94,234,212,0.4); border-radius:var(--radius-m);
-    padding:16px 20px; box-shadow:0 12px 32px rgba(0,0,0,0.4);
-    max-width:min(90vw,420px); align-items:center; gap:14px; flex-wrap:wrap;
-  }
-  .group-invite-banner.active{display:flex;}
-  .group-invite-banner span{font-size:13.5px; line-height:1.4;}
-  .group-invite-actions{display:flex; gap:8px; margin-left:auto;}
-  .ginvite-btn{border-radius:20px; padding:8px 16px; font-size:12.5px; font-weight:600; border:none;}
-  .ginvite-btn.accept{background:var(--mint); color:var(--ink);}
-  .ginvite-btn.decline{background:transparent; border:1px solid var(--line); color:var(--paper);}
-
-  .gcall{
-    display:none; position:fixed; inset:0; z-index:80;
-    background:var(--void-deep); color:var(--paper);
-    flex-direction:column; align-items:center;
-    padding:28px 6vw 24px;
-  }
-  .gcall.active{display:flex;}
-  .gcall-status{font-size:13px; letter-spacing:0.08em; color:var(--mint); margin-bottom:18px;}
-  .gcall-grid{
-    display:grid;
-    width:100%; max-width:920px; flex:1;
-    grid-template-columns:repeat(2, 1fr);
-    gap:14px; margin:0 auto;
-    align-content:center;
-  }
-  .gtile{
-    position:relative; aspect-ratio:4/3; border-radius:var(--radius-m);
-    background:rgba(237,231,218,0.05); border:1px solid var(--line);
-    overflow:hidden; display:flex; align-items:center; justify-content:center;
-  }
-  .gtile video{width:100%; height:100%; object-fit:cover;}
-  .gplaceholder span{
-    font-family:'Space Grotesk',sans-serif; font-size:14px; color:rgba(237,231,218,0.5);
-  }
-  .gtile-label{
-    position:absolute; left:10px; bottom:10px;
-    font-family:'IBM Plex Mono',monospace; font-size:11px;
-    background:rgba(5,6,11,0.55); padding:4px 9px; border-radius:20px;
-  }
-  .gtile-votecount{
-    position:absolute; left:10px; top:10px;
-    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--coral);
-    background:rgba(5,6,11,0.55); padding:3px 9px; border-radius:20px;
-    display:none;
-  }
-  .gtile-vote{
-    position:absolute; right:8px; top:8px;
-    border:1px solid rgba(255,107,91,0.5); background:rgba(5,6,11,0.55);
-    color:var(--coral); font-size:10.5px; font-weight:600;
-    padding:6px 10px; border-radius:20px; transition:background .15s ease;
-  }
-  .gtile-vote:hover{background:rgba(255,107,91,0.2);}
-  .gtile-vote.voted{color:var(--mint); border-color:rgba(94,234,212,0.5); opacity:0.85;}
-  .gtile-vote:disabled{cursor:default;}
-  .gcall-actions{display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; justify-content:center;}
-  .gcall-note{
-    margin-top:12px; font-size:12px; color:rgba(237,231,218,0.45); text-align:center;
-  }
-  @media (max-width:640px){
-    .gcall-grid{grid-template-columns:1fr;}
+  .vcapp-chat-input input::placeholder{ color:rgba(237,231,218,0.35); }
+  .vcapp-chat-input input:focus{ outline:none; border-color:var(--mint); }
+  .vcapp-chat-input button{
+    background:var(--mint);
+    color:var(--void-deep);
+    border:none;
+    border-radius:8px;
+    padding:0 16px;
+    font-family:inherit;
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
   }
 
-  .vcall-note{
-    position:absolute; top:56px; right:16px; z-index:10;
-    font-family:'IBM Plex Mono',monospace; font-size:10.5px;
-    color:rgba(237,231,218,0.5);
-    background:rgba(13,14,31,0.5);
-    padding:5px 10px; border-radius:999px;
-    display:none;
-  }
-  @media (min-width:700px){ .vcall-note{ display:block; } }
+  /* ============================================================
+     Info section — light "FriendHub" marketing design system:
+     Space Grotesk headings, Inter body copy, indigo/violet accent.
+     Sits below the dark call widget, same pairing the reference
+     file uses (dark lobby + light marketing sections).
+  ============================================================= */
+  .vcinfo{
+    --hp-blue:#6C5CE7;
+    --hp-blue-light:#9C8CFB;
+    --hp-blue-deep:#5142C4;
+    --hp-black:#05060B;
+    --hp-bg:#F6F5FC;
+    --hp-card:#F0EEFB;
+    --ink:#1F1B2E;
+    --ink-soft:#4B4760;
+    --mint:#5EEAD4;
+    --coral:#FF6B5B;
 
-  /* ---------- FOOTER ---------- */
-  footer{
+    background:#fff;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .vcinfo h1,.vcinfo h2,.vcinfo h3{
+    font-family:'Space Grotesk',sans-serif;
+    margin:0;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+  }
+
+  /* intro band */
+  .vcinfo-intro{
+    background:var(--hp-bg);
+    padding:90px 6vw 70px;
+  }
+  .vcinfo-intro-inner{
+    max-width:1180px; margin:0 auto;
+    display:grid; grid-template-columns:1fr 1fr; gap:56px;
+    align-items:center; text-align:left;
+  }
+  @media (max-width:900px){
+    .vcinfo-intro-inner{ grid-template-columns:1fr; text-align:center; }
+    .vcinfo-banner-wrap{ margin:0 auto; }
+  }
+  .vcinfo-eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+    color:var(--hp-blue-deep);
+    background:var(--hp-card);
+    border-radius:999px;
+    padding:8px 16px; margin-bottom:22px;
+  }
+  .vcinfo-intro h1{
+    font-size:clamp(34px,4.2vw,54px);
+    line-height:1.08;
+    font-weight:700;
+    max-width:560px;
+    color:var(--ink);
+  }
+  .vcinfo-intro h1 em{
+    font-style:normal;
+    background:linear-gradient(135deg,var(--hp-blue),var(--hp-blue-deep));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .vcinfo-intro p.lede{
+    font-size:17px; line-height:1.6; color:var(--ink-soft);
+    max-width:460px; margin:20px 0 32px;
+  }
+  .vcinfo-cta-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+  @media (max-width:900px){ .vcinfo-cta-row{ justify-content:center; } }
+  .vcinfo-btn{
+    border:none; border-radius:10px; padding:11px 22px;
+    font-weight:600; font-size:14px; font-family:'Inter',sans-serif;
+    cursor:pointer; text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .vcinfo-btn-primary{
+    background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+    color:#fff; box-shadow:0 10px 24px rgba(108,92,231,0.32);
+  }
+  .vcinfo-btn-primary:hover{ transform:translateY(-1px); box-shadow:0 14px 28px rgba(108,92,231,0.42); }
+  .vcinfo-btn-outline{
+    background:#fff; color:var(--ink); border:1px solid rgba(31,27,46,0.14);
+  }
+  .vcinfo-btn-outline:hover{ border-color:rgba(31,27,46,0.28); transform:translateY(-1px); }
+  .vcinfo-country-row{
+    display:flex; align-items:center; gap:10px; margin-top:22px; flex-wrap:wrap;
+  }
+  @media (max-width:900px){ .vcinfo-country-row{ justify-content:center; } }
+  .vcinfo-country-row label{ font-size:13px; font-weight:600; color:var(--ink-soft); }
+  .vcinfo-country-select{
+    background:#fff; border:1px solid rgba(31,27,46,0.14); color:var(--ink);
+    border-radius:999px; padding:9px 34px 9px 16px; font-size:13.5px; font-weight:500;
+    font-family:'Inter',sans-serif; appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236C5CE7'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-repeat:no-repeat; background-position:right 12px center;
+    box-shadow:0 4px 12px rgba(31,27,46,0.06);
+  }
+  .vcinfo-country-btn{
+    background:#fff; border:1px solid rgba(31,27,46,0.14); color:var(--ink);
+    border-radius:999px; padding:9px 34px 9px 16px; font-size:13.5px; font-weight:500;
+    font-family:'Inter',sans-serif; cursor:pointer; text-align:left; position:relative;
+    box-shadow:0 4px 12px rgba(31,27,46,0.06);
+  }
+  .vcinfo-country-btn::after{
+    content:'';
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    width:10px; height:10px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236C5CE7'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-repeat:no-repeat; background-size:contain;
+  }
+  .vcinfo-country-btn:hover{ border-color:rgba(31,27,46,0.28); }
+  .vcinfo-stats{ display:flex; align-items:center; gap:14px; margin-top:34px; }
+  @media (max-width:900px){ .vcinfo-stats{ justify-content:center; } }
+  .vcinfo-avatar-stack{ display:flex; }
+  .vcinfo-avatar-stack span{
+    width:38px; height:38px; border-radius:50%; border:3px solid var(--hp-bg);
+    margin-left:-12px; display:block;
+    background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+  }
+  .vcinfo-avatar-stack span:first-child{ margin-left:0; }
+  .vcinfo-avatar-stack span:nth-child(2){ background:linear-gradient(135deg,var(--mint),#2FBFA8); }
+  .vcinfo-avatar-stack span:nth-child(3){ background:linear-gradient(135deg,#FFB84D,#E08A2A); }
+  .vcinfo-avatar-stack span:nth-child(4){ background:linear-gradient(135deg,var(--coral),#C24438); }
+  .vcinfo-stats-text{ font-size:14px; color:var(--ink-soft); line-height:1.4; }
+  .vcinfo-stats-text strong{ color:var(--ink); }
+  .vcinfo-note{ margin-top:22px; font-size:13px; color:var(--ink-soft); opacity:0.8; }
+
+  /* hero preview mockup */
+  /* hero banner: image slideshow, same mechanism as the FriendHub reference */
+  .vcinfo-banner-dot{
+    position:absolute; width:10px; height:10px; border-radius:50%;
+    background:var(--hp-blue-light); opacity:0.5;
+    animation:vcinfo-pulse 3s ease-out infinite;
+  }
+  .vcinfo-banner-dot.d1{ top:-4%; left:14%; }
+  .vcinfo-banner-dot.d2{ top:6%; right:22%; background:var(--mint); }
+  @keyframes vcinfo-pulse{
+    0%{ transform:scale(1); opacity:0.5; }
+    70%{ transform:scale(2.4); opacity:0; }
+    100%{ transform:scale(2.4); opacity:0; }
+  }
+  .vcinfo-banner-wrap{ position:relative; width:100%; max-width:480px; margin-left:auto; }
+  @media (max-width:900px){ .vcinfo-banner-wrap{ margin:0 auto; } }
+  .vcinfo-banner{
+    position:relative; width:100%; cursor:zoom-in;
+    border-radius:20px; overflow:hidden; aspect-ratio:16/11;
+    background:linear-gradient(160deg,#2E2A57,#171735);
+    box-shadow:0 30px 60px -25px rgba(108,92,231,0.4), 0 10px 24px rgba(5,6,11,0.2);
+  }
+  .vcinfo-banner-img{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:contain; object-position:center center; opacity:0;
+    transition:opacity 1s ease;
+  }
+  .vcinfo-banner-img.active{ opacity:1; }
+  .vcinfo-banner-dots{
+    position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+    display:flex; gap:7px; z-index:2;
+  }
+  .vcinfo-banner-dots span{
+    width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.4);
+    transition:background .3s ease, transform .3s ease;
+  }
+  .vcinfo-banner-dots span.active{ background:#fff; transform:scale(1.2); }
+
+  /* lightbox */
+  .vcinfo-lightbox{
+    display:none; position:fixed; inset:0; z-index:999;
+    background:rgba(5,6,11,0.92); align-items:center; justify-content:center;
+    padding:40px; cursor:zoom-out;
+  }
+  .vcinfo-lightbox.active{ display:flex; }
+  .vcinfo-lightbox img{
+    max-width:92vw; max-height:88vh; width:auto; height:auto;
+    object-fit:contain; border-radius:12px; box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  }
+  .vcinfo-lightbox-close{
+    position:absolute; top:22px; right:28px; width:42px; height:42px; border-radius:50%;
+    background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
+    font-size:20px; line-height:1; display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease;
+  }
+  .vcinfo-lightbox-close:hover{ background:rgba(255,255,255,0.22); }
+  .vcinfo-lightbox-arrow{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:48px; height:48px; border-radius:50%;
+    background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
+    font-size:22px; line-height:1; display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease; cursor:pointer;
+  }
+  .vcinfo-lightbox-arrow:hover{ background:rgba(255,255,255,0.22); }
+  .vcinfo-lightbox-arrow.prev{ left:20px; }
+  .vcinfo-lightbox-arrow.next{ right:20px; }
+  @media (max-width:600px){
+    .vcinfo-lightbox-arrow{ width:40px; height:40px; font-size:18px; }
+    .vcinfo-lightbox-arrow.prev{ left:8px; }
+    .vcinfo-lightbox-arrow.next{ right:8px; }
+  }
+  .vcinfo-lightbox-dots{
+    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+    display:flex; gap:10px; z-index:2;
+  }
+  .vcinfo-lightbox-dots span{
+    width:9px; height:9px; border-radius:50%;
+    background:rgba(255,255,255,0.35); border:1px solid rgba(255,255,255,0.5);
+    cursor:pointer; transition:background .2s ease, transform .2s ease;
+  }
+  .vcinfo-lightbox-dots span:hover{ background:rgba(255,255,255,0.6); }
+  .vcinfo-lightbox-dots span.active{ background:#fff; transform:scale(1.25); }
+
+
+  /* feature-bar: elevated white card overlapping the intro band, like the reference */
+  .vcinfo-features{
+    position:relative; z-index:2;
+    max-width:1180px; margin:-46px auto 0;
+    background:#fff; border-radius:28px;
+    box-shadow:0 20px 50px -20px rgba(31,27,46,0.18);
+    padding:34px 6vw;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:28px 24px;
+  }
+  @media (max-width:900px){ .vcinfo-features{ grid-template-columns:1fr 1fr; margin:24px 6vw 0; } }
+  @media (max-width:520px){ .vcinfo-features{ grid-template-columns:1fr; } }
+  .vcinfo-feature{ display:flex; align-items:flex-start; gap:12px; }
+  .vcinfo-feature .ico{
+    flex:none; width:40px; height:40px; border-radius:11px;
+    background:var(--hp-card); border:1px solid rgba(108,92,231,0.22);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--hp-blue); font-size:17px;
+  }
+  .vcinfo-feature h3{ font-size:15px; margin:0 0 4px; font-weight:700; }
+  .vcinfo-feature p{ font-size:13.5px; line-height:1.5; color:var(--ink-soft); margin:0; }
+
+  /* how it works: white section, kicker + numbered steps */
+  .vcinfo-section{ padding:110px 6vw; background:#fff; }
+  .vcinfo-section-head{ max-width:640px; margin:0 auto 56px; text-align:center; }
+  .vcinfo-kicker{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--hp-blue); margin-bottom:14px; display:block;
+  }
+  .vcinfo-section-head h2{ font-size:clamp(28px,3.4vw,42px); line-height:1.1; color:#0A0A0A; }
+  .vcinfo-steps{
+    max-width:1100px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+  }
+  @media (max-width:860px){ .vcinfo-steps{ grid-template-columns:1fr; } }
+  .vcinfo-step{
+    background:#fff; border:1px solid #E7E9EE; border-radius:16px;
+    padding:32px 26px;
+  }
+  .vcinfo-step-num{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--hp-blue);
+    margin-bottom:18px; display:block;
+  }
+  .vcinfo-step h3{ font-size:20px; margin-bottom:10px; color:#0A0A0A; }
+  .vcinfo-step p{ font-size:15px; line-height:1.6; color:#5B616E; margin:0; }
+
+  /* safety: black band, two columns */
+  .vcinfo-safety{
+    background:var(--hp-black); color:#fff;
+    padding:80px 6vw;
+    display:grid; grid-template-columns:1fr 1fr; gap:48px;
+    max-width:none;
+  }
+  @media (max-width:860px){ .vcinfo-safety{ grid-template-columns:1fr; } }
+  .vcinfo-safety-inner{ max-width:1100px; margin:0 auto; display:contents; }
+  .vcinfo-safety h2{ color:#fff; font-size:clamp(24px,3vw,32px); margin-bottom:16px; }
+  .vcinfo-safety p.lede{ color:rgba(255,255,255,0.6); font-size:15px; line-height:1.6; max-width:420px; margin:0; }
+  .vcinfo-safety-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:18px; }
+  .vcinfo-safety-list li{ display:flex; gap:14px; align-items:flex-start; font-size:14px; line-height:1.55; color:rgba(255,255,255,0.6); }
+  .vcinfo-safety-list .ico{
+    flex:none; width:32px; height:32px; border-radius:9px;
+    background:rgba(108,92,231,0.15); border:1px solid rgba(108,92,231,0.4);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--hp-blue-light); font-family:'IBM Plex Mono',monospace; font-size:12px;
+  }
+  .vcinfo-safety-list strong{ color:#fff; display:block; margin-bottom:2px; font-weight:600; }
+
+  /* faq */
+  .vcinfo-faq{ max-width:760px; margin:0 auto; padding:80px 6vw; }
+  .vcinfo-faq-item{ border-bottom:1px solid #E7E9EE; padding:20px 0; }
+  .vcinfo-faq-item h3{ font-size:15.5px; margin:0 0 8px; }
+  .vcinfo-faq-item p{ font-size:14px; margin:0; color:var(--ink-soft); line-height:1.6; }
+
+  .vcinfo-foot{
     background:var(--hp-black); color:rgba(255,255,255,0.45);
     padding:40px 6vw; display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;
     font-size:13px; border-top:1px solid rgba(255,255,255,0.08);
   }
-  footer strong{color:var(--hp-blue-light);}
+  .vcinfo-foot strong{ color:var(--hp-blue-light); }
+
+  /* ============ All countries modal (checkbox grid, alphabetical, no flags) ============ */
+  .vc-country-overlay{
+    display:none; position:fixed; inset:0; z-index:2000;
+    background:rgba(5,6,11,0.6);
+    align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .vc-country-overlay.active{ display:flex; }
+  .vc-country-modal{
+    background:#fff; color:#1F1B2E;
+    width:100%; max-width:980px; max-height:82vh;
+    border-radius:22px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:0 40px 90px -20px rgba(0,0,0,0.55);
+    font-family:'Inter',sans-serif;
+  }
+  .vc-country-modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 26px; border-bottom:1px solid #ECEBF2; flex:none;
+  }
+  .vc-country-modal-title{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .vc-country-modal-close{
+    width:34px; height:34px; border-radius:50%; border:none;
+    background:#F1F0F6; color:#68647A; font-size:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .15s;
+  }
+  .vc-country-modal-close:hover{ background:#E4E2ED; }
+  .vc-country-grid{
+    padding:18px 22px 26px; overflow-y:auto;
+    display:grid; grid-template-columns:repeat(5,1fr); gap:4px 16px;
+  }
+  @media (max-width:820px){ .vc-country-grid{ grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:560px){ .vc-country-grid{ grid-template-columns:repeat(2,1fr); } }
+  .vc-country-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px; border-radius:10px; border:1px solid transparent;
+    background:none; cursor:pointer; text-align:left;
+    font-family:'Inter',sans-serif; font-size:13.5px; color:#2B2740;
+    transition:background .12s, border-color .12s;
+  }
+  .vc-country-item:hover{ background:#F7F6FB; }
+  .vc-country-item .flag{
+    flex:none; width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; background:#EFEEF4;
+    box-shadow:0 0 0 1px rgba(31,27,46,0.08);
+    font-size:13px; line-height:1;
+  }
+  .vc-country-item .flag img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .vc-country-item .flag-fallback{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    font-size:8px; font-weight:700; letter-spacing:0.02em; color:#6B6779; background:#EFEEF4;
+  }
+  .vc-country-item.selected{ background:rgba(94,234,212,0.14); border-color:rgba(46,191,168,0.55); }
+  .vc-country-item.selected .flag{ box-shadow:0 0 0 2px #2FBFA8; }
+  .vc-country-item.selected .label{ color:#12897A; font-weight:700; }
+  .vc-country-item.any .flag{
+    background:linear-gradient(135deg,#5EEAD4,#2FBFA8);
+    font-size:11px;
+  }
+  .vc-country-item.any.selected{ background:rgba(94,234,212,0.14); border-color:rgba(46,191,168,0.55); }
 </style>
-</head>
-<body>
 
-<!-- ================= MAIN SITE ================= -->
-<div id="site">
-  <nav class="nav">
-    <div class="logo">
-      <svg class="logo-lockup" viewBox="0 0 380 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FriendHub">
-        <defs>
-          <linearGradient id="navBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#9C8CFB"/>
-            <stop offset="100%" stop-color="#5142C4"/>
-          </linearGradient>
-          <linearGradient id="navTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#6C5CE7"/>
-            <stop offset="100%" stop-color="#5142C4"/>
-          </linearGradient>
-        </defs>
-        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#navBgGrad)"/>
-        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
-        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
-        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
-        <text x="120" y="64" font-family="'Space Grotesk','Poppins',sans-serif" font-weight="700" font-size="42" fill="#1F1B2E" letter-spacing="-0.5">Friend<tspan fill="url(#navTextGrad)">Hub</tspan></text>
-      </svg>
-    </div>
-    <div class="nav-links">
-      <a href="#site" class="current">Home</a>
-      <a href="#how">How it works</a>
-      <a href="#safety">Safety</a>
-    </div>
-    <div class="nav-actions">
-      <button class="btn btn-nav-ghost" onclick="openVideoCall()">Video call</button>
-      <button class="btn btn-nav-ghost" onclick="openGroupCall()">Group call</button>
-      <button class="btn btn-amber" onclick="openLobby()">Start chatting</button>
-    </div>
-  </nav>
 
-  <section class="hero">
-    <div class="hero-copy">
-      <span class="eyebrow">💜 Meet. Chat. Connect.</span>
-      <h1>Meet someone new.<br>Make it a <em>real</em> conversation.</h1>
-      <p class="lede">FriendHub pairs you with a random stranger for a one-on-one text or video chat. No profiles, no follower counts — just a real conversation with someone new.</p>
-      <div class="hero-cta-row">
-        <button class="btn btn-primary" onclick="openLobby()">💬 Start Random Chat</button>
-        <a href="#safety" class="btn btn-outline">🛡️ Safety First</a>
+<div class="vcapp" id="top">
+  <div class="vcapp-video-col">
+    <div class="vcbox">
+      <div class="vcbox-logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="vcboxLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#9C8CFB"/>
+              <stop offset="100%" stop-color="#5142C4"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcboxLogoGrad)"/>
+          <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+          <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+          <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+        </svg>
+        <span>Friend<em>Hub</em></span>
       </div>
-      <div class="home-country-row">
-        <label for="homeCountrySelect">Match me with:</label>
-        <select class="country-select-home" id="homeCountrySelect" onchange="onHomeCountryChange()" aria-label="Preferred country to match with"></select>
+      <div class="vcbox-status blocked"><span class="dot"></span> CAMERA/MIC BLOCKED</div>
+      <button class="vcbox-leave">✕ Leave</button>
+
+      <div class="vcbox-stage">
+        <div class="vcbox-half">
+          <div class="vcbox-half-label">You</div>
+        </div>
+        <div class="vcbox-half">
+          <div class="vcbox-placeholder">
+            <div class="vcbox-glass-wrap spin">
+              <svg class="vcbox-glass" width="44" height="44" viewBox="0 0 44 44" fill="none">
+                <circle cx="19" cy="19" r="13" stroke="#ffffff" stroke-width="3.5"/>
+                <line x1="28.5" y1="28.5" x2="39" y2="39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>looking for someone to chat with…</span>
+          </div>
+          <div class="vcbox-half-label">Stranger</div>
+
+          <div class="vcbox-toolbar" id="vcToolbar">
+            <button type="button" class="vcbox-toolbar-btn" id="vcFullscreenBtn" onclick="vcToggleFullscreen()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+              <span id="vcFullscreenLabel">Full Screen</span>
+            </button>
+            <button type="button" class="vcbox-toolbar-btn" id="vcSnapBtn" onclick="vcTakeSnapshot()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Snap</span>
+            </button>
+            <button type="button" class="vcbox-toolbar-btn" id="vcSettingsBtn" onclick="vcToggleSettings()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </button>
+          </div>
+
+          <div class="vcbox-settings-panel" id="vcSettingsPanel">
+            <h4>Settings</h4>
+            <div class="vcbox-settings-row">
+              <span>Mirror my video</span>
+              <button type="button" class="vcbox-toggle on" onclick="this.classList.toggle('on')"></button>
+            </div>
+            <div class="vcbox-settings-row">
+              <span>Match sound</span>
+              <button type="button" class="vcbox-toggle on" onclick="this.classList.toggle('on')"></button>
+            </div>
+            <div class="vcbox-settings-row">
+              <span>HD video</span>
+              <button type="button" class="vcbox-toggle" onclick="this.classList.toggle('on')"></button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="hero-stats">
-        <div class="avatar-stack"><img src="p1.png" alt=""><img src="p2.png" alt=""><img src="p3.png" alt=""><img src="p4.png" alt=""></div>
-        <div class="hero-stats-text"><strong id="onlineCount">—</strong> people are online chatting right now</div>
-      </div>
-      <div class="hero-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
     </div>
-    <div class="hero-banner-wrap">
-      <span class="hero-banner-dot d1"></span>
-      <span class="hero-banner-dot d2"></span>
-      <div class="hero-banner" onclick="openBannerLightbox()">
-        <img class="hero-banner-img active" id="bannerImg1" src="img1.png" alt="">
-        <img class="hero-banner-img" id="bannerImg2" src="img2.png" alt="">
-        <img class="hero-banner-img" id="bannerImg3" src="img3.png" alt="">
-        <div class="hero-banner-dots">
+
+    <div class="vcapp-controls">
+      <button class="vcbtn start">▶ Start</button>
+      <button class="vcbtn stop">■ Stop</button>
+      <div class="vcselect-wrap">
+        <button type="button" class="vcselect-btn" id="vcHeaderCountryBtn" aria-haspopup="dialog" aria-label="Match by country" onclick="openCountryModal('header')">Any country</button>
+      </div>
+      <div class="vcselect-wrap">
+        <select aria-label="I am">
+          <option>I am… 🙂</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Prefer not to say</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="vcapp-meta">
+      <div class="vcapp-online"><span class="dot"></span> <b>18,204</b>&nbsp;online now</div>
+      <span class="rules">Community rules · Safety tips</span>
+    </div>
+  </div>
+
+  <div class="vcapp-chat">
+    <div class="vcapp-chat-head">
+      <span>Chat</span>
+      <span class="rules">Report</span>
+    </div>
+    <div class="vcapp-chat-log">
+      <div class="vcapp-msg system"><div class="bubble">You've been connected to a stranger. Say hi!</div></div>
+      <div class="vcapp-msg"><div class="who">Stranger</div><div class="bubble">hey! where are you from?</div></div>
+      <div class="vcapp-msg me"><div class="who">You</div><div class="bubble">Dhaka, Bangladesh — you?</div></div>
+    </div>
+    <div class="vcapp-chat-input">
+      <input type="text" placeholder="Write a message…">
+      <button>Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============= Info / marketing section (light theme) ============= -->
+<div class="vcinfo">
+<section class="vcinfo-intro">
+  <div class="vcinfo-intro-inner">
+    <div>
+      <span class="vcinfo-eyebrow">✨ Meet. Chat. Connect.</span>
+      <h1>Talk to someone new.<br>Make it a <em>real</em> conversation.</h1>
+      <p class="lede">This is a free random video chat platform that pairs you with someone new the moment you click Start. No profiles, no accounts to fill in — just click, get matched, and start talking.</p>
+      <div class="vcinfo-cta-row">
+        <a href="#top" class="vcinfo-btn vcinfo-btn-primary">▶ Start Random Chat</a>
+        <a href="#safety" class="vcinfo-btn vcinfo-btn-outline">🛡️ Safety First</a>
+      </div>
+      <div class="vcinfo-country-row">
+        <label for="vcHeroCountryBtn">Match me with:</label>
+        <button type="button" class="vcinfo-country-btn" id="vcHeroCountryBtn" aria-haspopup="dialog" aria-label="Preferred country to match with" onclick="openCountryModal('hero')">Any country</button>
+      </div>
+      <div class="vcinfo-stats">
+        <div class="vcinfo-avatar-stack"><span></span><span></span><span></span><span></span></div>
+        <div class="vcinfo-stats-text"><strong>18,204</strong> people are online chatting right now</div>
+      </div>
+      <div class="vcinfo-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
+    </div>
+
+    <div class="vcinfo-banner-wrap">
+      <span class="vcinfo-banner-dot d1"></span>
+      <span class="vcinfo-banner-dot d2"></span>
+      <div class="vcinfo-banner" onclick="openVcinfoLightbox()">
+        <img class="vcinfo-banner-img active" id="vcinfoImg1" src="ss1.png" alt="Screenshot 1">
+        <img class="vcinfo-banner-img" id="vcinfoImg2" src="ss2.png" alt="Screenshot 2">
+        <img class="vcinfo-banner-img" id="vcinfoImg3" src="ss3.png" alt="Screenshot 3">
+        <div class="vcinfo-banner-dots">
           <span class="active"></span>
           <span></span>
           <span></span>
         </div>
       </div>
     </div>
-  </section>
-
-  <div class="banner-lightbox" id="bannerLightbox" onclick="closeBannerLightbox(event)">
-    <button class="banner-lightbox-close" onclick="event.stopPropagation(); closeBannerLightbox();" aria-label="Close">✕</button>
-    <button class="banner-lightbox-arrow prev" onclick="event.stopPropagation(); changeLightboxSlide(-1);" aria-label="Previous image">‹</button>
-    <img id="bannerLightboxImg" src="" alt="" onclick="event.stopPropagation();">
-    <button class="banner-lightbox-arrow next" onclick="event.stopPropagation(); changeLightboxSlide(1);" aria-label="Next image">›</button>
-    <div class="banner-lightbox-dots" id="bannerLightboxDots" onclick="event.stopPropagation();">
-      <span onclick="setLightboxSlide(0)"></span>
-      <span onclick="setLightboxSlide(1)"></span>
-      <span onclick="setLightboxSlide(2)"></span>
-    </div>
   </div>
+</section>
 
-  <section class="feature-bar">
-    <div class="feature-item"><span class="ico">🌐</span><div><h4>Global Community</h4><p>Connect with people from around the world, any time of day.</p></div></div>
-    <div class="feature-item"><span class="ico">🛡</span><div><h4>Safe & Secure</h4><p>Report, block, or leave any chat instantly. Nothing is stored.</p></div></div>
-    <div class="feature-item"><span class="ico">⚡</span><div><h4>Easy to Use</h4><p>No sign-up, no profile. Tap once and you're talking.</p></div></div>
-    <div class="feature-item"><span class="ico">❤</span><div><h4>Make Friends</h4><p>Hit it off? Add each other and pick up the chat anytime.</p></div></div>
-  </section>
-
-  <section class="section" id="how">
-
-    <div class="section-head">
-      <span class="kicker">How it works</span>
-      <h2>Three steps between you and a new conversation.</h2>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <span class="step-num">01 / Enter the lobby</span>
-        <h3>Drop in a few interests</h3>
-        <p>Type a word or two — "movies," "night owl," "startups" — or skip it and go in completely blind.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">02 / We find a match</span>
-        <h3>We find someone</h3>
-        <p>We pair you with another person online right now. No swiping, no waiting for approval — it just happens.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">03 / Start talking</span>
-        <h3>Say hi, see where it goes</h3>
-        <p>Chat as long as you want. Not feeling it? Tap "New stranger" and we start looking again.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="safety" id="safety">
-    <div>
-      <h2>Anonymous doesn't mean unsafe.</h2>
-      <p class="lede">FriendHub is built for spontaneous, low-stakes conversation — not for anything else. A few ground rules keep it that way.</p>
-    </div>
-    <ul class="safety-list">
-      <li><span class="ico">18+</span><div><strong>Adults only</strong>FriendHub is restricted to users 18 and older. No exceptions.</div></li>
-      <li><span class="ico">⛔</span><div><strong>One tap to leave</strong>Disconnect from any conversation instantly, no explanation needed.</div></li>
-      <li><span class="ico">▲</span><div><strong>Report & block</strong>Every chat has a report button. Reported accounts are reviewed and can be banned.</div></li>
-      <li><span class="ico">✎</span><div><strong>Nothing is saved</strong>Conversations aren't stored once a chat ends — there's no history to leak.</div></li>
-    </ul>
-  </section>
-
-  <footer>
-    <div><strong>FriendHub</strong> — a random meetup, minus the algorithm.</div>
-    <div>Demo build · not connected to a live matching backend</div>
-  </footer>
-</div>
-
-<!-- ================= LOBBY (matching screen) ================= -->
-<div class="lobby" id="lobby">
-  <div class="lobby-stage">
-    <div class="video-remote-placeholder">
-      <div class="search-glass-wrap spin">
-        <svg class="search-glass" width="44" height="44" viewBox="0 0 44 44" fill="none">
-          <circle cx="19" cy="19" r="13" stroke="#ffffff" stroke-width="3.5"/>
-          <line x1="28.5" y1="28.5" x2="39" y2="39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <span class="lobby-status mono" id="lobbyStatus">SCANNING…</span>
-    </div>
-  </div>
-  <h2 id="lobbyHeadline">Looking for someone to talk to</h2>
-  <div class="lobby-tags" id="lobbyTagDisplay"></div>
-  <div class="country-select-row">
-    <select class="country-select" id="countrySelect" onchange="onCountryChange()" aria-label="Match by country"></select>
-  </div>
-  <div class="tag-input-row">
-    <input class="tag-input" id="tagInput" type="text" placeholder="interests (optional) — press Enter to add" maxlength="20">
-  </div>
-  <div class="hero-cta-row">
-    <button class="btn btn-ghost" onclick="closeLobby()">Cancel</button>
+<div class="vcinfo-lightbox" id="vcinfoLightbox" onclick="closeVcinfoLightbox(event)">
+  <button class="vcinfo-lightbox-close" onclick="event.stopPropagation(); closeVcinfoLightbox();" aria-label="Close">✕</button>
+  <button class="vcinfo-lightbox-arrow prev" onclick="event.stopPropagation(); changeVcinfoLightboxSlide(-1);" aria-label="Previous image">‹</button>
+  <img id="vcinfoLightboxImg" src="" alt="" onclick="event.stopPropagation();">
+  <button class="vcinfo-lightbox-arrow next" onclick="event.stopPropagation(); changeVcinfoLightboxSlide(1);" aria-label="Next image">›</button>
+  <div class="vcinfo-lightbox-dots" id="vcinfoLightboxDots" onclick="event.stopPropagation();">
+    <span onclick="setVcinfoLightboxSlide(0)"></span>
+    <span onclick="setVcinfoLightboxSlide(1)"></span>
+    <span onclick="setVcinfoLightboxSlide(2)"></span>
   </div>
 </div>
 
-<!-- ================= INSTANT VIDEO MATCH ================= -->
-<div class="vcall" id="videoCallScreen">
-  <div class="vcall-status mono" id="vcallStatus">SEARCHING…</div>
-  <div class="vcall-actions" id="vcCountryRow" style="left:16px; right:auto; top:56px; position:absolute;">
-    <select class="country-select-sm" id="vcCountrySelect" onchange="onVideoCountryChange()" aria-label="Match by country"></select>
-  </div>
-  <div class="vcall-stage" id="vcallStage">
-    <div class="vcall-half" id="vcLocalHalf">
-      <video class="vcall-video" id="vcLocalVideo" autoplay playsinline muted style="display:none;"></video>
-      <div class="video-local-off" id="vcLocalVideoOff" style="display:none; position:absolute; inset:0; width:100%; height:100%; border-radius:0; border:none;">camera off</div>
-      <div class="vcall-half-label">You</div>
-    </div>
-    <div class="vcall-half" id="vcRemoteHalf">
-      <div class="video-remote-placeholder" id="vcRemotePlaceholder" style="position:absolute; inset:0;">
-        <div class="search-glass-wrap" id="vcSpinner">
-          <svg class="search-glass" width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <circle cx="19" cy="19" r="13" stroke="#ffffff" stroke-width="3.5"/>
-            <line x1="28.5" y1="28.5" x2="39" y2="39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <span id="vcRemoteStatusText">looking for someone for video…</span>
-      </div>
-      <video class="vcall-video" id="vcRemoteVideo" autoplay playsinline style="display:none;"></video>
-      <div class="vcall-half-label">Stranger <span id="vcStrangerFlag"></span></div>
-    </div>
-  </div>
-  <div class="vcall-actions">
-    <button class="vcall-btn report" id="vcReportBtn" onclick="reportStranger()" style="display:none;">🚩 Report</button>
-    <button class="vcall-btn skip" id="vcSkipBtn" onclick="skipVideoStranger()" style="display:none;">⟳ Skip</button>
-    <button class="vcall-btn leave" onclick="leaveVideoCall()">✕ Leave</button>
-  </div>
-  <div class="vcall-chat" id="vcallChat">
-    <div class="vcall-chat-body" id="vcallChatBody"></div>
-    <div class="emoji-quick-row">
-      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👋','vcallChatInput','vcallChatBody')" aria-label="Send wave emoji">👋</button>
-      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😀','vcallChatInput','vcallChatBody')" aria-label="Send smile emoji">😀</button>
-      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😂','vcallChatInput','vcallChatBody')" aria-label="Send laughing emoji">😂</button>
-      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('❤️','vcallChatInput','vcallChatBody')" aria-label="Send heart emoji">❤️</button>
-      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👍','vcallChatInput','vcallChatBody')" aria-label="Send thumbs up emoji">👍</button>
-      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('🔥','vcallChatInput','vcallChatBody')" aria-label="Send fire emoji">🔥</button>
-      <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😢','vcallChatInput','vcallChatBody')" aria-label="Send sad emoji">😢</button>
-    </div>
-    <div class="vcall-chat-input-row">
-      <input class="chat-input" id="vcallChatInput" type="text" placeholder="Say something…" autocomplete="off">
-      <button class="send-btn" onclick="sendMessage('vcallChatInput','vcallChatBody')" aria-label="Send message">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 11L21 3L13 21L11 13L3 11Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
+<script>
+// ---- Info-section hero banner: alternate ss1.png / ss2.png / ss3.png, one visible at a time ----
+// Slide state is shared with the lightbox so opening/navigating it stays in sync
+// with (and can override) the small banner preview. Swap the ss1/ss2/ss3.png src
+// attributes above for your real screenshots.
+(function(){
+  const vcinfoSlides = [document.getElementById('vcinfoImg1'), document.getElementById('vcinfoImg2'), document.getElementById('vcinfoImg3')].filter(Boolean);
+  const vcinfoDots = document.querySelectorAll('.vcinfo-banner-dots span');
+  let vcinfoIndex = 0;
+  let vcinfoAutoTimer = null;
 
-<!-- ================= GROUP VIDEO CALL (up to 4-person, vote-to-remove) ================= -->
-<div class="gcall" id="groupCallScreen">
-  <div class="gcall-status mono" id="gcallStatus">CONNECTING…</div>
+  function goToVcinfoSlide(newIndex){
+    const n = vcinfoSlides.length;
+    if (n === 0) return;
+    newIndex = ((newIndex % n) + n) % n;
+    vcinfoSlides[vcinfoIndex] && vcinfoSlides[vcinfoIndex].classList.remove('active');
+    vcinfoDots[vcinfoIndex] && vcinfoDots[vcinfoIndex].classList.remove('active');
+    vcinfoIndex = newIndex;
+    vcinfoSlides[vcinfoIndex] && vcinfoSlides[vcinfoIndex].classList.add('active');
+    vcinfoDots[vcinfoIndex] && vcinfoDots[vcinfoIndex].classList.add('active');
 
-  <div class="gcall-grid" id="gcallGrid"></div>
-
-  <div class="gcall-actions">
-    <button class="vcall-btn skip" id="gMicBtn" onclick="toggleGroupMic()">🎙 Mute</button>
-    <button class="vcall-btn skip" id="gCamBtn" onclick="toggleGroupCam()">📷 Camera off</button>
-    <button class="vcall-btn leave" onclick="leaveGroupCall()">✕ Leave</button>
-  </div>
-  <div class="gcall-note">Group video · anyone can be removed by majority vote · 18+ only</div>
-</div>
-
-<!-- ================= CHAT ================= -->
-<div class="chat" id="chatScreen">
-  <div class="chat-top">
-    <div class="chat-who">
-      <div class="chat-avatar" id="chatAvatarInitial">S</div>
-      <div>
-        <div class="chat-name"><span id="chatStrangerName">Stranger #0000</span> <span id="chatStrangerFlag" title=""></span></div>
-        <div class="chat-sub" id="chatStrangerTags">no shared interests listed</div>
-      </div>
-    </div>
-    <div class="chat-actions">
-      <button class="icon-btn danger" onclick="reportStranger()">Report</button>
-      <button class="icon-btn" id="videoToggleBtn" onclick="requestVideo()">Enable video</button>
-      <button class="icon-btn" onclick="newStranger()">New stranger</button>
-      <button class="icon-btn" onclick="disconnectChat()">Disconnect</button>
-    </div>
-  </div>
-
-  <div class="video-stage" id="videoStage">
-    <div class="video-half" id="localHalf">
-      <video class="video-local" id="localVideo" autoplay playsinline muted style="display:none;"></video>
-      <div class="video-local-off" id="localVideoOff">camera off</div>
-      <div class="video-half-label">You</div>
-    </div>
-    <div class="video-half" id="remoteHalf">
-      <div class="video-remote-placeholder" id="remotePlaceholder">
-        <div class="avatar-ring">?</div>
-        <span id="remoteStatusText">waiting for stranger's camera…</span>
-      </div>
-      <video class="video-remote" id="remoteVideo" autoplay playsinline style="display:none;"></video>
-      <div class="video-half-label">Stranger</div>
-    </div>
-
-    <div class="video-controls">
-      <span class="video-consent-note">Video starts automatically with each match · off anytime</span>
-      <div class="video-bar">
-        <button class="vbtn" id="micBtn" onclick="toggleMic()" title="Mute microphone">🎙</button>
-        <button class="vbtn" id="camBtn" onclick="toggleCam()" title="Turn off camera">📷</button>
-        <button class="vbtn end" onclick="endVideo()">End video</button>
-      </div>
-    </div>
-  </div>
-
-
-  <div class="chat-body" id="chatBody"></div>
-  <div class="emoji-quick-row">
-    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👋','chatInput','chatBody')" aria-label="Send wave emoji">👋</button>
-    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😀','chatInput','chatBody')" aria-label="Send smile emoji">😀</button>
-    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😂','chatInput','chatBody')" aria-label="Send laughing emoji">😂</button>
-    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('❤️','chatInput','chatBody')" aria-label="Send heart emoji">❤️</button>
-    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('👍','chatInput','chatBody')" aria-label="Send thumbs up emoji">👍</button>
-    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('🔥','chatInput','chatBody')" aria-label="Send fire emoji">🔥</button>
-    <button type="button" class="emoji-quick-btn" onclick="quickEmoji('😢','chatInput','chatBody')" aria-label="Send sad emoji">😢</button>
-  </div>
-  <div class="chat-input-row">
-    <input class="chat-input" id="chatInput" type="text" placeholder="Say something…" autocomplete="off">
-    <button class="send-btn" onclick="sendMessage()" aria-label="Send message">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 11L21 3L13 21L11 13L3 11Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-    </button>
-  </div>
-</div>
-
-<script type="module">
-/* ============================================================
-   FriendHub — now wired to a live Firebase backend.
-   Firestore handles: anonymous auth, random-stranger matching
-   for both text chat (waitingPool/matches) and instant video
-   (videoWaitingPool/videoMatches, kept separate so the two
-   never cross-match), calls/{callId} docs, real-time chat
-   messages, WebRTC signaling (offer/answer/ICE) for peer-to-peer
-   video, and a real (not simulated) report log. Actual audio/
-   video streams flow directly between browsers via WebRTC —
-   Firestore only ever carries the signaling handshake.
-
-   IMPORTANT — before pointing this at real public users you
-   still need: real age verification (not just a text claim),
-   and a person/process actually reviewing the "reports"
-   collection this now writes to. Those are not optional —
-   anonymous random video pairing is the highest-risk surface
-   for minor safety on a product like this.
-   ============================================================ */
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDoc, getDocs,
-  query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction, updateDoc,
-  arrayUnion, arrayRemove, Timestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
-  authDomain: "friendhub-9f934.firebaseapp.com",
-  projectId: "friendhub-9f934",
-  storageBucket: "friendhub-9f934.firebasestorage.app",
-  messagingSenderId: "97544296104",
-  appId: "1:97544296104:web:d7f7d27e86f1af748e949d",
-  measurementId: "G-BNRRLS7TSJ"
-};
-
-const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
-const auth = getAuth(fbApp);
-
-let myUid = null;
-const authReady = new Promise((resolve) => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) { myUid = user.uid; resolve(user.uid); }
-  });
-});
-signInAnonymously(auth).catch((err) => console.error('Anonymous sign-in failed:', err));
-
-/* ------------------------------------------------------------
-   LIVE ONLINE-USER COUNT
-   Every tab that has the site open writes a heartbeat doc to
-   presence/{uid} every 20s (and once immediately on load). The
-   homepage hero re-queries presence for docs whose lastSeen is
-   within the last 60s every 15s, and shows that count instead of
-   a hardcoded number. A doc older than 60s is treated as "gone"
-   (tab closed without a clean unload) even if it's never deleted,
-   so the count self-heals without needing a Cloud Function.
-   ------------------------------------------------------------ */
-const PRESENCE_HEARTBEAT_MS = 20000;
-const PRESENCE_STALE_MS = 60000;
-const PRESENCE_REFRESH_MS = 15000;
-
-async function startPresence(){
-  await authReady;
-  const presenceRef = doc(db, 'presence', myUid);
-
-  async function heartbeat(){
-    try{ await setDoc(presenceRef, { lastSeen: serverTimestamp() }); }
-    catch(err){ console.error('presence heartbeat failed:', err); }
+    const lb = document.getElementById('vcinfoLightbox');
+    if (lb && lb.classList.contains('active')) syncVcinfoLightboxToBanner();
   }
 
-  await heartbeat();
-  setInterval(heartbeat, PRESENCE_HEARTBEAT_MS);
-
-  // Best-effort cleanup on tab close — not guaranteed to fire, which is
-  // exactly why the "online" query below also filters by staleness.
-  window.addEventListener('beforeunload', () => {
-    deleteDoc(presenceRef).catch(()=>{});
-  });
-
-  refreshOnlineCount();
-  setInterval(refreshOnlineCount, PRESENCE_REFRESH_MS);
-}
-
-async function refreshOnlineCount(){
-  const countEl = document.getElementById('onlineCount');
-  if (!countEl) return;
-  try{
-    const cutoff = Timestamp.fromMillis(Date.now() - PRESENCE_STALE_MS);
-    const presenceRef = collection(db, 'presence');
-    const q = query(presenceRef, where('lastSeen', '>', cutoff));
-    const snap = await getDocs(q);
-    countEl.textContent = snap.size.toLocaleString();
-  }catch(err){
-    console.error('refreshOnlineCount failed:', err);
+  function startVcinfoAutoRotate(){
+    if (vcinfoAutoTimer || vcinfoSlides.length < 2) return;
+    vcinfoAutoTimer = setInterval(() => goToVcinfoSlide(vcinfoIndex + 1), 5000);
   }
-}
+  function stopVcinfoAutoRotate(){
+    if (vcinfoAutoTimer){ clearInterval(vcinfoAutoTimer); vcinfoAutoTimer = null; }
+  }
+  startVcinfoAutoRotate();
 
-startPresence();
-
-/* ------------------------------------------------------------
-   COUNTRY MATCHING
-   A small fixed list of countries plus "Any country" (the
-   default). Two people are considered country-compatible if
-   either of them has "any" selected, or if their chosen
-   countries are the same. The value is stored alongside the
-   waiting-pool doc so the matcher can filter candidates by it.
-   ------------------------------------------------------------ */
-const COUNTRIES = [
-  { code: 'any', flag: '🌍', name: 'Any country' },
-  { code: 'US', flag: '🇺🇸', name: 'United States' },
-  { code: 'CA', flag: '🇨🇦', name: 'Canada' },
-  { code: 'MX', flag: '🇲🇽', name: 'Mexico' },
-  { code: 'BR', flag: '🇧🇷', name: 'Brazil' },
-  { code: 'AR', flag: '🇦🇷', name: 'Argentina' },
-  { code: 'GB', flag: '🇬🇧', name: 'United Kingdom' },
-  { code: 'IE', flag: '🇮🇪', name: 'Ireland' },
-  { code: 'FR', flag: '🇫🇷', name: 'France' },
-  { code: 'DE', flag: '🇩🇪', name: 'Germany' },
-  { code: 'ES', flag: '🇪🇸', name: 'Spain' },
-  { code: 'IT', flag: '🇮🇹', name: 'Italy' },
-  { code: 'NL', flag: '🇳🇱', name: 'Netherlands' },
-  { code: 'SE', flag: '🇸🇪', name: 'Sweden' },
-  { code: 'PL', flag: '🇵🇱', name: 'Poland' },
-  { code: 'TR', flag: '🇹🇷', name: 'Turkey' },
-  { code: 'RU', flag: '🇷🇺', name: 'Russia' },
-  { code: 'ZA', flag: '🇿🇦', name: 'South Africa' },
-  { code: 'NG', flag: '🇳🇬', name: 'Nigeria' },
-  { code: 'EG', flag: '🇪🇬', name: 'Egypt' },
-  { code: 'AE', flag: '🇦🇪', name: 'UAE' },
-  { code: 'IN', flag: '🇮🇳', name: 'India' },
-  { code: 'PK', flag: '🇵🇰', name: 'Pakistan' },
-  { code: 'BD', flag: '🇧🇩', name: 'Bangladesh' },
-  { code: 'CN', flag: '🇨🇳', name: 'China' },
-  { code: 'JP', flag: '🇯🇵', name: 'Japan' },
-  { code: 'KR', flag: '🇰🇷', name: 'South Korea' },
-  { code: 'PH', flag: '🇵🇭', name: 'Philippines' },
-  { code: 'ID', flag: '🇮🇩', name: 'Indonesia' },
-  { code: 'VN', flag: '🇻🇳', name: 'Vietnam' },
-  { code: 'TH', flag: '🇹🇭', name: 'Thailand' },
-  { code: 'AU', flag: '🇦🇺', name: 'Australia' },
-  { code: 'NZ', flag: '🇳🇿', name: 'New Zealand' }
-];
-
-function countryInfo(code){
-  return COUNTRIES.find(c => c.code === code) || COUNTRIES[0];
-}
-
-// Flag AFTER the name everywhere it's displayed, e.g. "United States 🇺🇸"
-function countryOptionLabel(code){
-  const c = countryInfo(code);
-  return c.name + ' ' + c.flag;
-}
-
-function countryFlagOf(code){
-  return countryInfo(code || 'any').flag;
-}
-
-function countryNameOf(code){
-  return countryInfo(code || 'any').name;
-}
-
-// Keep "Any country" pinned first, then list the rest A→Z by name so
-// typing a letter in the dropdown jumps to countries in alphabetical order.
-function getSortedCountries(){
-  const anyEntry = COUNTRIES.find(c => c.code === 'any');
-  const sortedRest = COUNTRIES
-    .filter(c => c.code !== 'any')
-    .slice()
-    .sort((a, b) => a.name.localeCompare(b.name));
-  return anyEntry ? [anyEntry, ...sortedRest] : sortedRest;
-}
-
-function populateCountrySelect(selectEl, defaultCode){
-  if (!selectEl) return;
-  selectEl.innerHTML = '';
-  getSortedCountries().forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.code;
-    opt.textContent = countryOptionLabel(c.code);
-    selectEl.appendChild(opt);
-  });
-  selectEl.value = defaultCode || 'any';
-}
-
-// Real, colorful flag images (flagcdn.com) instead of relying on emoji
-// flags — many Android WebViews render flag emoji as plain two-letter
-// codes instead of an actual colored flag, so images are more reliable
-// inside the wrapped app.
-function countryFlagMarkup(code){
-  if (!code || code === 'any') return '<span class="flag-dd-emoji">🌍</span>';
-  const src = 'https://flagcdn.com/w40/' + code.toLowerCase() + '.png';
-  return '<img class="flag-dd-flag-img" src="' + src + '" alt="" loading="lazy">';
-}
-
-// Custom flag-image dropdown that sits on top of a hidden native <select>.
-// The native select still holds the real value/disabled state so none of
-// the existing matching/search logic elsewhere has to change — this just
-// replaces how the picker looks and adds a type-to-search box.
-const flagDropdowns = {};
-function createFlagDropdown(selectId, variant){
-  const selectEl = document.getElementById(selectId);
-  if (!selectEl) return;
-  selectEl.style.display = 'none';
-
-  const wrap = document.createElement('div');
-  wrap.className = 'flag-dd flag-dd--' + variant;
-  wrap.innerHTML =
-    '<button type="button" class="flag-dd-trigger" aria-haspopup="listbox" aria-expanded="false">' +
-      '<span class="flag-dd-trigger-flag"></span>' +
-      '<span class="flag-dd-trigger-name"></span>' +
-      '<span class="flag-dd-caret">▾</span>' +
-    '</button>' +
-    '<div class="flag-dd-panel" hidden>' +
-      '<input type="text" class="flag-dd-search" placeholder="Search country…" aria-label="Search country">' +
-      '<div class="flag-dd-list" role="listbox"></div>' +
-    '</div>';
-  selectEl.insertAdjacentElement('afterend', wrap);
-
-  const btn = wrap.querySelector('.flag-dd-trigger');
-  const panel = wrap.querySelector('.flag-dd-panel');
-  const search = wrap.querySelector('.flag-dd-search');
-  const list = wrap.querySelector('.flag-dd-list');
-  const triggerFlag = wrap.querySelector('.flag-dd-trigger-flag');
-  const triggerName = wrap.querySelector('.flag-dd-trigger-name');
-
-  function renderList(filterText){
-    const q = (filterText || '').trim().toLowerCase();
-    const items = getSortedCountries().filter(c => !q || c.name.toLowerCase().includes(q));
-    list.innerHTML = '';
-    if (items.length === 0){
-      const empty = document.createElement('div');
-      empty.className = 'flag-dd-empty';
-      empty.textContent = 'No countries match "' + filterText + '"';
-      list.appendChild(empty);
-      return;
-    }
-    items.forEach(c => {
-      const item = document.createElement('div');
-      item.className = 'flag-dd-item' + (c.code === selectEl.value ? ' selected' : '');
-      item.setAttribute('role', 'option');
-      item.dataset.code = c.code;
-      item.innerHTML = '<span class="flag-dd-item-flag">' + countryFlagMarkup(c.code) + '</span><span>' + c.name + '</span>';
-      item.addEventListener('click', () => {
-        selectEl.value = c.code;
-        syncTrigger();
-        closePanel();
-        selectEl.dispatchEvent(new Event('change'));
-      });
-      list.appendChild(item);
+  function syncVcinfoLightboxToBanner(){
+    const lbImg = document.getElementById('vcinfoLightboxImg');
+    const active = vcinfoSlides[vcinfoIndex];
+    if (lbImg && active) lbImg.src = active.src;
+    document.querySelectorAll('#vcinfoLightboxDots span').forEach((dot, idx) => {
+      dot.classList.toggle('active', idx === vcinfoIndex);
     });
   }
-
-  function syncTrigger(){
-    const code = selectEl.value || 'any';
-    triggerFlag.innerHTML = countryFlagMarkup(code);
-    triggerName.textContent = countryNameOf(code);
-    btn.disabled = !!selectEl.disabled;
-  }
-
-  function openPanel(){
-    panel.hidden = false;
-    btn.setAttribute('aria-expanded', 'true');
-    search.value = '';
-    renderList('');
-    search.focus();
-  }
-  function closePanel(){
-    panel.hidden = true;
-    btn.setAttribute('aria-expanded', 'false');
-  }
-
-  btn.addEventListener('click', () => {
-    if (btn.disabled) return;
-    if (panel.hidden) openPanel(); else closePanel();
-  });
-  search.addEventListener('input', () => renderList(search.value));
-  document.addEventListener('click', (e) => {
-    if (!wrap.contains(e.target)) closePanel();
-  });
-  wrap.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape'){ closePanel(); btn.focus(); }
-  });
-
-  syncTrigger();
-  flagDropdowns[selectId] = { sync: syncTrigger };
-}
-
-function refreshFlagDropdown(selectId){
-  const dd = flagDropdowns[selectId];
-  if (dd) dd.sync();
-}
-
-function countriesCompatible(a, b){
-  a = a || 'any'; b = b || 'any';
-  return a === 'any' || b === 'any' || a === b;
-}
-
-function countryLabel(code){
-  return countryNameOf(code);
-}
-
-populateCountrySelect(document.getElementById('countrySelect'), 'any');
-populateCountrySelect(document.getElementById('vcCountrySelect'), 'any');
-populateCountrySelect(document.getElementById('homeCountrySelect'), 'any');
-
-createFlagDropdown('countrySelect', 'lobby');
-createFlagDropdown('vcCountrySelect', 'video');
-createFlagDropdown('homeCountrySelect', 'home');
-
-// Homepage selector just sets the default that the lobby / video-call
-// screens open with — those screens each still have their own selector
-// so the choice can be changed per-search too.
-function onHomeCountryChange(){
-  const sel = document.getElementById('homeCountrySelect');
-  preferredCountry = sel ? sel.value : 'any';
-}
-
-// ---- Hero banner: alternate img1.png / img2.png / img3.png, one visible at a time ----
-// Slide state is shared with the lightbox below so opening/navigating the
-// lightbox stays in sync with (and can override) the small banner preview.
-const bannerSlides = [document.getElementById('bannerImg1'), document.getElementById('bannerImg2'), document.getElementById('bannerImg3')].filter(Boolean);
-const bannerDots = document.querySelectorAll('.hero-banner-dots span');
-let bannerIndex = 0;
-let bannerAutoTimer = null;
-
-function goToBannerSlide(newIndex){
-  const n = bannerSlides.length;
-  if (n === 0) return;
-  newIndex = ((newIndex % n) + n) % n; // wrap around both directions
-  bannerSlides[bannerIndex] && bannerSlides[bannerIndex].classList.remove('active');
-  bannerDots[bannerIndex] && bannerDots[bannerIndex].classList.remove('active');
-  bannerIndex = newIndex;
-  bannerSlides[bannerIndex] && bannerSlides[bannerIndex].classList.add('active');
-  bannerDots[bannerIndex] && bannerDots[bannerIndex].classList.add('active');
-
-  const lb = document.getElementById('bannerLightbox');
-  if (lb && lb.classList.contains('active')) syncLightboxToBanner();
-}
-
-function startBannerAutoRotate(){
-  if (bannerAutoTimer || bannerSlides.length < 2) return;
-  bannerAutoTimer = setInterval(() => goToBannerSlide(bannerIndex + 1), 5000);
-}
-function stopBannerAutoRotate(){
-  if (bannerAutoTimer){ clearInterval(bannerAutoTimer); bannerAutoTimer = null; }
-}
-startBannerAutoRotate();
-
-// ---- Banner lightbox: click banner to view the current slide full-size,
-// then use the arrows/dots (or ← →) to pick any image yourself ----
-function syncLightboxToBanner(){
-  const lbImg = document.getElementById('bannerLightboxImg');
-  const active = bannerSlides[bannerIndex];
-  if (lbImg && active) lbImg.src = active.src;
-  document.querySelectorAll('#bannerLightboxDots span').forEach((dot, idx) => {
-    dot.classList.toggle('active', idx === bannerIndex);
-  });
-}
-function openBannerLightbox(){
-  if (bannerSlides.length === 0) return;
-  stopBannerAutoRotate(); // pause auto-rotation while the user is browsing manually
-  syncLightboxToBanner();
-  document.getElementById('bannerLightbox').classList.add('active');
-}
-function closeBannerLightbox(e){
-  if (e && e.target && e.target.id !== 'bannerLightbox') return;
-  document.getElementById('bannerLightbox').classList.remove('active');
-  startBannerAutoRotate();
-}
-function changeLightboxSlide(delta){
-  goToBannerSlide(bannerIndex + delta);
-}
-function setLightboxSlide(idx){
-  goToBannerSlide(idx);
-}
-document.addEventListener('keydown', (e) => {
-  const lb = document.getElementById('bannerLightbox');
-  if (!lb || !lb.classList.contains('active')) return;
-  if (e.key === 'Escape') closeBannerLightbox();
-  else if (e.key === 'ArrowRight') changeLightboxSlide(1);
-  else if (e.key === 'ArrowLeft') changeLightboxSlide(-1);
-});
-
-// active call state
-let currentCallId = null;
-let isCaller = false;
-let otherUid = null;
-let unsubMessages = null;
-let unsubCallDoc = null;
-let unsubMyCandidates = null;
-let unsubWaitingWatch = null;
-let peerConnection = null;
-let ivcLocalStream = null;
-let ivcPeerConnection = null;
-
-let userTags = [];
-let myCountry = 'any';
-let preferredCountry = 'any'; // set from the homepage selector, used as the default when opening the lobby/video call
-let strangerId = null;
-let strangerTags = [];
-let matchTimeout = null;
-let botTimeout = null;
-
-/* ============================================================
-   INSTANT RANDOM VIDEO MATCH — no directory, no choosing.
-
-   Tapping "Video call" drops you into a separate video waiting
-   pool (videoWaitingPool/videoMatches — kept apart from the
-   text-chat waitingPool so the two intents never cross-match).
-   As soon as two people are waiting, they're paired atomically
-   (same race-safe transaction pattern as the text matcher) into
-   a calls/{callId} doc and dropped straight into a live video
-   call — camera/mic requested immediately, no extra opt-in step,
-   since choosing "Video call" already is the opt-in. WebRTC
-   offer/answer/ICE signaling flows through that same call doc;
-   the audio/video itself is peer-to-peer.
-
-   IMPORTANT — exactly like the text flow, this still needs real
-   age verification and someone actually reviewing the "reports"
-   collection before this goes anywhere near real public users.
-   Anonymous random video pairing is the single highest-risk
-   surface for minor safety on a product like this, so treat
-   that infrastructure as a launch blocker, not a follow-up.
-   ============================================================ */
-
-let videoFlowActive = false;   // true whenever the video-call screen is open (searching or connected)
-let unsubVideoWaitingWatch = null;
-let unsubVcallMessages = null;
-let myVideoCountry = 'any';
-
-async function openVideoCall(){
-  document.getElementById('site').style.display = 'none';
-  document.getElementById('videoCallScreen').classList.add('active');
-  videoFlowActive = true;
-  myVideoCountry = preferredCountry;
-  const vcSel = document.getElementById('vcCountrySelect');
-  if (vcSel) { vcSel.value = myVideoCountry; vcSel.disabled = false; }
-  refreshFlagDropdown('vcCountrySelect');
-  setVideoSearchingUI();
-
-  if (!ivcLocalStream){
-    try{
-      ivcLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
-    }catch(err){
-      document.getElementById('vcallStatus').textContent = 'CAMERA/MIC BLOCKED';
-      document.getElementById('vcRemoteStatusText').textContent = "camera/mic permission was denied — can't start video.";
-      return;
-    }
-    if (!videoFlowActive){ ivcLocalStream.getTracks().forEach(t => t.stop()); ivcLocalStream = null; return; }
-    const localVideo = document.getElementById('vcLocalVideo');
-    localVideo.srcObject = ivcLocalStream;
-    localVideo.style.display = 'block';
-  }
-
-  await authReady;
-  if (!videoFlowActive) return; // left while camera/auth was still loading
-  findVideoMatch();
-}
-
-async function onVideoCountryChange(){
-  const vcSel = document.getElementById('vcCountrySelect');
-  myVideoCountry = vcSel ? vcSel.value : 'any';
-  if (!videoFlowActive || currentCallId) return; // only restart search while still searching, not mid-call
-  if (unsubVideoWaitingWatch){ unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
-  if (myUid) await deleteDoc(doc(db, 'videoWaitingPool', myUid)).catch(()=>{});
-  setVideoSearchingUI('looking for someone in ' + countryLabel(myVideoCountry) + '…');
-  findVideoMatch();
-}
-
-function setVideoSearchingUI(msg){
-  document.getElementById('vcallStatus').textContent = 'SEARCHING…';
-  document.getElementById('vcRemoteStatusText').textContent = msg || 'looking for someone for video…';
-  document.getElementById('vcRemotePlaceholder').style.display = 'flex';
-  document.getElementById('vcSpinner').classList.add('spin');
-  document.getElementById('vcRemoteVideo').style.display = 'none';
-  document.getElementById('vcReportBtn').style.display = 'none';
-  document.getElementById('vcSkipBtn').style.display = 'none';
-  const vcCountryRow = document.getElementById('vcCountryRow');
-  if (vcCountryRow) vcCountryRow.style.display = 'flex';
-  const vcSel = document.getElementById('vcCountrySelect');
-  if (vcSel) vcSel.disabled = false;
-  refreshFlagDropdown('vcCountrySelect');
-}
-
-// Same simplified client-side matchmaking caveat as the text matcher:
-// move this into a Cloud Function before trusting it at real scale.
-async function findVideoMatch(){
-  const waitingRef = collection(db, 'videoWaitingPool');
-  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(30));
-  let snap;
-  try{
-    snap = await getDocs(q);
-  }catch(err){
-    console.error('findVideoMatch getDocs failed:', err);
-    if (!videoFlowActive) return;
-    document.getElementById('vcallStatus').textContent = 'CONNECTION ERROR';
-    document.getElementById('vcRemoteStatusText').textContent = "couldn't reach the matching service";
-    return;
-  }
-  if (!videoFlowActive) return;
-  const candidate = snap.docs.find(d => d.id !== myUid && countriesCompatible(myVideoCountry, d.data().country));
-
-  if (candidate){
-    try {
-      const callId = 'v_' + [myUid, candidate.id].sort().join('_') + '_' + Date.now();
-      await runTransaction(db, async (tx) => {
-        const candRef = doc(db, 'videoWaitingPool', candidate.id);
-        const candSnap = await tx.get(candRef);
-        if (!candSnap.exists()) throw new Error('candidate already taken');
-        const candidateCountry = candSnap.data().country || 'any';
-        tx.delete(candRef);
-        tx.set(doc(db, 'calls', callId), {
-          users: [myUid, candidate.id],
-          status: 'active',
-          countries: { [myUid]: myVideoCountry, [candidate.id]: candidateCountry },
-          createdAt: serverTimestamp()
-        });
-        tx.set(doc(db, 'videoMatches', candidate.id), { callId, with: myUid });
-      });
-      if (!videoFlowActive) return;
-      const caller = [myUid, candidate.id].sort()[0] === myUid;
-      startVideoCall(callId, caller, candidate.id);
-    } catch(e){
-      // lost the race — go back to waiting
-      registerAsVideoWaiting();
-    }
-  } else {
-    registerAsVideoWaiting();
-  }
-}
-
-function registerAsVideoWaiting(){
-  setDoc(doc(db, 'videoWaitingPool', myUid), { country: myVideoCountry, createdAt: serverTimestamp() }).then(() => {
-    const myMatchRef = doc(db, 'videoMatches', myUid);
-    unsubVideoWaitingWatch = onSnapshot(myMatchRef, (snap) => {
-      if (!videoFlowActive) return;
-      if (snap.exists()){
-        const { callId, with: partnerUid } = snap.data();
-        deleteDoc(myMatchRef).catch(()=>{});
-        if (unsubVideoWaitingWatch){ unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
-        const caller = [myUid, partnerUid].sort()[0] === myUid;
-        startVideoCall(callId, caller, partnerUid);
-      }
-    }, (err) => {
-      console.error('videoMatches listener failed:', err);
-      if (!videoFlowActive) return;
-      document.getElementById('vcallStatus').textContent = 'CONNECTION ERROR';
-      document.getElementById('vcRemoteStatusText').textContent = "couldn't reach the matching service";
-    });
-  }).catch((err) => {
-    console.error('registerAsVideoWaiting setDoc failed:', err);
-    if (!videoFlowActive) return;
-    document.getElementById('vcallStatus').textContent = 'CONNECTION ERROR';
-    document.getElementById('vcRemoteStatusText').textContent = "couldn't reach the matching service";
-  });
-}
-
-async function startVideoCall(callId, callerFlag, partnerUid){
-  if (!videoFlowActive){
-    // user already left while this match was being set up server-side
-    updateDoc(doc(db, 'calls', callId), { status: 'ended', endedBy: myUid }).catch(()=>{});
-    return;
-  }
-  document.getElementById('vcallStatus').textContent = 'CONNECTING…';
-  document.getElementById('vcRemoteStatusText').textContent = "waiting for the other person's camera…";
-  const vcCountryRow = document.getElementById('vcCountryRow');
-  if (vcCountryRow) vcCountryRow.style.display = 'none'; // lock in the filter once matched
-
-  currentCallId = callId;
-  isCaller = !!callerFlag;
-  otherUid = partnerUid;
-
-  showPartnerCountryFlag(currentCallId, otherUid, 'vcStrangerFlag');
-
-  document.getElementById('vcReportBtn').style.display = 'flex';
-  document.getElementById('vcSkipBtn').style.display = 'flex';
-
-  // Watch the call doc so if the other person leaves/skips, we find
-  // out and can react instead of sitting on a dead connection.
-  unsubCallDoc = onSnapshot(doc(db, 'calls', currentCallId), (snap) => {
-    const data = snap.data();
-    if (data && data.status === 'ended' && data.endedBy !== myUid){
-      skipVideoStranger('the other person left — finding someone new…');
-    }
-  });
-
-  // Live text chat alongside the video, floating over the call.
-  document.getElementById('vcallChatBody').innerHTML = '';
-  addSystemMessage("You're matched — say hi while you talk!", 'vcallChatBody');
-  const vcallMsgsRef = collection(db, 'calls', currentCallId, 'messages');
-  const vcallMsgsQuery = query(vcallMsgsRef, orderBy('createdAt', 'asc'));
-  unsubVcallMessages = onSnapshot(vcallMsgsQuery, (snap) => {
-    snap.docChanges().forEach(change => {
-      if (change.type === 'added'){
-        const m = change.doc.data();
-        addMessage(m.text, m.sender === myUid ? 'me' : 'them', 'vcallChatBody');
-      }
-    });
-  });
-
-  await startInstantVideoWebRTC();
-}
-
-async function startInstantVideoWebRTC(){
-  ivcPeerConnection = new RTCPeerConnection(RTC_CONFIG);
-  const remoteVideo = document.getElementById('vcRemoteVideo');
-  const remotePlaceholder = document.getElementById('vcRemotePlaceholder');
-
-  ivcLocalStream.getTracks().forEach(track => ivcPeerConnection.addTrack(track, ivcLocalStream));
-
-  const remoteStream = new MediaStream();
-  ivcPeerConnection.ontrack = (event) => {
-    event.streams[0].getTracks().forEach(t => remoteStream.addTrack(t));
-    remoteVideo.srcObject = remoteStream;
-    remoteVideo.style.display = 'block';
-    remotePlaceholder.style.display = 'none';
-    document.getElementById('vcSpinner').classList.remove('spin');
-    document.getElementById('vcallStatus').textContent = 'CONNECTED';
+  window.openVcinfoLightbox = function(){
+    if (vcinfoSlides.length === 0) return;
+    stopVcinfoAutoRotate();
+    syncVcinfoLightboxToBanner();
+    document.getElementById('vcinfoLightbox').classList.add('active');
   };
-
-  const callDocRef = doc(db, 'calls', currentCallId);
-  const myCandidates = collection(callDocRef, isCaller ? 'callerCandidates' : 'calleeCandidates');
-  const theirCandidates = collection(callDocRef, isCaller ? 'calleeCandidates' : 'callerCandidates');
-
-  ivcPeerConnection.onicecandidate = (event) => {
-    if (event.candidate) addDoc(myCandidates, event.candidate.toJSON());
+  window.closeVcinfoLightbox = function(e){
+    if (e && e.target && e.target.id !== 'vcinfoLightbox') return;
+    document.getElementById('vcinfoLightbox').classList.remove('active');
+    startVcinfoAutoRotate();
   };
+  window.changeVcinfoLightboxSlide = function(delta){ goToVcinfoSlide(vcinfoIndex + delta); };
+  window.setVcinfoLightboxSlide = function(idx){ goToVcinfoSlide(idx); };
 
-  if (isCaller){
-    const offer = await ivcPeerConnection.createOffer();
-    offer.sdp = boostOpusAudio(offer.sdp);
-    await ivcPeerConnection.setLocalDescription(offer);
-    await updateDoc(callDocRef, { offer: { type: offer.type, sdp: offer.sdp } });
-
-    onSnapshot(callDocRef, async (snap) => {
-      const data = snap.data();
-      if (data?.answer && ivcPeerConnection && ivcPeerConnection.currentRemoteDescription === null){
-        await ivcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-      }
-    });
-  } else {
-    onSnapshot(callDocRef, async (snap) => {
-      const data = snap.data();
-      if (data?.offer && ivcPeerConnection && ivcPeerConnection.currentRemoteDescription === null){
-        await ivcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-        const answer = await ivcPeerConnection.createAnswer();
-        answer.sdp = boostOpusAudio(answer.sdp);
-        await ivcPeerConnection.setLocalDescription(answer);
-        await updateDoc(callDocRef, { answer: { type: answer.type, sdp: answer.sdp } });
-      }
-    });
-  }
-
-  onSnapshot(theirCandidates, (snap) => {
-    snap.docChanges().forEach(change => {
-      if (change.type === 'added' && ivcPeerConnection){
-        ivcPeerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{});
-      }
-    });
+  document.addEventListener('keydown', (e) => {
+    const lb = document.getElementById('vcinfoLightbox');
+    if (!lb || !lb.classList.contains('active')) return;
+    if (e.key === 'Escape') closeVcinfoLightbox();
+    else if (e.key === 'ArrowRight') changeVcinfoLightboxSlide(1);
+    else if (e.key === 'ArrowLeft') changeVcinfoLightboxSlide(-1);
   });
-}
-
-async function endCurrentInstantCall(){
-  if (unsubCallDoc){ unsubCallDoc(); unsubCallDoc = null; }
-  if (unsubVcallMessages){ unsubVcallMessages(); unsubVcallMessages = null; }
-  if (currentCallId){
-    await updateDoc(doc(db, 'calls', currentCallId), { status: 'ended', endedBy: myUid }).catch(()=>{});
-  }
-  currentCallId = null;
-  otherUid = null;
-  isCaller = false;
-}
-
-// "Skip" — leave this stranger and immediately look for the next one.
-// The camera/mic stay on the whole time; only the peer connection
-// for the old match gets torn down.
-async function skipVideoStranger(message){
-  if (ivcPeerConnection){ ivcPeerConnection.close(); ivcPeerConnection = null; }
-  document.getElementById('vcRemoteVideo').srcObject = null;
-  await endCurrentInstantCall();
-  const flagEl = document.getElementById('vcStrangerFlag');
-  if (flagEl) flagEl.textContent = '';
-  document.getElementById('vcallChatBody').innerHTML = '';
-  if (!videoFlowActive) return;
-  setVideoSearchingUI(message || 'looking for someone new…');
-  findVideoMatch();
-}
-
-// "Leave" — end the call entirely, release the camera, and go home.
-async function leaveVideoCall(){
-  videoFlowActive = false;
-  if (unsubVideoWaitingWatch){ unsubVideoWaitingWatch(); unsubVideoWaitingWatch = null; }
-  if (myUid) deleteDoc(doc(db, 'videoWaitingPool', myUid)).catch(()=>{});
-  if (ivcPeerConnection){ ivcPeerConnection.close(); ivcPeerConnection = null; }
-  if (ivcLocalStream){ ivcLocalStream.getTracks().forEach(t => t.stop()); ivcLocalStream = null; }
-  await endCurrentInstantCall();
-
-  document.getElementById('videoCallScreen').classList.remove('active');
-  document.getElementById('vcRemoteVideo').srcObject = null;
-  document.getElementById('vcRemoteVideo').style.display = 'none';
-  document.getElementById('vcRemotePlaceholder').style.display = 'flex';
-  document.getElementById('vcLocalVideo').srcObject = null;
-  document.getElementById('vcLocalVideo').style.display = 'none';
-  document.getElementById('vcallChatBody').innerHTML = '';
-  const vcFlagEl = document.getElementById('vcStrangerFlag');
-  if (vcFlagEl) vcFlagEl.textContent = '';
-  document.getElementById('site').style.display = 'block';
-  window.scrollTo(0,0);
-}
-
-const tagInput = document.getElementById('tagInput');
-tagInput.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter' && tagInput.value.trim()){
-    if(userTags.length < 5){
-      userTags.push(tagInput.value.trim().toLowerCase());
-      renderLobbyTags();
-    }
-    tagInput.value = '';
-  }
-});
-
-function renderLobbyTags(){
-  const wrap = document.getElementById('lobbyTagDisplay');
-  wrap.innerHTML = '';
-  userTags.forEach(t => {
-    const chip = document.createElement('span');
-    chip.className = 'tag-chip';
-    chip.textContent = t;
-    wrap.appendChild(chip);
-  });
-}
-
-const SCAN_MESSAGES = [
-  "SCANNING…",
-  "CHECKING THE LOBBY…",
-  "LOOKING FOR A MATCH…",
-  "ALMOST THERE…"
-];
-
-let lobbyCycle = null;
-let lobbyLeft = false;
-
-async function openLobby(){
-  document.getElementById('site').style.display = 'none';
-  const lobby = document.getElementById('lobby');
-  lobby.classList.add('active');
-  document.getElementById('lobbyHeadline').textContent = 'Looking for someone to talk to';
-  myCountry = preferredCountry;
-  const countrySel = document.getElementById('countrySelect');
-  if (countrySel) countrySel.value = myCountry;
-  refreshFlagDropdown('countrySelect');
-  lobbyLeft = false;
-  let i = 0;
-  const statusEl = document.getElementById('lobbyStatus');
-  statusEl.textContent = SCAN_MESSAGES[0];
-  lobbyCycle = setInterval(() => {
-    i = (i+1) % SCAN_MESSAGES.length;
-    statusEl.textContent = SCAN_MESSAGES[i];
-  }, 900);
-
-  await authReady;
-  findMatch();
-}
-
-function closeLobby(){
-  lobbyLeft = true;
-  clearInterval(lobbyCycle);
-  if (unsubWaitingWatch) { unsubWaitingWatch(); unsubWaitingWatch = null; }
-  if (myUid) deleteDoc(doc(db, 'waitingPool', myUid)).catch(()=>{});
-  document.getElementById('lobby').classList.remove('active');
-  document.getElementById('site').style.display = 'block';
-}
-
-async function onCountryChange(){
-  const countrySel = document.getElementById('countrySelect');
-  myCountry = countrySel ? countrySel.value : 'any';
-  if (lobbyLeft) return; // select only affects an in-progress search
-  const statusEl = document.getElementById('lobbyStatus');
-  if (statusEl) statusEl.textContent = 'SEARCHING ' + countryLabel(myCountry).toUpperCase() + '…';
-  if (unsubWaitingWatch){ unsubWaitingWatch(); unsubWaitingWatch = null; }
-  if (myUid) await deleteDoc(doc(db, 'waitingPool', myUid)).catch(()=>{});
-  findMatch();
-}
-
-// Simplified client-side matchmaking. Two people can end up racing for
-// the same candidate under real concurrency — for a production app,
-// move this pairing logic into a Cloud Function so it's atomic and
-// server-trusted instead of client-trusted.
-async function findMatch(){
-  const waitingRef = collection(db, 'waitingPool');
-  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(30));
-  const snap = await getDocs(q);
-  const candidate = snap.docs.find(d => d.id !== myUid && countriesCompatible(myCountry, d.data().country));
-
-  if (candidate){
-    try {
-      const callId = [myUid, candidate.id].sort().join('_') + '_' + Date.now();
-      await runTransaction(db, async (tx) => {
-        const candRef = doc(db, 'waitingPool', candidate.id);
-        const candSnap = await tx.get(candRef);
-        if (!candSnap.exists()) throw new Error('candidate already taken');
-        const candidateCountry = candSnap.data().country || 'any';
-        tx.delete(candRef);
-        tx.set(doc(db, 'calls', callId), {
-          users: [myUid, candidate.id],
-          status: 'active',
-          countries: { [myUid]: myCountry, [candidate.id]: candidateCountry },
-          createdAt: serverTimestamp()
-        });
-        tx.set(doc(db, 'matches', candidate.id), { callId, with: myUid });
-      });
-      if (lobbyLeft) return;
-      clearInterval(lobbyCycle);
-      const caller = [myUid, candidate.id].sort()[0] === myUid;
-      startChat(null, callId, caller, candidate.id);
-    } catch(e){
-      // lost the race — go back to waiting
-      registerAsWaiting();
-    }
-  } else {
-    registerAsWaiting();
-  }
-}
-
-function registerAsWaiting(){
-  setDoc(doc(db, 'waitingPool', myUid), {
-    tags: userTags, country: myCountry, createdAt: serverTimestamp()
-  }).then(() => {
-    const myMatchRef = doc(db, 'matches', myUid);
-    unsubWaitingWatch = onSnapshot(myMatchRef, (snap) => {
-      if (lobbyLeft) return;
-      if (snap.exists()){
-        const { callId, with: partnerUid } = snap.data();
-        deleteDoc(myMatchRef).catch(()=>{});
-        unsubWaitingWatch();
-        clearInterval(lobbyCycle);
-        const caller = [myUid, partnerUid].sort()[0] === myUid;
-        startChat(null, callId, caller, partnerUid);
-      }
-    });
-  });
-}
-
-function startChat(chosenPerson, callId, callerFlag, partnerUid){
-  document.getElementById('lobby').classList.remove('active');
-  document.getElementById('chatScreen').classList.add('active');
-
-  currentCallId = callId || null;
-  isCaller = !!callerFlag;
-  otherUid = partnerUid || null;
-
-  if(chosenPerson){
-    strangerId = null;
-    document.getElementById('chatStrangerName').textContent = chosenPerson.name;
-    document.getElementById('chatAvatarInitial').textContent = chosenPerson.name[0];
-    document.getElementById('chatStrangerTags').textContent = 'connected by direct call';
-  } else {
-    strangerId = (partnerUid || '0000').slice(-4);
-    document.getElementById('chatStrangerName').textContent = 'Stranger #' + strangerId;
-    document.getElementById('chatAvatarInitial').textContent = 'S' + String(strangerId).slice(-1);
-    strangerTags = userTags;
-    const countryNote = myCountry !== 'any' ? (' · matched in ' + countryLabel(myCountry)) : '';
-    document.getElementById('chatStrangerTags').textContent = (strangerTags.length
-      ? 'shares interest in ' + strangerTags.join(', ')
-      : 'no shared interests listed') + countryNote;
-  }
-
-  const body = document.getElementById('chatBody');
-  body.innerHTML = '';
-  document.getElementById('chatInput').value = '';
-  document.getElementById('chatInput').focus();
-
-  addSystemMessage(chosenPerson
-    ? (chosenPerson.name + (isCaller ? ' accepted your call.' : ' is calling — say hi!'))
-    : 'You\'re now chatting with a random stranger.');
-
-  if (currentCallId){
-    showPartnerCountryFlag(currentCallId, otherUid, 'chatStrangerFlag');
-    const msgsRef = collection(db, 'calls', currentCallId, 'messages');
-    const q = query(msgsRef, orderBy('createdAt', 'asc'));
-    let firstLoad = true;
-    unsubMessages = onSnapshot(q, (snap) => {
-      if (firstLoad){ body.innerHTML = ''; firstLoad = false; }
-      snap.docChanges().forEach(change => {
-        if (change.type === 'added'){
-          const m = change.doc.data();
-          if (m.sender === myUid) addMessage(m.text, 'me');
-          else addMessage(m.text, 'them');
-        }
-      });
-    });
-
-    // Watch the call doc so if the other person disconnects/ends,
-    // we find out and reflect it in the UI instead of hanging.
-    unsubCallDoc = onSnapshot(doc(db, 'calls', currentCallId), (snap) => {
-      const data = snap.data();
-      if (data && data.status === 'ended' && data.endedBy !== myUid){
-        addSystemMessage('The other person disconnected.');
-      }
-    });
-
-    // Video now starts automatically the moment a real match is found,
-    // instead of waiting for a manual "Enable video" click. Both sides
-    // run this same startChat() independently, so both call requestVideo()
-    // on their own — that's what gets the offer/answer handshake going.
-    requestVideo();
-  }
-}
-
-// Looks up the country each side picked (stored on the calls/{callId} doc
-// at match time) and renders the partner's flag next to their name.
-async function showPartnerCountryFlag(callId, partnerUid, flagElId){
-  const flagEl = document.getElementById(flagElId);
-  if (!flagEl || !callId || !partnerUid) return;
-  flagEl.innerHTML = '';
-  try{
-    const snap = await getDoc(doc(db, 'calls', callId));
-    const countries = snap.exists() ? (snap.data().countries || {}) : {};
-    const code = countries[partnerUid] || 'any';
-    flagEl.innerHTML = countryFlagMarkup(code);
-    flagEl.title = countryNameOf(code);
-  }catch(err){
-    console.error('showPartnerCountryFlag failed:', err);
-  }
-}
-
-function addMessage(text, who, bodyId){
-  const body = document.getElementById(bodyId || 'chatBody');
-  const div = document.createElement('div');
-  div.className = 'msg ' + who;
-  div.textContent = text;
-  body.appendChild(div);
-  body.scrollTop = body.scrollHeight;
-}
-
-function addSystemMessage(text, bodyId){
-  const body = document.getElementById(bodyId || 'chatBody');
-  const div = document.createElement('div');
-  div.className = 'msg system';
-  div.textContent = text;
-  body.appendChild(div);
-  body.scrollTop = body.scrollHeight;
-}
-
-function botTyping(callback, bodyId){
-  const body = document.getElementById(bodyId || 'chatBody');
-  const div = document.createElement('div');
-  div.className = 'msg them';
-  div.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
-  body.appendChild(div);
-  body.scrollTop = body.scrollHeight;
-  setTimeout(() => {
-    div.remove();
-    callback();
-  }, 900 + Math.random()*900);
-}
-
-function quickEmoji(emoji, inputId, bodyId){
-  const input = document.getElementById(inputId);
-  if(!input) return;
-  input.value = emoji;
-  sendMessage(inputId, bodyId);
-}
-
-function sendMessage(inputId, bodyId){
-  inputId = inputId || 'chatInput';
-  bodyId = bodyId || 'chatBody';
-  const input = document.getElementById(inputId);
-  const text = input.value.trim();
-  if(!text) return;
-  input.value = '';
-
-  if (currentCallId){
-    // Real send — onSnapshot above will render it (for both sides)
-    // once Firestore confirms the write.
-    addDoc(collection(db, 'calls', currentCallId, 'messages'), {
-      text, sender: myUid, createdAt: serverTimestamp()
-    }).catch(() => addSystemMessage('Message failed to send — check your connection.', bodyId));
-  } else {
-    // No live call (e.g. the simulated "call a specific person" demo path)
-    addMessage(text, 'me', bodyId);
-    botTimeout = setTimeout(() => botTyping(() => addMessage("(this contact isn't wired to a live backend yet)", 'them', bodyId), bodyId), 600);
-  }
-}
-
-document.getElementById('chatInput').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') sendMessage('chatInput', 'chatBody');
-});
-
-const vcallChatInputEl = document.getElementById('vcallChatInput');
-if (vcallChatInputEl){
-  vcallChatInputEl.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') sendMessage('vcallChatInput', 'vcallChatBody');
-  });
-}
-
-async function endCurrentCall(){
-  if (unsubMessages){ unsubMessages(); unsubMessages = null; }
-  if (unsubCallDoc){ unsubCallDoc(); unsubCallDoc = null; }
-  if (currentCallId){
-    await updateDoc(doc(db, 'calls', currentCallId), { status: 'ended', endedBy: myUid }).catch(()=>{});
-  }
-  currentCallId = null;
-  otherUid = null;
-  isCaller = false;
-}
-
-async function newStranger(){
-  clearTimeout(botTimeout);
-  endVideo(); // never carry a live camera over to the next match
-  await endCurrentCall();
-  const flagEl = document.getElementById('chatStrangerFlag');
-  if (flagEl) flagEl.textContent = '';
-  addSystemMessage('You disconnected. Looking for someone new…');
-  document.getElementById('chatScreen').classList.remove('active');
-  openLobby();
-}
-
-async function disconnectChat(){
-  clearTimeout(botTimeout);
-  endVideo(); // release the camera/mic as soon as the chat ends
-  await endCurrentCall();
-  document.getElementById('chatScreen').classList.remove('active');
-  document.getElementById('site').style.display = 'block';
-  window.scrollTo(0,0);
-}
-
-function reportStranger(){
-  if (currentCallId && otherUid){
-    addDoc(collection(db, 'reports'), {
-      reporterUid: myUid, reportedUid: otherUid, callId: currentCallId,
-      createdAt: serverTimestamp()
-    }).catch(() => console.error('Report failed to save'));
-  }
-  addSystemMessage('Report received — thanks for helping keep FriendHub safe. You can disconnect anytime.');
-  // Reports land in the "reports" collection in Firestore. Nothing
-  // reviews them automatically — that still needs a real moderation
-  // process on your end before this goes anywhere public.
-}
-
-/* ============================================================
-   VIDEO — auto-starts for random-stranger matches, opt-in for
-   everything else.
-   As soon as "Start chatting" finds a real match, both sides'
-   startChat() calls trigger requestVideo() on their own, so video
-   comes up automatically alongside the text chat — no extra click
-   needed. The "Enable video" / "Hide video panel" button still lets
-   either person toggle their own camera off or back on at any time.
-   For the simulated "call a specific person" demo path (no live
-   currentCallId), video stays fully opt-in since there's no real
-   backend behind it to auto-connect to.
-
-   The signaling itself is real: SDP offer/answer and ICE candidates
-   are exchanged through the calls/{callId} doc and its
-   callerCandidates/calleeCandidates subcollections (see
-   startWebRTC() below), and Firestore only ever carries that
-   handshake — the actual audio/video streams flow peer-to-peer
-   between the two browsers once connected.
-
-   If this ever goes to real users: random video with strangers
-   carries real legal and safety obligations (age verification,
-   CSAM mandatory-reporting under US law for platforms enabling
-   this, moderation/reporting pipelines). Treat that as required
-   infrastructure before launch, not a follow-up task. Auto-starting
-   the camera the instant a match is found — rather than waiting for
-   an explicit tap — makes that consent story weaker, not stronger,
-   so this is worth reconsidering before real users ever hit it.
-   ============================================================ */
-
-let localStream = null;
-let micOn = true;
-let camOn = true;
-
-const RTC_CONFIG = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    // Free public TURN relay (Open Relay Project). Without a TURN fallback,
-    // peers behind strict/symmetric NATs either fail to connect at all, or
-    // limp along on a marginal path — which is what produces crackly audio
-    // and blocky/frozen video even after "connected". This free tier is
-    // fine for testing/small-scale use; swap in a paid TURN provider
-    // (Twilio, Cloudflare, Metered, etc.) before relying on this at scale.
-    { urls: 'stun:stun.relay.metered.ca:80' },
-    { urls: 'turn:global.relay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turn:global.relay.metered.ca:80?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turn:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turns:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
-  ]
-};
-
-// Explicit mic constraints — cleans up background noise/echo instead of
-// relying on each browser/device's own default behavior.
-const MIC_CONSTRAINTS = {
-  echoCancellation: true,
-  noiseSuppression: true,
-  autoGainControl: true
-};
-
-// The default Opus bitrate WebRTC negotiates (~32kbps) is tuned for low
-// bandwidth and can sound thin or noisy. Bumping the target bitrate in the
-// SDP noticeably cleans up voice quality once two peers are connected.
-function boostOpusAudio(sdp, bitrate){
-  bitrate = bitrate || 64000;
-  const lines = sdp.split('\r\n');
-  let opusPt = null;
-  for (const line of lines){
-    const m = line.match(/^a=rtpmap:(\d+) opus\/48000/);
-    if (m){ opusPt = m[1]; break; }
-  }
-  if (!opusPt) return sdp;
-  let foundFmtp = false;
-  const out = lines.map(line => {
-    const fm = line.match(new RegExp('^a=fmtp:' + opusPt + ' (.*)$'));
-    if (fm){
-      foundFmtp = true;
-      let params = fm[1];
-      if (!/maxaveragebitrate=/.test(params)) params += ';maxaveragebitrate=' + bitrate;
-      if (!/useinbandfec=/.test(params)) params += ';useinbandfec=1';
-      return 'a=fmtp:' + opusPt + ' ' + params;
-    }
-    return line;
-  });
-  if (!foundFmtp){
-    for (let i = 0; i < out.length; i++){
-      if (out[i].match(new RegExp('^a=rtpmap:' + opusPt + ' opus/48000'))){
-        out.splice(i + 1, 0, 'a=fmtp:' + opusPt + ' maxaveragebitrate=' + bitrate + ';useinbandfec=1');
-        break;
-      }
-    }
-  }
-  return out.join('\r\n');
-}
-
-async function requestVideo(){
-  const stage = document.getElementById('videoStage');
-  const localVideo = document.getElementById('localVideo');
-  const localOff = document.getElementById('localVideoOff');
-  const remoteText = document.getElementById('remoteStatusText');
-
-  if(stage.classList.contains('active')){
-    endVideo();
-    return;
-  }
-
-  if (!currentCallId){
-    addSystemMessage("Video isn't wired up for this contact yet.");
-    return;
-  }
-
-  try{
-    localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
-  }catch(err){
-    addSystemMessage('Camera/mic permission was denied or unavailable — video stays off.');
-    return;
-  }
-
-  localVideo.srcObject = localStream;
-  localVideo.style.display = 'block';
-  localOff.style.display = 'none';
-  stage.classList.add('active');
-  document.getElementById('videoToggleBtn').textContent = 'Hide video panel';
-  remoteText.textContent = 'connecting…';
-
-  await startWebRTC();
-}
-
-async function startWebRTC(){
-  peerConnection = new RTCPeerConnection(RTC_CONFIG);
-  const remoteVideo = document.getElementById('remoteVideo');
-  const remotePlaceholder = document.getElementById('remotePlaceholder');
-  const remoteText = document.getElementById('remoteStatusText');
-
-  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-  const remoteStream = new MediaStream();
-  peerConnection.ontrack = (event) => {
-    event.streams[0].getTracks().forEach(t => remoteStream.addTrack(t));
-    remoteVideo.srcObject = remoteStream;
-    remoteVideo.style.display = 'block';
-    remotePlaceholder.style.display = 'none';
-    addSystemMessage("You're now video connected.");
-  };
-
-  const callDocRef = doc(db, 'calls', currentCallId);
-  const myCandidates = collection(callDocRef, isCaller ? 'callerCandidates' : 'calleeCandidates');
-  const theirCandidates = collection(callDocRef, isCaller ? 'calleeCandidates' : 'callerCandidates');
-
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) addDoc(myCandidates, event.candidate.toJSON());
-  };
-
-  if (isCaller){
-    const offer = await peerConnection.createOffer();
-    offer.sdp = boostOpusAudio(offer.sdp);
-    await peerConnection.setLocalDescription(offer);
-    await updateDoc(callDocRef, { offer: { type: offer.type, sdp: offer.sdp } });
-
-    onSnapshot(callDocRef, async (snap) => {
-      const data = snap.data();
-      if (data?.answer && peerConnection.currentRemoteDescription === null){
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-      }
-    });
-  } else {
-    remoteText.textContent = "waiting for the other person's video…";
-    onSnapshot(callDocRef, async (snap) => {
-      const data = snap.data();
-      if (data?.offer && peerConnection.currentRemoteDescription === null){
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-        const answer = await peerConnection.createAnswer();
-        answer.sdp = boostOpusAudio(answer.sdp);
-        await peerConnection.setLocalDescription(answer);
-        await updateDoc(callDocRef, { answer: { type: answer.type, sdp: answer.sdp } });
-      }
-    });
-  }
-
-  onSnapshot(theirCandidates, (snap) => {
-    snap.docChanges().forEach(change => {
-      if (change.type === 'added'){
-        peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{});
-      }
-    });
-  });
-}
-
-function toggleMic(){
-  if(!localStream) return;
-  micOn = !micOn;
-  localStream.getAudioTracks().forEach(t => t.enabled = micOn);
-  const btn = document.getElementById('micBtn');
-  btn.textContent = micOn ? '🎙' : '🔇';
-  btn.classList.toggle('off', !micOn);
-}
-
-function toggleCam(){
-  if(!localStream) return;
-  camOn = !camOn;
-  localStream.getVideoTracks().forEach(t => t.enabled = camOn);
-  const btn = document.getElementById('camBtn');
-  const localVideo = document.getElementById('localVideo');
-  const localOff = document.getElementById('localVideoOff');
-  btn.classList.toggle('off', !camOn);
-  localVideo.style.display = camOn ? 'block' : 'none';
-  localOff.style.display = camOn ? 'none' : 'flex';
-}
-
-function endVideo(){
-  if(localStream){
-    localStream.getTracks().forEach(t => t.stop());
-    localStream = null;
-  }
-  if(peerConnection){
-    peerConnection.close();
-    peerConnection = null;
-  }
-  const remoteVideo = document.getElementById('remoteVideo');
-  remoteVideo.srcObject = null;
-  remoteVideo.style.display = 'none';
-  document.getElementById('remotePlaceholder').style.display = 'flex';
-  document.getElementById('videoStage').classList.remove('active');
-  document.getElementById('videoToggleBtn').textContent = 'Enable video';
-  document.getElementById('localVideo').srcObject = null;
-  micOn = true; camOn = true;
-  document.getElementById('micBtn').textContent = '🎙';
-  document.getElementById('micBtn').classList.remove('off');
-  document.getElementById('camBtn').textContent = '📷';
-  document.getElementById('camBtn').classList.remove('off');
-}
-
-/* ============================================================
-   GROUP CALLS — fully automatic matchmaking, mesh WebRTC,
-   vote-to-remove. No picking, no invites: tapping "Group call"
-   drops you straight into search.
-
-   Matching unit: groupWaitingPool/{groupId} — its mere existence
-   means "the group at groupCalls/{id} has room for more and wants
-   to be found." A lone searcher creates both docs at once (a
-   1-member group that's also advertising itself). Anyone else who
-   searches joins the oldest open group via an atomic transaction,
-   growing it — 2, then 3, then 4. The moment a join brings a group
-   up to GROUP_CAP (4), that same transaction deletes its waiting-pool
-   doc so nobody else piles on; the next person searching starts a
-   brand-new group instead (so a 5th, 6th... person online kicks off
-   group #2, and so on).
-
-   Every client mesh-connects — offer/answer/ICE — to every other uid
-   currently in the members array (up to 6 peer connections for a full
-   group of 4), using the same signaling-through-Firestore pattern as
-   the 1:1 calls above, just keyed per pair under
-   groupCalls/{id}/signals/{sortedUidA_sortedUidB}.
-
-   Voting: groupCalls/{id}/votes/{targetUid} holds an array of voter
-   uids. Once that reaches a majority of the OTHER current members,
-   any client watching removes the target from the members array. The
-   target's own onSnapshot listener notices it's no longer a member
-   and drops straight back into search for a new group — and since
-   the remaining members are now under GROUP_CAP, their group's
-   waiting-pool doc is recreated too, so it automatically resumes
-   searching for a replacement.
-
-   IMPORTANT — same caveats as the rest of this file: matching and
-   membership logic run entirely client-side (fine for a demo, not
-   trustworthy against a malicious client at real scale), and there's
-   still no real age verification or moderation pipeline.
-   ============================================================ */
-
-
-let currentGroupId = null;
-let groupLocalStream = null;
-let groupMicOn = true;
-let groupCamOn = true;
-let voluntaryLeave = false;
-let groupCallActive = false; // true whenever the group call screen is open (searching or connected)
-const groupPeers = {};        // uid -> RTCPeerConnection
-const groupPeerUnsubs = {};   // uid -> [unsub fns]
-const removalInFlight = new Set();
-let unsubGroupCallDoc = null;
-let unsubGroupVotes = null;
-
-const GROUP_CAP = 4;
-
-function groupPairKey(a, b){ return [a, b].sort().join('_'); }
-
-async function openGroupCall(){
-  document.getElementById('site').style.display = 'none';
-  document.getElementById('groupCallScreen').classList.add('active');
-  document.getElementById('gcallGrid').innerHTML = '';
-  document.getElementById('gcallStatus').textContent = 'SEARCHING FOR A GROUP…';
-  groupCallActive = true;
-  voluntaryLeave = false;
-
-  if (!groupLocalStream){
-    try{
-      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
-    }catch(err){
-      document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
-      alert("Camera/mic permission was denied — can't start a group call.");
-      groupCallActive = false;
-      document.getElementById('groupCallScreen').classList.remove('active');
-      document.getElementById('site').style.display = 'block';
-      return;
-    }
-  }
-
-  await authReady;
-  if (!groupCallActive) return; // left while camera/auth was still loading
-  findGroupMatch();
-}
-
-async function findGroupMatch(){
-  const waitingRef = collection(db, 'groupWaitingPool');
-  const q = query(waitingRef, orderBy('createdAt', 'asc'), limit(5));
-  let snap;
-  try{
-    snap = await getDocs(q);
-  }catch(err){
-    console.error('findGroupMatch getDocs failed:', err);
-    if (!groupCallActive) return;
-    document.getElementById('gcallStatus').textContent = 'CONNECTION ERROR';
-    return;
-  }
-  if (!groupCallActive) return;
-  const candidate = snap.docs.find(d => d.id !== currentGroupId);
-
-  if (candidate){
-    const candidateGroupId = candidate.id;
-    try{
-      await runTransaction(db, async (tx) => {
-        const groupRef = doc(db, 'groupCalls', candidateGroupId);
-        const waitRef = doc(db, 'groupWaitingPool', candidateGroupId);
-        const groupSnap = await tx.get(groupRef);
-        const waitSnap = await tx.get(waitRef);
-        if (!groupSnap.exists() || !waitSnap.exists()) throw new Error('group no longer open');
-        const members = groupSnap.data().members || [];
-        if (members.includes(myUid) || members.length >= GROUP_CAP) throw new Error('group full or already in it');
-        const newMembers = [...members, myUid];
-        tx.update(groupRef, { members: newMembers });
-        if (newMembers.length >= GROUP_CAP) tx.delete(waitRef);
-      });
-      if (!groupCallActive) return;
-      await enterGroupCallScreen(candidateGroupId, false);
-    }catch(e){
-      // lost the race, or the candidate group disappeared — try again
-      if (!groupCallActive) return;
-      findGroupMatch();
-    }
-  } else {
-    await createSearchGroup();
-  }
-}
-
-async function createSearchGroup(){
-  const groupId = 'g_' + myUid.slice(-4) + '_' + Date.now();
-  try{
-    await setDoc(doc(db, 'groupCalls', groupId), {
-      members: [myUid],
-      hostUid: myUid,
-      createdAt: serverTimestamp()
-    });
-    await setDoc(doc(db, 'groupWaitingPool', groupId), { createdAt: serverTimestamp() });
-  }catch(err){
-    console.error('createSearchGroup failed:', err);
-    if (!groupCallActive) return;
-    document.getElementById('gcallStatus').textContent = 'CONNECTION ERROR';
-    return;
-  }
-  if (!groupCallActive) return;
-  await enterGroupCallScreen(groupId, true);
-}
-
-async function enterGroupCallScreen(groupId, isHost){
-  currentGroupId = groupId;
-  document.getElementById('groupCallScreen').classList.add('active');
-  document.getElementById('gcallStatus').textContent = isHost ? 'SEARCHING FOR A GROUP…' : 'CONNECTING…';
-
-  if (!groupLocalStream){
-    try{
-      groupLocalStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:MIC_CONSTRAINTS });
-    }catch(err){
-      document.getElementById('gcallStatus').textContent = 'CAMERA/MIC BLOCKED';
-      alert("Camera/mic permission was denied — you'll still be in the call doc, but others won't see or hear you.");
-    }
-  }
-
-  const groupRef = doc(db, 'groupCalls', groupId);
-  unsubGroupCallDoc = onSnapshot(groupRef, (snap) => {
-    if (!snap.exists()){
-      if (!voluntaryLeave) teardownGroupCall(null);
-      return;
-    }
-    const data = snap.data();
-    const members = data.members || [];
-
-    if (!members.includes(myUid)){
-      if (!voluntaryLeave){
-        // Voted out: don't dead-end the person on an alert — drop them
-        // straight back into search for a fresh group, same as the
-        // "kick and re-search" flow that reopens for the people who
-        // stayed behind.
-        teardownGroupCall(null);
-        openGroupCall();
-      }
-      return;
-    }
-
-    if (members.length < GROUP_CAP){
-      document.getElementById('gcallStatus').textContent = members.length > 1
-        ? 'CONNECTED · SEARCHING FOR MORE…'
-        : 'SEARCHING FOR A GROUP…';
-    } else {
-      document.getElementById('gcallStatus').textContent = 'CONNECTED';
-    }
-    renderGroupTiles(members);
-
-    members.forEach(uid => {
-      if (uid !== myUid && !groupPeers[uid]) connectToGroupPeer(groupId, uid);
-    });
-    Object.keys(groupPeers).forEach(uid => {
-      if (!members.includes(uid)) teardownGroupPeer(uid);
-    });
-  }, (err) => console.error('groupCalls listener failed:', err));
-
-  unsubGroupVotes = onSnapshot(collection(db, 'groupCalls', groupId, 'votes'), (snap) => {
-    snap.forEach(d => updateVoteBadge(d.id, (d.data().voters || []).length));
-    handleVoteThresholds(groupId, snap);
-  }, (err) => console.error('group votes listener failed:', err));
-}
-
-function renderGroupTiles(members){
-  const grid = document.getElementById('gcallGrid');
-  const wanted = new Set(members);
-  Array.from(grid.children).forEach(tile => {
-    if (!wanted.has(tile.dataset.uid)) tile.remove();
-  });
-  members.forEach(uid => {
-    if (document.getElementById('gtile-' + uid)) return;
-    const isMe = uid === myUid;
-    const tile = document.createElement('div');
-    tile.className = 'gtile';
-    tile.id = 'gtile-' + uid;
-    tile.dataset.uid = uid;
-    tile.innerHTML =
-      '<div class="gplaceholder" id="gph-' + uid + '"><span>' + (isMe ? 'you' : 'connecting…') + '</span></div>' +
-      '<video id="gv-' + uid + '" autoplay playsinline' + (isMe ? ' muted' : '') + ' style="display:none;"></video>' +
-      '<div class="gtile-label">' + (isMe ? 'You' : 'Guest #' + uid.slice(-4)) + '</div>' +
-      '<div class="gtile-votecount" id="gvotes-' + uid + '"></div>' +
-      (isMe ? '' : '<button class="gtile-vote" id="gvotebtn-' + uid + '" onclick="voteToRemove(\'' + uid + '\')">Vote to remove</button>');
-    grid.appendChild(tile);
-    if (isMe && groupLocalStream){
-      const v = document.getElementById('gv-' + uid);
-      v.srcObject = groupLocalStream;
-      v.style.display = 'block';
-      document.getElementById('gph-' + uid).style.display = 'none';
-    }
-  });
-}
-
-function setTileStream(uid, stream){
-  const v = document.getElementById('gv-' + uid);
-  const ph = document.getElementById('gph-' + uid);
-  if (!v) return;
-  v.srcObject = stream;
-  v.style.display = 'block';
-  if (ph) ph.style.display = 'none';
-}
-
-async function connectToGroupPeer(groupId, peerUid){
-  const amCaller = [myUid, peerUid].sort()[0] === myUid;
-  const sigRef = doc(db, 'groupCalls', groupId, 'signals', groupPairKey(myUid, peerUid));
-  const pc = new RTCPeerConnection(RTC_CONFIG);
-  groupPeers[peerUid] = pc;
-  groupPeerUnsubs[peerUid] = [];
-
-  if (groupLocalStream){
-    groupLocalStream.getTracks().forEach(t => pc.addTrack(t, groupLocalStream));
-  }
-
-  const remoteStream = new MediaStream();
-  pc.ontrack = (event) => {
-    event.streams[0].getTracks().forEach(t => remoteStream.addTrack(t));
-    setTileStream(peerUid, remoteStream);
-  };
-
-  const myCandidates = collection(sigRef, amCaller ? 'candidatesA' : 'candidatesB');
-  const theirCandidates = collection(sigRef, amCaller ? 'candidatesB' : 'candidatesA');
-  pc.onicecandidate = (event) => {
-    if (event.candidate) addDoc(myCandidates, event.candidate.toJSON());
-  };
-
-  groupPeerUnsubs[peerUid].push(onSnapshot(theirCandidates, (snap) => {
-    snap.docChanges().forEach(change => {
-      if (change.type === 'added'){
-        pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{});
-      }
-    });
-  }));
-
-  if (amCaller){
-    const offer = await pc.createOffer();
-    offer.sdp = boostOpusAudio(offer.sdp);
-    await pc.setLocalDescription(offer);
-    await setDoc(sigRef, { offer: { type: offer.type, sdp: offer.sdp } }, { merge: true });
-    groupPeerUnsubs[peerUid].push(onSnapshot(sigRef, async (snap) => {
-      const data = snap.data();
-      if (data?.answer && pc.currentRemoteDescription === null){
-        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-      }
-    }));
-  } else {
-    groupPeerUnsubs[peerUid].push(onSnapshot(sigRef, async (snap) => {
-      const data = snap.data();
-      if (data?.offer && pc.currentRemoteDescription === null){
-        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-        const answer = await pc.createAnswer();
-        answer.sdp = boostOpusAudio(answer.sdp);
-        await pc.setLocalDescription(answer);
-        await setDoc(sigRef, { answer: { type: answer.type, sdp: answer.sdp } }, { merge: true });
-      }
-    }));
-  }
-}
-
-function teardownGroupPeer(peerUid){
-  if (groupPeers[peerUid]){ groupPeers[peerUid].close(); delete groupPeers[peerUid]; }
-  if (groupPeerUnsubs[peerUid]){ groupPeerUnsubs[peerUid].forEach(fn => fn()); delete groupPeerUnsubs[peerUid]; }
-  const tile = document.getElementById('gtile-' + peerUid);
-  if (tile) tile.remove();
-}
-
-async function voteToRemove(targetUid){
-  if (!currentGroupId || targetUid === myUid) return;
-  const btn = document.getElementById('gvotebtn-' + targetUid);
-  if (btn){ btn.classList.add('voted'); btn.textContent = 'Voted ✓'; btn.disabled = true; }
-  try{
-    await setDoc(doc(db, 'groupCalls', currentGroupId, 'votes', targetUid), {
-      voters: arrayUnion(myUid)
-    }, { merge: true });
-  }catch(err){
-    console.error('voteToRemove failed:', err);
-  }
-}
-
-function updateVoteBadge(targetUid, count){
-  const badge = document.getElementById('gvotes-' + targetUid);
-  if (!badge) return;
-  if (count > 0){
-    badge.textContent = count + (count === 1 ? ' vote' : ' votes');
-    badge.style.display = 'inline-block';
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
-// Any client currently watching the votes subcollection can perform the
-// actual removal once a target has a majority of the OTHER current
-// members voting against them — arrayRemove is idempotent, so it's
-// harmless if more than one client's listener fires this at once.
-async function handleVoteThresholds(groupId, votesSnap){
-  const groupSnap = await getDoc(doc(db, 'groupCalls', groupId)).catch(() => null);
-  if (!groupSnap || !groupSnap.exists()) return;
-  const groupData = groupSnap.data();
-  const members = groupData.members || [];
-
-  votesSnap.forEach(d => {
-    const targetUid = d.id;
-    if (!members.includes(targetUid) || removalInFlight.has(targetUid)) return;
-    const voters = d.data().voters || [];
-    const otherMembers = members.filter(u => u !== targetUid);
-    if (otherMembers.length === 0) return;
-    const majority = Math.floor(otherMembers.length / 2) + 1;
-    const eligibleVotes = voters.filter(v => otherMembers.includes(v)).length;
-
-    if (eligibleVotes >= majority){
-      removalInFlight.add(targetUid);
-      updateDoc(doc(db, 'groupCalls', groupId), { members: arrayRemove(targetUid) })
-        .then(async () => {
-          await deleteDoc(doc(db, 'groupCalls', groupId, 'votes', targetUid)).catch(()=>{});
-          // Kicked below the cap? Re-open this same group to the
-          // matchmaking queue so it automatically resumes searching
-          // for a replacement.
-          if ((members.length - 1) < GROUP_CAP){
-            await setDoc(doc(db, 'groupWaitingPool', groupId), { createdAt: serverTimestamp() }).catch(()=>{});
-          }
-        })
-        .catch(err => console.error('vote removal failed:', err))
-        .finally(() => removalInFlight.delete(targetUid));
-    }
-  });
-}
-
-function teardownGroupCall(finalMessage){
-  if (unsubGroupCallDoc){ unsubGroupCallDoc(); unsubGroupCallDoc = null; }
-  if (unsubGroupVotes){ unsubGroupVotes(); unsubGroupVotes = null; }
-  Object.keys(groupPeers).forEach(uid => teardownGroupPeer(uid));
-  if (groupLocalStream){ groupLocalStream.getTracks().forEach(t => t.stop()); groupLocalStream = null; }
-  document.getElementById('groupCallScreen').classList.remove('active');
-  document.getElementById('gcallGrid').innerHTML = '';
-  currentGroupId = null;
-  groupCallActive = false;
-  document.getElementById('site').style.display = 'block';
-  window.scrollTo(0,0);
-  if (finalMessage) alert(finalMessage);
-}
-
-async function leaveGroupCall(){
-  voluntaryLeave = true;
-  groupCallActive = false;
-  if (currentGroupId){
-    try{
-      const ref = doc(db, 'groupCalls', currentGroupId);
-      await updateDoc(ref, { members: arrayRemove(myUid) });
-      const snap = await getDoc(ref);
-      const remaining = snap.exists() ? (snap.data().members || []) : [];
-      if (remaining.length === 0){
-        await deleteDoc(ref).catch(()=>{});
-        // No one left — also drop the matchmaking entry so a stale
-        // group never lingers in the queue for someone else to find.
-        await deleteDoc(doc(db, 'groupWaitingPool', currentGroupId)).catch(()=>{});
-      } else if (remaining.length < GROUP_CAP){
-        // Someone left a group that still has people in it — reopen
-        // it to the queue so the rest keep searching for a
-        // replacement, same as after a vote-kick.
-        await setDoc(doc(db, 'groupWaitingPool', currentGroupId), { createdAt: serverTimestamp() }).catch(()=>{});
-      }
-    }catch(err){
-      console.error('leaveGroupCall failed:', err);
-    }
-  }
-  teardownGroupCall();
-  voluntaryLeave = false;
-}
-
-function toggleGroupMic(){
-  if (!groupLocalStream) return;
-  groupMicOn = !groupMicOn;
-  groupLocalStream.getAudioTracks().forEach(t => t.enabled = groupMicOn);
-  const btn = document.getElementById('gMicBtn');
-  btn.textContent = groupMicOn ? '🎙 Mute' : '🔇 Unmute';
-  btn.classList.toggle('off', !groupMicOn);
-}
-
-function toggleGroupCam(){
-  if (!groupLocalStream) return;
-  groupCamOn = !groupCamOn;
-  groupLocalStream.getVideoTracks().forEach(t => t.enabled = groupCamOn);
-  const btn = document.getElementById('gCamBtn');
-  btn.textContent = groupCamOn ? '📷 Camera off' : '📷 Camera on';
-  btn.classList.toggle('off', !groupCamOn);
-  const v = document.getElementById('gv-' + myUid);
-  const ph = document.getElementById('gph-' + myUid);
-  if (v) v.style.display = groupCamOn ? 'block' : 'none';
-  if (ph) ph.style.display = groupCamOn ? 'none' : 'flex';
-}
-
-// Module scripts don't expose top-level functions on window the way
-// classic scripts do — but the HTML uses onclick="..." attributes,
-// which need them there. Wiring that up explicitly:
-Object.assign(window, {
-  openVideoCall, skipVideoStranger, leaveVideoCall,
-  openLobby, closeLobby, sendMessage, reportStranger,
-  requestVideo, newStranger, disconnectChat, toggleMic, toggleCam, endVideo,
-  openGroupCall, voteToRemove, leaveGroupCall, toggleGroupMic, toggleGroupCam,
-  onCountryChange, onVideoCountryChange, onHomeCountryChange,
-  openBannerLightbox, closeBannerLightbox, changeLightboxSlide, setLightboxSlide
-});
+})();
 </script>
-</body>
-</html>
+
+<section class="vcinfo-features">
+  <div class="vcinfo-feature">
+    <span class="ico">⚡</span>
+    <div><h3>Instant matching</h3><p>You're connected to another online visitor in seconds — no waiting rooms.</p></div>
+  </div>
+  <div class="vcinfo-feature">
+    <span class="ico">🌐</span>
+    <div><h3>Filter by country</h3><p>Match with anyone, or narrow it down to a specific country using the dropdown.</p></div>
+  </div>
+  <div class="vcinfo-feature">
+    <span class="ico">💬</span>
+    <div><h3>Video + text chat</h3><p>Talk on camera or keep it to text in the side chat — whichever you prefer.</p></div>
+  </div>
+  <div class="vcinfo-feature">
+    <span class="ico">🔒</span>
+    <div><h3>Nothing saved</h3><p>Conversations aren't stored. Once you leave a chat, it's gone.</p></div>
+  </div>
+  <div class="vcinfo-feature">
+    <span class="ico">🚩</span>
+    <div><h3>One-click reporting</h3><p>Flag a bad actor instantly with the Report button in the chat panel.</p></div>
+  </div>
+  <div class="vcinfo-feature">
+    <span class="ico">🙂</span>
+    <div><h3>No account required</h3><p>Just allow camera/mic access and you're in. No email, no password.</p></div>
+  </div>
+</section>
+
+<section class="vcinfo-section">
+  <div class="vcinfo-section-head">
+    <span class="vcinfo-kicker">How it works</span>
+    <h2>Three steps and you're talking</h2>
+  </div>
+  <div class="vcinfo-steps">
+    <div class="vcinfo-step">
+      <span class="vcinfo-step-num">01</span>
+      <h3>Allow camera & mic</h3>
+      <p>Grant access when your browser prompts you, then set an optional country filter and how you'd like to be identified.</p>
+    </div>
+    <div class="vcinfo-step">
+      <span class="vcinfo-step-num">02</span>
+      <h3>Hit Start</h3>
+      <p>You'll be paired with the next available person online — usually within seconds.</p>
+    </div>
+    <div class="vcinfo-step">
+      <span class="vcinfo-step-num">03</span>
+      <h3>Chat, then Stop</h3>
+      <p>Talk on video or switch to text. Click Stop any time, then Start again for a new match.</p>
+    </div>
+  </div>
+</section>
+
+<section class="vcinfo-safety" id="safety">
+  <div>
+    <h2>Stay safe while you chat</h2>
+    <p class="lede">A few habits that keep random video chat fun instead of risky.</p>
+  </div>
+  <ul class="vcinfo-safety-list">
+    <li><span class="ico">01</span><div><strong>Keep personal details private</strong>Never share your full name, address, phone number, or financial details with a stranger.</div></li>
+    <li><span class="ico">02</span><div><strong>18 and over only</strong>This platform is intended for adult users.</div></li>
+    <li><span class="ico">03</span><div><strong>Report bad behavior</strong>End the call and use the Report button if someone behaves inappropriately.</div></li>
+    <li><span class="ico">04</span><div><strong>Watch for off-platform requests</strong>Be cautious of anyone asking you to move the conversation to another app.</div></li>
+    <li><span class="ico">05</span><div><strong>Trust your instincts</strong>You can leave a chat at any time — no explanation needed.</div></li>
+  </ul>
+</section>
+
+<section class="vcinfo-faq">
+  <div class="vcinfo-section-head" style="text-align:left; margin-bottom:24px;">
+    <span class="vcinfo-kicker">FAQ</span>
+    <h2>Frequently asked questions</h2>
+  </div>
+  <div class="vcinfo-faq-item">
+    <h3>Is this really free?</h3>
+    <p>Yes. There's no cost and no sign-up — you can start chatting right away.</p>
+  </div>
+  <div class="vcinfo-faq-item">
+    <h3>Can I chat without turning on my camera?</h3>
+    <p>Yes, the text chat panel works independently, so you can keep your camera off if you'd rather just type.</p>
+  </div>
+  <div class="vcinfo-faq-item">
+    <h3>Can I choose who I talk to?</h3>
+    <p>Matching is random, but you can narrow the pool by country using the filter above the chat.</p>
+  </div>
+  <div class="vcinfo-faq-item">
+    <h3>What happens if I click Stop?</h3>
+    <p>The current call ends immediately. Click Start again whenever you're ready for a new match.</p>
+  </div>
+</section>
+
+<div class="vcinfo-foot">
+  <div><strong>Live Chat</strong> — talk to strangers, no strings attached.</div>
+  <div>By using this site you agree to the Community Rules · Users must be 18 and over</div>
+</div>
+
+<!-- ============= All countries modal (checkbox grid, alphabetical, no flags) ============= -->
+<div class="vc-country-overlay" id="vcCountryOverlay" onclick="closeCountryModal(event)">
+  <div class="vc-country-modal" role="dialog" aria-modal="true" aria-label="All countries">
+    <div class="vc-country-modal-head">
+      <span class="vc-country-modal-title">🌐 All countries</span>
+      <button type="button" class="vc-country-modal-close" onclick="closeCountryModal()" aria-label="Close">✕</button>
+    </div>
+    <div class="vc-country-grid" id="vcCountryGrid"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Alphabetical order. Each country maps to its ISO 3166-1 alpha-2 code,
+  // used to load a real flag image. (Emoji flags render as plain letter
+  // codes on Windows without a flag-emoji font, so we use images instead,
+  // with a graceful fallback to the code badge if an image fails to load.)
+  const FLAG_CDN = 'https://flagcdn.com/w40/';
+  const VC_COUNTRIES = {
+    "Albania":"al","Argentina":"ar","Armenia":"am","Austria":"at","Bangladesh":"bd",
+    "Belarus":"by","Belgium":"be","Brazil":"br","Bulgaria":"bg","Canada":"ca",
+    "Chile":"cl","China":"cn","Colombia":"co","Croatia":"hr","Czechia":"cz",
+    "Denmark":"dk","Finland":"fi","France":"fr","Germany":"de","Greece":"gr",
+    "Hungary":"hu","India":"in","Indonesia":"id","Ireland":"ie","Israel":"il",
+    "Italy":"it","Japan":"jp","Kazakhstan":"kz","Korea":"kr","Latvia":"lv",
+    "Lithuania":"lt","Luxembourg":"lu","Malaysia":"my","Mexico":"mx","Moldova":"md",
+    "Netherlands":"nl","New Zealand":"nz","North Macedonia":"mk","Norway":"no",
+    "Peru":"pe","Philippines":"ph","Poland":"pl","Portugal":"pt","Romania":"ro",
+    "Russia":"ru","Serbia":"rs","Singapore":"sg","Slovakia":"sk","Slovenia":"si",
+    "South Africa":"za","Spain":"es","Sweden":"se","Switzerland":"ch","Taiwan":"tw",
+    "Thailand":"th","Turkey":"tr","Ukraine":"ua","United Kingdom":"gb",
+    "United States":"us","Venezuela":"ve"
+  };
+
+  let vcCountryTarget = null; // 'header' | 'hero'
+  let vcCountrySelected = {}; // target -> selected country name (or null = Any)
+
+  const grid = document.getElementById('vcCountryGrid');
+
+  function buildGrid(){
+    grid.innerHTML = '';
+    grid.appendChild(makeItem('Any country', true, null));
+    Object.keys(VC_COUNTRIES).forEach(name => grid.appendChild(makeItem(name, false, VC_COUNTRIES[name])));
+  }
+
+  function makeItem(name, isAny, iso){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'vc-country-item' + (isAny ? ' any' : '');
+    btn.dataset.name = isAny ? '' : name;
+    const flagHtml = isAny
+      ? '🌐'
+      : '<img src="' + FLAG_CDN + iso + '.png" alt="" loading="lazy" '
+        + 'onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'flag-fallback\',textContent:\'' + iso.toUpperCase() + '\'}))">';
+    btn.innerHTML = '<span class="flag">' + flagHtml + '</span><span class="label">' + name + '</span>';
+    btn.addEventListener('click', () => selectCountry(isAny ? null : name));
+    return btn;
+  }
+
+  function selectCountry(name){
+    if (!vcCountryTarget) return;
+    vcCountrySelected[vcCountryTarget] = name;
+    updateTriggerLabel(vcCountryTarget);
+    closeCountryModal();
+  }
+
+  function updateTriggerLabel(target){
+    const name = vcCountrySelected[target];
+    const label = name ? name : 'Any country';
+    const btnId = target === 'header' ? 'vcHeaderCountryBtn' : 'vcHeroCountryBtn';
+    const btn = document.getElementById(btnId);
+    if (btn) btn.textContent = label;
+  }
+
+  function refreshGridSelection(){
+    const current = vcCountrySelected[vcCountryTarget] || null;
+    Array.from(grid.children).forEach(item => {
+      const isSelected = (item.dataset.name || null) === current;
+      item.classList.toggle('selected', isSelected);
+    });
+  }
+
+  window.openCountryModal = function(target){
+    vcCountryTarget = target;
+    if (grid.children.length === 0) buildGrid();
+    refreshGridSelection();
+    document.getElementById('vcCountryOverlay').classList.add('active');
+  };
+
+  window.closeCountryModal = function(e){
+    if (e && e.target && e.target.id !== 'vcCountryOverlay') return;
+    document.getElementById('vcCountryOverlay').classList.remove('active');
+  };
+
+  document.addEventListener('keydown', (e) => {
+    const overlay = document.getElementById('vcCountryOverlay');
+    if (overlay && overlay.classList.contains('active') && e.key === 'Escape') closeCountryModal();
+  });
+})();
+</script>
+
+<script>
+// ---- Full Screen + Settings toolbar on the video box ----
+(function(){
+  const vcbox = document.querySelector('.vcbox');
+  const vcapp = document.querySelector('.vcapp');
+  const stage = document.querySelector('.vcbox-stage');
+  const toolbar = document.getElementById('vcToolbar');
+  const fsLabel = document.getElementById('vcFullscreenLabel');
+  const settingsPanel = document.getElementById('vcSettingsPanel');
+  const settingsBtn = document.getElementById('vcSettingsBtn');
+
+  window.vcToggleFullscreen = function(){
+    if (!vcapp) return;
+    if (!document.fullscreenElement) {
+      (vcapp.requestFullscreen || vcapp.webkitRequestFullscreen || vcapp.msRequestFullscreen)
+        .call(vcapp)
+        .catch(() => {});
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen)
+        .call(document)
+        .catch(() => {});
+    }
+  };
+
+  function syncFullscreenLabel(){
+    const isFs = !!document.fullscreenElement;
+    if (fsLabel) fsLabel.textContent = isFs ? 'Exit Full Screen' : 'Full Screen';
+    if (vcapp) vcapp.classList.toggle('vcbox-fullscreen', isFs);
+  }
+  document.addEventListener('fullscreenchange', syncFullscreenLabel);
+  document.addEventListener('webkitfullscreenchange', syncFullscreenLabel);
+
+  window.vcToggleSettings = function(){
+    if (settingsPanel) settingsPanel.classList.toggle('open');
+  };
+
+  document.addEventListener('click', (e) => {
+    if (!settingsPanel || !settingsPanel.classList.contains('open')) return;
+    if (settingsPanel.contains(e.target) || (settingsBtn && settingsBtn.contains(e.target))) return;
+    settingsPanel.classList.remove('open');
+  });
+
+  // Buttons stay hidden until the box is clicked, then show for 2 seconds.
+  let hideTimer = null;
+  function showToolbar(){
+    if (!toolbar) return;
+    toolbar.classList.add('visible');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      toolbar.classList.remove('visible');
+      if (settingsPanel) settingsPanel.classList.remove('open');
+    }, 2000);
+  }
+  if (stage) stage.addEventListener('click', showToolbar);
+
+  // ---- Snap (screenshot) ----
+  const snapBtn = document.getElementById('vcSnapBtn');
+  let html2canvasPromise = null;
+  function loadHtml2Canvas(){
+    if (window.html2canvas) return Promise.resolve();
+    if (html2canvasPromise) return html2canvasPromise;
+    html2canvasPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    return html2canvasPromise;
+  }
+
+  function flashScreen(){
+    const flash = document.createElement('div');
+    flash.className = 'vcbox-snap-flash';
+    if (vcbox) vcbox.appendChild(flash);
+    requestAnimationFrame(() => flash.classList.add('go'));
+    setTimeout(() => flash.remove(), 400);
+  }
+
+  function toast(msg){
+    const t = document.createElement('div');
+    t.className = 'vcbox-snap-toast';
+    t.textContent = msg;
+    if (vcbox) vcbox.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 250);
+    }, 1800);
+  }
+
+  window.vcTakeSnapshot = function(){
+    if (!stage) return;
+    flashScreen();
+    loadHtml2Canvas().then(() => {
+      return window.html2canvas(stage, { backgroundColor: '#0D0E1F', useCORS: true, logging: false });
+    }).then((canvas) => {
+      const link = document.createElement('a');
+      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+      link.download = 'friendhub-snap-' + stamp + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      toast('Snapshot saved ✓');
+    }).catch(() => {
+      toast('Could not save snapshot');
+    });
+  };
+})();
+</script>
+</div>
