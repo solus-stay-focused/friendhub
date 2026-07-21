@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 100" role="img" aria-label="FriendHub">
+  <defs>
+    <linearGradient id="navBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9C8CFB"/>
+      <stop offset="100%" stop-color="#5142C4"/>
+    </linearGradient>
+    <linearGradient id="navTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6C5CE7"/>
+      <stop offset="100%" stop-color="#5142C4"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#navBgGrad)"/>
+  <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+  <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+  <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+  <text x="120" y="64" font-family="'Space Grotesk','Poppins',sans-serif" font-weight="700" font-size="42" fill="#1F1B2E" letter-spacing="-0.5">Friend<tspan fill="url(#navTextGrad)">Hub</tspan></text>
+</svg>
