@@ -533,15 +533,12 @@
   .vcinfo-stats{ display:flex; align-items:center; gap:14px; margin-top:34px; }
   @media (max-width:900px){ .vcinfo-stats{ justify-content:center; } }
   .vcinfo-avatar-stack{ display:flex; }
-  .vcinfo-avatar-stack span{
+  .vcinfo-avatar-stack img{
     width:38px; height:38px; border-radius:50%; border:3px solid var(--hp-bg);
     margin-left:-12px; display:block;
-    background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+    object-fit:cover; background:var(--hp-blue-light);
   }
-  .vcinfo-avatar-stack span:first-child{ margin-left:0; }
-  .vcinfo-avatar-stack span:nth-child(2){ background:linear-gradient(135deg,var(--mint),#2FBFA8); }
-  .vcinfo-avatar-stack span:nth-child(3){ background:linear-gradient(135deg,#FFB84D,#E08A2A); }
-  .vcinfo-avatar-stack span:nth-child(4){ background:linear-gradient(135deg,var(--coral),#C24438); }
+  .vcinfo-avatar-stack img:first-child{ margin-left:0; }
   .vcinfo-stats-text{ font-size:14px; color:var(--ink-soft); line-height:1.4; }
   .vcinfo-stats-text strong{ color:var(--ink); }
   .vcinfo-note{ margin-top:22px; font-size:13px; color:var(--ink-soft); opacity:0.8; }
@@ -563,17 +560,22 @@
   .vcinfo-banner-wrap{ position:relative; width:100%; max-width:480px; margin-left:auto; }
   @media (max-width:900px){ .vcinfo-banner-wrap{ margin:0 auto; } }
   .vcinfo-banner{
-    position:relative; width:100%; cursor:zoom-in;
+    position:relative; width:100%; cursor:grab;
     border-radius:20px; overflow:hidden; aspect-ratio:16/11;
     background:linear-gradient(160deg,#2E2A57,#171735);
     box-shadow:0 30px 60px -25px rgba(108,92,231,0.4), 0 10px 24px rgba(5,6,11,0.2);
+    touch-action:pan-y;
+    user-select:none;
   }
+  .vcinfo-banner.dragging{ cursor:grabbing; }
   .vcinfo-banner-img{
     position:absolute; inset:0; width:100%; height:100%;
     object-fit:contain; object-position:center center; opacity:0;
     transition:opacity 1s ease;
+    pointer-events:none;
   }
   .vcinfo-banner-img.active{ opacity:1; }
+  .vcinfo-banner.dragging .vcinfo-banner-img.active{ transition:none; }
   .vcinfo-banner-dots{
     position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
     display:flex; gap:7px; z-index:2;
@@ -904,7 +906,7 @@
         <button type="button" class="vcinfo-country-btn" id="vcHeroCountryBtn" aria-haspopup="dialog" aria-label="Preferred country to match with" onclick="openCountryModal('hero')">Any country</button>
       </div>
       <div class="vcinfo-stats">
-        <div class="vcinfo-avatar-stack"><span></span><span></span><span></span><span></span></div>
+        <div class="vcinfo-avatar-stack"><img src="p1.png" alt=""><img src="p2.png" alt=""><img src="p3.png" alt=""><img src="p4.png" alt=""></div>
         <div class="vcinfo-stats-text"><strong>18,204</strong> people are online chatting right now</div>
       </div>
       <div class="vcinfo-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
@@ -913,10 +915,10 @@
     <div class="vcinfo-banner-wrap">
       <span class="vcinfo-banner-dot d1"></span>
       <span class="vcinfo-banner-dot d2"></span>
-      <div class="vcinfo-banner" onclick="openVcinfoLightbox()">
-        <img class="vcinfo-banner-img active" id="vcinfoImg1" src="ss1.png" alt="Screenshot 1">
-        <img class="vcinfo-banner-img" id="vcinfoImg2" src="ss2.png" alt="Screenshot 2">
-        <img class="vcinfo-banner-img" id="vcinfoImg3" src="ss3.png" alt="Screenshot 3">
+      <div class="vcinfo-banner" onclick="handleVcinfoBannerClick()">
+        <img class="vcinfo-banner-img active" id="vcinfoImg1" src="img1.png" alt="Screenshot 1">
+        <img class="vcinfo-banner-img" id="vcinfoImg2" src="img2.png" alt="Screenshot 2">
+        <img class="vcinfo-banner-img" id="vcinfoImg3" src="img3.png" alt="Screenshot 3">
         <div class="vcinfo-banner-dots">
           <span class="active"></span>
           <span></span>
@@ -940,9 +942,9 @@
 </div>
 
 <script>
-// ---- Info-section hero banner: alternate ss1.png / ss2.png / ss3.png, one visible at a time ----
+// ---- Info-section hero banner: alternate img1.png / img2.png / img3.png, one visible at a time ----
 // Slide state is shared with the lightbox so opening/navigating it stays in sync
-// with (and can override) the small banner preview. Swap the ss1/ss2/ss3.png src
+// with (and can override) the small banner preview. Swap the img1/img2/img3.png src
 // attributes above for your real screenshots.
 (function(){
   const vcinfoSlides = [document.getElementById('vcinfoImg1'), document.getElementById('vcinfoImg2'), document.getElementById('vcinfoImg3')].filter(Boolean);
@@ -994,6 +996,61 @@
   };
   window.changeVcinfoLightboxSlide = function(delta){ goToVcinfoSlide(vcinfoIndex + delta); };
   window.setVcinfoLightboxSlide = function(idx){ goToVcinfoSlide(idx); };
+
+  // ---- Drag / swipe to change slides ----
+  const vcinfoBannerEl = document.querySelector('.vcinfo-banner');
+  const DRAG_THRESHOLD = 40;
+  let vcDragging = false;
+  let vcDragMoved = false;
+  let vcDragStartX = 0;
+  let vcDragDeltaX = 0;
+
+  function vcOnPointerDown(e){
+    if (e.button !== undefined && e.button !== 0) return; // left click / touch only
+    vcDragging = true;
+    vcDragMoved = false;
+    vcDragStartX = e.clientX;
+    vcDragDeltaX = 0;
+    vcinfoBannerEl.classList.add('dragging');
+    stopVcinfoAutoRotate();
+    if (vcinfoBannerEl.setPointerCapture && e.pointerId !== undefined) {
+      try { vcinfoBannerEl.setPointerCapture(e.pointerId); } catch(err){}
+    }
+  }
+
+  function vcOnPointerMove(e){
+    if (!vcDragging) return;
+    vcDragDeltaX = e.clientX - vcDragStartX;
+    if (Math.abs(vcDragDeltaX) > 6) vcDragMoved = true;
+    const active = vcinfoSlides[vcinfoIndex];
+    if (active) active.style.transform = 'translateX(' + vcDragDeltaX + 'px)';
+  }
+
+  function vcOnPointerUp(){
+    if (!vcDragging) return;
+    vcDragging = false;
+    vcinfoBannerEl.classList.remove('dragging');
+    const active = vcinfoSlides[vcinfoIndex];
+    if (active) active.style.transform = '';
+    if (Math.abs(vcDragDeltaX) > DRAG_THRESHOLD) {
+      goToVcinfoSlide(vcinfoIndex + (vcDragDeltaX < 0 ? 1 : -1));
+    }
+    vcDragDeltaX = 0;
+    startVcinfoAutoRotate();
+  }
+
+  if (vcinfoBannerEl) {
+    vcinfoBannerEl.addEventListener('pointerdown', vcOnPointerDown);
+    vcinfoBannerEl.addEventListener('pointermove', vcOnPointerMove);
+    vcinfoBannerEl.addEventListener('pointerup', vcOnPointerUp);
+    vcinfoBannerEl.addEventListener('pointerleave', vcOnPointerUp);
+    vcinfoBannerEl.addEventListener('pointercancel', vcOnPointerUp);
+  }
+
+  window.handleVcinfoBannerClick = function(){
+    if (vcDragMoved) { vcDragMoved = false; return; }
+    openVcinfoLightbox();
+  };
 
   document.addEventListener('keydown', (e) => {
     const lb = document.getElementById('vcinfoLightbox');
