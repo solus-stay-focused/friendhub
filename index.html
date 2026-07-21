@@ -797,22 +797,24 @@
         </svg>
         <span>Friend<em>Hub</em></span>
       </div>
-      <div class="vcbox-status blocked"><span class="dot"></span> CAMERA/MIC BLOCKED</div>
-      <button class="vcbox-leave">✕ Leave</button>
+      <div class="vcbox-status blocked" id="vcStatus"><span class="dot"></span> <span id="vcStatusText">CAMERA/MIC BLOCKED</span></div>
+      <button class="vcbox-leave" id="vcLeaveBtn">✕ Leave</button>
 
       <div class="vcbox-stage">
         <div class="vcbox-half">
+          <video id="vcLocalVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;display:none;"></video>
           <div class="vcbox-half-label">You</div>
         </div>
         <div class="vcbox-half">
-          <div class="vcbox-placeholder">
+          <video id="vcRemoteVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none;"></video>
+          <div class="vcbox-placeholder" id="vcPlaceholder">
             <div class="vcbox-glass-wrap spin">
               <svg class="vcbox-glass" width="44" height="44" viewBox="0 0 44 44" fill="none">
                 <circle cx="19" cy="19" r="13" stroke="#ffffff" stroke-width="3.5"/>
                 <line x1="28.5" y1="28.5" x2="39" y2="39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
               </svg>
             </div>
-            <span>looking for someone to chat with…</span>
+            <span id="vcPlaceholderText">click Start to look for someone…</span>
           </div>
           <div class="vcbox-half-label">Stranger</div>
 
@@ -851,8 +853,8 @@
     </div>
 
     <div class="vcapp-controls">
-      <button class="vcbtn start">▶ Start</button>
-      <button class="vcbtn stop">■ Stop</button>
+      <button class="vcbtn start" id="vcStartBtn">▶ Start</button>
+      <button class="vcbtn stop" id="vcStopBtn">■ Stop</button>
       <div class="vcselect-wrap">
         <button type="button" class="vcselect-btn" id="vcHeaderCountryBtn" aria-haspopup="dialog" aria-label="Match by country" onclick="openCountryModal('header')">Any country</button>
       </div>
@@ -867,7 +869,7 @@
     </div>
 
     <div class="vcapp-meta">
-      <div class="vcapp-online"><span class="dot"></span> <b>18,204</b>&nbsp;online now</div>
+      <div class="vcapp-online"><span class="dot"></span> <b id="vcOnlineCount">18,204</b>&nbsp;online now</div>
       <span class="rules">Community rules · Safety tips</span>
     </div>
   </div>
@@ -877,14 +879,10 @@
       <span>Chat</span>
       <span class="rules">Report</span>
     </div>
-    <div class="vcapp-chat-log">
-      <div class="vcapp-msg system"><div class="bubble">You've been connected to a stranger. Say hi!</div></div>
-      <div class="vcapp-msg"><div class="who">Stranger</div><div class="bubble">hey! where are you from?</div></div>
-      <div class="vcapp-msg me"><div class="who">You</div><div class="bubble">Dhaka, Bangladesh — you?</div></div>
-    </div>
+    <div class="vcapp-chat-log" id="vcChatLog"></div>
     <div class="vcapp-chat-input">
-      <input type="text" placeholder="Write a message…">
-      <button>Send</button>
+      <input type="text" id="vcChatInput" placeholder="Write a message…">
+      <button id="vcChatSendBtn">Send</button>
     </div>
   </div>
 </div>
@@ -1363,6 +1361,325 @@
       toast('Could not save snapshot');
     });
   };
+})();
+</script>
+
+<!-- ============================================================
+  REAL MATCHMAKING + WEBRTC CALLING
+  Fill in firebaseConfig below with your own project's keys
+  (Firebase console → Project settings → your web app).
+  Requires: Anonymous auth enabled, Firestore enabled.
+============================================================= -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script>
+(function(){
+  // ---- 1. FIREBASE CONFIG — replace with your own project's config ----
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const FieldValue = firebase.firestore.FieldValue;
+
+  // STUN only — for reliability on restrictive networks (mobile data, corporate
+  // wifi, etc.) add a TURN server here too, e.g. one from Twilio or metered.ca:
+  // { urls: 'turn:your.turn.server:3478', username: '...', credential: '...' }
+  const RTC_CONFIG = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+  };
+
+  const WAITING_STALE_MS = 20000; // ignore waiting-pool entries older than this (dead tabs)
+
+  // ---- DOM refs ----
+  const startBtn = document.getElementById('vcStartBtn');
+  const stopBtn = document.getElementById('vcStopBtn');
+  const leaveBtn = document.getElementById('vcLeaveBtn');
+  const localVideo = document.getElementById('vcLocalVideo');
+  const remoteVideo = document.getElementById('vcRemoteVideo');
+  const placeholder = document.getElementById('vcPlaceholder');
+  const placeholderText = document.getElementById('vcPlaceholderText');
+  const statusEl = document.getElementById('vcStatus');
+  const statusText = document.getElementById('vcStatusText');
+  const onlineCountEl = document.getElementById('vcOnlineCount');
+  const chatLog = document.getElementById('vcChatLog');
+  const chatInput = document.getElementById('vcChatInput');
+  const chatSendBtn = document.getElementById('vcChatSendBtn');
+
+  // ---- state ----
+  let myUid = null;
+  let localStream = null;
+  let pc = null;
+  let callId = null;
+  let role = null; // 'caller' | 'callee'
+  let unsubWaitingPool = null;
+  let unsubIncomingCalls = null;
+  let unsubCallDoc = null;
+  let unsubCandidates = null;
+  let unsubMessages = null;
+  let matching = false;
+  let inCall = false;
+
+  function setStatus(text, blocked){
+    statusText.textContent = text;
+    statusEl.classList.toggle('blocked', !!blocked);
+  }
+  function setPlaceholder(text, visible){
+    if (placeholderText) placeholderText.textContent = text;
+    placeholder.style.display = visible ? 'flex' : 'none';
+    remoteVideo.style.display = visible ? 'none' : 'block';
+  }
+
+  function addChatMsg(who, text, mine){
+    const row = document.createElement('div');
+    row.className = 'vcapp-msg' + (mine ? ' me' : (who === 'system' ? ' system' : ''));
+    if (who === 'system'){
+      row.innerHTML = '<div class="bubble"></div>';
+      row.querySelector('.bubble').textContent = text;
+    } else {
+      row.innerHTML = '<div class="who"></div><div class="bubble"></div>';
+      row.querySelector('.who').textContent = mine ? 'You' : 'Stranger';
+      row.querySelector('.bubble').textContent = text;
+    }
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  async function ensureAuth(){
+    if (myUid) return myUid;
+    await new Promise((resolve) => {
+      const unsub = auth.onAuthStateChanged((user) => {
+        if (user){ myUid = user.uid; unsub(); resolve(); }
+      });
+      auth.signInAnonymously().catch((err) => {
+        setStatus('AUTH ERROR — CHECK CONSOLE', true);
+        console.error('Firebase anonymous auth failed:', err);
+      });
+    });
+    return myUid;
+  }
+
+  function refreshOnlineCount(){
+    if (!onlineCountEl) return;
+    db.collection('presence').count().get().then((snap) => {
+      onlineCountEl.textContent = snap.data().count.toLocaleString();
+    }).catch(() => { /* aggregate count not available on this SDK — ignore */ });
+  }
+  setInterval(refreshOnlineCount, 5000);
+
+  // ---- start button: get camera/mic, mark presence, join the waiting pool ----
+  startBtn.addEventListener('click', async () => {
+    if (inCall || matching) return;
+    startBtn.disabled = true;
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localVideo.srcObject = localStream;
+      localVideo.style.display = 'block';
+      setStatus('CAMERA/MIC READY', false);
+    } catch (err) {
+      setStatus('CAMERA/MIC BLOCKED', true);
+      startBtn.disabled = false;
+      console.error('getUserMedia failed:', err);
+      return;
+    }
+
+    await ensureAuth();
+    setPlaceholder('looking for someone to chat with…', true);
+    matching = true;
+
+    await db.collection('presence').doc(myUid).set({ state: 'waiting', updatedAt: FieldValue.serverTimestamp() });
+    await db.collection('waitingPool').doc(myUid).set({ createdAt: FieldValue.serverTimestamp() });
+
+    // Someone else's client may pair me into a call — watch for that.
+    unsubIncomingCalls = db.collection('calls')
+      .where('participants', 'array-contains', myUid)
+      .where('status', '==', 'active')
+      .onSnapshot((snap) => {
+        snap.docChanges().forEach((change) => {
+          if (change.type === 'added' && !inCall) {
+            const data = change.doc.data();
+            enterCall(change.doc.id, data.caller === myUid ? 'caller' : 'callee');
+          }
+        });
+      });
+
+    // Try to match immediately, then re-try whenever the pool changes.
+    tryMatch();
+    unsubWaitingPool = db.collection('waitingPool').onSnapshot(() => {
+      if (matching && !inCall) tryMatch();
+    });
+  });
+
+  async function tryMatch(){
+    if (!matching || inCall) return;
+    const cutoff = Date.now() - WAITING_STALE_MS;
+    const candidates = await db.collection('waitingPool')
+      .orderBy('createdAt')
+      .limit(10)
+      .get();
+
+    for (const doc of candidates.docs) {
+      if (doc.id === myUid) continue;
+      const ts = doc.data().createdAt;
+      if (ts && ts.toMillis && ts.toMillis() < cutoff) continue; // stale/dead tab
+
+      const otherUid = doc.id;
+      try {
+        const newCallId = await db.runTransaction(async (tx) => {
+          const meRef = db.collection('waitingPool').doc(myUid);
+          const otherRef = db.collection('waitingPool').doc(otherUid);
+          const meSnap = await tx.get(meRef);
+          const otherSnap = await tx.get(otherRef);
+          if (!meSnap.exists || !otherSnap.exists) {
+            throw new Error('already-taken');
+          }
+          const callRef = db.collection('calls').doc();
+          tx.set(callRef, {
+            participants: [myUid, otherUid],
+            caller: myUid,
+            callee: otherUid,
+            status: 'active',
+            createdAt: FieldValue.serverTimestamp()
+          });
+          tx.delete(meRef);
+          tx.delete(otherRef);
+          return callRef.id;
+        });
+        // matched! stop looking — enterCall for the caller side happens directly here,
+        // the callee side picks it up via the onSnapshot listener above.
+        enterCall(newCallId, 'caller');
+        return;
+      } catch (e) {
+        // race lost (someone else grabbed this candidate, or I got grabbed) — try next / wait
+        continue;
+      }
+    }
+  }
+
+  async function enterCall(id, myRole){
+    if (inCall) return;
+    inCall = true;
+    matching = false;
+    callId = id;
+    role = myRole;
+
+    if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
+    db.collection('waitingPool').doc(myUid).delete().catch(() => {});
+    db.collection('presence').doc(myUid).set({ state: 'in-call', updatedAt: FieldValue.serverTimestamp() });
+
+    setPlaceholder('', false);
+    addChatMsg('system', "You've been connected to a stranger. Say hi!");
+
+    pc = new RTCPeerConnection(RTC_CONFIG);
+    localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
+
+    pc.ontrack = (event) => {
+      remoteVideo.srcObject = event.streams[0];
+      remoteVideo.style.display = 'block';
+    };
+
+    const callRef = db.collection('calls').doc(callId);
+    const myCandidates = callRef.collection(role === 'caller' ? 'callerCandidates' : 'calleeCandidates');
+    const theirCandidates = callRef.collection(role === 'caller' ? 'calleeCandidates' : 'callerCandidates');
+
+    pc.onicecandidate = (event) => {
+      if (event.candidate) myCandidates.add(event.candidate.toJSON());
+    };
+
+    if (role === 'caller') {
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await callRef.update({ offer: { type: offer.type, sdp: offer.sdp } });
+
+      unsubCallDoc = callRef.onSnapshot(async (snap) => {
+        const data = snap.data();
+        if (data && data.answer && pc.currentRemoteDescription === null) {
+          await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        }
+      });
+    } else {
+      const snap = await callRef.get();
+      const data = snap.data();
+      await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await callRef.update({ answer: { type: answer.type, sdp: answer.sdp } });
+    }
+
+    unsubCandidates = theirCandidates.onSnapshot((snap) => {
+      snap.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(() => {});
+        }
+      });
+    });
+
+    unsubMessages = callRef.collection('messages').orderBy('createdAt').onSnapshot((snap) => {
+      snap.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const m = change.doc.data();
+          if (m.sender !== myUid) addChatMsg('them', m.text, false);
+        }
+      });
+    });
+  }
+
+  chatSendBtn.addEventListener('click', sendChat);
+  chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
+  function sendChat(){
+    const text = chatInput.value.trim();
+    if (!text || !inCall || !callId) return;
+    chatInput.value = '';
+    addChatMsg('me', text, true);
+    db.collection('calls').doc(callId).collection('messages').add({
+      sender: myUid, text, createdAt: FieldValue.serverTimestamp()
+    });
+  }
+
+  async function endCall(goIdle){
+    if (unsubIncomingCalls) { unsubIncomingCalls(); unsubIncomingCalls = null; }
+    if (unsubCallDoc) { unsubCallDoc(); unsubCallDoc = null; }
+    if (unsubCandidates) { unsubCandidates(); unsubCandidates = null; }
+    if (unsubMessages) { unsubMessages(); unsubMessages = null; }
+    if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
+
+    if (pc) { pc.close(); pc = null; }
+    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+    localVideo.srcObject = null;
+    localVideo.style.display = 'none';
+    remoteVideo.srcObject = null;
+    setPlaceholder('click Start to look for someone…', true);
+    chatLog.innerHTML = '';
+
+    if (myUid) {
+      db.collection('waitingPool').doc(myUid).delete().catch(() => {});
+      if (callId) db.collection('calls').doc(callId).update({ status: 'ended' }).catch(() => {});
+      db.collection('presence').doc(myUid).delete().catch(() => {});
+    }
+
+    callId = null; role = null; matching = false; inCall = false;
+    setStatus('CAMERA/MIC BLOCKED', true);
+    startBtn.disabled = false;
+  }
+
+  stopBtn.addEventListener('click', () => endCall());
+  leaveBtn.addEventListener('click', () => endCall());
+  window.addEventListener('beforeunload', () => {
+    if (myUid) {
+      navigator.sendBeacon && db.collection('waitingPool').doc(myUid).delete().catch(() => {});
+    }
+  });
 })();
 </script>
 </div>
