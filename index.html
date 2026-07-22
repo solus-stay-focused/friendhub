@@ -797,7 +797,7 @@
         </svg>
         <span>Friend<em>Hub</em></span>
       </div>
-      <div class="vcbox-status blocked" id="vcStatus"><span class="dot"></span> <span id="vcStatusText">CAMERA/MIC BLOCKED</span></div>
+      <div class="vcbox-status blocked" id="vcStatus" style="display:none;"><span class="dot"></span> <span id="vcStatusText">CAMERA/MIC BLOCKED</span></div>
       <button class="vcbox-leave" id="vcLeaveBtn">✕ Leave</button>
 
       <div class="vcbox-stage">
@@ -883,6 +883,17 @@
     <div class="vcapp-chat-input">
       <input type="text" id="vcChatInput" placeholder="Write a message…">
       <button id="vcChatSendBtn">Send</button>
+    </div>
+  </div>
+
+  <!-- ============= All countries modal (checkbox grid, alphabetical, no flags) ============= -->
+  <div class="vc-country-overlay" id="vcCountryOverlay" onclick="closeCountryModal(event)">
+    <div class="vc-country-modal" role="dialog" aria-modal="true" aria-label="All countries">
+      <div class="vc-country-modal-head">
+        <span class="vc-country-modal-title">🌐 All countries</span>
+        <button type="button" class="vc-country-modal-close" onclick="closeCountryModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="vc-country-grid" id="vcCountryGrid"></div>
     </div>
   </div>
 </div>
@@ -1151,17 +1162,6 @@
 <div class="vcinfo-foot">
   <div><strong>Live Chat</strong> — talk to strangers, no strings attached.</div>
   <div>By using this site you agree to the Community Rules · Users must be 18 and over</div>
-</div>
-
-<!-- ============= All countries modal (checkbox grid, alphabetical, no flags) ============= -->
-<div class="vc-country-overlay" id="vcCountryOverlay" onclick="closeCountryModal(event)">
-  <div class="vc-country-modal" role="dialog" aria-modal="true" aria-label="All countries">
-    <div class="vc-country-modal-head">
-      <span class="vc-country-modal-title">🌐 All countries</span>
-      <button type="button" class="vc-country-modal-close" onclick="closeCountryModal()" aria-label="Close">✕</button>
-    </div>
-    <div class="vc-country-grid" id="vcCountryGrid"></div>
-  </div>
 </div>
 
 <script>
