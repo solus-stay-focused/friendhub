@@ -245,28 +245,40 @@
   /* ---------- controls bar (Start/Stop, Country, I am) ---------- */
   .vcapp-controls{
     display:flex;
-    gap:10px;
+    gap:12px;
     flex-wrap:wrap;
   }
   .vcbtn{
-    flex:1 1 120px;
-    font-family:inherit;
-    font-size:13px;
-    font-weight:600;
+    flex:1 1 130px;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    font-weight:700;
     letter-spacing:0.01em;
     border:none;
-    border-radius:10px;
-    padding:14px 16px;
+    border-radius:999px;
+    padding:15px 20px;
     cursor:pointer;
-    transition:transform .15s, filter .15s;
+    transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
   }
   .vcbtn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
   .vcbtn:active{ transform:translateY(0); }
-  .vcbtn.start{ background:var(--mint); color:var(--void-deep); }
-  .vcbtn.stop{ background:rgba(255,107,91,0.15); color:var(--coral); border:1px solid rgba(255,107,91,0.4); }
+  .vcbtn svg{ flex:none; }
+  .vcbtn.start{
+    background:linear-gradient(135deg,#39D9B8,#12A98A);
+    color:#06231C;
+    box-shadow:0 6px 20px -4px rgba(57,217,184,0.55), 0 0 0 1px rgba(94,234,212,0.25) inset;
+  }
+  .vcbtn.start:hover{ box-shadow:0 8px 26px -4px rgba(57,217,184,0.7), 0 0 0 1px rgba(94,234,212,0.3) inset; }
+  .vcbtn.stop{
+    background:linear-gradient(135deg,#FF6B5B,#E23F44);
+    color:#fff;
+    box-shadow:0 6px 20px -4px rgba(255,90,80,0.5), 0 0 0 1px rgba(255,255,255,0.12) inset;
+  }
+  .vcbtn.stop:hover{ box-shadow:0 8px 26px -4px rgba(255,90,80,0.65), 0 0 0 1px rgba(255,255,255,0.16) inset; }
 
   .vcselect-wrap{
-    flex:1 1 140px;
+    flex:1 1 160px;
     position:relative;
     display:flex; align-items:center;
   }
@@ -275,39 +287,99 @@
     background:var(--void);
     border:1px solid var(--line);
     color:var(--paper);
-    border-radius:10px;
-    padding:13px 30px 13px 14px;
-    font-size:13px;
-    font-family:inherit;
+    border-radius:999px;
+    padding:13px 34px 13px 40px;
+    font-size:13.5px;
+    font-weight:600;
+    font-family:'Inter',sans-serif;
     appearance:none; -webkit-appearance:none;
     cursor:pointer;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat;
-    background-position:right 10px center;
+    background-position:right 14px center;
+    transition:border-color .15s ease;
   }
+  .vcselect-wrap select:hover{ border-color:rgba(156,140,251,0.45); }
   .vcselect-wrap select option{ background:var(--void); color:var(--paper); }
+  .vcselect-wrap .vcselect-icon{
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    width:18px; height:18px; color:#9C8CFB; pointer-events:none; z-index:1;
+  }
+  .vcselect-wrap .vcselect-icon svg{ width:100%; height:100%; display:block; }
 
   .vcselect-btn{
     width:100%;
+    display:flex; align-items:center; gap:10px;
     background:var(--void);
     border:1px solid var(--line);
     color:var(--paper);
-    border-radius:10px;
-    padding:13px 30px 13px 14px;
-    font-size:13px;
-    font-family:inherit;
+    border-radius:999px;
+    padding:13px 34px 13px 14px;
+    font-size:13.5px;
+    font-weight:600;
+    font-family:'Inter',sans-serif;
     text-align:left;
     cursor:pointer;
     position:relative;
+    transition:border-color .15s ease;
   }
+  .vcselect-btn .vcselect-icon{
+    flex:none; width:18px; height:18px; color:#5EEAD4;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .vcselect-btn .vcselect-icon svg{ width:100%; height:100%; display:block; }
   .vcselect-btn::after{
     content:'';
-    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
     width:10px; height:10px;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235EEAD4'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat; background-size:contain;
   }
   .vcselect-btn:hover{ border-color:rgba(94,234,212,0.4); }
+
+  /* ---------- custom "I am" gender dropdown ---------- */
+  .vcgender-wrap{ position:relative; }
+  .vcgender-wrap.open .vcselect-btn{ border-color:rgba(156,140,251,0.5); }
+  .vcgender-wrap.open .vcselect-btn::after{ transform:translateY(-50%) rotate(180deg); }
+
+  .vcgender-panel{
+    position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:30;
+    background:var(--void);
+    border:1px solid rgba(156,140,251,0.35);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 18px 44px rgba(0,0,0,0.5);
+    display:none;
+    min-width:260px;
+  }
+  .vcgender-panel.open{ display:block; }
+
+  .vcgender-item{
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px;
+    cursor:pointer;
+    font-size:14px; font-weight:600;
+    font-family:'Inter',sans-serif;
+    color:var(--paper);
+    transition:background .15s ease;
+  }
+  .vcgender-item:hover{ background:rgba(237,231,218,0.06); }
+  .vcgender-item .vcgender-item-icon{
+    flex:none; width:20px; height:20px; color:#9C8CFB;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .vcgender-item .vcgender-item-icon svg{ width:100%; height:100%; display:block; }
+  .vcgender-item .check{
+    margin-left:auto; width:18px; height:18px; color:#fff;
+    opacity:0; flex:none;
+  }
+  .vcgender-item.selected{
+    background:linear-gradient(135deg,#7A68E8,#5142C4);
+    color:#fff;
+  }
+  .vcgender-item.selected .vcgender-item-icon{ color:#fff; }
+  .vcgender-item.selected .check{ opacity:1; }
+  .vcgender-item + .vcgender-item{ border-top:1px solid rgba(237,231,218,0.06); }
 
   /* ---------- online count + report row ---------- */
   .vcapp-meta{
@@ -853,18 +925,57 @@
     </div>
 
     <div class="vcapp-controls">
-      <button class="vcbtn start" id="vcStartBtn">▶ Start</button>
-      <button class="vcbtn stop" id="vcStopBtn">■ Stop</button>
+      <button class="vcbtn start" id="vcStartBtn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M2 1.5v11l10-5.5z"/></svg>
+        Start
+      </button>
+      <button class="vcbtn stop" id="vcStopBtn">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><rect x="1" y="1" width="11" height="11" rx="1.5"/></svg>
+        Stop
+      </button>
       <div class="vcselect-wrap">
-        <button type="button" class="vcselect-btn" id="vcHeaderCountryBtn" aria-haspopup="dialog" aria-label="Match by country" onclick="openCountryModal('header')">Any country</button>
+        <span class="vcselect-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z"/></svg>
+        </span>
+        <button type="button" class="vcselect-btn" id="vcHeaderCountryBtn" aria-haspopup="dialog" aria-label="Match by country" onclick="openCountryModal('header')" style="padding-left:40px;">Any country</button>
       </div>
-      <div class="vcselect-wrap">
-        <select aria-label="I am">
-          <option>I am… 🙂</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Prefer not to say</option>
-        </select>
+      <div class="vcselect-wrap vcgender-wrap" id="vcGenderWrap">
+        <span class="vcselect-icon" aria-hidden="true" id="vcGenderIcon" style="color:#9C8CFB;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.9 3.6-7 8-7s8 3.1 8 7"/></svg>
+        </span>
+        <button type="button" class="vcselect-btn" id="vcGenderBtn" aria-haspopup="listbox" aria-expanded="false" onclick="toggleGenderPanel()" style="padding-left:40px;">
+          <span id="vcGenderLabel">I am… 🙂</span>
+        </button>
+        <div class="vcgender-panel" id="vcGenderPanel" role="listbox" aria-label="I am">
+          <div class="vcgender-item selected" data-value="" role="option" aria-selected="true" onclick="selectGender(this)">
+            <span class="vcgender-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.9 3.6-7 8-7s8 3.1 8 7"/></svg>
+            </span>
+            <span>I am… 🙂</span>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="vcgender-item" data-value="Male" role="option" aria-selected="false" onclick="selectGender(this)">
+            <span class="vcgender-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L21 3M21 3h-5M21 3v5"/></svg>
+            </span>
+            <span>Male</span>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="vcgender-item" data-value="Female" role="option" aria-selected="false" onclick="selectGender(this)">
+            <span class="vcgender-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M12 15v6M9 18h6"/></svg>
+            </span>
+            <span>Female</span>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="vcgender-item" data-value="Prefer not to say" role="option" aria-selected="false" onclick="selectGender(this)">
+            <span class="vcgender-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.4 8.4 0 0 1 12.5 3a8.5 8.5 0 0 1 8.5 8.5z"/><circle cx="8.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="16.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/></svg>
+            </span>
+            <span>Prefer not to say</span>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1250,6 +1361,48 @@
   document.addEventListener('keydown', (e) => {
     const overlay = document.getElementById('vcCountryOverlay');
     if (overlay && overlay.classList.contains('active') && e.key === 'Escape') closeCountryModal();
+  });
+
+  // ---- custom "I am" gender dropdown ----
+  let vcGenderValue = '';
+  const vcGenderWrap = document.getElementById('vcGenderWrap');
+  const vcGenderPanel = document.getElementById('vcGenderPanel');
+  const vcGenderBtn = document.getElementById('vcGenderBtn');
+
+  window.toggleGenderPanel = function(){
+    const isOpen = vcGenderWrap.classList.toggle('open');
+    vcGenderPanel.classList.toggle('open', isOpen);
+    vcGenderBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  };
+
+  window.selectGender = function(el){
+    vcGenderValue = el.dataset.value || '';
+    document.getElementById('vcGenderLabel').textContent = el.querySelector('span').textContent;
+    document.getElementById('vcGenderIcon').innerHTML = el.querySelector('.vcgender-item-icon').innerHTML;
+    Array.from(vcGenderPanel.children).forEach(item => {
+      const isSelected = item === el;
+      item.classList.toggle('selected', isSelected);
+      item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
+    vcGenderWrap.classList.remove('open');
+    vcGenderPanel.classList.remove('open');
+    vcGenderBtn.setAttribute('aria-expanded', 'false');
+  };
+
+  document.addEventListener('click', (e) => {
+    if (vcGenderWrap && vcGenderWrap.classList.contains('open') && !vcGenderWrap.contains(e.target)) {
+      vcGenderWrap.classList.remove('open');
+      vcGenderPanel.classList.remove('open');
+      vcGenderBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && vcGenderWrap && vcGenderWrap.classList.contains('open')) {
+      vcGenderWrap.classList.remove('open');
+      vcGenderPanel.classList.remove('open');
+      vcGenderBtn.setAttribute('aria-expanded', 'false');
+    }
   });
 })();
 </script>
