@@ -1079,7 +1079,7 @@
     </div>
 
     <div class="vcapp-meta">
-      <div class="vcapp-online"><span class="dot"></span> <b id="vcOnlineCount">…</b>&nbsp;online now</div>
+      <div class="vcapp-online"><span class="dot"></span> <b id="vcOnlineCount">…</b>&nbsp;online now <span id="vcOnlineDebug" style="display:none;color:#FF8A80;font-family:'IBM Plex Mono',monospace;font-size:10.5px;margin-left:8px;"></span></div>
       <span class="rules">Community rules · Safety tips</span>
     </div>
   </div>
@@ -1686,6 +1686,7 @@
   const statusEl = document.getElementById('vcStatus');
   const statusText = document.getElementById('vcStatusText');
   const onlineCountEl = document.getElementById('vcOnlineCount');
+  const onlineDebugEl = document.getElementById('vcOnlineDebug');
   const infoOnlineCountEl = document.getElementById('vcInfoOnlineCount');
   const chatLog = document.getElementById('vcChatLog');
   const chatInput = document.getElementById('vcChatInput');
@@ -1781,6 +1782,16 @@
   const PRESENCE_STALE_MS = 30000;      // a doc older than this is treated as "gone" (closed tab, dead connection, etc.)
   let presenceState = 'browsing';       // browsing | waiting | in-call
 
+  function showOnlineDebug(msg){
+    if (!onlineDebugEl) return;
+    onlineDebugEl.textContent = '(' + msg + ')';
+    onlineDebugEl.style.display = 'inline';
+  }
+  function clearOnlineDebug(){
+    if (!onlineDebugEl) return;
+    onlineDebugEl.style.display = 'none';
+  }
+
   async function touchPresence(state){
     if (state) presenceState = state;
     try {
@@ -1789,8 +1800,10 @@
         state: presenceState,
         updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
+      clearOnlineDebug();
     } catch (err) {
       console.error('presence heartbeat failed:', err);
+      showOnlineDebug('presence write failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
     }
   }
 
@@ -1801,6 +1814,7 @@
       const text = snap.data().count.toLocaleString();
       if (onlineCountEl) onlineCountEl.textContent = text;
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
+      clearOnlineDebug();
     }).catch((err) => {
       // Surface this loudly — a silently-swallowed error here is exactly how a fake
       // number keeps showing forever. Check: (1) Anonymous auth enabled in Firebase
@@ -1810,6 +1824,7 @@
       console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
       if (onlineCountEl) onlineCountEl.textContent = '—';
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = '—';
+      showOnlineDebug('count query failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
     });
   }
 
