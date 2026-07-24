@@ -1126,7 +1126,7 @@
       </div>
       <div class="vcinfo-stats">
         <div class="vcinfo-avatar-stack"><img src="p1.png" alt=""><img src="p2.png" alt=""><img src="p3.png" alt=""><img src="p4.png" alt=""></div>
-        <div class="vcinfo-stats-text"><strong>18,204</strong> people are online chatting right now</div>
+        <div class="vcinfo-stats-text"><strong id="vcInfoOnlineCount">18,204</strong> people are online chatting right now</div>
       </div>
       <div class="vcinfo-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
     </div>
@@ -1686,6 +1686,7 @@
   const statusEl = document.getElementById('vcStatus');
   const statusText = document.getElementById('vcStatusText');
   const onlineCountEl = document.getElementById('vcOnlineCount');
+  const infoOnlineCountEl = document.getElementById('vcInfoOnlineCount');
   const chatLog = document.getElementById('vcChatLog');
   const chatInput = document.getElementById('vcChatInput');
   const chatSendBtn = document.getElementById('vcChatSendBtn');
@@ -1757,13 +1758,51 @@
     return myUid;
   }
 
-  function refreshOnlineCount(){
-    if (!onlineCountEl) return;
-    db.collection('presence').count().get().then((snap) => {
-      onlineCountEl.textContent = snap.data().count.toLocaleString();
-    }).catch(() => { /* aggregate count not available on this SDK — ignore */ });
+  // ---- live presence: every visitor heartbeats a doc; count = docs updated in the last 30s ----
+  const PRESENCE_HEARTBEAT_MS = 15000;  // how often we refresh our own presence doc
+  const PRESENCE_STALE_MS = 30000;      // a doc older than this is treated as "gone" (closed tab, dead connection, etc.)
+  let presenceState = 'browsing';       // browsing | waiting | in-call
+
+  async function touchPresence(state){
+    if (state) presenceState = state;
+    try {
+      const uid = await ensureAuth();
+      await db.collection('presence').doc(uid).set({
+        state: presenceState,
+        updatedAt: FieldValue.serverTimestamp()
+      }, { merge: true });
+    } catch (err) {
+      console.error('presence heartbeat failed:', err);
+    }
   }
+
+  function refreshOnlineCount(){
+    if (!onlineCountEl && !infoOnlineCountEl) return;
+    const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - PRESENCE_STALE_MS);
+    db.collection('presence').where('updatedAt', '>', cutoff).count().get().then((snap) => {
+      const text = snap.data().count.toLocaleString();
+      if (onlineCountEl) onlineCountEl.textContent = text;
+      if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
+    }).catch((err) => {
+      console.error('online count query failed:', err);
+    });
+  }
+
+  // Mark ourselves present the moment the page loads — not just once a call starts —
+  // so the count reflects everyone actually browsing the site right now.
+  touchPresence('browsing');
+  setInterval(() => touchPresence(), PRESENCE_HEARTBEAT_MS);
+  refreshOnlineCount();
   setInterval(refreshOnlineCount, 5000);
+
+  // Best-effort cleanup when the tab actually closes (not required for accuracy —
+  // the count only ever includes docs heartbeated within the last 30s regardless —
+  // but this keeps the collection tidy). Pair this with a Firestore TTL policy on
+  // the `updatedAt` field (Firebase Console → Firestore → TTL) to auto-delete
+  // abandoned docs after a day or two, since a stopped heartbeat alone won't remove them.
+  window.addEventListener('pagehide', () => {
+    if (myUid) db.collection('presence').doc(myUid).delete().catch(() => {});
+  });
 
   // ---- Enable Camera (pre-call preview): grabs the stream early so "You" shows live video ----
   enableCameraBtn.addEventListener('click', async () => {
@@ -1816,7 +1855,7 @@
     setPlaceholder('searching', 'looking for someone to chat with…');
     matching = true;
 
-    await db.collection('presence').doc(myUid).set({ state: 'waiting', updatedAt: FieldValue.serverTimestamp() });
+    await touchPresence('waiting');
     await db.collection('waitingPool').doc(myUid).set({ createdAt: FieldValue.serverTimestamp() });
 
     // Someone else's client may pair me into a call — watch for that.
@@ -1894,7 +1933,7 @@
 
     if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
     db.collection('waitingPool').doc(myUid).delete().catch(() => {});
-    db.collection('presence').doc(myUid).set({ state: 'in-call', updatedAt: FieldValue.serverTimestamp() });
+    touchPresence('in-call');
 
     setPlaceholder('hidden');
     addChatMsg('system', "You've been connected to a stranger. Say hi!");
@@ -1985,7 +2024,7 @@
     if (myUid) {
       db.collection('waitingPool').doc(myUid).delete().catch(() => {});
       if (callId) db.collection('calls').doc(callId).update({ status: 'ended' }).catch(() => {});
-      db.collection('presence').doc(myUid).delete().catch(() => {});
+      touchPresence('browsing');
     }
 
     callId = null; role = null; matching = false; inCall = false;
