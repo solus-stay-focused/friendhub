@@ -1079,7 +1079,7 @@
     </div>
 
     <div class="vcapp-meta">
-      <div class="vcapp-online"><span class="dot"></span> <b id="vcOnlineCount">18,204</b>&nbsp;online now</div>
+      <div class="vcapp-online"><span class="dot"></span> <b id="vcOnlineCount">…</b>&nbsp;online now</div>
       <span class="rules">Community rules · Safety tips</span>
     </div>
   </div>
@@ -1126,7 +1126,7 @@
       </div>
       <div class="vcinfo-stats">
         <div class="vcinfo-avatar-stack"><img src="p1.png" alt=""><img src="p2.png" alt=""><img src="p3.png" alt=""><img src="p4.png" alt=""></div>
-        <div class="vcinfo-stats-text"><strong id="vcInfoOnlineCount">18,204</strong> people are online chatting right now</div>
+        <div class="vcinfo-stats-text"><strong id="vcInfoOnlineCount">…</strong> people are online chatting right now</div>
       </div>
       <div class="vcinfo-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
     </div>
@@ -1784,15 +1784,23 @@
       if (onlineCountEl) onlineCountEl.textContent = text;
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
     }).catch((err) => {
-      console.error('online count query failed:', err);
+      // Surface this loudly — a silently-swallowed error here is exactly how a fake
+      // number keeps showing forever. Check: (1) Anonymous auth enabled in Firebase
+      // Console → Authentication → Sign-in method, (2) Firestore rules allow
+      // `read` on /presence for signed-in users, (3) this file is the one actually
+      // deployed (hard-refresh / check the deployed source).
+      console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
+      if (onlineCountEl) onlineCountEl.textContent = '—';
+      if (infoOnlineCountEl) infoOnlineCountEl.textContent = '—';
     });
   }
 
   // Mark ourselves present the moment the page loads — not just once a call starts —
-  // so the count reflects everyone actually browsing the site right now.
-  touchPresence('browsing');
+  // so the count reflects everyone actually browsing the site right now. We wait for
+  // the first touchPresence (which drives anonymous auth) before the first count query,
+  // since the query needs request.auth != null to pass the Firestore rules.
+  touchPresence('browsing').then(refreshOnlineCount);
   setInterval(() => touchPresence(), PRESENCE_HEARTBEAT_MS);
-  refreshOnlineCount();
   setInterval(refreshOnlineCount, 5000);
 
   // Best-effort cleanup when the tab actually closes (not required for accuracy —
