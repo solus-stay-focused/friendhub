@@ -223,12 +223,67 @@
   .vcbox-toggle.on::after{ transform:translateX(16px); background:var(--void-deep); }
 
   .vcbox-placeholder{
-    position:absolute; inset:0;
+    position:absolute; inset:0; z-index:2;
     display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:10px;
     color:rgba(237,231,218,0.55); font-size:12px;
     text-align:center; padding:0 20px;
   }
+  .vcbox-ph-idle, .vcbox-ph-searching{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    text-align:center; padding:0 28px; max-width:340px;
+  }
+  .vcbox-ph-icon{
+    position:relative;
+    width:76px; height:76px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    border:1.5px solid currentColor;
+    opacity:1;
+  }
+  .vcbox-ph-icon::before{
+    content:''; position:absolute; inset:-13px;
+    border-radius:50%; border:1px dashed currentColor; opacity:0.35;
+  }
+  .vcbox-ph-icon svg{ width:32px; height:32px; flex:none; }
+  .vcbox-ph-icon.mint{ color:var(--mint); background:rgba(94,234,212,0.08); }
+  .vcbox-ph-icon.violet{ color:#9C8CFB; background:rgba(139,124,246,0.1); }
+  .vcbox-ph-idle h3, .vcbox-half .vcbox-placeholder h3{
+    margin:0; font-family:'Space Grotesk','Poppins',sans-serif;
+    font-size:19px; font-weight:700; color:var(--paper);
+  }
+  .vcbox-ph-idle p{
+    margin:0; font-size:13px; line-height:1.55;
+    color:rgba(237,231,218,0.5);
+  }
+  .vcbox-ph-btn{
+    display:inline-flex; align-items:center; gap:9px;
+    border:none; border-radius:10px; cursor:pointer;
+    padding:13px 26px;
+    font-family:inherit; font-weight:700; font-size:14px;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .vcbox-ph-btn:hover{ filter:brightness(1.08); }
+  .vcbox-ph-btn:active{ transform:translateY(1px); }
+  .vcbox-ph-btn svg{ width:15px; height:15px; flex:none; }
+  .vcbox-ph-btn.mint{
+    background:linear-gradient(135deg,#5EEAD4,#2FBFA8); color:#06251F;
+    box-shadow:0 10px 22px rgba(47,191,138,0.25);
+  }
+  .vcbox-ph-btn.violet{
+    background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff;
+    box-shadow:0 10px 22px rgba(81,66,196,0.35);
+  }
+  .vcbox-ph-skip{
+    font-size:12.5px; color:rgba(237,231,218,0.55);
+    text-decoration:underline; text-underline-offset:3px; cursor:pointer;
+    background:none; border:none; font-family:inherit;
+  }
+  .vcbox-ph-skip:hover{ color:var(--paper); }
+  .vcbox-ph-wait{
+    display:flex; align-items:center; gap:7px;
+    font-size:12.5px; color:rgba(237,231,218,0.45);
+  }
+  .vcbox-ph-wait svg{ width:14px; height:14px; flex:none; }
   .vcbox-glass-wrap{ width:56px; height:56px; display:flex; align-items:center; justify-content:center; }
   .vcbox-glass-wrap.spin .vcbox-glass{
     animation:vcbox-glass-scan 1.6s ease-in-out infinite;
@@ -330,6 +385,7 @@
   .vcselect-btn .vcselect-icon{
     flex:none; width:18px; height:18px; color:#5EEAD4;
     display:flex; align-items:center; justify-content:center;
+    font-size:15px; line-height:1;
   }
   .vcselect-btn .vcselect-icon svg{ width:100%; height:100%; display:block; }
   .vcselect-btn::after{
@@ -371,6 +427,7 @@
   .vcgender-item .vcgender-item-icon{
     flex:none; width:20px; height:20px; color:#9C8CFB;
     display:flex; align-items:center; justify-content:center;
+    font-size:17px; line-height:1;
   }
   .vcgender-item .vcgender-item-icon svg{ width:100%; height:100%; display:block; }
   .vcgender-item .check{
@@ -418,14 +475,17 @@
     .vcapp-chat{ flex-basis:180px; }
   }
   .vcapp-chat-head{
-    padding:12px 16px;
-    font-size:11px;
-    color:rgba(237,231,218,0.55);
+    padding:14px 16px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--paper);
     border-bottom:1px solid var(--line);
     display:flex; align-items:center; justify-content:space-between;
   }
   .vcapp-chat-head span.rules{
-    color:var(--mint);
+    color:#8B7CF6;
+    font-weight:500;
+    font-size:13px;
     cursor:pointer;
     text-decoration:underline;
     text-underline-offset:2px;
@@ -465,8 +525,9 @@
 
   .vcapp-chat-input{
     display:flex;
-    gap:8px;
-    padding:12px;
+    align-items:center;
+    gap:12px;
+    padding:16px;
     border-top:1px solid var(--line);
   }
   .vcapp-chat-input input{
@@ -474,24 +535,34 @@
     background:var(--void-deep);
     border:1px solid var(--line);
     color:var(--paper);
-    border-radius:8px;
-    padding:10px 12px;
+    border-radius:10px;
+    padding:13px 16px;
     font-family:inherit;
-    font-size:12.5px;
+    font-size:14px;
   }
   .vcapp-chat-input input::placeholder{ color:rgba(237,231,218,0.35); }
-  .vcapp-chat-input input:focus{ outline:none; border-color:var(--mint); }
+  .vcapp-chat-input input:focus{ outline:none; border-color:#7A68E8; }
   .vcapp-chat-input button{
-    background:var(--mint);
-    color:var(--void-deep);
+    flex:none;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:linear-gradient(135deg,#8B7CF6,#5142C4);
+    color:#fff;
     border:none;
-    border-radius:8px;
-    padding:0 16px;
+    border-radius:10px;
+    padding:0 22px;
+    height:46px;
     font-family:inherit;
     font-weight:600;
-    font-size:12.5px;
+    font-size:14.5px;
     cursor:pointer;
+    box-shadow:0 4px 14px rgba(81,66,196,0.35);
+    transition:filter .15s ease, transform .15s ease;
   }
+  .vcapp-chat-input button:hover{ filter:brightness(1.08); }
+  .vcapp-chat-input button:active{ transform:translateY(1px); }
+  .vcapp-chat-input button svg{ width:16px; height:16px; flex:none; }
 
   /* ============================================================
      Info section — light "FriendHub" marketing design system:
@@ -879,18 +950,47 @@
       <div class="vcbox-stage">
         <div class="vcbox-half">
           <video id="vcLocalVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;display:none;"></video>
+          <div class="vcbox-placeholder" id="vcLocalPlaceholder">
+            <div class="vcbox-ph-icon mint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            </div>
+            <h3>Your Camera</h3>
+            <p>See how you appear before joining a conversation.</p>
+            <button type="button" class="vcbox-ph-btn mint" id="vcEnableCameraBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              Enable Camera
+            </button>
+            <button type="button" class="vcbox-ph-skip" id="vcSkipCameraBtn">Continue without camera</button>
+          </div>
           <div class="vcbox-half-label">You</div>
         </div>
         <div class="vcbox-half">
           <video id="vcRemoteVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none;"></video>
           <div class="vcbox-placeholder" id="vcPlaceholder">
-            <div class="vcbox-glass-wrap spin">
-              <svg class="vcbox-glass" width="44" height="44" viewBox="0 0 44 44" fill="none">
-                <circle cx="19" cy="19" r="13" stroke="#ffffff" stroke-width="3.5"/>
-                <line x1="28.5" y1="28.5" x2="39" y2="39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
-              </svg>
+            <div class="vcbox-ph-idle" id="vcPhIdle">
+              <div class="vcbox-ph-icon violet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <h3>Ready to Connect?</h3>
+              <p>Meet new people from around the world through random conversations.</p>
+              <button type="button" class="vcbox-ph-btn violet" id="vcPressStartBtn">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M2 1.5v11l10-5.5z"/></svg>
+                Press Start
+              </button>
+              <div class="vcbox-ph-wait">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Average wait: 5–20 seconds
+              </div>
             </div>
-            <span id="vcPlaceholderText">click Start to look for someone…</span>
+            <div class="vcbox-ph-searching" id="vcPhSearching" style="display:none;">
+              <div class="vcbox-glass-wrap spin">
+                <svg class="vcbox-glass" width="44" height="44" viewBox="0 0 44 44" fill="none">
+                  <circle cx="19" cy="19" r="13" stroke="#ffffff" stroke-width="3.5"/>
+                  <line x1="28.5" y1="28.5" x2="39" y2="39" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span id="vcPlaceholderText">looking for someone to chat with…</span>
+            </div>
           </div>
           <div class="vcbox-half-label">Stranger</div>
 
@@ -944,39 +1044,34 @@
         <button type="button" class="vcselect-btn" id="vcHeaderCountryBtn" aria-haspopup="dialog" aria-label="Match by country" onclick="openCountryModal('header')" style="padding-left:40px;">Any country</button>
       </div>
       <div class="vcselect-wrap vcgender-wrap" id="vcGenderWrap">
-        <span class="vcselect-icon" aria-hidden="true" id="vcGenderIcon" style="color:#9C8CFB;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.9 3.6-7 8-7s8 3.1 8 7"/></svg>
-        </span>
+        <span class="vcselect-icon" aria-hidden="true" id="vcGenderIcon" style="color:#9C8CFB;">🙂</span>
         <button type="button" class="vcselect-btn" id="vcGenderBtn" aria-haspopup="listbox" aria-expanded="false" onclick="toggleGenderPanel()" style="padding-left:40px;">
-          <span id="vcGenderLabel">I am… 🙂</span>
+          <span id="vcGenderLabel">I am…</span>
         </button>
         <div class="vcgender-panel" id="vcGenderPanel" role="listbox" aria-label="I am">
           <div class="vcgender-item selected" data-value="" role="option" aria-selected="true" onclick="selectGender(this)">
-            <span class="vcgender-item-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.9 3.6-7 8-7s8 3.1 8 7"/></svg>
-            </span>
-            <span>I am… 🙂</span>
+            <span class="vcgender-item-icon">🙂</span>
+            <span class="vcgender-item-label">I am…</span>
             <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           </div>
           <div class="vcgender-item" data-value="Male" role="option" aria-selected="false" onclick="selectGender(this)">
-            <span class="vcgender-item-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L21 3M21 3h-5M21 3v5"/></svg>
-            </span>
-            <span>Male</span>
+            <span class="vcgender-item-icon">👨</span>
+            <span class="vcgender-item-label">Male</span>
             <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           </div>
           <div class="vcgender-item" data-value="Female" role="option" aria-selected="false" onclick="selectGender(this)">
-            <span class="vcgender-item-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M12 15v6M9 18h6"/></svg>
-            </span>
-            <span>Female</span>
+            <span class="vcgender-item-icon">👩</span>
+            <span class="vcgender-item-label">Female</span>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="vcgender-item" data-value="Couple" role="option" aria-selected="false" onclick="selectGender(this)">
+            <span class="vcgender-item-icon">👫</span>
+            <span class="vcgender-item-label">Couple</span>
             <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           </div>
           <div class="vcgender-item" data-value="Prefer not to say" role="option" aria-selected="false" onclick="selectGender(this)">
-            <span class="vcgender-item-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.4 8.4 0 0 1 12.5 3a8.5 8.5 0 0 1 8.5 8.5z"/><circle cx="8.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="16.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/></svg>
-            </span>
-            <span>Prefer not to say</span>
+            <span class="vcgender-item-icon">🤐</span>
+            <span class="vcgender-item-label">Prefer not to say</span>
             <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           </div>
         </div>
@@ -997,7 +1092,7 @@
     <div class="vcapp-chat-log" id="vcChatLog"></div>
     <div class="vcapp-chat-input">
       <input type="text" id="vcChatInput" placeholder="Write a message…">
-      <button id="vcChatSendBtn">Send</button>
+      <button id="vcChatSendBtn">Send <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
     </div>
   </div>
 
@@ -1396,7 +1491,7 @@
 
   window.selectGender = function(el){
     vcGenderValue = el.dataset.value || '';
-    document.getElementById('vcGenderLabel').textContent = el.querySelector('span').textContent;
+    document.getElementById('vcGenderLabel').textContent = el.querySelector('.vcgender-item-label').textContent;
     document.getElementById('vcGenderIcon').innerHTML = el.querySelector('.vcgender-item-icon').innerHTML;
     Array.from(vcGenderPanel.children).forEach(item => {
       const isSelected = item === el;
@@ -1582,6 +1677,12 @@
   const remoteVideo = document.getElementById('vcRemoteVideo');
   const placeholder = document.getElementById('vcPlaceholder');
   const placeholderText = document.getElementById('vcPlaceholderText');
+  const phIdle = document.getElementById('vcPhIdle');
+  const phSearching = document.getElementById('vcPhSearching');
+  const localPlaceholder = document.getElementById('vcLocalPlaceholder');
+  const enableCameraBtn = document.getElementById('vcEnableCameraBtn');
+  const skipCameraBtn = document.getElementById('vcSkipCameraBtn');
+  const pressStartBtn = document.getElementById('vcPressStartBtn');
   const statusEl = document.getElementById('vcStatus');
   const statusText = document.getElementById('vcStatusText');
   const onlineCountEl = document.getElementById('vcOnlineCount');
@@ -1602,15 +1703,29 @@
   let unsubMessages = null;
   let matching = false;
   let inCall = false;
+  let cameraSkipped = false;
 
   function setStatus(text, blocked){
     statusText.textContent = text;
     statusEl.classList.toggle('blocked', !!blocked);
   }
-  function setPlaceholder(text, visible){
-    if (placeholderText) placeholderText.textContent = text;
-    placeholder.style.display = visible ? 'flex' : 'none';
-    remoteVideo.style.display = visible ? 'none' : 'block';
+  function setPlaceholder(state, text){
+    // state: 'idle' | 'searching' | 'hidden' (kept name for minimal diff elsewhere)
+    if (state === 'hidden' || state === false){
+      placeholder.style.display = 'none';
+      remoteVideo.style.display = 'block';
+      return;
+    }
+    placeholder.style.display = 'flex';
+    remoteVideo.style.display = 'none';
+    if (state === 'searching' || state === true){
+      phIdle.style.display = 'none';
+      phSearching.style.display = 'flex';
+      if (text && placeholderText) placeholderText.textContent = text;
+    } else {
+      phIdle.style.display = 'flex';
+      phSearching.style.display = 'none';
+    }
   }
 
   function addChatMsg(who, text, mine){
@@ -1650,24 +1765,55 @@
   }
   setInterval(refreshOnlineCount, 5000);
 
-  // ---- start button: get camera/mic, mark presence, join the waiting pool ----
-  startBtn.addEventListener('click', async () => {
-    if (inCall || matching) return;
-    startBtn.disabled = true;
+  // ---- Enable Camera (pre-call preview): grabs the stream early so "You" shows live video ----
+  enableCameraBtn.addEventListener('click', async () => {
+    if (localStream) return;
+    enableCameraBtn.disabled = true;
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localVideo.srcObject = localStream;
       localVideo.style.display = 'block';
+      localPlaceholder.style.display = 'none';
+      cameraSkipped = false;
       setStatus('CAMERA/MIC READY', false);
     } catch (err) {
       setStatus('CAMERA/MIC BLOCKED', true);
-      startBtn.disabled = false;
       console.error('getUserMedia failed:', err);
-      return;
+    } finally {
+      enableCameraBtn.disabled = false;
+    }
+  });
+
+  // ---- Continue without camera: hide the local preview panel, go audio-only when matching starts ----
+  skipCameraBtn.addEventListener('click', () => {
+    cameraSkipped = true;
+    localPlaceholder.style.display = 'none';
+  });
+
+  // ---- Press Start (inside the "Ready to Connect?" panel) just triggers the main Start button ----
+  pressStartBtn.addEventListener('click', () => startBtn.click());
+
+  // ---- start button: get camera/mic, mark presence, join the waiting pool ----
+  startBtn.addEventListener('click', async () => {
+    if (inCall || matching) return;
+    startBtn.disabled = true;
+    if (!localStream) {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: !cameraSkipped, audio: true });
+        localVideo.srcObject = localStream;
+        localVideo.style.display = cameraSkipped ? 'none' : 'block';
+        localPlaceholder.style.display = 'none';
+        setStatus('CAMERA/MIC READY', false);
+      } catch (err) {
+        setStatus('CAMERA/MIC BLOCKED', true);
+        startBtn.disabled = false;
+        console.error('getUserMedia failed:', err);
+        return;
+      }
     }
 
     await ensureAuth();
-    setPlaceholder('looking for someone to chat with…', true);
+    setPlaceholder('searching', 'looking for someone to chat with…');
     matching = true;
 
     await db.collection('presence').doc(myUid).set({ state: 'waiting', updatedAt: FieldValue.serverTimestamp() });
@@ -1750,7 +1896,7 @@
     db.collection('waitingPool').doc(myUid).delete().catch(() => {});
     db.collection('presence').doc(myUid).set({ state: 'in-call', updatedAt: FieldValue.serverTimestamp() });
 
-    setPlaceholder('', false);
+    setPlaceholder('hidden');
     addChatMsg('system', "You've been connected to a stranger. Say hi!");
 
     pc = new RTCPeerConnection(RTC_CONFIG);
@@ -1830,8 +1976,10 @@
     if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
     localVideo.srcObject = null;
     localVideo.style.display = 'none';
+    localPlaceholder.style.display = 'flex';
+    cameraSkipped = false;
     remoteVideo.srcObject = null;
-    setPlaceholder('click Start to look for someone…', true);
+    setPlaceholder('idle');
     chatLog.innerHTML = '';
 
     if (myUid) {
