@@ -960,7 +960,6 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
               Enable Camera
             </button>
-            <button type="button" class="vcbox-ph-skip" id="vcSkipCameraBtn">Continue without camera</button>
           </div>
           <div class="vcbox-half-label">You</div>
         </div>
@@ -1681,7 +1680,6 @@
   const phSearching = document.getElementById('vcPhSearching');
   const localPlaceholder = document.getElementById('vcLocalPlaceholder');
   const enableCameraBtn = document.getElementById('vcEnableCameraBtn');
-  const skipCameraBtn = document.getElementById('vcSkipCameraBtn');
   const pressStartBtn = document.getElementById('vcPressStartBtn');
   const statusEl = document.getElementById('vcStatus');
   const statusText = document.getElementById('vcStatusText');
@@ -1705,7 +1703,6 @@
   let unsubMessages = null;
   let matching = false;
   let inCall = false;
-  let cameraSkipped = false;
 
   function setStatus(text, blocked){
     statusText.textContent = text;
@@ -1854,7 +1851,6 @@
       localVideo.srcObject = localStream;
       localVideo.style.display = 'block';
       localPlaceholder.style.display = 'none';
-      cameraSkipped = false;
       setStatus('CAMERA/MIC READY', false);
     } catch (err) {
       setStatus('CAMERA/MIC BLOCKED', true);
@@ -1862,12 +1858,6 @@
     } finally {
       enableCameraBtn.disabled = false;
     }
-  });
-
-  // ---- Continue without camera: hide the local preview panel, go audio-only when matching starts ----
-  skipCameraBtn.addEventListener('click', () => {
-    cameraSkipped = true;
-    localPlaceholder.style.display = 'none';
   });
 
   // ---- Press Start (inside the "Ready to Connect?" panel) just triggers the main Start button ----
@@ -1879,9 +1869,9 @@
     startBtn.disabled = true;
     if (!localStream) {
       try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: !cameraSkipped, audio: true });
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         localVideo.srcObject = localStream;
-        localVideo.style.display = cameraSkipped ? 'none' : 'block';
+        localVideo.style.display = 'block';
         localPlaceholder.style.display = 'none';
         setStatus('CAMERA/MIC READY', false);
       } catch (err) {
@@ -2057,7 +2047,6 @@
     localVideo.srcObject = null;
     localVideo.style.display = 'none';
     localPlaceholder.style.display = 'flex';
-    cameraSkipped = false;
     remoteVideo.srcObject = null;
     setPlaceholder('idle');
     chatLog.innerHTML = '';
