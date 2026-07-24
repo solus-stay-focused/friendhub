@@ -1746,13 +1746,31 @@
 
   async function ensureAuth(){
     if (myUid) return myUid;
-    await new Promise((resolve) => {
+    await new Promise((resolve, reject) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        unsub();
+        reject(new Error('Anonymous sign-in timed out after 8s — check Firebase Console → Authentication → Sign-in method → Anonymous is enabled.'));
+      }, 8000);
       const unsub = auth.onAuthStateChanged((user) => {
-        if (user){ myUid = user.uid; unsub(); resolve(); }
+        if (user && !settled){
+          settled = true;
+          clearTimeout(timer);
+          myUid = user.uid;
+          unsub();
+          resolve();
+        }
       });
       auth.signInAnonymously().catch((err) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        unsub();
         setStatus('AUTH ERROR: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'), true);
         console.error('Firebase anonymous auth failed:', err);
+        reject(err);
       });
     });
     return myUid;
