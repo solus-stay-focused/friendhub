@@ -565,24 +565,84 @@
   .vcapp-chat-input button svg{ width:16px; height:16px; flex:none; }
 
   /* ============================================================
-     Info section — light "FriendHub" marketing design system:
-     Space Grotesk headings, Inter body copy, indigo/violet accent.
-     Sits below the dark call widget, same pairing the reference
-     file uses (dark lobby + light marketing sections).
+     Top nav — dark "FriendHub" marketing design system.
+  ============================================================= */
+  .vcnav{
+    --hp-blue:#6C5CE7;
+    --hp-blue-light:#9C8CFB;
+    --hp-blue-deep:#5142C4;
+    --hp-navy:#0B0C1E;
+    background:rgba(11,12,30,0.92);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    position:sticky; top:0; z-index:50;
+    font-family:'Inter',sans-serif;
+  }
+  .vcnav-inner{
+    max-width:1400px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 6vw;
+  }
+  .vcnav-brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .vcnav-brand svg{ width:30px; height:30px; flex:none; }
+  .vcnav-brand span{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; color:#fff;
+  }
+  .vcnav-brand span em{ font-style:normal; color:var(--hp-blue-light); }
+  .vcnav-links{
+    display:flex; align-items:center; gap:34px;
+    list-style:none; margin:0; padding:0;
+  }
+  .vcnav-links a{
+    color:rgba(255,255,255,0.72); text-decoration:none; font-size:14.5px; font-weight:500;
+    padding-bottom:4px; border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .vcnav-links a:hover{ color:#fff; }
+  .vcnav-links a.active{ color:#fff; border-color:var(--hp-blue-light); }
+  .vcnav-actions{ display:flex; align-items:center; gap:12px; }
+  .vcnav-signin{
+    display:inline-flex; align-items:center; gap:8px;
+    background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.22);
+    border-radius:10px; padding:9px 18px; font-size:14px; font-weight:600;
+    font-family:'Inter',sans-serif; text-decoration:none; cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .vcnav-signin:hover{ border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.04); }
+  .vcnav-getstarted{
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+    color:#fff; border:none; border-radius:10px; padding:10px 20px;
+    font-size:14px; font-weight:600; font-family:'Inter',sans-serif; text-decoration:none;
+    cursor:pointer; box-shadow:0 10px 24px rgba(108,92,231,0.35);
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .vcnav-getstarted:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(108,92,231,0.45); }
+  @media (max-width:900px){
+    .vcnav-links{ display:none; }
+    .vcnav-signin{ display:none; }
+  }
+
+  /* ============================================================
+     Info section — dark "FriendHub" marketing design system:
+     Space Grotesk headings, Inter body copy, indigo/violet accent
+     on a deep navy background, matching the reference screenshot.
   ============================================================= */
   .vcinfo{
     --hp-blue:#6C5CE7;
     --hp-blue-light:#9C8CFB;
     --hp-blue-deep:#5142C4;
     --hp-black:#05060B;
-    --hp-bg:#F6F5FC;
-    --hp-card:#F0EEFB;
-    --ink:#1F1B2E;
-    --ink-soft:#4B4760;
+    --hp-bg:#0B0C1E;
+    --hp-card:rgba(255,255,255,0.05);
+    --hp-card-border:rgba(255,255,255,0.09);
+    --ink:#F5F4FB;
+    --ink-soft:rgba(245,244,251,0.62);
     --mint:#5EEAD4;
     --coral:#FF6B5B;
 
-    background:#fff;
+    background:var(--hp-bg);
     color:var(--ink);
     font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;
@@ -611,8 +671,9 @@
   .vcinfo-eyebrow{
     display:inline-flex; align-items:center; gap:8px;
     font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
-    color:var(--hp-blue-deep);
+    color:#fff;
     background:var(--hp-card);
+    border:1px solid var(--hp-card-border);
     border-radius:999px;
     padding:8px 16px; margin-bottom:22px;
   }
@@ -647,36 +708,34 @@
   }
   .vcinfo-btn-primary:hover{ transform:translateY(-1px); box-shadow:0 14px 28px rgba(108,92,231,0.42); }
   .vcinfo-btn-outline{
-    background:#fff; color:var(--ink); border:1px solid rgba(31,27,46,0.14);
+    background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.18);
   }
-  .vcinfo-btn-outline:hover{ border-color:rgba(31,27,46,0.28); transform:translateY(-1px); }
+  .vcinfo-btn-outline:hover{ border-color:rgba(255,255,255,0.34); background:rgba(255,255,255,0.07); transform:translateY(-1px); }
   .vcinfo-country-row{
     display:flex; align-items:center; gap:10px; margin-top:22px; flex-wrap:wrap;
   }
   @media (max-width:900px){ .vcinfo-country-row{ justify-content:center; } }
   .vcinfo-country-row label{ font-size:13px; font-weight:600; color:var(--ink-soft); }
   .vcinfo-country-select{
-    background:#fff; border:1px solid rgba(31,27,46,0.14); color:var(--ink);
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); color:var(--ink);
     border-radius:999px; padding:9px 34px 9px 16px; font-size:13.5px; font-weight:500;
     font-family:'Inter',sans-serif; appearance:none; -webkit-appearance:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236C5CE7'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat; background-position:right 12px center;
-    box-shadow:0 4px 12px rgba(31,27,46,0.06);
   }
   .vcinfo-country-btn{
-    background:#fff; border:1px solid rgba(31,27,46,0.14); color:var(--ink);
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); color:var(--ink);
     border-radius:999px; padding:9px 34px 9px 16px; font-size:13.5px; font-weight:500;
     font-family:'Inter',sans-serif; cursor:pointer; text-align:left; position:relative;
-    box-shadow:0 4px 12px rgba(31,27,46,0.06);
   }
   .vcinfo-country-btn::after{
     content:'';
     position:absolute; right:14px; top:50%; transform:translateY(-50%);
     width:10px; height:10px;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236C5CE7'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat; background-size:contain;
   }
-  .vcinfo-country-btn:hover{ border-color:rgba(31,27,46,0.28); }
+  .vcinfo-country-btn:hover{ border-color:rgba(255,255,255,0.3); }
   .vcinfo-stats{ display:flex; align-items:center; gap:14px; margin-top:34px; }
   @media (max-width:900px){ .vcinfo-stats{ justify-content:center; } }
   .vcinfo-avatar-stack{ display:flex; }
@@ -779,12 +838,12 @@
   .vcinfo-lightbox-dots span.active{ background:#fff; transform:scale(1.25); }
 
 
-  /* feature-bar: elevated white card overlapping the intro band, like the reference */
+  /* feature-bar: elevated dark card overlapping the intro band, like the reference */
   .vcinfo-features{
     position:relative; z-index:2;
     max-width:1180px; margin:-46px auto 0;
-    background:#fff; border-radius:28px;
-    box-shadow:0 20px 50px -20px rgba(31,27,46,0.18);
+    background:#11122A; border:1px solid var(--hp-card-border); border-radius:28px;
+    box-shadow:0 20px 50px -20px rgba(0,0,0,0.5);
     padding:34px 6vw;
     display:grid; grid-template-columns:repeat(3,1fr); gap:28px 24px;
   }
@@ -795,34 +854,38 @@
     flex:none; width:40px; height:40px; border-radius:11px;
     background:var(--hp-card); border:1px solid rgba(108,92,231,0.22);
     display:flex; align-items:center; justify-content:center;
-    color:var(--hp-blue); font-size:17px;
+    color:var(--hp-blue-light); font-size:17px;
   }
-  .vcinfo-feature h3{ font-size:15px; margin:0 0 4px; font-weight:700; }
+  .vcinfo-feature .ico.c-blue{ background:rgba(94,158,255,0.14); border-color:rgba(94,158,255,0.32); color:#5E9EFF; }
+  .vcinfo-feature .ico.c-mint{ background:rgba(94,234,212,0.14); border-color:rgba(94,234,212,0.32); color:var(--mint); }
+  .vcinfo-feature .ico.c-gold{ background:rgba(255,184,77,0.14); border-color:rgba(255,184,77,0.32); color:#FFB84D; }
+  .vcinfo-feature .ico.c-coral{ background:rgba(255,107,91,0.14); border-color:rgba(255,107,91,0.32); color:var(--coral); }
+  .vcinfo-feature h3{ font-size:15px; margin:0 0 4px; font-weight:700; color:#fff; }
   .vcinfo-feature p{ font-size:13.5px; line-height:1.5; color:var(--ink-soft); margin:0; }
 
-  /* how it works: white section, kicker + numbered steps */
-  .vcinfo-section{ padding:110px 6vw; background:#fff; }
+  /* how it works: dark section, kicker + numbered steps */
+  .vcinfo-section{ padding:110px 6vw; background:var(--hp-bg); }
   .vcinfo-section-head{ max-width:640px; margin:0 auto 56px; text-align:center; }
   .vcinfo-kicker{
     font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.08em;
-    text-transform:uppercase; color:var(--hp-blue); margin-bottom:14px; display:block;
+    text-transform:uppercase; color:var(--hp-blue-light); margin-bottom:14px; display:block;
   }
-  .vcinfo-section-head h2{ font-size:clamp(28px,3.4vw,42px); line-height:1.1; color:#0A0A0A; }
+  .vcinfo-section-head h2{ font-size:clamp(28px,3.4vw,42px); line-height:1.1; color:#fff; }
   .vcinfo-steps{
     max-width:1100px; margin:0 auto;
     display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
   }
   @media (max-width:860px){ .vcinfo-steps{ grid-template-columns:1fr; } }
   .vcinfo-step{
-    background:#fff; border:1px solid #E7E9EE; border-radius:16px;
+    background:var(--hp-card); border:1px solid var(--hp-card-border); border-radius:16px;
     padding:32px 26px;
   }
   .vcinfo-step-num{
-    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--hp-blue);
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--hp-blue-light);
     margin-bottom:18px; display:block;
   }
-  .vcinfo-step h3{ font-size:20px; margin-bottom:10px; color:#0A0A0A; }
-  .vcinfo-step p{ font-size:15px; line-height:1.6; color:#5B616E; margin:0; }
+  .vcinfo-step h3{ font-size:20px; margin-bottom:10px; color:#fff; }
+  .vcinfo-step p{ font-size:15px; line-height:1.6; color:var(--ink-soft); margin:0; }
 
   /* safety: black band, two columns */
   .vcinfo-safety{
@@ -847,8 +910,8 @@
 
   /* faq */
   .vcinfo-faq{ max-width:760px; margin:0 auto; padding:80px 6vw; }
-  .vcinfo-faq-item{ border-bottom:1px solid #E7E9EE; padding:20px 0; }
-  .vcinfo-faq-item h3{ font-size:15.5px; margin:0 0 8px; }
+  .vcinfo-faq-item{ border-bottom:1px solid var(--hp-card-border); padding:20px 0; }
+  .vcinfo-faq-item h3{ font-size:15.5px; margin:0 0 8px; color:#fff; }
   .vcinfo-faq-item p{ font-size:14px; margin:0; color:var(--ink-soft); line-height:1.6; }
 
   .vcinfo-foot{
@@ -925,6 +988,37 @@
   .vc-country-item.any.selected{ background:rgba(94,234,212,0.14); border-color:rgba(46,191,168,0.55); }
 </style>
 
+
+<nav class="vcnav">
+  <div class="vcnav-inner">
+    <a class="vcnav-brand" href="#top">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="vcnavLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#9C8CFB"/>
+            <stop offset="100%" stop-color="#5142C4"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcnavLogoGrad)"/>
+        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+      </svg>
+      <span>Friend<em>Hub</em></span>
+    </a>
+    <ul class="vcnav-links">
+      <li><a href="#top" class="active">Home</a></li>
+      <li><a href="#top">About</a></li>
+      <li><a href="#safety">Safety</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#top">Blog</a></li>
+    </ul>
+    <div class="vcnav-actions">
+      <a href="#top" class="vcnav-signin">👤 Sign in</a>
+      <a href="#top" class="vcnav-getstarted">Get Started</a>
+    </div>
+  </div>
+</nav>
 
 <div class="vcapp" id="top">
   <div class="vcapp-video-col">
@@ -1286,19 +1380,19 @@
     <div><h3>Instant matching</h3><p>You're connected to another online visitor in seconds — no waiting rooms.</p></div>
   </div>
   <div class="vcinfo-feature">
-    <span class="ico">🌐</span>
+    <span class="ico c-blue">🌐</span>
     <div><h3>Filter by country</h3><p>Match with anyone, or narrow it down to a specific country using the dropdown.</p></div>
   </div>
   <div class="vcinfo-feature">
-    <span class="ico">💬</span>
+    <span class="ico c-mint">💬</span>
     <div><h3>Video + text chat</h3><p>Talk on camera or keep it to text in the side chat — whichever you prefer.</p></div>
   </div>
   <div class="vcinfo-feature">
-    <span class="ico">🔒</span>
+    <span class="ico c-gold">🔒</span>
     <div><h3>Nothing saved</h3><p>Conversations aren't stored. Once you leave a chat, it's gone.</p></div>
   </div>
   <div class="vcinfo-feature">
-    <span class="ico">🚩</span>
+    <span class="ico c-coral">🚩</span>
     <div><h3>One-click reporting</h3><p>Flag a bad actor instantly with the Report button in the chat panel.</p></div>
   </div>
   <div class="vcinfo-feature">
@@ -1345,7 +1439,7 @@
   </ul>
 </section>
 
-<section class="vcinfo-faq">
+<section class="vcinfo-faq" id="faq">
   <div class="vcinfo-section-head" style="text-align:left; margin-bottom:24px;">
     <span class="vcinfo-kicker">FAQ</span>
     <h2>Frequently asked questions</h2>
