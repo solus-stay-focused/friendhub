@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://friendhub.space/</loc>
+    <loc>https://www.friendhub.space/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://friendhub.space/blog.html</loc>
+    <loc>https://www.friendhub.space/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!--
     Add one <url> entry per published blog post here, e.g.:
     <url>
-      <loc>https://friendhub.space/blog-post.html?slug=your-post-slug</loc>
+      <loc>https://www.friendhub.space/blog-post?slug=your-post-slug</loc>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
     </url>
