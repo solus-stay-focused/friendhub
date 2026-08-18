@@ -1916,7 +1916,7 @@
 
   // ---- state ----
   let myUid = null;
-  let myUser = null; // Firebase User object once signed in with Google
+  let myUser = null; // Firebase User object once signed in (anonymous or Google)
   let localStream = null;
   let pc = null;
   let callId = null;
@@ -1967,30 +1967,50 @@
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
-  // ---- Google sign-in ----
-  // Auth state is tracked continuously so the header + overlay stay in sync,
-  // including on page reload (Firebase persists the session by default).
+  // ---- Auth ----
+  // Two tiers, on purpose:
+  //  - Anonymous auth fires immediately for every visitor. It's *only* used to
+  //    give everyone a uid so presence/online-count works for casual browsers,
+  //    matching "no account required" in the marketing copy.
+  //  - Google sign-in is still required to actually start a call, since that's
+  //    where we collect the 18+ / community-rules confirmation. The header UI
+  //    and account chip only reflect real (non-anonymous) sign-in.
   let authReady = false;
   let authReadyResolve;
   const authReadyPromise = new Promise((res) => { authReadyResolve = res; });
+  let signingInAnon = false;
 
   auth.onAuthStateChanged((user) => {
     if (user) {
       myUid = user.uid;
       myUser = user;
-      db.collection('users').doc(user.uid).set({
-        displayName: user.displayName || null,
-        email: user.email || null,
-        photoURL: user.photoURL || null,
-        lastSignInAt: FieldValue.serverTimestamp(),
-        createdAt: FieldValue.serverTimestamp()
-      }, { merge: true }).catch((err) => console.error('user profile write failed:', err));
-      renderSignedIn(user);
-      closeAuthOverlay();
+
+      if (!user.isAnonymous) {
+        db.collection('users').doc(user.uid).set({
+          displayName: user.displayName || null,
+          email: user.email || null,
+          photoURL: user.photoURL || null,
+          lastSignInAt: FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp()
+        }, { merge: true }).catch((err) => console.error('user profile write failed:', err));
+        renderSignedIn(user);
+        closeAuthOverlay();
+      } else {
+        renderSignedOut();
+      }
     } else {
       myUid = null;
       myUser = null;
       renderSignedOut();
+      // Nobody signed in yet on this tab — get an anonymous uid right away so
+      // presence/online-count starts working immediately, without forcing the
+      // Google sign-in prompt on every casual visitor.
+      if (!signingInAnon) {
+        signingInAnon = true;
+        auth.signInAnonymously()
+          .catch((err) => console.error('anonymous sign-in failed:', err))
+          .finally(() => { signingInAnon = false; });
+      }
     }
     if (!authReady) { authReady = true; authReadyResolve(); }
   });
@@ -2027,7 +2047,21 @@
     authGoogleBtn.disabled = true;
     authError.classList.remove('show');
     try {
-      await auth.signInWithPopup(googleProvider);
+      if (myUser && myUser.isAnonymous) {
+        // Upgrade the existing anonymous session so the same uid (and any
+        // presence/history tied to it) carries over into the Google account.
+        try {
+          await myUser.linkWithPopup(googleProvider);
+        } catch (linkErr) {
+          if (linkErr && linkErr.code === 'auth/credential-already-in-use') {
+            await auth.signInWithPopup(googleProvider);
+          } else {
+            throw linkErr;
+          }
+        }
+      } else {
+        await auth.signInWithPopup(googleProvider);
+      }
       // onAuthStateChanged handles the rest (closes overlay, updates header).
     } catch (err) {
       console.error('Google sign-in failed:', err);
@@ -2055,15 +2089,23 @@
     auth.signOut();
   });
 
-  // Waits until we know the auth state, then makes sure someone is actually
-  // signed in with Google before letting them into matching/presence — prompts
-  // the sign-in overlay instead of silently falling back to anonymous access.
+  // Waits until we know the auth state, then makes sure a *real* (non-anonymous)
+  // Google account is signed in before letting them into matching/calling —
+  // prompts the sign-in overlay instead of silently letting anonymous auth
+  // (which now exists for every visitor) count as "signed in" here.
   async function ensureAuth(promptOnMissing){
     if (promptOnMissing === undefined) promptOnMissing = true;
     if (!authReady) await authReadyPromise;
-    if (myUid) return myUid;
+    if (myUid && myUser && !myUser.isAnonymous) return myUid;
     if (promptOnMissing) openAuthOverlay();
     throw new Error('sign-in-required');
+  }
+
+  // Just needs *some* uid (anonymous is fine) — used for presence/online-count
+  // so casual visitors are counted without being pushed through Google sign-in.
+  async function ensureAnyAuth(){
+    if (!authReady) await authReadyPromise;
+    return myUid;
   }
 
   // ---- live presence: every visitor heartbeats a doc; count = docs updated in the last 30s ----
@@ -2083,17 +2125,15 @@
 
   async function touchPresence(state){
     if (state) presenceState = state;
+    const uid = await ensureAnyAuth();
+    if (!uid) return; // anonymous sign-in hasn't resolved yet — next heartbeat retries
     try {
-      // Background heartbeats (page load, interval) shouldn't interrupt a
-      // browsing visitor with the sign-in overlay — only the Start button does.
-      const uid = await ensureAuth(false);
       await db.collection('presence').doc(uid).set({
         state: presenceState,
         updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
       clearOnlineDebug();
     } catch (err) {
-      if (err && err.message === 'sign-in-required') return; // expected pre-sign-in, not an error
       console.error('presence heartbeat failed:', err);
       showOnlineDebug('presence write failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
     }
@@ -2115,7 +2155,7 @@
       // deployed (hard-refresh / check the deployed source).
       if (onlineCountEl) onlineCountEl.textContent = '—';
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = '—';
-      if (!myUid && err && err.code === 'permission-denied') return; // expected pre-sign-in
+      if (!myUid && err && err.code === 'permission-denied') return; // expected in the instant before anonymous auth resolves
       console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
       showOnlineDebug('count query failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
     });
@@ -2123,7 +2163,7 @@
 
   // Mark ourselves present the moment the page loads — not just once a call starts —
   // so the count reflects everyone actually browsing the site right now. We wait for
-  // the first touchPresence (which drives anonymous auth) before the first count query,
+  // the first touchPresence (which waits on anonymous auth) before the first count query,
   // since the query needs request.auth != null to pass the Firestore rules.
   touchPresence('browsing').then(refreshOnlineCount);
   setInterval(() => touchPresence(), PRESENCE_HEARTBEAT_MS);
@@ -2372,4 +2412,3 @@
   });
 })();
 </script>
-</div>
