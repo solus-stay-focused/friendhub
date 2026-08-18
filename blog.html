@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — FriendHub | Video Chat Tips, Safety & Updates</title>
+<meta name="description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
+<link rel="canonical" href="https://friendhub.example.com/blog.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="FriendHub Blog">
+<meta property="og:description" content="Guides, safety tips, and updates from FriendHub.">
+<meta property="og:url" content="https://friendhub.example.com/blog.html">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --panel:#101A2E;
+    --panel-2:#0D1626;
+    --line:#1E2A45;
+    --text:#E8ECF3;
+    --muted:#8291AA;
+    --accent:#4FD1C5;
+    --accent-dim:#2A6E68;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+
+  nav{
+    max-width:1080px;margin:0 auto;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;}
+  .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+  nav a.back{text-decoration:none;color:var(--muted);font-size:13.5px;}
+  nav a.back:hover{color:var(--accent);}
+
+  header.hero{max-width:1080px;margin:0 auto;padding:40px 24px 30px;border-bottom:1px solid var(--line);}
+  header.hero .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+    color:var(--accent);background:rgba(79,209,197,0.08);border:1px solid var(--accent-dim);
+    padding:4px 10px;border-radius:20px;margin-bottom:16px;
+  }
+  header.hero .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  header.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,5vw,46px);margin:0 0 12px;font-weight:700;letter-spacing:-0.01em;}
+  header.hero p{color:var(--muted);font-size:15.5px;max-width:520px;line-height:1.6;margin:0;}
+
+  main{max-width:1080px;margin:0 auto;padding:36px 24px 80px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+    text-decoration:none;display:flex;flex-direction:column;transition:border-color .15s, transform .15s;
+    position:relative;
+  }
+  .card:hover{border-color:var(--accent-dim);transform:translateY(-2px);}
+  .card .accent-bar{position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent);opacity:0;transition:opacity .15s;}
+  .card:hover .accent-bar{opacity:1;}
+  .card img.cover{width:100%;height:170px;object-fit:cover;display:block;background:var(--panel-2);}
+  .card-body{padding:18px 20px 20px;flex:1;display:flex;flex-direction:column;}
+  .card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .tag-pill{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--accent);background:rgba(79,209,197,0.09);
+    padding:3px 8px;border-radius:20px;letter-spacing:.02em;}
+  .card h2{font-family:'Space Grotesk',sans-serif;font-size:18px;margin:0 0 8px;line-height:1.35;font-weight:600;}
+  .card p{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0 0 14px;flex:1;}
+  .card-meta{display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);
+    border-top:1px solid var(--line);padding-top:12px;}
+  .card-meta .dot-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);}
+
+  .empty, .loading{text-align:center;color:var(--muted);padding:60px 20px;font-size:14px;}
+
+  footer{border-top:1px solid var(--line);padding:24px;text-align:center;color:var(--muted);font-size:12.5px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><span class="dot"></span>FriendHub</a>
+  <a href="index.html" class="back">← Back to app</a>
+</nav>
+
+<header class="hero">
+  <span class="eyebrow"><span class="dot"></span>FROM THE TEAM</span>
+  <h1>The FriendHub Blog</h1>
+  <p>Notes on meeting people online safely, making the most of random video chat, and what we're building next.</p>
+</header>
+
+<main>
+  <div id="postGrid" class="grid">
+    <div class="loading">Loading posts…</div>
+  </div>
+</main>
+
+<footer>© <span id="year"></span> FriendHub. All rights reserved.</footer>
+
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, query, where, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// TODO: replace with your existing FriendHub Firebase config (same as admin-blog.html)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+function escapeHtml(str) {
+  const d = document.createElement("div");
+  d.textContent = str || "";
+  return d.innerHTML;
+}
+
+function readMinutes(html) {
+  const words = (html || "").replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+async function loadPosts() {
+  const grid = document.getElementById("postGrid");
+  try {
+    const q = query(
+      collection(db, "blogPosts"),
+      where("status", "==", "published"),
+      orderBy("publishedAt", "desc")
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      grid.innerHTML = '<div class="empty">No posts published yet — check back soon.</div>';
+      return;
+    }
+
+    grid.innerHTML = snap.docs.map(d => {
+      const p = d.data();
+      const date = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "";
+      const cover = p.coverImageUrl ? `<img class="cover" src="${escapeHtml(p.coverImageUrl)}" alt="${escapeHtml(p.title)}" loading="lazy">` : "";
+      const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("");
+      return `
+        <a class="card" href="blog-post.html?slug=${encodeURIComponent(p.slug)}">
+          <span class="accent-bar"></span>
+          ${cover}
+          <div class="card-body">
+            <div class="card-tags">${tags}</div>
+            <h2>${escapeHtml(p.title)}</h2>
+            <p>${escapeHtml(p.excerpt)}</p>
+            <div class="card-meta">
+              <span>${date}</span>
+              <span class="dot-sep"></span>
+              <span>${readMinutes(p.content)} min read</span>
+            </div>
+          </div>
+        </a>`;
+    }).join("");
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = '<div class="empty">Couldn\'t load posts. Try refreshing.</div>';
+  }
+}
+
+loadPosts();
+</script>
+</body>
+</html>
