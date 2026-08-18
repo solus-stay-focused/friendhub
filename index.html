@@ -921,71 +921,68 @@
   }
   .vcinfo-foot strong{ color:var(--hp-blue-light); }
 
-  /* ============ All countries modal (checkbox grid, alphabetical, no flags) ============ */
-  .vc-country-overlay{
-    display:none; position:fixed; inset:0; z-index:2000;
-    background:rgba(5,6,11,0.6);
-    align-items:center; justify-content:center;
-    padding:24px;
-  }
-  .vc-country-overlay.active{ display:flex; }
-  .vc-country-modal{
-    background:#fff; color:#1F1B2E;
-    width:100%; max-width:980px; max-height:82vh;
-    border-radius:22px; overflow:hidden;
-    display:flex; flex-direction:column;
-    box-shadow:0 40px 90px -20px rgba(0,0,0,0.55);
+  /* ---------- expanded site footer (brand + nav + legal + social) ---------- */
+  .vcfoot{
+    background:var(--hp-black);
+    color:rgba(255,255,255,0.55);
+    padding:64px 6vw 0;
     font-family:'Inter',sans-serif;
   }
-  .vc-country-modal-head{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:20px 26px; border-bottom:1px solid #ECEBF2; flex:none;
+  .vcfoot-inner{
+    max-width:1180px; margin:0 auto;
+    display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:40px;
+    padding-bottom:44px;
   }
-  .vc-country-modal-title{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;
-    display:flex; align-items:center; gap:8px;
+  @media (max-width:760px){
+    .vcfoot-inner{ grid-template-columns:1fr 1fr; }
+    .vcfoot-brand-col{ grid-column:1 / -1; }
   }
-  .vc-country-modal-close{
-    width:34px; height:34px; border-radius:50%; border:none;
-    background:#F1F0F6; color:#68647A; font-size:14px; cursor:pointer;
+  @media (max-width:480px){
+    .vcfoot-inner{ grid-template-columns:1fr; }
+  }
+  .vcfoot-brand{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .vcfoot-brand svg{ width:30px; height:30px; flex:none; }
+  .vcfoot-brand span{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; color:#fff;
+  }
+  .vcfoot-brand span em{ font-style:normal; color:var(--hp-blue-light); }
+  .vcfoot-tagline{
+    font-size:13.5px; line-height:1.6; color:rgba(255,255,255,0.45);
+    max-width:280px; margin:0 0 20px;
+  }
+  .vcfoot-social{ display:flex; flex-wrap:wrap; gap:10px; }
+  .vcfoot-social a{
+    width:38px; height:38px; border-radius:10px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+    color:rgba(255,255,255,0.65);
     display:flex; align-items:center; justify-content:center;
-    transition:background .15s;
+    text-decoration:none;
+    transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
   }
-  .vc-country-modal-close:hover{ background:#E4E2ED; }
-  .vc-country-grid{
-    padding:18px 22px 26px; overflow-y:auto;
-    display:grid; grid-template-columns:repeat(5,1fr); gap:4px 16px;
+  .vcfoot-social a:hover{
+    background:rgba(108,92,231,0.18); border-color:rgba(108,92,231,0.4);
+    color:#fff; transform:translateY(-2px);
   }
-  @media (max-width:820px){ .vc-country-grid{ grid-template-columns:repeat(3,1fr); } }
-  @media (max-width:560px){ .vc-country-grid{ grid-template-columns:repeat(2,1fr); } }
-  .vc-country-item{
-    display:flex; align-items:center; gap:10px;
-    padding:9px 10px; border-radius:10px; border:1px solid transparent;
-    background:none; cursor:pointer; text-align:left;
-    font-family:'Inter',sans-serif; font-size:13.5px; color:#2B2740;
-    transition:background .12s, border-color .12s;
+  .vcfoot-social a svg{ width:17px; height:17px; }
+  .vcfoot-col h4{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em;
+    text-transform:uppercase; color:rgba(255,255,255,0.4);
+    margin:0 0 18px; font-weight:500;
   }
-  .vc-country-item:hover{ background:#F7F6FB; }
-  .vc-country-item .flag{
-    flex:none; width:22px; height:22px; border-radius:50%;
+  .vcfoot-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:13px; }
+  .vcfoot-col a{
+    color:rgba(255,255,255,0.62); text-decoration:none; font-size:14px;
+    transition:color .15s ease;
+  }
+  .vcfoot-col a:hover{ color:#fff; }
+  .vcfoot-bottom{
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding:22px 0;
+    max-width:1180px; margin:0 auto;
     display:flex; align-items:center; justify-content:center;
-    overflow:hidden; background:#EFEEF4;
-    box-shadow:0 0 0 1px rgba(31,27,46,0.08);
-    font-size:13px; line-height:1;
+    font-size:12.5px; color:rgba(255,255,255,0.35);
+    text-align:center;
   }
-  .vc-country-item .flag img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .vc-country-item .flag-fallback{
-    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
-    font-size:8px; font-weight:700; letter-spacing:0.02em; color:#6B6779; background:#EFEEF4;
-  }
-  .vc-country-item.selected{ background:rgba(94,234,212,0.14); border-color:rgba(46,191,168,0.55); }
-  .vc-country-item.selected .flag{ box-shadow:0 0 0 2px #2FBFA8; }
-  .vc-country-item.selected .label{ color:#12897A; font-weight:700; }
-  .vc-country-item.any .flag{
-    background:linear-gradient(135deg,#5EEAD4,#2FBFA8);
-    font-size:11px;
-  }
-  .vc-country-item.any.selected{ background:rgba(94,234,212,0.14); border-color:rgba(46,191,168,0.55); }
 
   /* ---------- Google sign-in ---------- */
   .vcauth-overlay{
@@ -1578,7 +1575,69 @@
   </div>
 </section>
 
-<div class="vcinfo-foot">
+<footer class="vcfoot">
+  <div class="vcfoot-inner">
+    <div class="vcfoot-brand-col">
+      <a class="vcfoot-brand" href="/">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="vcfootLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#9C8CFB"/>
+              <stop offset="100%" stop-color="#5142C4"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcfootLogoGrad)"/>
+          <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+          <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+          <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+        </svg>
+        <span>Friend<em>Hub</em></span>
+      </a>
+      <p class="vcfoot-tagline">Free random video chat built for instant connections — no accounts to fill in, nothing saved, just click and talk.</p>
+      <div class="vcfoot-social">
+        <a href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+        </a>
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.6h2.55l.38-2.96h-2.93V8.55c0-.86.24-1.44 1.47-1.44h1.57V4.46C16.24 4.4 15.36 4.32 14.33 4.32c-2.15 0-3.62 1.31-3.62 3.72v2.4H8.15v2.96h2.56V21z"/></svg>
+        </a>
+        <a href="#" aria-label="X / Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 3H21l-6.7 7.66L22.2 21h-6.2l-4.85-6.34L5.6 21H3.5l7.17-8.2L2.8 3h6.35l4.38 5.8zM17.8 19.2h1.72L8.3 4.72H6.45z"/></svg>
+        </a>
+        <a href="#" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12s0-3.1-.4-4.6a2.9 2.9 0 0 0-2-2C17.9 5 12 5 12 5s-5.9 0-7.6.4a2.9 2.9 0 0 0-2 2C2 8.9 2 12 2 12s0 3.1.4 4.6a2.9 2.9 0 0 0 2 2C6.1 19 12 19 12 19s5.9 0 7.6-.4a2.9 2.9 0 0 0 2-2C22 15.1 22 12 22 12z"/><path d="M10 15.2V8.8L15.5 12z" fill="#05060B"/></svg>
+        </a>
+        <a href="#" aria-label="Discord">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 5.4A17 17 0 0 0 15.3 4l-.2.4a12 12 0 0 1 3.6 1.4 15.6 15.6 0 0 0-13.4 0 12 12 0 0 1 3.6-1.4L8.7 4a17 17 0 0 0-4.2 1.4C2 8.9 1.4 12.3 1.6 15.7a17 17 0 0 0 5.1 2.6l.7-1.1a10 10 0 0 1-1.6-.8l.4-.3a12.2 12.2 0 0 0 10.4 0l.4.3a10 10 0 0 1-1.6.8l.7 1.1a17 17 0 0 0 5.1-2.6c.3-3.9-.6-7.3-2.7-10.3zM9 13.6c-.8 0-1.5-.8-1.5-1.7S8.2 10.2 9 10.2s1.5.8 1.5 1.7-.7 1.7-1.5 1.7zm6 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="vcfoot-col">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="#top">Features</a></li>
+        <li><a href="#safety">Safety</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/">About</a></li>
+        <li><a href="/support">Support</a></li>
+      </ul>
+    </div>
+    <div class="vcfoot-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms of Service</a></li>
+        <li><a href="/community-rules">Community Rules</a></li>
+        <li><a href="/cookies">Cookie Policy</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="vcfoot-bottom">All rights reserved. FriendHub © 2026</div>
+</footer>
+
+<div class="vcinfo-foot" style="display:none;">
   <div><strong>Live Chat</strong> — talk to strangers, no strings attached.</div>
   <div>By using this site you agree to the Community Rules · Users must be 18 and over</div>
 </div>
