@@ -5,14 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blog — FriendHub | Video Chat Tips, Safety & Updates</title>
 <meta name="description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="FriendHub">
 <link rel="canonical" href="https://friendhub.space/blog.html">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="FriendHub Blog">
-<meta property="og:description" content="Guides, safety tips, and updates from FriendHub.">
+<meta property="og:site_name" content="FriendHub">
+<meta property="og:title" content="FriendHub Blog — Video Chat Tips, Safety & Updates">
+<meta property="og:description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
 <meta property="og:url" content="https://friendhub.space/blog.html">
+<meta property="og:image" content="https://friendhub.space/og-image.png">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FriendHub Blog — Video Chat Tips, Safety & Updates">
+<meta name="twitter:description" content="Guides, safety tips, and updates from FriendHub.">
+<meta name="twitter:image" content="https://friendhub.space/og-image.png">
+
+<!-- Structured data: Blog -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "FriendHub Blog",
+  "url": "https://friendhub.space/blog.html",
+  "description": "Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "FriendHub",
+    "url": "https://friendhub.space/"
+  }
+}
+</script>
+
+<!-- Structured data: Breadcrumbs -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://friendhub.space/" },
+    { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://friendhub.space/blog.html" }
+  ]
+}
+</script>
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%20role%3D%22img%22%20aria-label%3D%22FriendHub%22%3E%20%20%3Cdefs%3E%20%20%20%20%3ClinearGradient%20id%3D%22navBgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%239C8CFB%22/%3E%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235142C4%22/%3E%20%20%20%20%3C/linearGradient%3E%20%20%3C/defs%3E%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22url%28%23navBgGrad%29%22/%3E%20%20%3Cpath%20d%3D%22M14%2C44%20a22%2C22%200%201%2C1%2022%2C26%20l-7%2C10%20l-2%2C-12%20a22%2C22%200%200%2C1%20-13%2C-24%20z%22%20fill%3D%22%23FFFFFF%22/%3E%20%20%3Cpath%20d%3D%22M86%2C48%20a22%2C22%200%201%2C0%20-22%2C26%20l7%2C10%20l2%2C-12%20a22%2C22%200%200%2C0%2013%2C-24%20z%22%20fill%3D%22%235EEAD4%22%20fill-opacity%3D%220.88%22/%3E%20%20%3Cpath%20d%3D%22M79%2C17%20l2.6%2C6.4%206.4%2C2.6%20-6.4%2C2.6%20-2.6%2C6.4%20-2.6%2C-6.4%20-6.4%2C-2.6%206.4%2C-2.6%20z%22%20fill%3D%22%23FFB84D%22/%3E%3C/svg%3E">
 
@@ -179,9 +217,15 @@
 </header>
 
 <main>
-  <div id="postGrid" class="grid">
+  <section class="grid" id="postGrid" aria-label="Blog posts">
     <div class="loading"><div class="spin"></div>Loading posts…</div>
-  </div>
+  </section>
+  <noscript>
+    <p style="color:var(--muted);text-align:center;padding:40px 20px;">
+      This page needs JavaScript enabled to load blog posts. Please enable JavaScript in your browser, or
+      <a href="index.html" style="color:var(--mint);">return to the FriendHub homepage</a>.
+    </p>
+  </noscript>
 </main>
 
 <footer>© <span id="year"></span> FriendHub. All rights reserved.</footer>
@@ -232,12 +276,14 @@ async function loadPosts() {
       return;
     }
 
-    grid.innerHTML = snap.docs.map(d => {
-      const p = d.data();
+    const posts = snap.docs.map(d => d.data());
+
+    grid.innerHTML = posts.map(p => {
       const date = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "";
       const cover = p.coverImageUrl ? `<div class="cover-wrap"><img class="cover" src="${escapeHtml(p.coverImageUrl)}" alt="${escapeHtml(p.title)}" loading="lazy"></div>` : "";
       const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("");
       return `
+        <article>
         <a class="card" href="blog-post.html?slug=${encodeURIComponent(p.slug)}">
           <span class="accent-bar"></span>
           ${cover}
@@ -252,8 +298,26 @@ async function loadPosts() {
               <span class="read-link">Read →</span>
             </div>
           </div>
-        </a>`;
+        </a>
+        </article>`;
     }).join("");
+
+    // Inject ItemList structured data now that posts are known, so crawlers
+    // that execute JS (Googlebot) can associate this page with its posts.
+    const itemListLd = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": posts.map((p, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "url": `https://friendhub.space/blog-post.html?slug=${encodeURIComponent(p.slug)}`,
+        "name": p.title
+      }))
+    };
+    const ldScript = document.createElement("script");
+    ldScript.type = "application/ld+json";
+    ldScript.textContent = JSON.stringify(itemListLd);
+    document.head.appendChild(ldScript);
   } catch (err) {
     console.error(err);
     grid.innerHTML = '<div class="empty">Couldn\'t load posts. Try refreshing.</div>';
