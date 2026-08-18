@@ -158,6 +158,10 @@ const LOGO_SVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" 
 const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">`;
 
+// Same favicon as the homepage, so blog pages show the FriendHub logo in
+// the browser tab instead of a generic globe icon.
+const FAVICON_TAG = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${encodeURIComponent(LOGO_SVG)}">`;
+
 function navBar(backHref, backLabel) {
   return `<nav class="topnav">
   <div class="topnav-inner">
@@ -206,6 +210,7 @@ function renderPostPage(p) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+${FAVICON_TAG}
 <title>${escapeHtml(metaTitle)} — FriendHub Blog</title>
 <meta name="description" content="${escapeHtml(metaDesc)}">
 <meta name="robots" content="index, follow, max-image-preview:large">
@@ -342,6 +347,7 @@ function renderIndexPage(posts) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+${FAVICON_TAG}
 <title>Blog — FriendHub | Video Chat Tips, Safety & Updates</title>
 <meta name="description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
 <meta name="robots" content="index, follow, max-image-preview:large">
