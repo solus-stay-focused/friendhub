@@ -986,6 +986,86 @@
     font-size:11px;
   }
   .vc-country-item.any.selected{ background:rgba(94,234,212,0.14); border-color:rgba(46,191,168,0.55); }
+
+  /* ---------- Google sign-in ---------- */
+  .vcauth-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(13,14,31,0.82);
+    backdrop-filter:blur(4px);
+    display:none;
+    align-items:center; justify-content:center;
+    padding:20px;
+    font-family:'Inter',sans-serif;
+  }
+  .vcauth-overlay.open{ display:flex; }
+  .vcauth-card{
+    width:100%; max-width:380px;
+    background:#14152B;
+    border:1px solid rgba(237,231,218,0.14);
+    border-radius:18px;
+    padding:28px 26px 24px;
+    box-shadow:0 30px 70px rgba(0,0,0,0.5);
+    text-align:center;
+  }
+  .vcauth-card h3{
+    margin:14px 0 6px; font-family:'Space Grotesk',sans-serif;
+    font-size:19px; color:#EDE7DA;
+  }
+  .vcauth-card p{
+    margin:0 0 20px; font-size:13.5px; line-height:1.5;
+    color:rgba(237,231,218,0.6);
+  }
+  .vcauth-logo{ width:40px; height:40px; margin:0 auto; }
+  .vcauth-google-btn{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:#EDE7DA; color:#14152B; border:none;
+    padding:12px 16px; border-radius:10px;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+    cursor:pointer; transition:transform .15s, box-shadow .15s;
+  }
+  .vcauth-google-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 24px rgba(0,0,0,0.35); }
+  .vcauth-google-btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
+  .vcauth-google-btn svg{ width:18px; height:18px; flex:none; }
+  .vcauth-age{
+    display:flex; align-items:flex-start; gap:9px;
+    margin:18px 0 16px; text-align:left;
+    font-size:12.5px; line-height:1.45; color:rgba(237,231,218,0.7);
+  }
+  .vcauth-age input{ margin-top:2px; flex:none; width:15px; height:15px; accent-color:#5EEAD4; }
+  .vcauth-error{
+    display:none; margin-top:14px; font-size:12.5px; color:var(--coral, #FF6B5B);
+  }
+  .vcauth-error.show{ display:block; }
+  .vcauth-terms{
+    margin-top:16px; font-size:11.5px; color:rgba(237,231,218,0.4);
+  }
+  .vcauth-terms a{ color:rgba(237,231,218,0.6); }
+
+  /* header account chip (replaces "Sign in" link once authenticated) */
+  .vcnav-account{
+    display:none; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    padding:5px 12px 5px 5px; border-radius:999px;
+    color:#EDE7DA; font-size:13px; cursor:pointer;
+    position:relative;
+  }
+  .vcnav-account.show{ display:flex; }
+  .vcnav-account img{ width:24px; height:24px; border-radius:50%; }
+  .vcnav-account-menu{
+    position:absolute; top:calc(100% + 8px); right:0; z-index:30;
+    background:#14152B; border:1px solid rgba(237,231,218,0.14);
+    border-radius:10px; padding:6px; min-width:150px;
+    box-shadow:0 18px 40px rgba(0,0,0,0.4);
+    display:none;
+  }
+  .vcnav-account-menu.open{ display:block; }
+  .vcnav-account-menu button{
+    width:100%; text-align:left; background:none; border:none;
+    color:#EDE7DA; font-family:'Inter',sans-serif; font-size:13px;
+    padding:9px 10px; border-radius:6px; cursor:pointer;
+  }
+  .vcnav-account-menu button:hover{ background:rgba(255,255,255,0.06); }
 </style>
 
 
@@ -1014,11 +1094,47 @@
       <li><a href="/blog">Blog</a></li>
     </ul>
     <div class="vcnav-actions">
-      <a href="/" class="vcnav-signin">👤 Sign in</a>
-      <a href="/" class="vcnav-getstarted">Get Started</a>
+      <a href="/" class="vcnav-signin" id="vcNavSignIn">👤 Sign in</a>
+      <a href="/" class="vcnav-getstarted" id="vcNavGetStarted">Get Started</a>
+      <div class="vcnav-account" id="vcNavAccount">
+        <img id="vcNavAvatar" src="" alt="">
+        <span id="vcNavName"></span>
+        <div class="vcnav-account-menu" id="vcNavAccountMenu">
+          <button type="button" id="vcNavSignOutBtn">Sign out</button>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
+
+<!-- ============= Google sign-in overlay ============= -->
+<div class="vcauth-overlay" id="vcAuthOverlay">
+  <div class="vcauth-card">
+    <svg class="vcauth-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="vcauthLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#9C8CFB"/>
+          <stop offset="100%" stop-color="#5142C4"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcauthLogoGrad)"/>
+      <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+      <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+      <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+    </svg>
+    <h3>Sign in to FriendHub</h3>
+    <p>Create a free account with Google to start meeting new people.</p>
+    <button type="button" class="vcauth-google-btn" id="vcAuthGoogleBtn" disabled>
+      <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.4c-2.1 1.6-4.8 2.5-7.7 2.5-5.3 0-9.7-3.1-11.3-7.6l-6.7 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.6 5.4C41.9 35.9 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+      Continue with Google
+    </button>
+    <label class="vcauth-age">
+      <input type="checkbox" id="vcAuthAgeCheck">
+      <span>I confirm I am 18 years of age or older and agree to the <a href="/terms" target="_blank" rel="noopener">Terms</a> and <a href="/community-rules" target="_blank" rel="noopener">Community Rules</a>. FriendHub is not for anyone under 18.</span>
+    </label>
+    <div class="vcauth-error" id="vcAuthError"></div>
+  </div>
+</div>
 
 <div class="vcapp" id="top">
   <div class="vcapp-video-col">
@@ -1749,6 +1865,7 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
   const FieldValue = firebase.firestore.FieldValue;
+  const googleProvider = new firebase.auth.GoogleAuthProvider();
 
   // STUN only — for reliability on restrictive networks (mobile data, corporate
   // wifi, etc.) add a TURN server here too, e.g. one from Twilio or metered.ca:
@@ -1784,8 +1901,22 @@
   const chatInput = document.getElementById('vcChatInput');
   const chatSendBtn = document.getElementById('vcChatSendBtn');
 
+  // ---- auth DOM refs ----
+  const authOverlay = document.getElementById('vcAuthOverlay');
+  const authGoogleBtn = document.getElementById('vcAuthGoogleBtn');
+  const authAgeCheck = document.getElementById('vcAuthAgeCheck');
+  const authError = document.getElementById('vcAuthError');
+  const navSignIn = document.getElementById('vcNavSignIn');
+  const navGetStarted = document.getElementById('vcNavGetStarted');
+  const navAccount = document.getElementById('vcNavAccount');
+  const navAvatar = document.getElementById('vcNavAvatar');
+  const navName = document.getElementById('vcNavName');
+  const navAccountMenu = document.getElementById('vcNavAccountMenu');
+  const navSignOutBtn = document.getElementById('vcNavSignOutBtn');
+
   // ---- state ----
   let myUid = null;
+  let myUser = null; // Firebase User object once signed in with Google
   let localStream = null;
   let pc = null;
   let callId = null;
@@ -1836,36 +1967,103 @@
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
-  async function ensureAuth(){
+  // ---- Google sign-in ----
+  // Auth state is tracked continuously so the header + overlay stay in sync,
+  // including on page reload (Firebase persists the session by default).
+  let authReady = false;
+  let authReadyResolve;
+  const authReadyPromise = new Promise((res) => { authReadyResolve = res; });
+
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      myUid = user.uid;
+      myUser = user;
+      db.collection('users').doc(user.uid).set({
+        displayName: user.displayName || null,
+        email: user.email || null,
+        photoURL: user.photoURL || null,
+        lastSignInAt: FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp()
+      }, { merge: true }).catch((err) => console.error('user profile write failed:', err));
+      renderSignedIn(user);
+      closeAuthOverlay();
+    } else {
+      myUid = null;
+      myUser = null;
+      renderSignedOut();
+    }
+    if (!authReady) { authReady = true; authReadyResolve(); }
+  });
+
+  function renderSignedIn(user){
+    navSignIn.style.display = 'none';
+    navGetStarted.style.display = 'none';
+    navAccount.classList.add('show');
+    navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
+    navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
+  }
+  function renderSignedOut(){
+    navSignIn.style.display = '';
+    navGetStarted.style.display = '';
+    navAccount.classList.remove('show');
+    navAccountMenu.classList.remove('open');
+  }
+
+  function openAuthOverlay(message){
+    authError.classList.remove('show');
+    if (message) { authError.textContent = message; authError.classList.add('show'); }
+    authOverlay.classList.add('open');
+  }
+  function closeAuthOverlay(){
+    authOverlay.classList.remove('open');
+  }
+
+  authAgeCheck.addEventListener('change', () => {
+    authGoogleBtn.disabled = !authAgeCheck.checked;
+  });
+
+  authGoogleBtn.addEventListener('click', async () => {
+    if (!authAgeCheck.checked) return;
+    authGoogleBtn.disabled = true;
+    authError.classList.remove('show');
+    try {
+      await auth.signInWithPopup(googleProvider);
+      // onAuthStateChanged handles the rest (closes overlay, updates header).
+    } catch (err) {
+      console.error('Google sign-in failed:', err);
+      const code = err && err.code ? err.code : '';
+      let msg = 'Sign-in failed. Please try again.';
+      if (code === 'auth/popup-closed-by-user') msg = 'Sign-in window closed — try again.';
+      else if (code === 'auth/popup-blocked') msg = 'Your browser blocked the sign-in popup — allow popups and try again.';
+      else if (code === 'auth/unauthorized-domain') msg = 'This domain isn\'t authorized for sign-in yet (Firebase Console → Authentication → Settings → Authorized domains).';
+      openAuthOverlay(msg);
+    } finally {
+      authGoogleBtn.disabled = !authAgeCheck.checked;
+    }
+  });
+
+  navSignIn.addEventListener('click', (e) => { e.preventDefault(); openAuthOverlay(); });
+  navGetStarted.addEventListener('click', (e) => { e.preventDefault(); openAuthOverlay(); });
+  navAccount.addEventListener('click', (e) => {
+    e.stopPropagation();
+    navAccountMenu.classList.toggle('open');
+  });
+  document.addEventListener('click', () => navAccountMenu.classList.remove('open'));
+  navSignOutBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    await endCall();
+    auth.signOut();
+  });
+
+  // Waits until we know the auth state, then makes sure someone is actually
+  // signed in with Google before letting them into matching/presence — prompts
+  // the sign-in overlay instead of silently falling back to anonymous access.
+  async function ensureAuth(promptOnMissing){
+    if (promptOnMissing === undefined) promptOnMissing = true;
+    if (!authReady) await authReadyPromise;
     if (myUid) return myUid;
-    await new Promise((resolve, reject) => {
-      let settled = false;
-      const timer = setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        unsub();
-        reject(new Error('Anonymous sign-in timed out after 8s — check Firebase Console → Authentication → Sign-in method → Anonymous is enabled.'));
-      }, 8000);
-      const unsub = auth.onAuthStateChanged((user) => {
-        if (user && !settled){
-          settled = true;
-          clearTimeout(timer);
-          myUid = user.uid;
-          unsub();
-          resolve();
-        }
-      });
-      auth.signInAnonymously().catch((err) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        unsub();
-        setStatus('AUTH ERROR: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'), true);
-        console.error('Firebase anonymous auth failed:', err);
-        reject(err);
-      });
-    });
-    return myUid;
+    if (promptOnMissing) openAuthOverlay();
+    throw new Error('sign-in-required');
   }
 
   // ---- live presence: every visitor heartbeats a doc; count = docs updated in the last 30s ----
@@ -1886,13 +2084,16 @@
   async function touchPresence(state){
     if (state) presenceState = state;
     try {
-      const uid = await ensureAuth();
+      // Background heartbeats (page load, interval) shouldn't interrupt a
+      // browsing visitor with the sign-in overlay — only the Start button does.
+      const uid = await ensureAuth(false);
       await db.collection('presence').doc(uid).set({
         state: presenceState,
         updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
       clearOnlineDebug();
     } catch (err) {
+      if (err && err.message === 'sign-in-required') return; // expected pre-sign-in, not an error
       console.error('presence heartbeat failed:', err);
       showOnlineDebug('presence write failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
     }
@@ -1912,9 +2113,10 @@
       // Console → Authentication → Sign-in method, (2) Firestore rules allow
       // `read` on /presence for signed-in users, (3) this file is the one actually
       // deployed (hard-refresh / check the deployed source).
-      console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
       if (onlineCountEl) onlineCountEl.textContent = '—';
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = '—';
+      if (!myUid && err && err.code === 'permission-denied') return; // expected pre-sign-in
+      console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
       showOnlineDebug('count query failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
     });
   }
@@ -1976,7 +2178,12 @@
       }
     }
 
-    await ensureAuth();
+    try {
+      await ensureAuth(); // prompts the Google sign-in overlay if not signed in
+    } catch (err) {
+      startBtn.disabled = false;
+      return;
+    }
     setPlaceholder('searching', 'looking for someone to chat with…');
     matching = true;
 
