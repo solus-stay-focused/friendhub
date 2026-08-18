@@ -116,16 +116,6 @@
   .panel-card h2 .n{color:var(--mint);}
   textarea#content{min-height:280px;resize:vertical;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6;}
   textarea#excerpt{min-height:70px;resize:vertical;}
-  .upload-row{display:flex;align-items:center;gap:10px;margin:6px 0;flex-wrap:wrap;}
-  .btn-secondary{
-    background:var(--panel-2,#0D1322); border:1px solid var(--line,#212C42); color:var(--text,#EDE7DA);
-    padding:7px 12px; border-radius:8px; font-size:13px; cursor:pointer; transition:border-color .15s;
-  }
-  .btn-secondary:hover{border-color:var(--violet,#9C8CFB);}
-  .btn-secondary:disabled{opacity:.5;cursor:not-allowed;}
-  .upload-status{font-size:12px;color:var(--muted,#8B96AC);}
-  .upload-status.error{color:#FF6B6B;}
-  .upload-status.success{color:var(--mint,#5EEAD4);}
 
   .char-count{font-size:11px;color:var(--muted);text-align:right;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
   .char-count.over{color:var(--red);}
@@ -241,13 +231,8 @@
           </div>
           <div class="field">
             <label for="content">Content (HTML)</label>
-            <div class="upload-row">
-              <button type="button" id="insertImageBtn" class="btn-secondary">+ Insert image</button>
-              <input type="file" id="insertImageFile" accept="image/*" style="display:none">
-              <span id="insertImageStatus" class="upload-status"></span>
-            </div>
             <textarea id="content" placeholder="&lt;p&gt;Write your post content here using basic HTML tags like &lt;p&gt;, &lt;h2&gt;, &lt;strong&gt;, &lt;a&gt;, &lt;ul&gt;.&lt;/p&gt;"></textarea>
-            <div class="hint">Rendered as raw HTML on blog-post.html — keep it to safe, simple tags. Click "Insert image" to upload a photo and drop an &lt;img&gt; tag at your cursor.</div>
+            <div class="hint">Rendered as raw HTML on blog-post.html — keep it to safe, simple tags.</div>
           </div>
         </div>
       </div>
@@ -270,11 +255,6 @@
           <div class="field">
             <label for="coverImageUrl">Cover image URL</label>
             <input type="text" id="coverImageUrl" placeholder="https://...">
-            <div class="upload-row">
-              <button type="button" id="uploadCoverBtn" class="btn-secondary">Upload image instead</button>
-              <input type="file" id="uploadCoverFile" accept="image/*" style="display:none">
-              <span id="uploadCoverStatus" class="upload-status"></span>
-            </div>
             <div class="cover-preview-wrap" id="coverPreviewWrap">
               <span class="placeholder">No image URL yet</span>
             </div>
@@ -325,9 +305,6 @@ import {
 import {
   getFirestore, collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp, orderBy, query
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import {
-  getStorage, ref, uploadBytes, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 // Same FriendHub Firebase project as index.html.
 const firebaseConfig = {
@@ -368,45 +345,7 @@ const ADMIN_EMAILS = [
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
-
-// ---- Image upload helper --------------------------------------------------
-// Uploads a file to Firebase Storage under blog-images/ and returns a
-// permanent public download URL (does not expire, unlike third-party
-// image-sharing links).
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
-
-async function uploadBlogImage(file, statusEl) {
-  if (!file) return null;
-  if (!file.type.startsWith("image/")) {
-    statusEl.textContent = "That's not an image file.";
-    statusEl.className = "upload-status error";
-    return null;
-  }
-  if (file.size > MAX_IMAGE_BYTES) {
-    statusEl.textContent = "Image is too large (max 8MB).";
-    statusEl.className = "upload-status error";
-    return null;
-  }
-  statusEl.textContent = "Uploading…";
-  statusEl.className = "upload-status";
-  try {
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `blog-images/${Date.now()}-${safeName}`;
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    statusEl.textContent = "Uploaded ✓";
-    statusEl.className = "upload-status success";
-    return url;
-  } catch (err) {
-    console.error("Image upload failed:", err);
-    statusEl.textContent = "Upload failed — check Storage rules.";
-    statusEl.className = "upload-status error";
-    return null;
-  }
-}
 
 const $ = (id) => document.getElementById(id);
 let posts = [];
@@ -577,46 +516,6 @@ $("excerpt").addEventListener("input", () => { updateCounts(); updateSerpPreview
 $("metaTitle").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
 $("metaDescription").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
 $("coverImageUrl").addEventListener("input", updateCoverPreview);
-
-// ---- Cover image upload ----
-$("uploadCoverBtn").addEventListener("click", () => $("uploadCoverFile").click());
-$("uploadCoverFile").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = ""; // allow re-selecting the same file later
-  if (!file) return;
-  const statusEl = $("uploadCoverStatus");
-  $("uploadCoverBtn").disabled = true;
-  const url = await uploadBlogImage(file, statusEl);
-  $("uploadCoverBtn").disabled = false;
-  if (url) {
-    $("coverImageUrl").value = url;
-    updateCoverPreview();
-  }
-});
-
-// ---- Insert image into content at cursor ----
-$("insertImageBtn").addEventListener("click", () => $("insertImageFile").click());
-$("insertImageFile").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = "";
-  if (!file) return;
-  const statusEl = $("insertImageStatus");
-  $("insertImageBtn").disabled = true;
-  const url = await uploadBlogImage(file, statusEl);
-  $("insertImageBtn").disabled = false;
-  if (url) {
-    const textarea = $("content");
-    const imgTag = `<img src="${url}" alt="" style="max-width:100%;border-radius:12px;">`;
-    const start = textarea.selectionStart ?? textarea.value.length;
-    const end = textarea.selectionEnd ?? textarea.value.length;
-    const before = textarea.value.slice(0, start);
-    const after = textarea.value.slice(end);
-    textarea.value = `${before}\n${imgTag}\n${after}`;
-    textarea.focus();
-    const newPos = (before + "\n" + imgTag + "\n").length;
-    textarea.setSelectionRange(newPos, newPos);
-  }
-});
 
 function updateCounts() {
   setCount("excerptCount", $("excerpt").value.length, 200);
