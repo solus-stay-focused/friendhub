@@ -2,23 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.friendhub.space/</loc>
-    <changefreq>weekly</changefreq>
+    
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.friendhub.space/blog</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://www.friendhub.space/blog/</loc>
+    
     <priority>0.8</priority>
   </url>
-  <!--
-    Add one <url> entry per published blog post here, e.g.:
-    <url>
-      <loc>https://www.friendhub.space/blog-post?slug=your-post-slug</loc>
-      <changefreq>monthly</changefreq>
-      <priority>0.6</priority>
-    </url>
-    Ideally this file is regenerated automatically whenever a post is
-    published (e.g. via a Cloud Function reading the blogPosts collection),
-    since a hand-maintained sitemap will drift out of date.
-  -->
+  <url>
+    <loc>https://www.friendhub.space/blog/staying-safe-on-video-chat/</loc>
+    <lastmod>2026-08-18</lastmod>
+    <priority>0.6</priority>
+  </url>
 </urlset>
