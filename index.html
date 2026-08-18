@@ -2142,8 +2142,13 @@
   function refreshOnlineCount(){
     if (!onlineCountEl && !infoOnlineCountEl) return;
     const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - PRESENCE_STALE_MS);
-    db.collection('presence').where('updatedAt', '>', cutoff).count().get().then((snap) => {
-      const text = snap.data().count.toLocaleString();
+    db.collection('presence').where('updatedAt', '>', cutoff).get().then((snap) => {
+      // Using snap.size instead of the .count() aggregation shorthand — that
+      // API isn't available in every SDK build (was throwing
+      // "db.collection(...).count is not a function" and silently killing
+      // every refresh). Plain .get() + snap.size works everywhere and is
+      // plenty cheap at the scale of a presence collection like this.
+      const text = snap.size.toLocaleString();
       if (onlineCountEl) onlineCountEl.textContent = text;
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
       clearOnlineDebug();
