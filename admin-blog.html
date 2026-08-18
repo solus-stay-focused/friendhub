@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — FriendHub Blog</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%20role%3D%22img%22%20aria-label%3D%22FriendHub%22%3E%20%20%3Cdefs%3E%20%20%20%20%3ClinearGradient%20id%3D%22navBgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%239C8CFB%22/%3E%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235142C4%22/%3E%20%20%20%20%3C/linearGradient%3E%20%20%3C/defs%3E%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22url%28%23navBgGrad%29%22/%3E%20%20%3Cpath%20d%3D%22M14%2C44%20a22%2C22%200%201%2C1%2022%2C26%20l-7%2C10%20l-2%2C-12%20a22%2C22%200%200%2C1%20-13%2C-24%20z%22%20fill%3D%22%23FFFFFF%22/%3E%20%20%3Cpath%20d%3D%22M86%2C48%20a22%2C22%200%201%2C0%20-22%2C26%20l7%2C10%20l2%2C-12%20a22%2C22%200%200%2C0%2013%2C-24%20z%22%20fill%3D%22%235EEAD4%22%20fill-opacity%3D%220.88%22/%3E%20%20%3Cpath%20d%3D%22M79%2C17%20l2.6%2C6.4%206.4%2C2.6%20-6.4%2C2.6%20-2.6%2C6.4%20-2.6%2C-6.4%20-6.4%2C-2.6%206.4%2C-2.6%20z%22%20fill%3D%22%23FFB84D%22/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0F1A; --panel:#121A2C; --panel-2:#0D1322; --line:#212C42;
+    --text:#EDE7DA; --muted:#8B96AC; --violet:#9C8CFB; --violet-dim:#5142C4;
+    --mint:#5EEAD4; --amber:#FFB84D; --red:#F87171;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  input, textarea, select{font-family:inherit;}
+
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(640px 420px at 12% -6%, rgba(156,140,251,0.13), transparent 60%),
+      radial-gradient(560px 380px at 96% 8%, rgba(94,234,212,0.08), transparent 60%),
+      var(--bg);
+  }
+
+  nav.topnav{
+    position:sticky;top:0;z-index:50;background:rgba(11,15,26,0.85);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand svg{width:28px;height:28px;flex-shrink:0;}
+  .brand span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;color:#fff;}
+  .brand span em{font-style:normal;color:var(--mint);}
+  .brand .tag{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--violet);background:rgba(156,140,251,0.1);
+    border:1px solid rgba(156,140,251,0.25);padding:2px 8px;border-radius:20px;margin-left:8px;
+  }
+  .nav-actions{display:flex;align-items:center;gap:10px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:13.5px;font-weight:600;
+    padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--text);
+    transition:border-color .15s, background .15s, color .15s;
+  }
+  .btn:hover{border-color:var(--violet-dim);background:rgba(156,140,251,0.07);}
+  .btn-primary{background:linear-gradient(135deg, var(--violet), var(--violet-dim));border-color:transparent;color:#fff;}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-danger{color:var(--red);border-color:rgba(248,113,113,0.3);}
+  .btn-danger:hover{background:rgba(248,113,113,0.08);border-color:var(--red);}
+  .btn-sm{padding:6px 12px;font-size:12.5px;}
+  .btn[disabled]{opacity:0.5;cursor:not-allowed;}
+
+  main{max-width:1180px;margin:0 auto;padding:40px 24px 90px;}
+
+  /* ---- LOGIN ---- */
+  #loginScreen{max-width:400px;margin:80px auto;padding:36px;background:var(--panel);border:1px solid var(--line);border-radius:16px;}
+  #loginScreen h1{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 6px;}
+  #loginScreen p{color:var(--muted);font-size:13.5px;margin:0 0 24px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;}
+  .field input, .field textarea, .field select{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);
+    padding:10px 12px;font-size:14px;outline:none;transition:border-color .15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--violet);}
+  .field .hint{font-size:11.5px;color:var(--muted);margin-top:5px;}
+  #loginError{color:var(--red);font-size:13px;margin-top:12px;display:none;}
+
+  /* ---- DASHBOARD ---- */
+  #dashboard{display:none;}
+  .dash-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px;}
+  .dash-head h1{font-family:'Space Grotesk',sans-serif;font-size:26px;margin:0;}
+  .dash-head p{color:var(--muted);font-size:13.5px;margin:4px 0 0;}
+
+  .post-row{
+    display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--panel);
+    border:1px solid var(--line);border-radius:12px;margin-bottom:10px;
+  }
+  .post-row .cover-thumb{width:52px;height:52px;border-radius:8px;background:var(--panel-2);flex-shrink:0;object-fit:cover;}
+  .post-row .info{flex:1;min-width:0;}
+  .post-row .info h3{margin:0 0 4px;font-size:15px;font-family:'Space Grotesk',sans-serif;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .post-row .info .meta{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .status-pill{font-size:10.5px;padding:2px 9px;border-radius:20px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;}
+  .status-pill.published{color:var(--mint);background:rgba(94,234,212,0.1);border:1px solid rgba(94,234,212,0.3);}
+  .status-pill.draft{color:var(--amber);background:rgba(255,184,77,0.1);border:1px solid rgba(255,184,77,0.3);}
+  .post-row .actions{display:flex;gap:8px;flex-shrink:0;}
+
+  .empty-state{text-align:center;color:var(--muted);padding:60px 20px;border:1px dashed var(--line);border-radius:14px;font-size:14px;}
+
+  /* ---- EDITOR ---- */
+  #editorScreen{display:none;}
+  .editor-head{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+  .editor-head h1{font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0;flex:1;}
+  .back-arrow{
+    width:36px;height:36px;border-radius:9px;border:1px solid var(--line);display:flex;align-items:center;
+    justify-content:center;background:transparent;color:var(--text);flex-shrink:0;
+  }
+  .back-arrow:hover{border-color:var(--violet-dim);background:rgba(156,140,251,0.07);}
+  .back-arrow svg{width:16px;height:16px;}
+
+  .editor-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:860px){.editor-grid{grid-template-columns:1fr;}}
+
+  .panel-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px;}
+  .panel-card h2{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.06em;color:var(--violet);
+    text-transform:uppercase;margin:0 0 18px;display:flex;align-items:center;gap:8px;
+  }
+  .panel-card h2 .n{color:var(--mint);}
+  textarea#content{min-height:280px;resize:vertical;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6;}
+  textarea#excerpt{min-height:70px;resize:vertical;}
+
+  .char-count{font-size:11px;color:var(--muted);text-align:right;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+  .char-count.over{color:var(--red);}
+
+  .serp-preview{
+    background:#fff;border-radius:10px;padding:16px 18px;margin-top:6px;
+  }
+  .serp-preview .serp-url{color:#4d5156;font-size:12.5px;font-family:arial,sans-serif;margin-bottom:2px;}
+  .serp-preview .serp-title{color:#1a0dab;font-size:17px;font-family:arial,sans-serif;line-height:1.3;margin-bottom:2px;}
+  .serp-preview .serp-desc{color:#4d5156;font-size:13px;font-family:arial,sans-serif;line-height:1.4;}
+
+  .editor-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap;}
+  #saveStatus{font-size:12.5px;color:var(--mint);margin-right:auto;align-self:center;display:none;font-family:'IBM Plex Mono',monospace;}
+
+  .cover-preview-wrap{width:100%;height:140px;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);
+    overflow:hidden;margin-top:8px;display:flex;align-items:center;justify-content:center;}
+  .cover-preview-wrap img{width:100%;height:100%;object-fit:cover;}
+  .cover-preview-wrap .placeholder{color:var(--muted);font-size:12px;}
+
+  #toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 20px;font-size:13.5px;
+    box-shadow:0 12px 30px -12px rgba(0,0,0,0.6);transition:opacity .2s, transform .2s;pointer-events:none;z-index:100;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="adminLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#9C8CFB"/><stop offset="100%" stop-color="#5142C4"/>
+        </linearGradient></defs>
+        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#adminLogoGrad)"/>
+        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+      </svg>
+      <span>Friend<em>Hub</em></span>
+      <span class="tag">ADMIN</span>
+    </a>
+    <div class="nav-actions">
+      <a class="btn" href="/blog" target="_blank" rel="noopener">View blog ↗</a>
+      <button class="btn" id="signOutBtn" style="display:none;">Sign out</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <h1>Admin sign in</h1>
+    <p>Sign in with your FriendHub Google account to manage blog posts.</p>
+    <button class="btn btn-primary" id="googleSignInBtn" style="width:100%;justify-content:center;gap:10px;">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.4c-2.1 1.6-4.8 2.5-7.7 2.5-5.3 0-9.7-3.1-11.3-7.6l-6.7 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.6 5.4C41.9 35.9 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+      Continue with Google
+    </button>
+    <div id="loginError"></div>
+  </div>
+
+  <!-- NOT AUTHORIZED — shown when a Google account signs in but isn't on the admin list -->
+  <div id="notAdminBanner" style="display:none;max-width:520px;margin:80px auto;padding:32px 36px;background:var(--panel);border:1px solid var(--red);border-radius:16px;">
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:20px;margin:0 0 10px;">This account isn't an admin</h1>
+    <p style="color:var(--muted);font-size:13.5px;margin:0 0 18px;line-height:1.6;">
+      You're signed in as <strong id="notAdminEmail" style="color:var(--text);"></strong>, but this email isn't on the admin list. Ask the site owner to add it in <span class="mono">ADMIN_EMAILS</span> (in this file) and in the Firestore security rules, then refresh.
+    </p>
+    <button class="btn" id="notAdminSignOutBtn" style="width:100%;justify-content:center;">Sign out</button>
+  </div>
+
+  <!-- DASHBOARD (post list) -->
+  <div id="dashboard">
+    <div class="dash-head">
+      <div>
+        <h1>Blog posts</h1>
+        <p id="postCount">Loading…</p>
+      </div>
+      <button class="btn btn-primary" id="newPostBtn">+ New post</button>
+    </div>
+    <div id="postList"></div>
+  </div>
+
+  <!-- EDITOR -->
+  <div id="editorScreen">
+    <div class="editor-head">
+      <button class="back-arrow" id="backBtn" aria-label="Back to post list">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 id="editorTitle">New post</h1>
+    </div>
+
+    <div class="editor-grid">
+      <!-- LEFT: content -->
+      <div>
+        <div class="panel-card">
+          <h2>Content</h2>
+          <div class="field">
+            <label for="title">Title</label>
+            <input type="text" id="title" placeholder="10 tips for staying safe on random video chat">
+          </div>
+          <div class="field">
+            <label for="slug">URL slug</label>
+            <input type="text" id="slug" placeholder="staying-safe-on-video-chat">
+            <div class="hint">Post will live at friendhub.space/blog-post?slug=<span id="slugPreview">your-slug</span></div>
+          </div>
+          <div class="field">
+            <label for="excerpt">Excerpt (shown on blog index &amp; used as fallback meta description)</label>
+            <textarea id="excerpt" maxlength="200" placeholder="A short one- or two-sentence summary of the post."></textarea>
+            <div class="char-count" id="excerptCount">0 / 200</div>
+          </div>
+          <div class="field">
+            <label for="content">Content (HTML)</label>
+            <textarea id="content" placeholder="&lt;p&gt;Write your post content here using basic HTML tags like &lt;p&gt;, &lt;h2&gt;, &lt;strong&gt;, &lt;a&gt;, &lt;ul&gt;.&lt;/p&gt;"></textarea>
+            <div class="hint">Rendered as raw HTML on blog-post.html — keep it to safe, simple tags.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: metadata + SEO -->
+      <div>
+        <div class="panel-card">
+          <h2>Publishing</h2>
+          <div class="field">
+            <label for="status">Status</label>
+            <select id="status">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="tags">Tags (comma-separated, max 3 shown)</label>
+            <input type="text" id="tags" placeholder="safety, video chat, tips">
+          </div>
+          <div class="field">
+            <label for="coverImageUrl">Cover image URL</label>
+            <input type="text" id="coverImageUrl" placeholder="https://...">
+            <div class="cover-preview-wrap" id="coverPreviewWrap">
+              <span class="placeholder">No image URL yet</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h2>SEO <span class="n">·</span> search appearance</h2>
+          <div class="field">
+            <label for="metaTitle">Meta title (optional — falls back to Title)</label>
+            <input type="text" id="metaTitle" maxlength="70" placeholder="Leave blank to reuse the post title">
+            <div class="char-count" id="metaTitleCount">0 / 70</div>
+          </div>
+          <div class="field">
+            <label for="metaDescription">Meta description (optional — falls back to Excerpt)</label>
+            <textarea id="metaDescription" maxlength="160" placeholder="Leave blank to reuse the excerpt"></textarea>
+            <div class="char-count" id="metaDescCount">0 / 160</div>
+          </div>
+          <div class="field">
+            <label>Google preview</label>
+            <div class="serp-preview">
+              <div class="serp-url">friendhub.space › blog-post › <span id="serpSlug">your-slug</span></div>
+              <div class="serp-title" id="serpTitle">Your post title</div>
+              <div class="serp-desc" id="serpDesc">Your meta description or excerpt will appear here.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="editor-footer">
+          <span id="saveStatus">Saved ✓</span>
+          <button class="btn btn-danger" id="deleteBtn" style="display:none;">Delete post</button>
+          <button class="btn" id="saveDraftBtn">Save draft</button>
+          <button class="btn btn-primary" id="publishBtn">Save &amp; publish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp, orderBy, query
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// Same FriendHub Firebase project as index.html.
+const firebaseConfig = {
+  apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
+  authDomain: "friendhub-9f934.firebaseapp.com",
+  projectId: "friendhub-9f934",
+  storageBucket: "friendhub-9f934.firebasestorage.app",
+  messagingSenderId: "97544296104",
+  appId: "1:97544296104:web:d7f7d27e86f1af748e949d"
+};
+
+// ---- Who's allowed to post -----------------------------------------------
+// This list ONLY controls what this page shows/hides — it is NOT security by
+// itself, since anyone can view page source. The real gate has to be the
+// Firestore rules below (they check the same emails server-side). Add every
+// admin's Google account email here AND in the Firestore rules.
+const ADMIN_EMAILS = [
+  "you@gmail.com"
+];
+/*  Paste this into Firebase Console → Firestore Database → Rules — it's what
+    actually stops non-admins from writing posts, even if they inspect/edit
+    the JS on this page:
+
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /blogPosts/{postId} {
+          allow read: if true;
+          allow write: if request.auth != null &&
+            request.auth.token.email in [
+              "you@gmail.com"
+            ];
+        }
+      }
+    }
+*/
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+const $ = (id) => document.getElementById(id);
+let posts = [];
+let editingId = null; // null = new post
+
+/* ---------- AUTH ---------- */
+function hideAllAuthScreens() {
+  $("loginScreen").style.display = "none";
+  $("notAdminBanner").style.display = "none";
+  $("dashboard").style.display = "none";
+  $("editorScreen").style.display = "none";
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (user && ADMIN_EMAILS.includes(user.email)) {
+    $("signOutBtn").style.display = "inline-flex";
+    hideAllAuthScreens();
+    showDashboard();
+    const ok = await loadPosts();
+    if (!ok) {
+      // Signed in + on the client-side admin list, but Firestore rules still
+      // rejected the write/read — almost always means the rules above
+      // haven't been updated with this email yet.
+      hideAllAuthScreens();
+      $("notAdminBanner").style.display = "block";
+      $("notAdminEmail").textContent = user.email;
+    }
+  } else if (user) {
+    // Signed in with Google, but not an admin email.
+    hideAllAuthScreens();
+    $("notAdminBanner").style.display = "block";
+    $("notAdminEmail").textContent = user.email;
+    $("signOutBtn").style.display = "inline-flex";
+  } else {
+    hideAllAuthScreens();
+    $("loginScreen").style.display = "block";
+    $("signOutBtn").style.display = "none";
+  }
+});
+
+$("googleSignInBtn").addEventListener("click", async () => {
+  $("loginError").style.display = "none";
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (err) {
+    console.error(err);
+    $("loginError").textContent = "Couldn't sign in — please try again.";
+    $("loginError").style.display = "block";
+  }
+});
+
+$("signOutBtn").addEventListener("click", () => signOut(auth));
+$("notAdminSignOutBtn").addEventListener("click", () => signOut(auth));
+
+/* ---------- VIEW SWITCHING ---------- */
+function showDashboard() {
+  $("dashboard").style.display = "block";
+  $("editorScreen").style.display = "none";
+}
+function showEditor() {
+  $("dashboard").style.display = "none";
+  $("editorScreen").style.display = "block";
+}
+
+$("newPostBtn").addEventListener("click", () => openEditor(null));
+$("backBtn").addEventListener("click", () => { showDashboard(); });
+
+/* ---------- LOAD & RENDER POST LIST ---------- */
+async function loadPosts() {
+  $("postCount").textContent = "Loading…";
+  try {
+    const q = query(collection(db, "blogPosts"), orderBy("updatedAt", "desc"));
+    const snap = await getDocs(q);
+    posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderPostList();
+    return true;
+  } catch (err) {
+    console.error(err);
+    if (err.code === "permission-denied") {
+      // Not yet an approved admin — let the caller show the UID banner instead.
+      return false;
+    }
+    $("postList").innerHTML = '<div class="empty-state">Couldn\'t load posts. Check your Firebase config and Firestore rules.</div>';
+    $("postCount").textContent = "Error loading posts";
+    return true; // real error, not a permissions issue — stay on dashboard with the message
+  }
+}
+
+function renderPostList() {
+  $("postCount").textContent = posts.length === 1 ? "1 post" : `${posts.length} posts`;
+  if (posts.length === 0) {
+    $("postList").innerHTML = '<div class="empty-state">No posts yet — click "New post" to write your first one.</div>';
+    return;
+  }
+  $("postList").innerHTML = posts.map(p => {
+    const cover = p.coverImageUrl
+      ? `<img class="cover-thumb" src="${escapeHtml(p.coverImageUrl)}" alt="">`
+      : `<div class="cover-thumb"></div>`;
+    const dateStr = p.publishedAt?.toDate
+      ? p.publishedAt.toDate().toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" })
+      : "not published";
+    return `
+      <div class="post-row">
+        ${cover}
+        <div class="info">
+          <h3>${escapeHtml(p.title || "(untitled)")}</h3>
+          <div class="meta">
+            <span class="status-pill ${p.status === 'published' ? 'published' : 'draft'}">${p.status || 'draft'}</span>
+            <span>·</span>
+            <span>${dateStr}</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-sm" data-edit="${p.id}">Edit</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  document.querySelectorAll("[data-edit]").forEach(btn => {
+    btn.addEventListener("click", () => openEditor(btn.getAttribute("data-edit")));
+  });
+}
+
+/* ---------- EDITOR ---------- */
+function openEditor(id) {
+  editingId = id;
+  const p = id ? posts.find(x => x.id === id) : null;
+
+  $("editorTitle").textContent = p ? "Edit post" : "New post";
+  $("title").value = p?.title || "";
+  $("slug").value = p?.slug || "";
+  $("excerpt").value = p?.excerpt || "";
+  $("content").value = p?.content || "";
+  $("status").value = p?.status || "draft";
+  $("tags").value = (p?.tags || []).join(", ");
+  $("coverImageUrl").value = p?.coverImageUrl || "";
+  $("metaTitle").value = p?.metaTitle || "";
+  $("metaDescription").value = p?.metaDescription || "";
+  $("deleteBtn").style.display = p ? "inline-flex" : "none";
+  $("saveStatus").style.display = "none";
+
+  updateCoverPreview();
+  updateCounts();
+  updateSerpPreview();
+  showEditor();
+}
+
+function slugify(str) {
+  return (str || "").toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+$("title").addEventListener("input", () => {
+  if (!editingId && !$("slug").dataset.manual) {
+    $("slug").value = slugify($("title").value);
+  }
+  updateSerpPreview();
+});
+$("slug").addEventListener("input", () => {
+  $("slug").dataset.manual = "1";
+  $("slug").value = slugify($("slug").value);
+  updateSerpPreview();
+});
+$("excerpt").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
+$("metaTitle").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
+$("metaDescription").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
+$("coverImageUrl").addEventListener("input", updateCoverPreview);
+
+function updateCounts() {
+  setCount("excerptCount", $("excerpt").value.length, 200);
+  setCount("metaTitleCount", $("metaTitle").value.length, 70);
+  setCount("metaDescCount", $("metaDescription").value.length, 160);
+}
+function setCount(elId, len, max) {
+  const el = $(elId);
+  el.textContent = `${len} / ${max}`;
+  el.classList.toggle("over", len > max);
+}
+
+function updateSerpPreview() {
+  const slug = $("slug").value || "your-slug";
+  $("slugPreview").textContent = slug;
+  $("serpSlug").textContent = slug;
+  $("serpTitle").textContent = $("metaTitle").value || $("title").value || "Your post title";
+  $("serpDesc").textContent = $("metaDescription").value || $("excerpt").value || "Your meta description or excerpt will appear here.";
+}
+
+function updateCoverPreview() {
+  const url = $("coverImageUrl").value.trim();
+  const wrap = $("coverPreviewWrap");
+  if (!url) { wrap.innerHTML = '<span class="placeholder">No image URL yet</span>'; return; }
+  wrap.innerHTML = `<img src="${escapeHtml(url)}" alt="" onerror="this.parentElement.innerHTML='<span class=&quot;placeholder&quot;>Couldn\\'t load image</span>'">`;
+}
+
+function escapeHtml(str) {
+  const d = document.createElement("div");
+  d.textContent = str || "";
+  return d.innerHTML;
+}
+
+/* ---------- SAVE / PUBLISH / DELETE ---------- */
+$("saveDraftBtn").addEventListener("click", () => savePost("draft"));
+$("publishBtn").addEventListener("click", () => savePost("published"));
+
+async function savePost(status) {
+  const slug = $("slug").value.trim();
+  const title = $("title").value.trim();
+  if (!title || !slug) {
+    showToast("Title and slug are required.");
+    return;
+  }
+
+  const existing = editingId ? posts.find(x => x.id === editingId) : null;
+  const data = {
+    title,
+    slug,
+    excerpt: $("excerpt").value.trim(),
+    content: $("content").value,
+    status,
+    tags: $("tags").value.split(",").map(t => t.trim()).filter(Boolean),
+    coverImageUrl: $("coverImageUrl").value.trim(),
+    metaTitle: $("metaTitle").value.trim(),
+    metaDescription: $("metaDescription").value.trim(),
+    updatedAt: serverTimestamp(),
+  };
+  if (status === "published" && !(existing?.publishedAt)) {
+    data.publishedAt = serverTimestamp();
+  } else if (existing?.publishedAt) {
+    data.publishedAt = existing.publishedAt;
+  }
+
+  try {
+    const docId = editingId || slug;
+    await setDoc(doc(db, "blogPosts", docId), data, { merge: true });
+    editingId = docId;
+    $("deleteBtn").style.display = "inline-flex";
+    showToast(status === "published" ? "Published ✓" : "Draft saved ✓");
+    await loadPosts();
+  } catch (err) {
+    console.error(err);
+    showToast("Couldn't save — check your connection and Firestore rules.");
+  }
+}
+
+$("deleteBtn").addEventListener("click", async () => {
+  if (!editingId) return;
+  if (!confirm("Delete this post? This can't be undone.")) return;
+  try {
+    await deleteDoc(doc(db, "blogPosts", editingId));
+    showToast("Post deleted");
+    editingId = null;
+    await loadPosts();
+    showDashboard();
+  } catch (err) {
+    console.error(err);
+    showToast("Couldn't delete post.");
+  }
+});
+
+function showToast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("show"), 2600);
+}
+</script>
+</body>
+</html>
