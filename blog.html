@@ -7,22 +7,22 @@
 <meta name="description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="author" content="FriendHub">
-<link rel="canonical" href="https://friendhub.space/blog.html">
+<link rel="canonical" href="https://www.friendhub.space/blog">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FriendHub">
 <meta property="og:title" content="FriendHub Blog — Video Chat Tips, Safety & Updates">
 <meta property="og:description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
-<meta property="og:url" content="https://friendhub.space/blog.html">
-<meta property="og:image" content="https://friendhub.space/og-image.png">
+<meta property="og:url" content="https://www.friendhub.space/blog">
+<meta property="og:image" content="https://www.friendhub.space/og-image.png">
 <meta property="og:locale" content="en_US">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="FriendHub Blog — Video Chat Tips, Safety & Updates">
 <meta name="twitter:description" content="Guides, safety tips, and updates from FriendHub.">
-<meta name="twitter:image" content="https://friendhub.space/og-image.png">
+<meta name="twitter:image" content="https://www.friendhub.space/og-image.png">
 
 <!-- Structured data: Blog -->
 <script type="application/ld+json">
@@ -30,12 +30,12 @@
   "@context": "https://schema.org",
   "@type": "Blog",
   "name": "FriendHub Blog",
-  "url": "https://friendhub.space/blog.html",
+  "url": "https://www.friendhub.space/blog",
   "description": "Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.",
   "publisher": {
     "@type": "Organization",
     "name": "FriendHub",
-    "url": "https://friendhub.space/"
+    "url": "https://www.friendhub.space/"
   }
 }
 </script>
@@ -46,8 +46,8 @@
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://friendhub.space/" },
-    { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://friendhub.space/blog.html" }
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.friendhub.space/" },
+    { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.friendhub.space/blog" }
   ]
 }
 </script>
@@ -187,7 +187,7 @@
 
 <nav class="topnav">
   <div class="topnav-inner">
-    <a class="brand" href="index.html">
+    <a class="brand" href="/">
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
           <linearGradient id="blogLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -202,7 +202,7 @@
       </svg>
       <span>Friend<em>Hub</em></span>
     </a>
-    <a href="index.html" class="back">
+    <a href="/" class="back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Back to app
     </a>
@@ -223,7 +223,7 @@
   <noscript>
     <p style="color:var(--muted);text-align:center;padding:40px 20px;">
       This page needs JavaScript enabled to load blog posts. Please enable JavaScript in your browser, or
-      <a href="index.html" style="color:var(--mint);">return to the FriendHub homepage</a>.
+      <a href="/" style="color:var(--mint);">return to the FriendHub homepage</a>.
     </p>
   </noscript>
 </main>
@@ -284,7 +284,7 @@ async function loadPosts() {
       const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("");
       return `
         <article>
-        <a class="card" href="blog-post.html?slug=${encodeURIComponent(p.slug)}">
+        <a class="card" href="/blog-post?slug=${encodeURIComponent(p.slug)}">
           <span class="accent-bar"></span>
           ${cover}
           <div class="card-body">
@@ -310,7 +310,7 @@ async function loadPosts() {
       "itemListElement": posts.map((p, i) => ({
         "@type": "ListItem",
         "position": i + 1,
-        "url": `https://friendhub.space/blog-post.html?slug=${encodeURIComponent(p.slug)}`,
+        "url": `https://www.friendhub.space/blog-post?slug=${encodeURIComponent(p.slug)}`,
         "name": p.title
       }))
     };
