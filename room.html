@@ -201,7 +201,8 @@
     padding:8px 10px; margin-bottom:8px;
   }
   .attach-preview.show{ display:flex; }
-  .attach-preview img{ width:44px; height:44px; border-radius:7px; object-fit:cover; flex:none; }
+  .attach-preview img{ width:44px; height:44px; border-radius:7px; object-fit:cover; flex:none; background:var(--void); }
+  .attach-preview img.broken{ visibility:hidden; }
   .attach-preview .apname{ flex:1 1 auto; min-width:0; font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .attach-preview .apremove{
     flex:none; width:24px; height:24px; border-radius:7px; border:none;
@@ -741,13 +742,22 @@
   fileInput.addEventListener('change', () => {
     const file = fileInput.files && fileInput.files[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
+    // Some browsers/OS pickers (iPhone HEIC, some cloud pickers) report an
+    // empty or unrecognized MIME type even for real images. The <input
+    // accept="image/*"> already filters the picker itself, so only block
+    // when we positively know it's a non-image type — never on "unknown".
+    const looksNonImage = file.type && !file.type.startsWith('image/');
+    const extOk = /\.(jpe?g|png|gif|webp|heic|heif|bmp|svg|avif)$/i.test(file.name || '');
+    if (looksNonImage && !extOk) {
       fileInput.value = '';
+      alert('That file doesn\'t look like an image. Please choose a photo (JPG, PNG, GIF, WEBP, HEIC…).');
       return;
     }
     if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
     pendingFile = file;
     pendingPreviewUrl = URL.createObjectURL(file);
+    attachThumb.classList.remove('broken');
+    attachThumb.onerror = () => { attachThumb.classList.add('broken'); }; // HEIC etc. may not preview in-browser; name still shows
     attachThumb.src = pendingPreviewUrl;
     attachName.textContent = file.name;
     attachPreview.classList.add('show');
