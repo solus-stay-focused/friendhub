@@ -1170,6 +1170,7 @@
       <li><a href="#safety">Safety</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a href="/blog">Blog</a></li>
+      <li><a href="/community" id="vcNavCommunityLink">Community Chat</a></li>
     </ul>
     <div class="vcnav-actions">
       <a href="/" class="vcnav-signin" id="vcNavSignIn">👤 Sign in</a>
@@ -1200,8 +1201,8 @@
       <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
       <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
     </svg>
-    <h3>Sign in to FriendHub</h3>
-    <p>Create a free account with Google to start meeting new people.</p>
+    <h3 id="vcAuthTitle">Sign in to FriendHub</h3>
+    <p id="vcAuthSubtitle">Create a free account with Google to start meeting new people.</p>
     <button type="button" class="vcauth-google-btn" id="vcAuthGoogleBtn" disabled>
       <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.4c-2.1 1.6-4.8 2.5-7.7 2.5-5.3 0-9.7-3.1-11.3-7.6l-6.7 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.6 5.4C41.9 35.9 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
       Continue with Google
@@ -1699,6 +1700,7 @@
         <li><a href="/">Home</a></li>
         <li><a href="#top">Features</a></li>
         <li><a href="#safety">Safety</a></li>
+        <li><a href="/community">Community Chat</a></li>
         <li><a href="/blog">Blog</a></li>
         <li><a href="/">About</a></li>
         <li><a href="/support">Support</a></li>
@@ -2053,6 +2055,7 @@
   const navName = document.getElementById('vcNavName');
   const navAccountMenu = document.getElementById('vcNavAccountMenu');
   const navSignOutBtn = document.getElementById('vcNavSignOutBtn');
+  const navCommunityLink = document.getElementById('vcNavCommunityLink');
 
   // ---- state ----
   let myUid = null;
@@ -2111,14 +2114,17 @@
   // Two tiers, on purpose:
   //  - Anonymous auth fires immediately for every visitor. It's *only* used to
   //    give everyone a uid so presence/online-count works for casual browsers,
-  //    matching "no account required" in the marketing copy.
-  //  - Google sign-in is still required to actually start a call, since that's
-  //    where we collect the 18+ / community-rules confirmation. The header UI
-  //    and account chip only reflect real (non-anonymous) sign-in.
+  //    matching "no account required" in the marketing copy, and to let people
+  //    browse the marketing/info section freely.
+  //  - Google sign-in is still required to actually start a call or open
+  //    Community Chat, since that's where we collect the 18+ / community-rules
+  //    confirmation. The header UI and account chip only reflect real
+  //    (non-anonymous) sign-in.
   let authReady = false;
   let authReadyResolve;
   const authReadyPromise = new Promise((res) => { authReadyResolve = res; });
   let signingInAnon = false;
+  let pendingCommunityRedirect = false; // true while the overlay is open specifically to gate Community Chat
 
   auth.onAuthStateChanged((user) => {
     if (user) {
@@ -2135,6 +2141,10 @@
         }, { merge: true }).catch((err) => console.error('user profile write failed:', err));
         renderSignedIn(user);
         closeAuthOverlay();
+        if (pendingCommunityRedirect) {
+          pendingCommunityRedirect = false;
+          window.location.href = '/community';
+        }
       } else {
         renderSignedOut();
       }
@@ -2176,6 +2186,7 @@
   }
   function closeAuthOverlay(){
     authOverlay.classList.remove('open');
+    pendingCommunityRedirect = false;
   }
 
   authAgeCheck.addEventListener('change', () => {
@@ -2202,7 +2213,8 @@
       } else {
         await auth.signInWithPopup(googleProvider);
       }
-      // onAuthStateChanged handles the rest (closes overlay, updates header).
+      // onAuthStateChanged handles the rest (closes overlay, updates header,
+      // and redirects to /community if that's what triggered the overlay).
     } catch (err) {
       console.error('Google sign-in failed:', err);
       const code = err && err.code ? err.code : '';
@@ -2229,6 +2241,22 @@
     auth.signOut();
   });
 
+  // ---- Community Chat nav link: same sign-in gate as Start, before navigating away ----
+  if (navCommunityLink) {
+    navCommunityLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!authReady) await authReadyPromise;
+      if (myUid && myUser && !myUser.isAnonymous) {
+        window.location.href = '/community';
+        return;
+      }
+      pendingCommunityRedirect = true;
+      document.getElementById('vcAuthTitle').textContent = 'Sign in to join Community Chat';
+      document.getElementById('vcAuthSubtitle').textContent = 'Create a free account with Google to join the community conversation.';
+      openAuthOverlay();
+    });
+  }
+
   // Waits until we know the auth state, then makes sure a *real* (non-anonymous)
   // Google account is signed in before letting them into matching/calling —
   // prompts the sign-in overlay instead of silently letting anonymous auth
@@ -2237,7 +2265,11 @@
     if (promptOnMissing === undefined) promptOnMissing = true;
     if (!authReady) await authReadyPromise;
     if (myUid && myUser && !myUser.isAnonymous) return myUid;
-    if (promptOnMissing) openAuthOverlay();
+    if (promptOnMissing) {
+      document.getElementById('vcAuthTitle').textContent = 'Sign in to FriendHub';
+      document.getElementById('vcAuthSubtitle').textContent = 'Create a free account with Google to start meeting new people.';
+      openAuthOverlay();
+    }
     throw new Error('sign-in-required');
   }
 
