@@ -631,6 +631,47 @@
   }
   .vcnav-links a:hover{ color:#fff; }
   .vcnav-links a.active{ color:#fff; border-color:var(--hp-blue-light); }
+
+  /* ---- special "Community Chat" nav pill: distinct gradient + live pulse ---- */
+  .vcnav-links li.vcnav-community-item{ display:flex; align-items:center; }
+  .vcnav-links a.vcnav-community{
+    display:inline-flex; align-items:center; gap:7px;
+    color:#fff !important;
+    font-weight:600;
+    padding:7px 14px 7px 11px;
+    border:1px solid transparent;
+    border-radius:999px;
+    background:
+      linear-gradient(#0B0C1E,#0B0C1E) padding-box,
+      linear-gradient(120deg,#FF6B5B,#9C8CFB 55%,#5EEAD4) border-box;
+    position:relative;
+    overflow:hidden;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .vcnav-links a.vcnav-community::before{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(120deg, rgba(255,107,91,0.22), rgba(156,140,251,0.22) 55%, rgba(94,234,212,0.22));
+    opacity:0.9;
+  }
+  .vcnav-links a.vcnav-community:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 20px -6px rgba(156,140,251,0.55);
+  }
+  .vcnav-links a.vcnav-community .vcnav-community-label{ position:relative; z-index:1; }
+  .vcnav-links a.vcnav-community .vcnav-community-dot{
+    position:relative; z-index:1;
+    width:7px; height:7px; border-radius:50%;
+    background:#5EEAD4;
+    box-shadow:0 0 0 0 rgba(94,234,212,0.6);
+    animation:vcnav-community-pulse 1.8s ease-out infinite;
+    flex:none;
+  }
+  @keyframes vcnav-community-pulse{
+    0%{ box-shadow:0 0 0 0 rgba(94,234,212,0.55); }
+    70%{ box-shadow:0 0 0 7px rgba(94,234,212,0); }
+    100%{ box-shadow:0 0 0 0 rgba(94,234,212,0); }
+  }
   .vcnav-actions{ display:flex; align-items:center; gap:12px; }
   .vcnav-signin{
     display:inline-flex; align-items:center; gap:8px;
@@ -1201,7 +1242,7 @@
       <li><a href="#safety">Safety</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a href="/blog">Blog</a></li>
-      <li><a href="/community" id="vcNavCommunityLink">Community Chat</a></li>
+      <li class="vcnav-community-item"><a href="/community" id="vcNavCommunityLink" class="vcnav-community"><span class="vcnav-community-dot"></span><span class="vcnav-community-label">Community Chat</span></a></li>
     </ul>
     <div class="vcnav-actions">
       <a href="/" class="vcnav-signin" id="vcNavSignIn">👤 Sign in</a>
