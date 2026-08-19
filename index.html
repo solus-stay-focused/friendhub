@@ -113,7 +113,7 @@
   }
   .vcbox-logo span em{
     font-style:normal;
-    background:linear-gradient(90deg,#9C8CFB,#5EEAD4);
+    background:linear-gradient(90deg,#5E9EFF,#5EEAD4);
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
 
@@ -248,7 +248,7 @@
   }
   .vcbox-ph-icon svg{ width:32px; height:32px; flex:none; }
   .vcbox-ph-icon.mint{ color:var(--mint); background:rgba(94,234,212,0.08); }
-  .vcbox-ph-icon.violet{ color:#9C8CFB; background:rgba(139,124,246,0.1); }
+  .vcbox-ph-icon.violet{ color:#5E9EFF; background:rgba(76,141,255,0.1); }
   .vcbox-ph-idle h3, .vcbox-half .vcbox-placeholder h3{
     margin:0; font-family:'Space Grotesk','Poppins',sans-serif;
     font-size:19px; font-weight:700; color:var(--paper);
@@ -272,8 +272,8 @@
     box-shadow:0 10px 22px rgba(47,191,138,0.25);
   }
   .vcbox-ph-btn.violet{
-    background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff;
-    box-shadow:0 10px 22px rgba(81,66,196,0.35);
+    background:linear-gradient(135deg,#4C8DFF,#1E4FD8); color:#fff;
+    box-shadow:0 10px 22px rgba(30,79,216,0.35);
   }
   .vcbox-ph-skip{
     font-size:12.5px; color:rgba(237,231,218,0.55);
@@ -351,16 +351,16 @@
     font-family:'Inter',sans-serif;
     appearance:none; -webkit-appearance:none;
     cursor:pointer;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235E9EFF'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat;
     background-position:right 14px center;
     transition:border-color .15s ease;
   }
-  .vcselect-wrap select:hover{ border-color:rgba(156,140,251,0.45); }
+  .vcselect-wrap select:hover{ border-color:rgba(94,158,255,0.45); }
   .vcselect-wrap select option{ background:var(--void); color:var(--paper); }
   .vcselect-wrap .vcselect-icon{
     position:absolute; left:14px; top:50%; transform:translateY(-50%);
-    width:18px; height:18px; color:#9C8CFB; pointer-events:none; z-index:1;
+    width:18px; height:18px; color:#5E9EFF; pointer-events:none; z-index:1;
   }
   .vcselect-wrap .vcselect-icon svg{ width:100%; height:100%; display:block; }
   .vcselect-wrap .vcselect-icon img{
@@ -394,20 +394,20 @@
     content:'';
     position:absolute; right:14px; top:50%; transform:translateY(-50%);
     width:10px; height:10px;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235E9EFF'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat; background-size:contain;
   }
   .vcselect-btn:hover{ border-color:rgba(94,234,212,0.4); }
 
   /* ---------- custom "I am" gender dropdown ---------- */
   .vcgender-wrap{ position:relative; }
-  .vcgender-wrap.open .vcselect-btn{ border-color:rgba(156,140,251,0.5); }
+  .vcgender-wrap.open .vcselect-btn{ border-color:rgba(94,158,255,0.5); }
   .vcgender-wrap.open .vcselect-btn::after{ transform:translateY(-50%) rotate(180deg); }
 
   .vcgender-panel{
     position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:30;
     background:var(--void);
-    border:1px solid rgba(156,140,251,0.35);
+    border:1px solid rgba(94,158,255,0.35);
     border-radius:16px;
     overflow:hidden;
     box-shadow:0 18px 44px rgba(0,0,0,0.5);
@@ -427,7 +427,7 @@
   }
   .vcgender-item:hover{ background:rgba(237,231,218,0.06); }
   .vcgender-item .vcgender-item-icon{
-    flex:none; width:20px; height:20px; color:#9C8CFB;
+    flex:none; width:20px; height:20px; color:#5E9EFF;
     display:flex; align-items:center; justify-content:center;
     font-size:17px; line-height:1;
   }
@@ -437,7 +437,7 @@
     opacity:0; flex:none;
   }
   .vcgender-item.selected{
-    background:linear-gradient(135deg,#7A68E8,#5142C4);
+    background:linear-gradient(135deg,#2F6FE0,#1E4FD8);
     color:#fff;
   }
   .vcgender-item.selected .vcgender-item-icon{ color:#fff; }
@@ -485,7 +485,7 @@
     display:flex; align-items:center; justify-content:space-between;
   }
   .vcapp-chat-head span.rules{
-    color:#8B7CF6;
+    color:#4C8DFF;
     font-weight:500;
     font-size:13px;
     cursor:pointer;
@@ -543,13 +543,13 @@
     font-size:14px;
   }
   .vcapp-chat-input input::placeholder{ color:rgba(237,231,218,0.35); }
-  .vcapp-chat-input input:focus{ outline:none; border-color:#7A68E8; }
+  .vcapp-chat-input input:focus{ outline:none; border-color:#2F6FE0; }
   .vcapp-chat-input button{
     flex:none;
     display:flex;
     align-items:center;
     gap:8px;
-    background:linear-gradient(135deg,#8B7CF6,#5142C4);
+    background:linear-gradient(135deg,#4C8DFF,#1E4FD8);
     color:#fff;
     border:none;
     border-radius:10px;
@@ -559,7 +559,7 @@
     font-weight:600;
     font-size:14.5px;
     cursor:pointer;
-    box-shadow:0 4px 14px rgba(81,66,196,0.35);
+    box-shadow:0 4px 14px rgba(30,79,216,0.35);
     transition:filter .15s ease, transform .15s ease;
   }
   .vcapp-chat-input button:hover{ filter:brightness(1.08); }
@@ -570,9 +570,9 @@
      Top nav — dark "FriendHub" marketing design system.
   ============================================================= */
   .vcnav{
-    --hp-blue:#6C5CE7;
-    --hp-blue-light:#9C8CFB;
-    --hp-blue-deep:#5142C4;
+    --hp-blue:#3B7BFF;
+    --hp-blue-light:#5E9EFF;
+    --hp-blue-deep:#1E4FD8;
     --hp-navy:#0B0C1E;
     background:rgba(11,12,30,0.92);
     backdrop-filter:blur(10px);
@@ -644,7 +644,7 @@
     border-radius:999px;
     background:
       linear-gradient(#0B0C1E,#0B0C1E) padding-box,
-      linear-gradient(120deg,#FF6B5B,#9C8CFB 55%,#5EEAD4) border-box;
+      linear-gradient(120deg,#FF6B5B,#5E9EFF 55%,#5EEAD4) border-box;
     position:relative;
     overflow:hidden;
     transition:transform .15s ease, box-shadow .2s ease;
@@ -652,12 +652,12 @@
   .vcnav-links a.vcnav-community::before{
     content:'';
     position:absolute; inset:0;
-    background:linear-gradient(120deg, rgba(255,107,91,0.22), rgba(156,140,251,0.22) 55%, rgba(94,234,212,0.22));
+    background:linear-gradient(120deg, rgba(255,107,91,0.22), rgba(94,158,255,0.22) 55%, rgba(94,234,212,0.22));
     opacity:0.9;
   }
   .vcnav-links a.vcnav-community:hover{
     transform:translateY(-1px);
-    box-shadow:0 8px 20px -6px rgba(156,140,251,0.55);
+    box-shadow:0 8px 20px -6px rgba(94,158,255,0.55);
   }
   .vcnav-links a.vcnav-community .vcnav-community-label{ position:relative; z-index:1; }
   .vcnav-links a.vcnav-community .vcnav-community-dot{
@@ -687,10 +687,10 @@
     background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
     color:#fff; border:none; border-radius:10px; padding:10px 20px;
     font-size:14px; font-weight:600; font-family:'Inter',sans-serif; text-decoration:none;
-    cursor:pointer; box-shadow:0 10px 24px rgba(108,92,231,0.35);
+    cursor:pointer; box-shadow:0 10px 24px rgba(59,123,255,0.35);
     transition:transform .15s ease, box-shadow .2s ease;
   }
-  .vcnav-getstarted:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(108,92,231,0.45); }
+  .vcnav-getstarted:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(59,123,255,0.45); }
   @media (max-width:900px){
     .vcnav-links{ display:none; }
     .vcnav-signin{ display:none; }
@@ -702,9 +702,9 @@
      on a deep navy background, matching the reference screenshot.
   ============================================================= */
   .vcinfo{
-    --hp-blue:#6C5CE7;
-    --hp-blue-light:#9C8CFB;
-    --hp-blue-deep:#5142C4;
+    --hp-blue:#3B7BFF;
+    --hp-blue-light:#5E9EFF;
+    --hp-blue-deep:#1E4FD8;
     --hp-black:#05060B;
     --hp-bg:#0B0C1E;
     --hp-card:rgba(255,255,255,0.05);
@@ -776,9 +776,9 @@
   }
   .vcinfo-btn-primary{
     background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
-    color:#fff; box-shadow:0 10px 24px rgba(108,92,231,0.32);
+    color:#fff; box-shadow:0 10px 24px rgba(59,123,255,0.32);
   }
-  .vcinfo-btn-primary:hover{ transform:translateY(-1px); box-shadow:0 14px 28px rgba(108,92,231,0.42); }
+  .vcinfo-btn-primary:hover{ transform:translateY(-1px); box-shadow:0 14px 28px rgba(59,123,255,0.42); }
   .vcinfo-btn-outline{
     background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.18);
   }
@@ -792,7 +792,7 @@
     background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); color:var(--ink);
     border-radius:999px; padding:9px 34px 9px 16px; font-size:13.5px; font-weight:500;
     font-family:'Inter',sans-serif; appearance:none; -webkit-appearance:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235E9EFF'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat; background-position:right 12px center;
   }
   .vcinfo-country-btn{
@@ -804,7 +804,7 @@
     content:'';
     position:absolute; right:14px; top:50%; transform:translateY(-50%);
     width:10px; height:10px;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239C8CFB'><path d='M5 8l5 5 5-5H5z'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235E9EFF'><path d='M5 8l5 5 5-5H5z'/></svg>");
     background-repeat:no-repeat; background-size:contain;
   }
   .vcinfo-country-btn:hover{ border-color:rgba(255,255,255,0.3); }
@@ -841,7 +841,7 @@
     position:relative; width:100%; cursor:grab;
     border-radius:20px; overflow:hidden; aspect-ratio:16/11;
     background:linear-gradient(160deg,#2E2A57,#171735);
-    box-shadow:0 30px 60px -25px rgba(108,92,231,0.4), 0 10px 24px rgba(5,6,11,0.2);
+    box-shadow:0 30px 60px -25px rgba(59,123,255,0.4), 0 10px 24px rgba(5,6,11,0.2);
     touch-action:pan-y;
     user-select:none;
   }
@@ -924,7 +924,7 @@
   .vcinfo-feature{ display:flex; align-items:flex-start; gap:12px; }
   .vcinfo-feature .ico{
     flex:none; width:40px; height:40px; border-radius:11px;
-    background:var(--hp-card); border:1px solid rgba(108,92,231,0.22);
+    background:var(--hp-card); border:1px solid rgba(59,123,255,0.22);
     display:flex; align-items:center; justify-content:center;
     color:var(--hp-blue-light); font-size:17px;
   }
@@ -974,7 +974,7 @@
   .vcinfo-safety-list li{ display:flex; gap:14px; align-items:flex-start; font-size:14px; line-height:1.55; color:rgba(255,255,255,0.6); }
   .vcinfo-safety-list .ico{
     flex:none; width:32px; height:32px; border-radius:9px;
-    background:rgba(108,92,231,0.15); border:1px solid rgba(108,92,231,0.4);
+    background:rgba(59,123,255,0.15); border:1px solid rgba(59,123,255,0.4);
     display:flex; align-items:center; justify-content:center;
     color:var(--hp-blue-light); font-family:'IBM Plex Mono',monospace; font-size:12px;
   }
@@ -1032,7 +1032,7 @@
     transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
   }
   .vcfoot-social a:hover{
-    background:rgba(108,92,231,0.18); border-color:rgba(108,92,231,0.4);
+    background:rgba(59,123,255,0.18); border-color:rgba(59,123,255,0.4);
     color:#fff; transform:translateY(-2px);
   }
   .vcfoot-social a svg{ width:17px; height:17px; }
@@ -1193,9 +1193,9 @@
     text-align:left;
     transition:background .15s ease, border-color .15s ease;
   }
-  .vc-country-item:hover{ background:rgba(237,231,218,0.1); border-color:rgba(156,140,251,0.4); }
+  .vc-country-item:hover{ background:rgba(237,231,218,0.1); border-color:rgba(94,158,255,0.4); }
   .vc-country-item.selected{
-    background:linear-gradient(135deg,#7A68E8,#5142C4);
+    background:linear-gradient(135deg,#2F6FE0,#1E4FD8);
     border-color:transparent;
     color:#fff;
   }
@@ -1208,7 +1208,7 @@
   }
   .vc-country-item .flag img{ width:100%; height:100%; object-fit:cover; display:block; }
   .vc-country-item .flag .flag-fallback{
-    font-size:9px; font-weight:700; color:#9C8CFB;
+    font-size:9px; font-weight:700; color:#5E9EFF;
   }
   .vc-country-item .label{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   @media (max-width:520px){
@@ -1225,8 +1225,8 @@
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient id="vcnavLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#9C8CFB"/>
-          <stop offset="100%" stop-color="#5142C4"/>
+          <stop offset="0%" stop-color="#5E9EFF"/>
+          <stop offset="100%" stop-color="#1E4FD8"/>
         </linearGradient>
       </defs>
       <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcnavLogoGrad)"/>
@@ -1265,8 +1265,8 @@
     <svg class="vcauth-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient id="vcauthLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#9C8CFB"/>
-          <stop offset="100%" stop-color="#5142C4"/>
+          <stop offset="0%" stop-color="#5E9EFF"/>
+          <stop offset="100%" stop-color="#1E4FD8"/>
         </linearGradient>
       </defs>
       <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcauthLogoGrad)"/>
@@ -1295,8 +1295,8 @@
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="vcboxLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#9C8CFB"/>
-              <stop offset="100%" stop-color="#5142C4"/>
+              <stop offset="0%" stop-color="#5E9EFF"/>
+              <stop offset="100%" stop-color="#1E4FD8"/>
             </linearGradient>
           </defs>
           <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcboxLogoGrad)"/>
@@ -1405,7 +1405,7 @@
         <button type="button" class="vcselect-btn" id="vcHeaderCountryBtn" aria-haspopup="dialog" aria-label="Match by country" onclick="openCountryModal('header')" style="padding-left:40px;">Any country</button>
       </div>
       <div class="vcselect-wrap vcgender-wrap" id="vcGenderWrap">
-        <span class="vcselect-icon" aria-hidden="true" id="vcGenderIcon" style="color:#9C8CFB;">🙂</span>
+        <span class="vcselect-icon" aria-hidden="true" id="vcGenderIcon" style="color:#5E9EFF;">🙂</span>
         <button type="button" class="vcselect-btn" id="vcGenderBtn" aria-haspopup="listbox" aria-expanded="false" onclick="toggleGenderPanel()" style="padding-left:40px;">
           <span id="vcGenderLabel">I am…</span>
         </button>
@@ -1736,8 +1736,8 @@
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="vcfootLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#9C8CFB"/>
-              <stop offset="100%" stop-color="#5142C4"/>
+              <stop offset="0%" stop-color="#5E9EFF"/>
+              <stop offset="100%" stop-color="#1E4FD8"/>
             </linearGradient>
           </defs>
           <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcfootLogoGrad)"/>
@@ -2242,7 +2242,7 @@
     navSignIn.style.display = 'none';
     navGetStarted.style.display = 'none';
     navAccount.classList.add('show');
-    navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
+    navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=1E4FD8&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
     navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
   }
   function renderSignedOut(){
