@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community — FriendHub</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --void:#14152B;
+    --void-deep:#0D0E1F;
+    --hp-black:#05060B;
+    --paper:#EDE7DA;
+    --mint:#5EEAD4;
+    --coral:#FF6B5B;
+    --violet:#9C8CFB;
+    --violet-deep:#5142C4;
+    --gold:#FFB84D;
+    --line:rgba(237,231,218,0.14);
+    --card:rgba(255,255,255,0.05);
+    --card-border:rgba(255,255,255,0.09);
+    --ink-soft:rgba(245,244,251,0.62);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--void-deep); }
+  body{
+    font-family:'Inter',sans-serif;
+    color:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em; }
+  a{ color:inherit; text-decoration:none; }
+
+  /* ---------- nav (matches index) ---------- */
+  .cnav{
+    background:rgba(11,12,30,0.92);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    position:sticky; top:0; z-index:50;
+  }
+  .cnav-inner{
+    max-width:1400px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 6vw;
+  }
+  .cnav-brand{ display:flex; align-items:center; gap:10px; }
+  .cnav-brand svg{ width:30px; height:30px; flex:none; }
+  .cnav-brand span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; color:#fff; }
+  .cnav-brand span em{ font-style:normal; color:var(--violet); }
+  .cnav-links{ display:flex; align-items:center; gap:34px; list-style:none; margin:0; padding:0; }
+  .cnav-links a{
+    color:rgba(255,255,255,0.72); font-size:14.5px; font-weight:500;
+    padding-bottom:4px; border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .cnav-links a:hover{ color:#fff; }
+  .cnav-links a.active{ color:#fff; border-color:var(--violet); }
+  .cnav-account{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+    padding:5px 12px 5px 5px; border-radius:999px; font-size:13px;
+  }
+  .cnav-account img{ width:24px; height:24px; border-radius:50%; }
+  @media (max-width:900px){ .cnav-links{ display:none; } }
+
+  /* ---------- intro ---------- */
+  .cintro{ padding:72px 6vw 48px; max-width:1180px; margin:0 auto; }
+  .cintro-eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-weight:600; font-size:12.5px; color:#fff;
+    background:var(--card); border:1px solid var(--card-border);
+    border-radius:999px; padding:7px 15px; margin-bottom:20px;
+  }
+  .cintro h1{ font-size:clamp(30px,3.8vw,46px); line-height:1.1; max-width:640px; }
+  .cintro h1 em{
+    font-style:normal;
+    background:linear-gradient(135deg,var(--violet),var(--violet-deep));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .cintro p{ font-size:16px; line-height:1.6; color:var(--ink-soft); max-width:560px; margin:16px 0 0; }
+
+  .csearch-row{
+    display:flex; gap:12px; margin-top:32px; max-width:520px; flex-wrap:wrap;
+  }
+  .csearch-input{
+    flex:1 1 260px;
+    background:var(--card); border:1px solid var(--card-border); color:var(--paper);
+    border-radius:12px; padding:13px 18px; font-family:inherit; font-size:14px;
+  }
+  .csearch-input::placeholder{ color:rgba(237,231,218,0.4); }
+  .csearch-input:focus{ outline:none; border-color:var(--violet); }
+
+  /* ---------- grid ---------- */
+  .cgrid-wrap{ padding:8px 6vw 100px; max-width:1180px; margin:0 auto; }
+  .cgrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:16px;
+  }
+  .ccard{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:18px;
+    padding:22px 20px;
+    display:flex; flex-direction:column; gap:14px;
+    cursor:pointer;
+    transition:transform .18s ease, border-color .18s ease, background .18s ease;
+    overflow:hidden;
+  }
+  .ccard::before{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(120px 90px at 85% -10%, var(--glow, rgba(156,140,251,0.25)), transparent 70%);
+    opacity:0; transition:opacity .25s ease;
+    pointer-events:none;
+  }
+  .ccard:hover{ transform:translateY(-3px); border-color:rgba(255,255,255,0.22); background:rgba(255,255,255,0.07); }
+  .ccard:hover::before{ opacity:1; }
+  .ccard-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .ccard-icon{
+    flex:none; width:44px; height:44px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:21px;
+    background:var(--tint, rgba(156,140,251,0.14));
+    border:1px solid var(--tint-border, rgba(156,140,251,0.32));
+  }
+  .ccard-online{
+    display:flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--mint);
+    background:rgba(94,234,212,0.08); border:1px solid rgba(94,234,212,0.22);
+    border-radius:999px; padding:4px 9px; white-space:nowrap;
+  }
+  .ccard-online .dot{ width:6px; height:6px; border-radius:50%; background:var(--mint); }
+  .ccard h3{ font-size:17px; color:#fff; }
+  .ccard p{ font-size:13px; line-height:1.5; color:var(--ink-soft); margin:0; }
+  .ccard-enter{
+    margin-top:auto;
+    display:flex; align-items:center; gap:6px;
+    font-size:12.5px; font-weight:600; color:var(--violet);
+  }
+  .ccard-enter svg{ width:13px; height:13px; transition:transform .15s ease; }
+  .ccard:hover .ccard-enter svg{ transform:translateX(3px); }
+
+  .cgrid-empty{
+    display:none;
+    text-align:center; padding:60px 20px; color:var(--ink-soft); font-size:14px;
+  }
+  .cgrid-empty.show{ display:block; }
+
+  /* ---------- footer strip ---------- */
+  .cfoot{
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding:26px 6vw;
+    text-align:center;
+    font-size:12.5px;
+    color:rgba(255,255,255,0.35);
+  }
+</style>
+</head>
+<body>
+
+<nav class="cnav">
+  <div class="cnav-inner">
+    <a class="cnav-brand" href="/">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="cnavLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#9C8CFB"/>
+            <stop offset="100%" stop-color="#5142C4"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#cnavLogoGrad)"/>
+        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+      </svg>
+      <span>Friend<em>Hub</em></span>
+    </a>
+    <ul class="cnav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/">About</a></li>
+      <li><a href="/#safety">Safety</a></li>
+      <li><a href="/community" class="active">Community Chat</a></li>
+      <li><a href="/#faq">FAQ</a></li>
+      <li><a href="/blog">Blog</a></li>
+    </ul>
+    <div class="cnav-account" id="cNavAccount" style="display:none;">
+      <img id="cNavAvatar" src="" alt="">
+      <span id="cNavName"></span>
+    </div>
+  </div>
+</nav>
+
+<section class="cintro">
+  <span class="cintro-eyebrow">👥 20 rooms, one topic each</span>
+  <h1>Find <em>your</em> people, not just a random one.</h1>
+  <p>Every room here is a live group chat around one topic. Drop in, talk shop, ask questions, or just lurk — no video required unless you want it.</p>
+  <div class="csearch-row">
+    <input type="text" class="csearch-input" id="cSearchInput" placeholder="Search communities… (e.g. coding, fitness)">
+  </div>
+</section>
+
+<div class="cgrid-wrap">
+  <div class="cgrid" id="cGrid"></div>
+  <div class="cgrid-empty" id="cGridEmpty">No communities match “<span id="cGridEmptyTerm"></span>.” Try a different word.</div>
+</div>
+
+<div class="cfoot">FriendHub © 2026 — Community rooms are moderated. Be kind, keep it legal, keep it 18+.</div>
+
+<script>
+  // Each community maps to a slug used for the room URL (e.g. /community/room.html?topic=cooking),
+  // an icon, a short one-line description, and a tint pair for the card accent.
+  const COMMUNITIES = [
+    { slug:"cooking",       name:"Cooking",            icon:"🍳", desc:"Recipes, techniques, and what's for dinner tonight.",      tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"sports",        name:"Sports",             icon:"⚽", desc:"Scores, highlights, and hot takes on every league.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"business",      name:"Business",           icon:"💼", desc:"Strategy, operations, and running a company day to day.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"learning",      name:"Learning",           icon:"📚", desc:"Study tips, courses, and figuring things out together.",  tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"coding",        name:"Coding",             icon:"💻", desc:"Debugging, side projects, and language wars.",            tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"startups",      name:"Startups",           icon:"🚀", desc:"Building, fundraising, and shipping v1.",                 tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"music",         name:"Music",              icon:"🎵", desc:"New releases, production, and playlist swaps.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"movies-tv",     name:"Movies & TV",        icon:"🎬", desc:"What to watch next, and spoiler-free discussion.",        tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"gaming",        name:"Gaming",             icon:"🎮", desc:"Squad-up chat, patch notes, and what you're grinding.",   tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"travel",        name:"Travel",             icon:"✈️", desc:"Trip planning, hidden gems, and flight-deal alerts.",     tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"fitness",       name:"Fitness",            icon:"🏋️", desc:"Training plans, form checks, and accountability.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"photography",   name:"Photography",        icon:"📷", desc:"Gear talk, edits, and critique welcome.",                 tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"art-design",    name:"Art & Design",       icon:"🎨", desc:"Sketches, feedback, and design process chat.",            tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"books",         name:"Books",              icon:"📖", desc:"What you're reading and what's worth the hype.",         tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"finance",       name:"Finance & Investing",icon:"💰", desc:"Markets, budgeting, and long-term money talk.",           tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"science",       name:"Science",            icon:"🔬", desc:"New research, weird facts, and honest questions.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"mental-health", name:"Mental Health",      icon:"🧠", desc:"Supportive, judgment-free peer conversation.",            tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"parenting",     name:"Parenting",          icon:"👶", desc:"Trading notes on the hardest job with no manual.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"pets-animals",  name:"Pets & Animals",     icon:"🐾", desc:"Show off your pet, ask for advice, swap stories.",        tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"relationships", name:"Relationships & Dating", icon:"❤️", desc:"Advice, venting, and modern-dating chaos.",           tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" }
+  ];
+
+  const grid = document.getElementById('cGrid');
+  const emptyState = document.getElementById('cGridEmpty');
+  const emptyTerm = document.getElementById('cGridEmptyTerm');
+  const searchInput = document.getElementById('cSearchInput');
+
+  function cardHTML(c){
+    return (
+      '<a class="ccard" href="/community/room.html?topic=' + encodeURIComponent(c.slug) + '" ' +
+      'style="--tint:' + c.tint + ';--tint-border:' + c.border + ';--glow:' + c.tint + ';">' +
+        '<div class="ccard-top">' +
+          '<div class="ccard-icon">' + c.icon + '</div>' +
+          '<div class="ccard-online" data-slug="' + c.slug + '"><span class="dot"></span><span class="ccard-online-count">—</span></div>' +
+        '</div>' +
+        '<h3>' + c.name + '</h3>' +
+        '<p>' + c.desc + '</p>' +
+        '<div class="ccard-enter">Enter room ' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>' +
+        '</div>' +
+      '</a>'
+    );
+  }
+
+  function renderGrid(list){
+    grid.innerHTML = list.map(cardHTML).join('');
+    emptyState.classList.toggle('show', list.length === 0);
+  }
+
+  renderGrid(COMMUNITIES);
+
+  searchInput.addEventListener('input', () => {
+    const term = searchInput.value.trim().toLowerCase();
+    const filtered = term
+      ? COMMUNITIES.filter(c => c.name.toLowerCase().includes(term) || c.desc.toLowerCase().includes(term))
+      : COMMUNITIES;
+    emptyTerm.textContent = searchInput.value.trim();
+    renderGrid(filtered);
+  });
+</script>
+
+<!-- ============================================================
+  Firebase: reflect signed-in header state + per-room online counts.
+  Reuses the same project as the main FriendHub page.
+============================================================= -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  const firebaseConfig = {
+    apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
+    authDomain: "friendhub-9f934.firebaseapp.com",
+    projectId: "friendhub-9f934",
+    storageBucket: "friendhub-9f934.firebasestorage.app",
+    messagingSenderId: "97544296104",
+    appId: "1:97544296104:web:d7f7d27e86f1af748e949d"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const navAccount = document.getElementById('cNavAccount');
+  const navAvatar = document.getElementById('cNavAvatar');
+  const navName = document.getElementById('cNavName');
+
+  auth.onAuthStateChanged((user) => {
+    if (user && !user.isAnonymous) {
+      navAccount.style.display = 'flex';
+      navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
+      navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
+    } else if (!user) {
+      // No session at all (e.g. direct link, cookies cleared) — bounce to
+      // home so the sign-in gate on the nav link there can do its job,
+      // matching the "browse freely, gate the actions" pattern.
+      window.location.href = '/';
+    }
+  });
+
+  // ---- per-room online counts: presence docs written as /roomPresence/{slug}_{uid} ----
+  // Mirrors the main page's /presence pattern but scoped to a room slug, so
+  // each card can show its own live count without a query per card blowing
+  // up read costs (all read from one collection, filtered client-side).
+  function refreshRoomCounts(){
+    const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - 30000);
+    db.collection('roomPresence').where('updatedAt', '>', cutoff).get().then((snap) => {
+      const counts = {};
+      snap.forEach((doc) => {
+        const slug = doc.data().topic;
+        if (!slug) return;
+        counts[slug] = (counts[slug] || 0) + 1;
+      });
+      document.querySelectorAll('.ccard-online').forEach((el) => {
+        const slug = el.getAttribute('data-slug');
+        const countEl = el.querySelector('.ccard-online-count');
+        countEl.textContent = (counts[slug] || 0).toLocaleString();
+      });
+    }).catch(() => {
+      document.querySelectorAll('.ccard-online-count').forEach((el) => { el.textContent = '—'; });
+    });
+  }
+  refreshRoomCounts();
+  setInterval(refreshRoomCounts, 8000);
+})();
+</script>
+
+</body>
+</html>
