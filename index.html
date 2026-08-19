@@ -592,6 +592,34 @@
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; color:#fff;
   }
   .vcnav-brand span em{ font-style:normal; color:var(--hp-blue-light); }
+  .vcnav-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.vcnav-status{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  background:rgba(94,234,212,0.08);
+  border:1px solid rgba(94,234,212,0.25);
+  border-radius:999px;
+  padding:7px 14px;
+  font-size:12.5px;
+  font-weight:600;
+  color:#5EEAD4;
+  font-family:'Inter',sans-serif;
+  white-space:nowrap;
+}
+.vcnav-status .dot{
+  width:7px; height:7px; border-radius:50%;
+  background:#5EEAD4;
+  box-shadow:0 0 0 3px rgba(94,234,212,0.15);
+  flex:none;
+}
+@media (max-width:640px){
+  .vcnav-status span.label{ display:none; }
+}
   .vcnav-links{
     display:flex; align-items:center; gap:34px;
     list-style:none; margin:0; padding:0;
@@ -1149,21 +1177,24 @@
 
 <nav class="vcnav">
   <div class="vcnav-inner">
-    <a class="vcnav-brand" href="/">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="vcnavLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#9C8CFB"/>
-            <stop offset="100%" stop-color="#5142C4"/>
-          </linearGradient>
-        </defs>
-        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcnavLogoGrad)"/>
-        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
-        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
-        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
-      </svg>
-      <span>Friend<em>Hub</em></span>
-    </a>
+    <div class="vcnav-left">
+  <span class="vcnav-status"><span class="dot"></span><span id="vcNavOnlineCount">…</span><span class="label">&nbsp;active</span></span>
+  <a class="vcnav-brand" href="/">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="vcnavLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#9C8CFB"/>
+          <stop offset="100%" stop-color="#5142C4"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcnavLogoGrad)"/>
+      <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+      <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+      <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+    </svg>
+    <span>Friend<em>Hub</em></span>
+  </a>
+</div>
     <ul class="vcnav-links">
       <li><a href="/" class="active">Home</a></li>
       <li><a href="/">About</a></li>
@@ -2039,6 +2070,7 @@
   const onlineCountEl = document.getElementById('vcOnlineCount');
   const onlineDebugEl = document.getElementById('vcOnlineDebug');
   const infoOnlineCountEl = document.getElementById('vcInfoOnlineCount');
+  const navOnlineCountEl = document.getElementById('vcNavOnlineCount');
   const chatLog = document.getElementById('vcChatLog');
   const chatInput = document.getElementById('vcChatInput');
   const chatSendBtn = document.getElementById('vcChatSendBtn');
@@ -2321,8 +2353,9 @@
       // every refresh). Plain .get() + snap.size works everywhere and is
       // plenty cheap at the scale of a presence collection like this.
       const text = snap.size.toLocaleString();
-      if (onlineCountEl) onlineCountEl.textContent = text;
-      if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
+if (onlineCountEl) onlineCountEl.textContent = text;
+if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
+if (navOnlineCountEl) navOnlineCountEl.textContent = text;
       clearOnlineDebug();
     }).catch((err) => {
       // Surface this loudly — a silently-swallowed error here is exactly how a fake
@@ -2332,6 +2365,7 @@
       // deployed (hard-refresh / check the deployed source).
       if (onlineCountEl) onlineCountEl.textContent = '—';
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = '—';
+      if (navOnlineCountEl) navOnlineCountEl.textContent = '—';
       if (!myUid && err && err.code === 'permission-denied') return; // expected in the instant before anonymous auth resolves
       console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
       showOnlineDebug('count query failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
