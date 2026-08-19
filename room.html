@@ -189,17 +189,88 @@
   .mhead .mname.mine{ color:var(--mint); }
   .mhead .mtime{ font-size:10.5px; color:var(--ink-dim); font-family:'IBM Plex Mono',monospace; }
   .mtext{ font-size:14px; line-height:1.48; color:var(--paper); word-wrap:break-word; }
+  .mimg{
+    margin-top:4px; max-width:320px; max-height:320px; border-radius:10px;
+    border:1px solid var(--line); cursor:pointer; display:block; object-fit:cover;
+  }
 
   .chat-input-wrap{ flex:none; padding:10px 18px 16px; }
+  .attach-preview{
+    display:none; align-items:center; gap:10px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:8px 10px; margin-bottom:8px;
+  }
+  .attach-preview.show{ display:flex; }
+  .attach-preview img{ width:44px; height:44px; border-radius:7px; object-fit:cover; flex:none; }
+  .attach-preview .apname{ flex:1 1 auto; min-width:0; font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .attach-preview .apremove{
+    flex:none; width:24px; height:24px; border-radius:7px; border:none;
+    background:transparent; color:var(--ink-dim); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .attach-preview .apremove:hover{ background:rgba(255,107,91,0.14); color:var(--coral); }
+  .attach-preview .apremove svg{ width:14px; height:14px; }
   .chat-input-row{
     display:flex; align-items:center; gap:8px;
     background:var(--panel); border:1px solid var(--line);
-    border-radius:12px; padding:5px 6px 5px 15px;
+    border-radius:12px; padding:5px 6px 5px 6px;
   }
   .chat-input-row:focus-within{ border-color:var(--violet); }
+  .chat-input-row .attach-btn{
+    flex:none; width:36px; height:36px; border-radius:9px; margin-left:2px;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent; border:none; color:var(--ink-dim); cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .chat-input-row .attach-btn:hover{ background:rgba(237,231,218,0.06); color:var(--paper); }
+  .chat-input-row .attach-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .chat-input-row .attach-btn:disabled:hover{ background:transparent; color:var(--ink-dim); }
+  .chat-input-row .attach-btn svg{ width:19px; height:19px; }
+  .chat-input-row .gif-btn{
+    flex:none; height:30px; padding:0 9px; border-radius:8px; margin-left:1px;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--line); color:var(--ink-dim); cursor:pointer;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:.02em;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .chat-input-row .gif-btn:hover{ background:rgba(237,231,218,0.06); color:var(--paper); border-color:var(--line); }
+  .chat-input-row .gif-btn.active{ background:rgba(156,140,251,0.16); color:#fff; border-color:rgba(156,140,251,0.4); }
+  .chat-input-row .gif-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  .gif-popover{
+    display:none; position:absolute; bottom:64px; left:18px; z-index:40;
+    width:320px; max-height:380px; background:var(--panel-raise);
+    border:1px solid var(--line); border-radius:12px;
+    box-shadow:0 12px 32px rgba(0,0,0,0.45);
+    flex-direction:column; overflow:hidden;
+  }
+  .gif-popover.show{ display:flex; }
+  .gif-popover-search{ flex:none; padding:10px; border-bottom:1px solid var(--line); }
+  .gif-popover-search input{
+    width:100%; background:var(--void-deep); border:1px solid var(--line);
+    color:var(--paper); border-radius:8px; padding:8px 11px;
+    font-family:inherit; font-size:12.5px;
+  }
+  .gif-popover-search input::placeholder{ color:var(--ink-dim); }
+  .gif-popover-search input:focus{ outline:none; border-color:var(--violet); }
+  .gif-popover-grid{
+    flex:1 1 auto; min-height:0; overflow-y:auto; padding:8px;
+    display:grid; grid-template-columns:1fr 1fr; gap:6px;
+  }
+  .gif-popover-grid img{
+    width:100%; height:100px; object-fit:cover; border-radius:7px;
+    cursor:pointer; display:block; background:var(--void);
+    transition:transform .12s ease, filter .12s ease;
+  }
+  .gif-popover-grid img:hover{ transform:scale(1.03); filter:brightness(1.08); }
+  .gif-popover-msg{ padding:24px 14px; text-align:center; font-size:12px; color:var(--ink-dim); grid-column:1 / -1; }
+  .gif-popover-attr{
+    flex:none; padding:6px 10px; font-size:9.5px; color:var(--ink-dim);
+    border-top:1px solid var(--line); text-align:center;
+  }
   .chat-input-row input{
     flex:1 1 auto; background:transparent; border:none; color:var(--paper);
-    font-family:inherit; font-size:14px; padding:9px 0; min-width:0;
+    font-family:inherit; font-size:14px; padding:9px 4px; min-width:0;
   }
   .chat-input-row input::placeholder{ color:var(--ink-dim); }
   .chat-input-row input:focus{ outline:none; }
@@ -304,8 +375,29 @@
         <div class="chat-log-empty" id="rLogEmpty">No messages yet — say hi 👋</div>
       </div>
 
-      <div class="chat-input-wrap">
+      <div class="chat-input-wrap" style="position:relative;">
+        <div class="gif-popover" id="rGifPopover">
+          <div class="gif-popover-search">
+            <input type="text" id="rGifSearch" placeholder="Search GIFs">
+          </div>
+          <div class="gif-popover-grid" id="rGifGrid">
+            <div class="gif-popover-msg">Loading trending GIFs…</div>
+          </div>
+          <div class="gif-popover-attr">Powered by GIPHY</div>
+        </div>
+        <div class="attach-preview" id="rAttachPreview">
+          <img id="rAttachThumb" src="" alt="">
+          <span class="apname" id="rAttachName"></span>
+          <button class="apremove" id="rAttachRemove" aria-label="Remove image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
         <div class="chat-input-row">
+          <input type="file" id="rFileInput" accept="image/*" hidden>
+          <button class="attach-btn" id="rAttachBtn" aria-label="Attach image" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
+          </button>
+          <button class="gif-btn" id="rGifBtn" aria-label="Send a GIF" type="button" disabled>GIF</button>
           <input type="text" id="rInput" placeholder="Message this room…" maxlength="500">
           <button id="rSendBtn" disabled aria-label="Send">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -418,13 +510,19 @@
 
   Firestore layout used here (add rules for these — see notes below):
     /communityRooms/{topic}/messages/{messageId}
-      { text, sender (uid), senderName, senderPhoto, createdAt }
+      { text, imageUrl, imagePath, sender (uid), senderName, senderPhoto, createdAt }
     /roomPresence/{topic}_{uid}
       { topic, updatedAt }   -- same shape /community/index.html already reads
+
+  Storage layout:
+    /roomUploads/{topic}/{uid}_{timestamp}_{filename}
+    (add Storage rules allowing authenticated, non-anonymous users to write
+    under roomUploads/** and read publicly, mirroring the Firestore rules)
 ============================================================= -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script>
 (function(){
   const firebaseConfig = {
@@ -438,6 +536,7 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const storage = firebase.storage();
   const FieldValue = firebase.firestore.FieldValue;
 
   const userPanel = document.getElementById('rUserPanel');
@@ -448,6 +547,16 @@
   const input = document.getElementById('rInput');
   const sendBtn = document.getElementById('rSendBtn');
   const onlineCountEl = document.getElementById('rOnlineCount');
+  const fileInput = document.getElementById('rFileInput');
+  const attachBtn = document.getElementById('rAttachBtn');
+  const attachPreview = document.getElementById('rAttachPreview');
+  const attachThumb = document.getElementById('rAttachThumb');
+  const attachName = document.getElementById('rAttachName');
+  const attachRemove = document.getElementById('rAttachRemove');
+  const gifBtn = document.getElementById('rGifBtn');
+  const gifPopover = document.getElementById('rGifPopover');
+  const gifSearch = document.getElementById('rGifSearch');
+  const gifGrid = document.getElementById('rGifGrid');
 
   let myUser = null;
   let unsubMessages = null;
@@ -455,6 +564,9 @@
   let onlineInterval = null;
   let activeTopic = null;
   let lastRender = null; // { uid, ts } for message grouping
+  let pendingFile = null;
+  let pendingPreviewUrl = null;
+  let uploading = false;
 
   auth.onAuthStateChanged((user) => {
     if (user && !user.isAnonymous) {
@@ -463,7 +575,9 @@
       navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
       navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
       input.disabled = false;
-      sendBtn.disabled = false;
+      attachBtn.disabled = false;
+      gifBtn.disabled = false;
+      updateSendState();
       if (window.currentTopic) mountRoom(window.currentTopic);
     } else {
       // Anonymous or fully signed out — chat rooms are a gated action, same
@@ -513,10 +627,22 @@
         '<span class="mtime">' + fmtTime(ts) + '</span>';
       content.appendChild(head);
     }
-    const text = document.createElement('div');
-    text.className = 'mtext';
-    text.textContent = m.text;
-    content.appendChild(text);
+    const mediaUrl = m.imageUrl || m.gifUrl;
+    if (mediaUrl) {
+      const imgEl = document.createElement('img');
+      imgEl.className = 'mimg';
+      imgEl.src = mediaUrl;
+      imgEl.alt = m.text ? m.text : (m.gifUrl ? 'GIF' : 'Shared image');
+      imgEl.loading = 'lazy';
+      imgEl.addEventListener('click', () => window.open(mediaUrl, '_blank'));
+      content.appendChild(imgEl);
+    }
+    if (m.text) {
+      const text = document.createElement('div');
+      text.className = 'mtext';
+      text.textContent = m.text;
+      content.appendChild(text);
+    }
 
     row.appendChild(avcol);
     row.appendChild(content);
@@ -596,24 +722,184 @@
       .catch(() => { if (activeTopic === topic) onlineCountEl.textContent = '—'; });
   }
 
-  function sendMessage(){
-    const text = input.value.trim();
-    if (!text || !myUser || !activeTopic) return;
-    input.value = '';
+  function updateSendState(){
+    const hasContent = !!input.value.trim() || !!pendingFile;
+    sendBtn.disabled = !myUser || uploading || !hasContent;
+  }
+
+  function clearAttachment(){
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+    pendingFile = null;
+    pendingPreviewUrl = null;
+    fileInput.value = '';
+    attachPreview.classList.remove('show');
+    updateSendState();
+  }
+
+  attachBtn.addEventListener('click', () => { if (!attachBtn.disabled) fileInput.click(); });
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      fileInput.value = '';
+      return;
+    }
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+    pendingFile = file;
+    pendingPreviewUrl = URL.createObjectURL(file);
+    attachThumb.src = pendingPreviewUrl;
+    attachName.textContent = file.name;
+    attachPreview.classList.add('show');
+    closeGifPopover();
+    updateSendState();
+  });
+
+  attachRemove.addEventListener('click', clearAttachment);
+
+  // ---------------- GIF picker ----------------
+  // Public GIPHY demo key (rate-limited). Swap in your own GIPHY API key
+  // for production use: https://developers.giphy.com/
+  const GIPHY_KEY = 'GlVGYHkr3WSBnllca54iNt0yFbjz7L65';
+  let gifSearchTimer = null;
+  let gifRequestId = 0;
+
+  function openGifPopover(){
+    gifPopover.classList.add('show');
+    gifBtn.classList.add('active');
+    clearAttachment();
+    if (!gifGrid.dataset.loaded) {
+      loadGifs('');
+      gifGrid.dataset.loaded = '1';
+    }
+    setTimeout(() => gifSearch.focus(), 0);
+  }
+  function closeGifPopover(){
+    gifPopover.classList.remove('show');
+    gifBtn.classList.remove('active');
+  }
+  gifBtn.addEventListener('click', () => {
+    if (gifBtn.disabled) return;
+    if (gifPopover.classList.contains('show')) closeGifPopover();
+    else openGifPopover();
+  });
+  document.addEventListener('click', (e) => {
+    if (!gifPopover.classList.contains('show')) return;
+    if (gifPopover.contains(e.target) || e.target === gifBtn) return;
+    closeGifPopover();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGifPopover();
+  });
+
+  function loadGifs(query){
+    const myRequest = ++gifRequestId;
+    gifGrid.innerHTML = '<div class="gif-popover-msg">Loading GIFs…</div>';
+    const endpoint = query
+      ? 'https://api.giphy.com/v1/gifs/search?api_key=' + GIPHY_KEY + '&q=' + encodeURIComponent(query) + '&limit=15&rating=pg-13'
+      : 'https://api.giphy.com/v1/gifs/trending?api_key=' + GIPHY_KEY + '&limit=15&rating=pg-13';
+    fetch(endpoint).then((res) => {
+      if (!res.ok) throw new Error('GIPHY request failed: ' + res.status);
+      return res.json();
+    }).then((data) => {
+      if (myRequest !== gifRequestId) return; // stale response, a newer search superseded it
+      const results = (data && data.data) || [];
+      if (!results.length) {
+        gifGrid.innerHTML = '<div class="gif-popover-msg">No GIFs found — try another search.</div>';
+        return;
+      }
+      gifGrid.innerHTML = '';
+      results.forEach((g) => {
+        const thumb = g.images && (g.images.fixed_width_small || g.images.fixed_width);
+        const full = g.images && (g.images.original || g.images.fixed_width);
+        if (!thumb || !full) return;
+        const img = document.createElement('img');
+        img.src = thumb.url;
+        img.alt = g.title || 'GIF';
+        img.loading = 'lazy';
+        img.addEventListener('click', () => {
+          sendGif(full.url);
+          closeGifPopover();
+        });
+        gifGrid.appendChild(img);
+      });
+    }).catch((err) => {
+      if (myRequest !== gifRequestId) return;
+      console.error('GIF fetch failed:', err);
+      gifGrid.innerHTML = '<div class="gif-popover-msg">Couldn\'t load GIFs — check your connection.</div>';
+    });
+  }
+
+  gifSearch.addEventListener('input', () => {
+    clearTimeout(gifSearchTimer);
+    const q = gifSearch.value.trim();
+    gifSearchTimer = setTimeout(() => loadGifs(q), 300);
+  });
+
+  function sendGif(url){
+    if (!myUser || !activeTopic) return;
     db.collection('communityRooms').doc(activeTopic).collection('messages').add({
-      text: text,
+      text: null,
+      imageUrl: null,
+      imagePath: null,
+      gifUrl: url,
       sender: myUser.uid,
       senderName: myUser.displayName || 'Someone',
       senderPhoto: myUser.photoURL || null,
       createdAt: FieldValue.serverTimestamp()
+    }).catch((err) => console.error('gif send failed:', err));
+  }
+
+  function sendMessage(){
+    const text = input.value.trim();
+    const file = pendingFile;
+    if ((!text && !file) || !myUser || !activeTopic || uploading) return;
+
+    input.value = '';
+    clearAttachment(); // clears preview UI; pendingFile var already captured above
+    uploading = true;
+    updateSendState();
+
+    const topic = activeTopic;
+    const finishSend = (imageUrl, imagePath) => {
+      db.collection('communityRooms').doc(topic).collection('messages').add({
+        text: text || null,
+        imageUrl: imageUrl || null,
+        imagePath: imagePath || null,
+        gifUrl: null,
+        sender: myUser.uid,
+        senderName: myUser.displayName || 'Someone',
+        senderPhoto: myUser.photoURL || null,
+        createdAt: FieldValue.serverTimestamp()
+      }).catch((err) => {
+        console.error('send failed:', err);
+        input.value = text; // restore so they don't lose what they typed
+      }).finally(() => {
+        uploading = false;
+        updateSendState();
+      });
+    };
+
+    if (!file) {
+      finishSend(null, null);
+      return;
+    }
+
+    const path = 'roomUploads/' + topic + '/' + myUser.uid + '_' + Date.now() + '_' + file.name;
+    const ref = storage.ref().child(path);
+    ref.put(file).then((snap) => snap.ref.getDownloadURL()).then((url) => {
+      finishSend(url, path);
     }).catch((err) => {
-      console.error('send failed:', err);
-      input.value = text; // restore so they don't lose what they typed
+      console.error('image upload failed:', err);
+      uploading = false;
+      input.value = text;
+      updateSendState();
     });
   }
 
   sendBtn.addEventListener('click', sendMessage);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+  input.addEventListener('input', updateSendState);
 })();
 </script>
 
