@@ -13,143 +13,249 @@
   :root{
     --void:#14152B;
     --void-deep:#0D0E1F;
+    --void-panel:#181A33;
+    --void-panel-2:#1D1F3D;
     --paper:#EDE7DA;
     --mint:#5EEAD4;
     --coral:#FF6B5B;
     --violet:#9C8CFB;
     --violet-deep:#5142C4;
-    --line:rgba(237,231,218,0.14);
-    --card:rgba(255,255,255,0.05);
-    --card-border:rgba(255,255,255,0.09);
-    --ink-soft:rgba(245,244,251,0.62);
+    --line:rgba(237,231,218,0.10);
+    --line-soft:rgba(237,231,218,0.06);
+    --ink-soft:rgba(245,244,251,0.58);
+    --ink-faint:rgba(245,244,251,0.36);
   }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; height:100%; background:var(--void-deep); }
+  html,body{ margin:0; height:100%; background:var(--void-deep); overflow:hidden; }
   body{
     font-family:'Inter',sans-serif;
     color:var(--paper);
     -webkit-font-smoothing:antialiased;
-    display:flex; flex-direction:column; min-height:100vh;
+    display:flex; flex-direction:column; height:100vh;
   }
   h1,h2,h3{ font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em; }
   a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(237,231,218,0.14); border-radius:6px; border:2px solid transparent; background-clip:padding-box; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(237,231,218,0.24); background-clip:padding-box; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  mark{ background:rgba(255,184,77,0.45); color:inherit; border-radius:3px; padding:0 1px; }
 
-  /* ---------- nav ---------- */
+  /* ---------- top nav ---------- */
   .rnav{
-    background:rgba(11,12,30,0.92);
-    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    background:rgba(11,12,30,0.95);
     border-bottom:1px solid rgba(255,255,255,0.08);
-    flex:none;
+    flex:none; z-index:20;
   }
   .rnav-inner{
-    max-width:1400px; margin:0 auto;
     display:flex; align-items:center; justify-content:space-between;
-    padding:14px 6vw;
+    padding:11px 18px;
   }
   .rnav-left{ display:flex; align-items:center; gap:16px; }
   .rnav-back{
     display:flex; align-items:center; gap:6px;
-    font-size:13.5px; font-weight:600; color:rgba(255,255,255,0.65);
+    font-size:13px; font-weight:600; color:rgba(255,255,255,0.6);
     transition:color .15s ease;
   }
   .rnav-back:hover{ color:#fff; }
-  .rnav-back svg{ width:15px; height:15px; }
-  .rnav-brand{ display:flex; align-items:center; gap:9px; }
-  .rnav-brand svg{ width:26px; height:26px; flex:none; }
-  .rnav-brand span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; color:#fff; }
+  .rnav-back svg{ width:14px; height:14px; }
+  .rnav-brand{ display:flex; align-items:center; gap:8px; }
+  .rnav-brand svg{ width:22px; height:22px; flex:none; }
+  .rnav-brand span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; color:#fff; }
   .rnav-brand span em{ font-style:normal; color:var(--violet); }
   .rnav-account{ display:flex; align-items:center; gap:8px; font-size:13px; }
-  .rnav-account img{ width:26px; height:26px; border-radius:50%; }
-
-  /* ---------- room header ---------- */
-  .rhead{
-    padding:16px 6vw;
-    display:flex; align-items:center; justify-content:space-between;
-    gap:16px; flex-wrap:wrap;
-    border-bottom:1px solid var(--line);
-    flex:none;
+  .rnav-account img{ width:24px; height:24px; border-radius:50%; }
+  .rnav-menu-btn{
+    display:none; background:none; border:none; color:var(--paper);
+    width:32px; height:32px; align-items:center; justify-content:center; cursor:pointer;
   }
-  .rhead-left{ display:flex; align-items:center; gap:14px; }
+  .rnav-menu-btn svg{ width:20px; height:20px; }
+
+  /* ---------- body layout ---------- */
+  .rbody{ flex:1 1 auto; min-height:0; display:flex; }
+
+  /* channel sidebar */
+  .rsidebar{
+    width:248px; flex:none; background:var(--void-panel);
+    border-right:1px solid var(--line);
+    display:flex; flex-direction:column;
+    min-height:0;
+  }
+  .rsidebar-hd{
+    padding:16px 16px 10px;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
+    letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-faint);
+  }
+  .rsidebar-list{ flex:1 1 auto; overflow-y:auto; padding:2px 10px 14px; display:flex; flex-direction:column; gap:2px; }
+  .rchan{
+    display:flex; align-items:center; gap:9px;
+    padding:7px 9px; border-radius:7px; cursor:pointer;
+    color:var(--ink-soft); font-size:13.5px; font-weight:500;
+    transition:background .12s ease, color .12s ease;
+  }
+  .rchan:hover{ background:rgba(237,231,218,0.05); color:var(--paper); }
+  .rchan .rchan-hash{ font-size:14px; opacity:0.7; flex:none; width:16px; text-align:center; }
+  .rchan.active{ background:var(--tint,rgba(156,140,251,0.16)); color:#fff; }
+  .rchan.active .rchan-hash{ opacity:1; }
+  .rchan-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* main column */
+  .rmain-col{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; min-height:0; }
+
+  .rhead{
+    flex:none;
+    padding:12px 18px;
+    display:flex; align-items:center; gap:14px;
+    border-bottom:1px solid var(--line);
+    background:var(--void);
+  }
   .rhead-icon{
-    flex:none; width:46px; height:46px; border-radius:13px;
-    display:flex; align-items:center; justify-content:center; font-size:22px;
+    flex:none; width:38px; height:38px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center; font-size:18px;
     background:var(--tint, rgba(156,140,251,0.14));
     border:1px solid var(--tint-border, rgba(156,140,251,0.32));
   }
-  .rhead h1{ font-size:19px; color:#fff; }
-  .rhead p{ margin:2px 0 0; font-size:13px; color:var(--ink-soft); }
+  .rhead-txt{ min-width:0; }
+  .rhead h1{ font-size:16px; color:#fff; line-height:1.2; }
+  .rhead p{ margin:1px 0 0; font-size:12px; color:var(--ink-faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rhead-spacer{ flex:1 1 auto; }
+
   .rhead-online{
-    display:flex; align-items:center; gap:7px;
-    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mint);
-    background:rgba(94,234,212,0.08); border:1px solid rgba(94,234,212,0.22);
-    border-radius:999px; padding:7px 14px;
+    display:flex; align-items:center; gap:6px; flex:none;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--mint);
+    background:rgba(94,234,212,0.08); border:1px solid rgba(94,234,212,0.2);
+    border-radius:999px; padding:6px 12px;
   }
-  .rhead-online .dot{ width:7px; height:7px; border-radius:50%; background:var(--mint); box-shadow:0 0 0 3px rgba(94,234,212,0.15); }
+  .rhead-online .dot{ width:6px; height:6px; border-radius:50%; background:var(--mint); box-shadow:0 0 0 3px rgba(94,234,212,0.15); }
 
-  /* ---------- chat area ---------- */
-  .rmain{
-    flex:1 1 auto; min-height:0;
-    max-width:900px; width:100%; margin:0 auto;
-    display:flex; flex-direction:column;
-    padding:0 6vw;
+  /* search */
+  .rsearch-wrap{ position:relative; flex:none; }
+  .rsearch-btn{
+    display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:9px; border:1px solid var(--line);
+    background:var(--void-panel-2); color:var(--ink-soft); cursor:pointer;
+    transition:color .12s ease, border-color .12s ease;
   }
-  .rlog{
-    flex:1 1 auto; min-height:0;
-    overflow-y:auto;
-    padding:20px 0;
-    display:flex; flex-direction:column; gap:14px;
+  .rsearch-btn:hover{ color:#fff; border-color:rgba(237,231,218,0.24); }
+  .rsearch-btn svg{ width:16px; height:16px; }
+  .rsearch-box{
+    display:none; align-items:center; gap:6px;
+    background:var(--void-panel-2); border:1px solid var(--violet);
+    border-radius:9px; padding:0 6px 0 11px; height:34px;
+    width:220px;
   }
-  .rmsg{ max-width:74%; display:flex; flex-direction:column; gap:4px; }
-  .rmsg.me{ align-self:flex-end; align-items:flex-end; }
-  .rmsg .who{
-    display:flex; align-items:center; gap:6px;
-    font-size:11.5px; color:rgba(237,231,218,0.45); font-weight:600;
+  .rsearch-box.open{ display:flex; }
+  .rsearch-box input{
+    flex:1 1 auto; background:none; border:none; color:var(--paper);
+    font-family:inherit; font-size:13px; height:100%; min-width:0;
   }
-  .rmsg .who img{ width:16px; height:16px; border-radius:50%; }
-  .rmsg .bubble{
-    background:rgba(237,231,218,0.06);
-    border-radius:14px 14px 14px 4px;
-    padding:10px 14px;
-    font-size:14px; line-height:1.5;
+  .rsearch-box input:focus{ outline:none; }
+  .rsearch-box input::placeholder{ color:var(--ink-faint); }
+  .rsearch-count{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint);
+    flex:none; padding:0 2px; white-space:nowrap;
   }
-  .rmsg.me .bubble{
-    background:linear-gradient(135deg, rgba(94,234,212,0.22), rgba(94,234,212,0.1));
-    border-radius:14px 14px 4px 14px;
+  .rsearch-nav{ display:flex; gap:2px; flex:none; }
+  .rsearch-nav button{
+    background:none; border:none; color:var(--ink-soft); cursor:pointer;
+    width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:5px;
   }
-  .rmsg.system{ align-self:center; max-width:none; }
-  .rmsg.system .bubble{
-    background:transparent; color:rgba(237,231,218,0.4);
-    font-style:italic; font-size:12.5px; padding:0;
+  .rsearch-nav button:hover{ background:rgba(237,231,218,0.08); color:#fff; }
+  .rsearch-nav button:disabled{ opacity:0.3; cursor:default; }
+  .rsearch-nav button:disabled:hover{ background:none; }
+  .rsearch-nav svg{ width:14px; height:14px; }
+  .rsearch-close{
+    background:none; border:none; color:var(--ink-faint); cursor:pointer;
+    width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:5px;
   }
-  .rlog-empty{
-    margin:auto; text-align:center; color:rgba(237,231,218,0.4); font-size:13.5px; padding:40px 20px;
-  }
+  .rsearch-close:hover{ background:rgba(237,231,218,0.08); color:#fff; }
+  .rsearch-close svg{ width:13px; height:13px; }
 
+  /* member list */
+  .rmembers{
+    width:216px; flex:none; background:var(--void-panel);
+    border-left:1px solid var(--line);
+    display:flex; flex-direction:column; min-height:0;
+  }
+  .rmembers-hd{
+    padding:16px 16px 10px;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
+    letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-faint);
+  }
+  .rmembers-list{ flex:1 1 auto; overflow-y:auto; padding:0 12px 14px; display:flex; flex-direction:column; gap:1px; }
+  .rmember{ display:flex; align-items:center; gap:9px; padding:6px 6px; border-radius:7px; }
+  .rmember:hover{ background:rgba(237,231,218,0.05); }
+  .rmember-av{ position:relative; flex:none; }
+  .rmember-av img{ width:26px; height:26px; border-radius:50%; display:block; }
+  .rmember-av .stat{
+    position:absolute; right:-1px; bottom:-1px; width:9px; height:9px; border-radius:50%;
+    background:var(--mint); border:2px solid var(--void-panel);
+  }
+  .rmember-name{ font-size:13px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rmembers-empty{ padding:6px; font-size:12px; color:var(--ink-faint); }
+
+  /* ---------- message log ---------- */
+  .rlog-scroll{ flex:1 1 auto; min-height:0; overflow-y:auto; }
+  .rlog{ padding:14px 18px 6px; display:flex; flex-direction:column; }
+  .rlog-empty{ margin:40px auto; text-align:center; color:var(--ink-faint); font-size:13.5px; padding:0 20px; }
+  .rlog-welcome{ padding:10px 2px 22px; }
+  .rlog-welcome .wic{
+    width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    font-size:26px; background:var(--tint, rgba(156,140,251,0.14)); border:1px solid var(--tint-border, rgba(156,140,251,0.32));
+    margin-bottom:12px;
+  }
+  .rlog-welcome h2{ font-size:22px; color:#fff; }
+  .rlog-welcome p{ margin:6px 0 0; font-size:13.5px; color:var(--ink-soft); max-width:440px; line-height:1.5; }
+
+  .rgroup{ display:flex; gap:12px; padding:6px 6px; border-radius:8px; margin:0 -6px; }
+  .rgroup:hover{ background:rgba(237,231,218,0.025); }
+  .rgroup.dim{ opacity:0.28; }
+  .rgroup .gav{ flex:none; width:36px; }
+  .rgroup .gav img{ width:36px; height:36px; border-radius:50%; display:block; }
+  .rgroup .gav-spacer{ width:36px; }
+  .rgroup-body{ min-width:0; flex:1 1 auto; }
+  .rgroup-hd{ display:flex; align-items:baseline; gap:8px; margin-bottom:2px; }
+  .rgroup-hd .gname{ font-size:14px; font-weight:600; color:#fff; }
+  .rgroup-hd .gtime{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); }
+  .rline{ font-size:14px; line-height:1.5; color:var(--paper); word-break:break-word; position:relative; }
+  .rline .rline-time{
+    display:none; position:absolute; left:-46px; top:2px; width:38px; text-align:right;
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--ink-faint);
+  }
+  .rgroup:hover .rline .rline-time{ display:block; }
+  .rgroup.first-in-group{ margin-top:10px; }
+
+  .rsearch-hit{ scroll-margin-top:60px; }
+  .rsearch-hit.current{ outline:1px solid rgba(156,140,251,0.5); outline-offset:2px; border-radius:6px; }
+
+  .rmsg-system{ text-align:center; color:var(--ink-faint); font-style:italic; font-size:12px; padding:10px 0; }
+
+  /* ---------- input ---------- */
+  .rinput-wrap{ flex:none; padding:0 18px 18px; }
   .rinput-row{
-    flex:none;
-    display:flex; align-items:center; gap:12px;
-    padding:16px 0 22px;
-    border-top:1px solid var(--line);
+    display:flex; align-items:center; gap:8px;
+    background:var(--void-panel-2); border:1px solid var(--line);
+    border-radius:12px; padding:5px 6px 5px 16px;
+    transition:border-color .12s ease;
   }
+  .rinput-row:focus-within{ border-color:var(--violet); }
   .rinput-row input{
-    flex:1 1 auto;
-    background:var(--void); border:1px solid var(--line); color:var(--paper);
-    border-radius:12px; padding:14px 16px; font-family:inherit; font-size:14.5px;
+    flex:1 1 auto; background:none; border:none; color:var(--paper);
+    font-family:inherit; font-size:14.5px; padding:10px 0;
   }
-  .rinput-row input::placeholder{ color:rgba(237,231,218,0.35); }
-  .rinput-row input:focus{ outline:none; border-color:var(--violet); }
+  .rinput-row input:focus{ outline:none; }
+  .rinput-row input::placeholder{ color:var(--ink-faint); }
   .rinput-row button{
-    flex:none; display:flex; align-items:center; gap:8px;
+    flex:none; display:flex; align-items:center; justify-content:center;
     background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff; border:none;
-    border-radius:12px; padding:0 22px; height:48px;
-    font-family:inherit; font-weight:600; font-size:14.5px; cursor:pointer;
-    box-shadow:0 4px 14px rgba(81,66,196,0.35);
-    transition:filter .15s ease, transform .15s ease;
+    border-radius:9px; width:38px; height:38px; cursor:pointer;
+    transition:filter .15s ease, transform .15s ease, opacity .15s ease;
   }
   .rinput-row button:hover{ filter:brightness(1.08); }
   .rinput-row button:active{ transform:translateY(1px); }
-  .rinput-row button:disabled{ opacity:0.5; cursor:not-allowed; }
-  .rinput-row button svg{ width:16px; height:16px; flex:none; }
+  .rinput-row button:disabled{ opacity:0.45; cursor:not-allowed; }
+  .rinput-row button svg{ width:16px; height:16px; }
 
   .rnotfound{
     flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -162,6 +268,26 @@
     background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff;
     border-radius:10px; padding:11px 20px; font-weight:600; font-size:14px;
   }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:980px){
+    .rmembers{ display:none; }
+  }
+  @media (max-width:760px){
+    .rnav-menu-btn{ display:flex; }
+    .rsidebar{
+      position:fixed; left:0; top:49px; bottom:0; z-index:30;
+      transform:translateX(-100%); transition:transform .18s ease;
+      box-shadow:12px 0 30px rgba(0,0,0,0.4);
+    }
+    .rsidebar.open{ transform:translateX(0); }
+    .rhead-txt p{ display:none; }
+    .rsearch-box{ width:150px; }
+  }
+  @media (max-width:520px){
+    .rhead{ gap:10px; }
+    .rsearch-box{ width:120px; }
+  }
 </style>
 </head>
 <body>
@@ -169,6 +295,9 @@
 <nav class="rnav">
   <div class="rnav-inner">
     <div class="rnav-left">
+      <button class="rnav-menu-btn" id="rMenuBtn" aria-label="Toggle channel list">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
       <a class="rnav-back" href="/community.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         All communities
@@ -196,29 +325,73 @@
   </div>
 </nav>
 
-<div id="rRoomFound">
-  <div class="rhead">
-    <div class="rhead-left">
+<div class="rbody" id="rRoomFound">
+  <aside class="rsidebar" id="rSidebar">
+    <div class="rsidebar-hd">Text channels</div>
+    <div class="rsidebar-list" id="rSidebarList"></div>
+  </aside>
+
+  <div class="rmain-col">
+    <div class="rhead">
       <div class="rhead-icon" id="rHeadIcon"></div>
-      <div>
+      <div class="rhead-txt">
         <h1 id="rHeadName"></h1>
         <p id="rHeadDesc"></p>
       </div>
+      <div class="rhead-spacer"></div>
+
+      <div class="rsearch-wrap">
+        <button class="rsearch-btn" id="rSearchBtn" aria-label="Search messages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <div class="rsearch-box" id="rSearchBox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex:none;color:var(--ink-faint);"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="rSearchInput" placeholder="Search this room…" autocomplete="off">
+          <span class="rsearch-count" id="rSearchCount"></span>
+          <div class="rsearch-nav">
+            <button id="rSearchPrev" aria-label="Previous result" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+            <button id="rSearchNext" aria-label="Next result" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <button class="rsearch-close" id="rSearchClose" aria-label="Close search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="rhead-online"><span class="dot"></span> <span id="rOnlineCount">…</span>&nbsp;here now</div>
     </div>
-    <div class="rhead-online"><span class="dot"></span> <span id="rOnlineCount">…</span>&nbsp;here now</div>
+
+    <div class="rlog-scroll" id="rLogScroll">
+      <div class="rlog" id="rLog">
+        <div class="rlog-welcome" id="rLogWelcome">
+          <div class="wic" id="rWelcomeIcon"></div>
+          <h2 id="rWelcomeTitle"></h2>
+          <p id="rWelcomeDesc"></p>
+        </div>
+        <div class="rlog-empty" id="rLogEmpty" style="display:none;">No messages yet — say hi 👋</div>
+      </div>
+    </div>
+
+    <div class="rinput-wrap">
+      <div class="rinput-row">
+        <input type="text" id="rInput" placeholder="Message this room…" maxlength="500">
+        <button id="rSendBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="rmain">
-    <div class="rlog" id="rLog">
-      <div class="rlog-empty" id="rLogEmpty">No messages yet — say hi 👋</div>
+  <aside class="rmembers">
+    <div class="rmembers-hd">Online — <span id="rMembersCount">0</span></div>
+    <div class="rmembers-list" id="rMembersList">
+      <div class="rmembers-empty">No one else is here yet.</div>
     </div>
-    <div class="rinput-row">
-      <input type="text" id="rInput" placeholder="Message this room…" maxlength="500">
-      <button id="rSendBtn" disabled>Send
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-      </button>
-    </div>
-  </div>
+  </aside>
 </div>
 
 <div class="rnotfound" id="rNotFound" style="display:none;">
@@ -264,23 +437,58 @@
     notFoundEl.style.display = 'flex';
   } else {
     document.title = room.name + ' — FriendHub Community';
+
     document.getElementById('rHeadIcon').textContent = room.icon;
     document.getElementById('rHeadIcon').style.setProperty('--tint', room.tint);
     document.getElementById('rHeadIcon').style.setProperty('--tint-border', room.border);
     document.getElementById('rHeadName').textContent = room.name;
     document.getElementById('rHeadDesc').textContent = room.desc;
+
+    document.getElementById('rWelcomeIcon').textContent = room.icon;
+    document.getElementById('rWelcomeIcon').style.setProperty('--tint', room.tint);
+    document.getElementById('rWelcomeIcon').style.setProperty('--tint-border', room.border);
+    document.getElementById('rWelcomeTitle').textContent = 'Welcome to ' + room.name;
+    document.getElementById('rWelcomeDesc').textContent = room.desc + ' This is the start of the room — messages from the last little while show up below.';
+
+    // Build the channel sidebar from the same list.
+    const sidebarList = document.getElementById('rSidebarList');
+    Object.keys(COMMUNITIES).forEach((key) => {
+      const c = COMMUNITIES[key];
+      const el = document.createElement('a');
+      el.className = 'rchan' + (key === topic ? ' active' : '');
+      el.href = window.location.pathname + '?topic=' + encodeURIComponent(key);
+      el.style.setProperty('--tint', c.tint);
+      el.innerHTML = '<span class="rchan-hash">' + c.icon + '</span><span class="rchan-name">' + c.name + '</span>';
+      sidebarList.appendChild(el);
+    });
+    if (sidebarList.querySelector('.active')) {
+      requestAnimationFrame(() => sidebarList.querySelector('.active').scrollIntoView({ block: 'center' }));
+    }
+  }
+
+  // mobile channel-list toggle
+  const menuBtn = document.getElementById('rMenuBtn');
+  const sidebarEl = document.getElementById('rSidebar');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', () => sidebarEl.classList.toggle('open'));
+    document.addEventListener('click', (e) => {
+      if (sidebarEl.classList.contains('open') && !sidebarEl.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)) {
+        sidebarEl.classList.remove('open');
+      }
+    });
   }
 </script>
 
 <!-- ============================================================
-  Firebase: auth gate, live messages, send, presence/online count.
+  Firebase: auth gate, live messages, send, presence/online count,
+  member list, and in-room search.
   Reuses the same project as the main FriendHub page.
 
   Firestore layout used here (add rules for these — see notes below):
     /communityRooms/{topic}/messages/{messageId}
       { text, sender (uid), senderName, senderPhoto, createdAt }
     /roomPresence/{topic}_{uid}
-      { topic, updatedAt }   -- same shape /community/index.html already reads
+      { topic, uid, name, photo, updatedAt }
 ============================================================= -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -305,11 +513,23 @@
   const navAccount = document.getElementById('rNavAccount');
   const navAvatar = document.getElementById('rNavAvatar');
   const navName = document.getElementById('rNavName');
+  const logScroll = document.getElementById('rLogScroll');
   const log = document.getElementById('rLog');
+  const logWelcome = document.getElementById('rLogWelcome');
   const logEmpty = document.getElementById('rLogEmpty');
   const input = document.getElementById('rInput');
   const sendBtn = document.getElementById('rSendBtn');
   const onlineCountEl = document.getElementById('rOnlineCount');
+  const membersList = document.getElementById('rMembersList');
+  const membersCount = document.getElementById('rMembersCount');
+
+  const searchBtn = document.getElementById('rSearchBtn');
+  const searchBox = document.getElementById('rSearchBox');
+  const searchInput = document.getElementById('rSearchInput');
+  const searchCount = document.getElementById('rSearchCount');
+  const searchClose = document.getElementById('rSearchClose');
+  const searchPrev = document.getElementById('rSearchPrev');
+  const searchNext = document.getElementById('rSearchNext');
 
   if (!document.getElementById('rRoomFound') || document.getElementById('rRoomFound').style.display === 'none') {
     return; // unknown room — nothing below needs to run
@@ -317,6 +537,12 @@
 
   let myUser = null;
   let unsubMessages = null;
+
+  // In-memory record of rendered message groups/lines for search.
+  // Each entry: { text, lineEl, bubbleEl (span holding the text) }
+  const renderedLines = [];
+  let lastGroup = null; // { senderKey, el, bodyEl, ts }
+  const GROUP_WINDOW_MS = 5 * 60 * 1000;
 
   auth.onAuthStateChanged((user) => {
     if (user && !user.isAnonymous) {
@@ -341,19 +567,82 @@
     return div.innerHTML;
   }
 
+  function fmtTime(date){
+    if (!date) return '';
+    try {
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    } catch (e) { return ''; }
+  }
+
+  function avatarUrl(m){
+    return m.senderPhoto || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(m.senderName || 'U'));
+  }
+
   function addMessageEl(m, mine){
+    logWelcome.style.marginBottom = '4px';
     logEmpty.style.display = 'none';
-    const row = document.createElement('div');
-    row.className = 'rmsg' + (mine ? ' me' : '');
-    const nameHtml = mine ? '' :
-      '<div class="who">' +
-        (m.senderPhoto ? '<img src="' + m.senderPhoto + '" alt="">' : '') +
-        '<span>' + escapeHtml(m.senderName || 'Someone') + '</span>' +
-      '</div>';
-    row.innerHTML = nameHtml + '<div class="bubble"></div>';
-    row.querySelector('.bubble').textContent = m.text;
-    log.appendChild(row);
-    log.scrollTop = log.scrollHeight;
+
+    const senderKey = m.sender || m.senderName || 'unknown';
+    const now = m.createdAt && m.createdAt.toDate ? m.createdAt.toDate() : new Date();
+    const canGroup = lastGroup && lastGroup.senderKey === senderKey && (now - lastGroup.ts) < GROUP_WINDOW_MS;
+
+    let bodyEl, groupEl;
+    if (canGroup) {
+      groupEl = lastGroup.el;
+      bodyEl = lastGroup.bodyEl;
+    } else {
+      groupEl = document.createElement('div');
+      groupEl.className = 'rgroup first-in-group' + (mine ? ' mine' : '');
+
+      const avWrap = document.createElement('div');
+      avWrap.className = 'gav';
+      const avImg = document.createElement('img');
+      avImg.src = avatarUrl(m);
+      avImg.alt = '';
+      avWrap.appendChild(avImg);
+
+      bodyEl = document.createElement('div');
+      bodyEl.className = 'rgroup-body';
+
+      const hd = document.createElement('div');
+      hd.className = 'rgroup-hd';
+      const nameEl = document.createElement('span');
+      nameEl.className = 'gname';
+      nameEl.style.color = mine ? 'var(--mint)' : '#fff';
+      nameEl.textContent = mine ? 'You' : (m.senderName || 'Someone');
+      const timeEl = document.createElement('span');
+      timeEl.className = 'gtime';
+      timeEl.textContent = fmtTime(now);
+      hd.appendChild(nameEl);
+      hd.appendChild(timeEl);
+
+      bodyEl.appendChild(hd);
+      groupEl.appendChild(avWrap);
+      groupEl.appendChild(bodyEl);
+      log.appendChild(groupEl);
+
+      lastGroup = { senderKey, el: groupEl, bodyEl, ts: now };
+    }
+
+    const lineEl = document.createElement('div');
+    lineEl.className = 'rline rsearch-hit';
+    const timeMini = document.createElement('span');
+    timeMini.className = 'rline-time';
+    timeMini.textContent = fmtTime(now);
+    const textSpan = document.createElement('span');
+    textSpan.className = 'rline-text';
+    textSpan.textContent = m.text;
+    lineEl.appendChild(timeMini);
+    lineEl.appendChild(textSpan);
+    bodyEl.appendChild(lineEl);
+
+    renderedLines.push({ text: m.text || '', groupEl, lineEl, textSpan });
+
+    logScroll.scrollTop = logScroll.scrollHeight;
+
+    if (searchBox.classList.contains('open') && searchInput.value.trim()) {
+      runSearch(searchInput.value.trim());
+    }
   }
 
   function startRoom(){
@@ -377,8 +666,8 @@
 
     touchPresence();
     setInterval(touchPresence, 15000);
-    refreshOnlineCount();
-    setInterval(refreshOnlineCount, 8000);
+    refreshOnline();
+    setInterval(refreshOnline, 8000);
     window.addEventListener('pagehide', () => {
       if (myUser) db.collection('roomPresence').doc(topic + '_' + myUser.uid).delete().catch(() => {});
     });
@@ -388,18 +677,57 @@
     if (!myUser) return;
     db.collection('roomPresence').doc(topic + '_' + myUser.uid).set({
       topic: topic,
+      uid: myUser.uid,
+      name: myUser.displayName || myUser.email || 'Someone',
+      photo: myUser.photoURL || null,
       updatedAt: FieldValue.serverTimestamp()
     }, { merge: true }).catch((err) => console.error('room presence write failed:', err));
   }
 
-  function refreshOnlineCount(){
+  function refreshOnline(){
     const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - 30000);
     db.collection('roomPresence')
       .where('topic', '==', topic)
       .where('updatedAt', '>', cutoff)
       .get()
-      .then((snap) => { onlineCountEl.textContent = snap.size.toLocaleString(); })
+      .then((snap) => {
+        onlineCountEl.textContent = snap.size.toLocaleString();
+        membersCount.textContent = snap.size.toLocaleString();
+        renderMembers(snap.docs.map((d) => d.data()));
+      })
       .catch(() => { onlineCountEl.textContent = '—'; });
+  }
+
+  function renderMembers(list){
+    membersList.innerHTML = '';
+    if (!list.length) {
+      const empty = document.createElement('div');
+      empty.className = 'rmembers-empty';
+      empty.textContent = 'No one else is here yet.';
+      membersList.appendChild(empty);
+      return;
+    }
+    list
+      .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+      .forEach((p) => {
+        const row = document.createElement('div');
+        row.className = 'rmember';
+        const avWrap = document.createElement('div');
+        avWrap.className = 'rmember-av';
+        const img = document.createElement('img');
+        img.src = p.photo || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(p.name || 'U'));
+        img.alt = '';
+        const stat = document.createElement('span');
+        stat.className = 'stat';
+        avWrap.appendChild(img);
+        avWrap.appendChild(stat);
+        const nameEl = document.createElement('span');
+        nameEl.className = 'rmember-name';
+        nameEl.textContent = (myUser && p.uid === myUser.uid) ? (p.name || 'You') + ' (you)' : (p.name || 'Someone');
+        row.appendChild(avWrap);
+        row.appendChild(nameEl);
+        membersList.appendChild(row);
+      });
   }
 
   function sendMessage(){
@@ -420,6 +748,106 @@
 
   sendBtn.addEventListener('click', sendMessage);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+  /* ---------------- in-room message search ---------------- */
+  let searchHits = [];
+  let searchIdx = -1;
+
+  function openSearch(){
+    searchBox.classList.add('open');
+    searchBtn.style.display = 'none';
+    searchInput.focus();
+  }
+  function closeSearch(){
+    searchBox.classList.remove('open');
+    searchBtn.style.display = 'flex';
+    searchInput.value = '';
+    clearSearch();
+  }
+  function clearSearch(){
+    renderedLines.forEach((l) => {
+      l.groupEl.classList.remove('dim');
+      l.textSpan.innerHTML = escapeHtml(l.text);
+      l.lineEl.classList.remove('current');
+    });
+    searchHits = [];
+    searchIdx = -1;
+    searchCount.textContent = '';
+    searchPrev.disabled = true;
+    searchNext.disabled = true;
+  }
+
+  function runSearch(qRaw){
+    const q = qRaw.trim();
+    if (!q) { clearSearch(); return; }
+    const qLower = q.toLowerCase();
+    searchHits = [];
+
+    renderedLines.forEach((l) => {
+      const textLower = l.text.toLowerCase();
+      const hasMatch = textLower.includes(qLower);
+      l.groupEl.classList.toggle('dim', !hasMatch);
+      if (hasMatch) {
+        // highlight all occurrences, case-insensitive, on escaped text
+        const escaped = escapeHtml(l.text);
+        const re = new RegExp('(' + qLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+        l.textSpan.innerHTML = escaped.replace(re, '<mark>$1</mark>');
+        searchHits.push(l);
+      } else {
+        l.textSpan.innerHTML = escapeHtml(l.text);
+      }
+      l.lineEl.classList.remove('current');
+    });
+
+    if (searchHits.length) {
+      searchIdx = searchHits.length - 1; // land on the most recent match
+      focusHit();
+    } else {
+      searchIdx = -1;
+      searchCount.textContent = 'No results';
+    }
+    searchPrev.disabled = searchHits.length === 0;
+    searchNext.disabled = searchHits.length === 0;
+  }
+
+  function focusHit(){
+    renderedLines.forEach((l) => l.lineEl.classList.remove('current'));
+    if (searchIdx < 0 || !searchHits[searchIdx]) return;
+    const hit = searchHits[searchIdx];
+    hit.lineEl.classList.add('current');
+    hit.lineEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    searchCount.textContent = (searchIdx + 1) + ' of ' + searchHits.length;
+  }
+
+  searchBtn.addEventListener('click', openSearch);
+  searchClose.addEventListener('click', closeSearch);
+  searchInput.addEventListener('input', () => runSearch(searchInput.value));
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeSearch(); return; }
+    if (e.key === 'Enter') {
+      if (!searchHits.length) return;
+      if (e.shiftKey) { searchIdx = (searchIdx - 1 + searchHits.length) % searchHits.length; }
+      else { searchIdx = (searchIdx + 1) % searchHits.length; }
+      focusHit();
+    }
+  });
+  searchNext.addEventListener('click', () => {
+    if (!searchHits.length) return;
+    searchIdx = (searchIdx + 1) % searchHits.length;
+    focusHit();
+  });
+  searchPrev.addEventListener('click', () => {
+    if (!searchHits.length) return;
+    searchIdx = (searchIdx - 1 + searchHits.length) % searchHits.length;
+    focusHit();
+  });
+  // keyboard shortcut: Ctrl/Cmd+F opens the in-room search instead of the browser's
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+      e.preventDefault();
+      openSearch();
+    }
+  });
 })();
 </script>
 
