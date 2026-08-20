@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20100%20100%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20aria-hidden%3D%22true%22%3E%0A%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22navBgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%239C8CFB%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235142C4%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%0A%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22url(%23navBgGrad)%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M14%2C44%20a22%2C22%200%201%2C1%2022%2C26%20l-7%2C10%20l-2%2C-12%20a22%2C22%200%200%2C1%20-13%2C-24%20z%22%20fill%3D%22%23FFFFFF%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M86%2C48%20a22%2C22%200%201%2C0%20-22%2C26%20l7%2C10%20l2%2C-12%20a22%2C22%200%200%2C0%2013%2C-24%20z%22%20fill%3D%22%235EEAD4%22%20fill-opacity%3D%220.88%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M79%2C17%20l2.6%2C6.4%206.4%2C2.6%20-6.4%2C2.6%20-2.6%2C6.4%20-2.6%2C-6.4%20-6.4%2C-2.6%206.4%2C-2.6%20z%22%20fill%3D%22%23FFB84D%22%2F%3E%0A%3C%2Fsvg%3E">
+<title>FriendHub Coding Community | Build, Learn &amp; Connect — FriendHub Blog</title>
+<meta name="description" content="Discover FriendHub Coding, a community for programmers and technology enthusiasts to share projects, ask questions, debug problems, learn together, and meet lik">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="FriendHub">
+<link rel="canonical" href="https://www.friendhub.space/blog/friendhub-coding-community/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="FriendHub">
+<meta property="og:title" content="FriendHub Coding Community | Build, Learn &amp; Connect">
+<meta property="og:description" content="Discover FriendHub Coding, a community for programmers and technology enthusiasts to share projects, ask questions, debug problems, learn together, and meet lik">
+<meta property="og:url" content="https://www.friendhub.space/blog/friendhub-coding-community/">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/solus-stay-focused/friendhub@main/friendhub-coding-community.png">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FriendHub Coding Community | Build, Learn &amp; Connect">
+<meta name="twitter:description" content="Discover FriendHub Coding, a community for programmers and technology enthusiasts to share projects, ask questions, debug problems, learn together, and meet lik">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/solus-stay-focused/friendhub@main/friendhub-coding-community.png">
+
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Welcome to FriendHub Coding: Build, Debug, Learn, and Connect","description":"Discover FriendHub Coding, a community for programmers and technology enthusiasts to share projects, ask questions, debug problems, learn together, and meet lik","url":"https://www.friendhub.space/blog/friendhub-coding-community/","image":"https://cdn.jsdelivr.net/gh/solus-stay-focused/friendhub@main/friendhub-coding-community.png","datePublished":"2026-08-20T04:10:50.599Z","author":{"@type":"Organization","name":"FriendHub"},"publisher":{"@type":"Organization","name":"FriendHub","url":"https://www.friendhub.space/"}}</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg:#0B0F1A; --bg-2:#0E1424; --panel:#121A2C; --panel-2:#0D1322; --line:#212C42;
+    --text:#EDE7DA; --muted:#8B96AC; --violet:#9C8CFB; --violet-dim:#5142C4;
+    --mint:#5EEAD4; --amber:#FFB84D;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(640px 420px at 12% -6%, rgba(156,140,251,0.16), transparent 60%),
+      radial-gradient(560px 380px at 96% 8%, rgba(94,234,212,0.10), transparent 60%),
+      var(--bg);
+  }
+  nav.topnav{position:sticky;top:0;z-index:50;background:rgba(11,15,26,0.78);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topnav-inner{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand svg{width:30px;height:30px;flex-shrink:0;}
+  .brand span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;color:#fff;}
+  .brand span em{font-style:normal;color:var(--mint);}
+  .topnav a.back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--muted);font-size:13.5px;font-weight:500;padding:8px 14px;border-radius:20px;border:1px solid var(--line);}
+  .topnav a.back:hover{color:var(--text);border-color:var(--violet-dim);background:rgba(156,140,251,0.06);}
+  .topnav a.back svg{width:14px;height:14px;}
+  footer.site-footer{border-top:1px solid var(--line);padding:28px 24px;text-align:center;color:var(--muted);font-size:12.5px;}
+  .tag-pill{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--violet);background:rgba(156,140,251,0.1);border:1px solid rgba(156,140,251,0.2);padding:3px 9px;border-radius:20px;letter-spacing:.02em;}
+
+main{max-width:760px;margin:0 auto;padding:52px 24px 100px;}
+.post-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.post-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,42px);font-weight:700;letter-spacing:-0.02em;line-height:1.12;margin:0 0 16px;background:linear-gradient(100deg,#fff 40%, var(--violet) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.post-meta{display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:28px;}
+.post-meta .dot-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.post-cover{width:100%;border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-bottom:34px;background:var(--panel-2);}
+.post-cover img{width:100%;display:block;object-fit:cover;max-height:420px;}
+.post-body{font-size:16.5px;line-height:1.75;color:#DCD6C9;}
+.post-body h2{font-family:'Space Grotesk',sans-serif;color:#fff;font-size:24px;margin:36px 0 14px;letter-spacing:-0.01em;}
+.post-body h3{font-family:'Space Grotesk',sans-serif;color:#fff;font-size:19px;margin:28px 0 12px;}
+.post-body p{margin:0 0 18px;}
+.post-body a{color:var(--mint);text-decoration:underline;text-underline-offset:2px;}
+.post-body ul, .post-body ol{margin:0 0 18px;padding-left:22px;}
+.post-body li{margin-bottom:8px;}
+.post-body strong{color:#fff;}
+.post-body img{max-width:100%;border-radius:10px;margin:10px 0;}
+.post-body blockquote{margin:22px 0;padding:4px 20px;border-left:3px solid var(--violet);color:var(--muted);font-style:italic;}
+.post-body code{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:2px 6px;font-size:0.9em;font-family:'IBM Plex Mono',monospace;}
+.post-footer{margin-top:56px;padding-top:28px;border-top:1px solid var(--line);text-align:center;}
+.post-footer a.cta{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-weight:600;font-size:14.5px;background:linear-gradient(135deg, var(--violet), var(--violet-dim));padding:12px 24px;border-radius:999px;}
+@media (max-width:520px){.topnav-inner{padding:14px 18px;}main{padding:36px 18px 80px;}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="/"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs><linearGradient id="navBgGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#9C8CFB"/><stop offset="100%" stop-color="#5142C4"/></linearGradient></defs>
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#navBgGrad)"/>
+  <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+  <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+  <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+</svg><span>Friend<em>Hub</em></span></a>
+    <a href="/blog/" class="back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      All posts
+    </a>
+  </div>
+</nav>
+<main>
+  <article>
+    <div class="post-tags"><span class="tag-pill">coding</span><span class="tag-pill">programming</span><span class="tag-pill">community</span></div>
+    <h1 class="post-title">Welcome to FriendHub Coding: Build, Debug, Learn, and Connect</h1>
+    <div class="post-meta">
+      <span>Aug 20, 2026</span>
+      <span class="dot-sep"></span>
+      <span>12 min read</span>
+    </div>
+    <div class="post-cover"><img src="https://cdn.jsdelivr.net/gh/solus-stay-focused/friendhub@main/friendhub-coding-community.png" alt="Welcome to FriendHub Coding: Build, Debug, Learn, and Connect"></div>
+    <div class="post-body"><h1>Welcome to FriendHub Coding: Build, Debug, Learn, and Connect</h1>
+
+<p>There is something special about building software with other people. A small idea can turn into a project, a frustrating bug can become a valuable lesson, and a simple question can lead to a conversation that changes the way you think about programming. That is exactly why we created the new <strong>Coding</strong> community on FriendHub.</p>
+
+<p>FriendHub Coding is a new space for people who enjoy technology, programming, problem-solving, side projects, and everything that comes with being a developer. Whether you are writing your first lines of code, working on a personal project, studying computer science, or spending your days building production applications, this community is designed to give you a place to talk about it.</p>
+
+<p>Our goal is simple: make it easier for people who love coding to find other people who love coding.</p>
+
+<h2>A Community Built Around Coding</h2>
+
+<p>Programming can sometimes feel like a solitary activity. You sit in front of a screen, stare at an error message, search through documentation, try several solutions, and wonder why something that looked so simple suddenly stopped working.</p>
+
+<p>Every developer has experienced that moment.</p>
+
+<p>Sometimes you need another perspective. Sometimes you simply want to explain what you are building to someone who understands. Other times, you want to share a cool project, discuss a programming language, compare tools, or have a friendly debate about which technology is actually better.</p>
+
+<p>The new Coding community gives you a place for all of those conversations.</p>
+
+<p>Instead of keeping every programming conversation inside private group chats or scattered across different platforms, FriendHub brings people together around a shared interest. The Coding room is a place where developers, learners, students, creators, and technology enthusiasts can meet and start conversations naturally.</p>
+
+<h2>Debugging Is Better Together</h2>
+
+<p>One of the biggest parts of programming is debugging.</p>
+
+<p>You can write what looks like perfect code and still end up with an error that makes absolutely no sense. A missing character, incorrect variable, unexpected response, dependency problem, configuration issue, or tiny logic mistake can sometimes take hours to find.</p>
+
+<p>That is where another developer can make a huge difference.</p>
+
+<p>When you explain a problem to another person, you often discover the solution yourself. Sometimes, however, you really do need someone to look at the problem from a different angle.</p>
+
+<p>The Coding community is a place where those conversations can happen.</p>
+
+<p>You can talk about the problems you are facing, explain what you have already tried, ask for suggestions, or help someone else who is stuck on a similar issue. You do not need to be an expert to participate. In fact, some of the best programming discussions happen when people with different levels of experience share what they know.</p>
+
+<p>A beginner may ask a question that leads to a useful explanation. An experienced developer may provide a solution. Another person may suggest a completely different approach. Everyone learns something from the conversation.</p>
+
+<h2>Share Your Side Projects</h2>
+
+<p>Not every project needs to be a startup.</p>
+
+<p>Some of the most interesting software projects begin as small experiments created simply because someone wanted to learn something new.</p>
+
+<p>Maybe you are building a website for the first time. Maybe you are experimenting with JavaScript, Python, Java, C++, Rust, Go, or another language. Perhaps you are creating a mobile application, a game, an automation script, an AI experiment, a browser extension, or a tool that solves a problem you personally have.</p>
+
+<p>These projects are worth sharing.</p>
+
+<p>Your side project does not have to be finished. It does not need thousands of users. It does not need to be perfect.</p>
+
+<p>Sharing an unfinished project can actually be more valuable because other people can see the process behind it. You can explain what you are trying to accomplish, where you are currently stuck, and what you have learned so far.</p>
+
+<p>The Coding community gives you a place to talk about those projects and discover what other people are building.</p>
+
+<h2>From Beginners to Experienced Developers</h2>
+
+<p>One of the things we want to encourage in FriendHub Coding is an environment where different levels of experience can exist together.</p>
+
+<p>If you are completely new to programming, you belong here.</p>
+
+<p>If you have been coding for years, you belong here too.</p>
+
+<p>There is no requirement to prove how experienced you are before joining a conversation. Programming is a constantly changing field, and even experienced developers regularly encounter technologies, concepts, and problems they have never seen before.</p>
+
+<p>A beginner today can become the person helping someone else tomorrow.</p>
+
+<p>Learning programming is not about knowing everything. It is about continuously learning, experimenting, making mistakes, fixing those mistakes, and becoming better over time.</p>
+
+<p>That is the kind of environment we want the Coding community to encourage.</p>
+
+<h2>Talk About Programming Languages</h2>
+
+<p>Every developer has a favorite programming language.</p>
+
+<p>Some developers love the simplicity of Python. Others prefer the flexibility of JavaScript. Some enjoy the structure of Java or C#. Others are passionate about Rust, Go, C++, PHP, TypeScript, Kotlin, Swift, or languages that are still relatively unknown to the wider developer community.</p>
+
+<p>And then there is the eternal question: which language is actually the best?</p>
+
+<p>The answer depends on what you are building.</p>
+
+<p>That does not mean we cannot have fun discussing it.</p>
+
+<p>The Coding community is a place for friendly debates about programming languages, frameworks, libraries, databases, editors, operating systems, development environments, and the tools developers use every day.</p>
+
+<p>Have a strong opinion about tabs versus spaces?</p>
+
+<p>Want to explain why your favorite framework is underrated?</p>
+
+<p>Think a certain programming language deserves more attention?</p>
+
+<p>Bring the conversation to the community.</p>
+
+<p>Keep the discussion friendly, respect different opinions, and remember that the best technology is often the one that solves the problem effectively.</p>
+
+<h2>Learn From Real Experiences</h2>
+
+<p>Documentation is incredibly useful, but there are things you can learn from another developer that documentation does not always explain.</p>
+
+<p>Real projects come with real problems.</p>
+
+<p>A tutorial might show you how to create a feature, but another developer can tell you what happened when they tried to maintain that feature six months later. A guide might explain how a framework works, but someone who has used it in production can explain the practical challenges they encountered.</p>
+
+<p>These experiences are valuable.</p>
+
+<p>Community conversations can help you discover different approaches to software development, understand common mistakes, learn new tools, and see how other people solve problems.</p>
+
+<p>You might join a conversation looking for one answer and leave with five new ideas.</p>
+
+<h2>Ask Questions Without Feeling Stuck</h2>
+
+<p>There is no such thing as a useless programming question.</p>
+
+<p>If something is confusing to you, there is a good chance someone else has been confused by the same thing.</p>
+
+<p>Asking questions is one of the fastest ways to learn. The important part is being willing to explain the problem clearly, listen to different suggestions, and experiment with the solutions people provide.</p>
+
+<p>The Coding community is designed to make those conversations easier.</p>
+
+<p>You can ask about a programming concept, discuss an error, request feedback on an approach, talk about a project idea, or simply start a conversation about something you find interesting.</p>
+
+<p>You do not have to wait until you become an expert before participating.</p>
+
+<p>Start with a question.</p>
+
+<p>Someone may have the answer.</p>
+
+<h2>Meet People Who Understand Your Interests</h2>
+
+<p>Finding people who share your interests can be surprisingly difficult.</p>
+
+<p>You might know people who enjoy sports, movies, music, travel, or gaming, but finding someone who wants to spend an evening discussing APIs, databases, algorithms, frontend architecture, or debugging can be a little harder.</p>
+
+<p>That is one of the reasons communities matter.</p>
+
+<p>FriendHub is built around the idea that shared interests can bring people together. The Coding community gives technology enthusiasts a starting point for meeting others who enjoy the same conversations.</p>
+
+<p>You might meet someone who is learning the same language.</p>
+
+<p>You might discover someone working on a similar project.</p>
+
+<p>You might find a person who can teach you something you have wanted to learn for months.</p>
+
+<p>Or you might simply have an interesting conversation with another developer.</p>
+
+<p>Not every interaction needs to become a professional connection. Sometimes meeting another person who understands your interests is valuable on its own.</p>
+
+<h2>More Than Just Code</h2>
+
+<p>Although the community is called Coding, conversations do not have to be limited to lines of code.</p>
+
+<p>Developers talk about many things connected to technology.</p>
+
+<p>They talk about careers, education, freelancing, startups, productivity, open-source projects, hardware, artificial intelligence, design, entrepreneurship, developer tools, and the future of technology.</p>
+
+<p>These conversations can be just as interesting as technical discussions.</p>
+
+<p>Maybe you are thinking about becoming a developer and want to know what the industry is like. Maybe you are working on your first freelance project. Maybe you are considering contributing to open source. Maybe you are trying to decide what technology to learn next.</p>
+
+<p>These are all conversations worth having.</p>
+
+<h2>A Place to Build in Public</h2>
+
+<p>Building something can be more motivating when other people know about it.</p>
+
+<p>When you share your progress, you create a small sense of accountability. You can talk about what you accomplished today, what you want to work on tomorrow, and what problems are slowing you down.</p>
+
+<p>You can also receive feedback before a project is finished.</p>
+
+<p>Sometimes a simple suggestion from another person can completely change the direction of a project.</p>
+
+<p>Building in public does not mean revealing private information or sharing everything about your work. It simply means being open about the parts of your creative and technical journey that you are comfortable sharing.</p>
+
+<p>FriendHub Coding can be your place to do that.</p>
+
+<h2>Technology Changes Quickly</h2>
+
+<p>The technology world never stays still.</p>
+
+<p>New frameworks appear. Existing tools receive major updates. Programming languages evolve. Artificial intelligence is changing development workflows. Cloud platforms continue to expand. New databases, libraries, editors, and development tools appear every year.</p>
+
+<p>Keeping up can feel overwhelming.</p>
+
+<p>You do not need to learn everything.</p>
+
+<p>You need to keep learning what matters to you.</p>
+
+<p>Community discussions can help you discover what other developers are experimenting with and which technologies are worth exploring. Instead of trying to follow every trend, you can have conversations with real people and decide what is actually relevant to your goals.</p>
+
+<h2>Friendly Debates Welcome</h2>
+
+<p>Yes, we mentioned language wars.</p>
+
+<p>Programming communities would not be programming communities without a few strong opinions.</p>
+
+<p>Which editor is the best? Which operating system should developers use? Is one framework better than another? Should you use a particular database? Is a new technology actually useful, or is it just another trend?</p>
+
+<p>These debates can be fun.</p>
+
+<p>The important thing is to keep them constructive.</p>
+
+<p>Different developers have different requirements, experiences, and preferences. A tool that works perfectly for one person may be completely wrong for another.</p>
+
+<p>Disagree with an idea, not the person.</p>
+
+<p>Explain your reasoning.</p>
+
+<p>Share your experience.</p>
+
+<p>And if someone changes your mind, that is a good thing.</p>
+
+<h2>Why We Created Coding on FriendHub</h2>
+
+<p>FriendHub is about people.</p>
+
+<p>Technology is simply one of the many interests that can bring people together.</p>
+
+<p>We created the Coding community because developers and technology enthusiasts deserve a dedicated place to start conversations, exchange ideas, share projects, ask questions, and meet people with similar interests.</p>
+
+<p>We want FriendHub communities to feel active, welcoming, and easy to join.</p>
+
+<p>You should not need a complicated setup just to participate in a conversation.</p>
+
+<p>You should be able to find a topic that interests you, enter the community, and start talking.</p>
+
+<p>That is the experience we want to build.</p>
+
+<h2>Who Should Join?</h2>
+
+<p>The Coding community is for anyone interested in programming and technology.</p>
+
+<ul>
+<li>Beginners learning their first programming language</li>
+<li>Students studying computer science or software development</li>
+<li>Web developers building websites and web applications</li>
+<li>Mobile developers creating apps</li>
+<li>Game developers experimenting with new ideas</li>
+<li>Backend and frontend developers</li>
+<li>AI and machine learning enthusiasts</li>
+<li>Open-source contributors</li>
+<li>Freelancers and independent developers</li>
+<li>Startup founders and technical builders</li>
+<li>People working on side projects</li>
+<li>Anyone curious about technology and programming</li>
+</ul>
+
+<p>You do not need a job title, degree, or impressive portfolio to participate.</p>
+
+<p>If you enjoy learning and talking about technology, you have a place in the conversation.</p>
+
+<h2>Start With a Conversation</h2>
+
+<p>You do not need to arrive with a perfect introduction.</p>
+
+<p>You can simply say hello.</p>
+
+<p>Tell people what you are learning.</p>
+
+<p>Share something you are building.</p>
+
+<p>Ask a question.</p>
+
+<p>Talk about a tool you recently discovered.</p>
+
+<p>Explain a problem you finally solved.</p>
+
+<p>Recommend a resource that helped you.</p>
+
+<p>There are countless ways to start.</p>
+
+<p>The first message is often the hardest part. Once someone responds, the conversation can go in a completely different direction.</p>
+
+<h2>Build Something. Share Something. Learn Something.</h2>
+
+<p>That is the spirit behind FriendHub Coding.</p>
+
+<p>It is not about being the smartest person in the room.</p>
+
+<p>It is not about proving that your programming language is better than everyone else's.</p>
+
+<p>It is not about having the biggest project or the most impressive GitHub profile.</p>
+
+<p>It is about people who enjoy building things coming together.</p>
+
+<p>It is about asking questions without being afraid of looking inexperienced.</p>
+
+<p>It is about sharing knowledge without expecting everyone to already understand it.</p>
+
+<p>It is about learning from mistakes, experimenting with new ideas, and helping each other move forward.</p>
+
+<p>Most importantly, it is about turning an interest in technology into an opportunity to connect with other people.</p>
+
+<h2>Welcome to FriendHub Coding</h2>
+
+<p>The new Coding community is now part of FriendHub, and we are excited to see what conversations grow from it.</p>
+
+<p>Maybe the next great side project will be discussed there.</p>
+
+<p>Maybe someone will finally solve a bug they have been fighting for three days.</p>
+
+<p>Maybe a beginner will ask their first programming question and discover a new direction for their future.</p>
+
+<p>Maybe two developers will meet and start building something together.</p>
+
+<p>Maybe you will simply find a few people who enjoy talking about the same things you do.</p>
+
+<p>We do not know exactly where every conversation will lead.</p>
+
+<p>That is part of what makes a community interesting.</p>
+
+<p>So bring your questions, your ideas, your unfinished projects, your opinions, your curiosity, and your enthusiasm for technology.</p>
+
+<p><strong>Welcome to FriendHub Coding.</strong></p>
+
+<p><strong>Build something. Debug something. Learn something. And meet someone along the way.</strong></p></div>
+    <div class="post-footer">
+      <a class="cta" href="/">Start a chat on FriendHub →</a>
+    </div>
+  </article>
+</main>
+<footer class="site-footer">© 2026 FriendHub. All rights reserved.</footer>
+</body>
+</html>
