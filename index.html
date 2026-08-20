@@ -993,69 +993,6 @@
   }
   .vcinfo-foot strong{ color:var(--hp-blue-light); }
 
-  /* ---------- expanded site footer (brand + nav + legal + social) ---------- */
-  .vcfoot{
-    background:var(--hp-black);
-    color:rgba(255,255,255,0.55);
-    padding:64px 6vw 0;
-    font-family:'Inter',sans-serif;
-  }
-  .vcfoot-inner{
-    max-width:1180px; margin:0 auto;
-    display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:40px;
-    padding-bottom:44px;
-  }
-  @media (max-width:760px){
-    .vcfoot-inner{ grid-template-columns:1fr 1fr; }
-    .vcfoot-brand-col{ grid-column:1 / -1; }
-  }
-  @media (max-width:480px){
-    .vcfoot-inner{ grid-template-columns:1fr; }
-  }
-  .vcfoot-brand{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-  .vcfoot-brand svg{ width:30px; height:30px; flex:none; }
-  .vcfoot-brand span{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; color:#fff;
-  }
-  .vcfoot-brand span em{ font-style:normal; color:var(--hp-blue-light); }
-  .vcfoot-tagline{
-    font-size:13.5px; line-height:1.6; color:rgba(255,255,255,0.45);
-    max-width:280px; margin:0 0 20px;
-  }
-  .vcfoot-social{ display:flex; flex-wrap:wrap; gap:10px; }
-  .vcfoot-social a{
-    width:38px; height:38px; border-radius:10px;
-    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-    color:rgba(255,255,255,0.65);
-    display:flex; align-items:center; justify-content:center;
-    text-decoration:none;
-    transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
-  }
-  .vcfoot-social a:hover{
-    background:rgba(59,123,255,0.18); border-color:rgba(59,123,255,0.4);
-    color:#fff; transform:translateY(-2px);
-  }
-  .vcfoot-social a svg{ width:17px; height:17px; }
-  .vcfoot-col h4{
-    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em;
-    text-transform:uppercase; color:rgba(255,255,255,0.4);
-    margin:0 0 18px; font-weight:500;
-  }
-  .vcfoot-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:13px; }
-  .vcfoot-col a{
-    color:rgba(255,255,255,0.62); text-decoration:none; font-size:14px;
-    transition:color .15s ease;
-  }
-  .vcfoot-col a:hover{ color:#fff; }
-  .vcfoot-bottom{
-    border-top:1px solid rgba(255,255,255,0.08);
-    padding:22px 0;
-    max-width:1180px; margin:0 auto;
-    display:flex; align-items:center; justify-content:center;
-    font-size:12.5px; color:rgba(255,255,255,0.35);
-    text-align:center;
-  }
-
   /* ---------- Google sign-in ---------- */
   .vcauth-overlay{
     position:fixed; inset:0; z-index:200;
@@ -1213,6 +1150,154 @@
   .vc-country-item .label{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   @media (max-width:520px){
     .vc-country-grid{ grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); }
+  }
+
+  /* ============================================================
+     Footer
+  ============================================================= */
+  .vcfoot{
+    position:relative;
+    background:var(--hp-black);
+    color:rgba(255,255,255,0.55);
+    padding:72px 6vw 0;
+    font-family:'Inter',sans-serif;
+    overflow:hidden;
+  }
+  /* bookends the top nav's "active" gradient line, tying head and foot together */
+  .vcfoot::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, var(--coral), var(--hp-blue-light) 55%, var(--mint), transparent);
+    opacity:0.55;
+  }
+  /* faint ambient glow, echoes the hero banner's pulse dots without adding motion */
+  .vcfoot::after{
+    content:'';
+    position:absolute; top:-120px; left:50%; width:640px; height:240px;
+    transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(59,123,255,0.14), transparent 70%);
+    pointer-events:none;
+  }
+
+  .vcfoot-inner{
+    position:relative; z-index:1;
+    max-width:1180px; margin:0 auto;
+    display:grid; grid-template-columns:1.3fr 0.9fr 0.9fr 1fr; gap:40px;
+    padding-bottom:48px;
+  }
+  @media (max-width:860px){
+    .vcfoot-inner{ grid-template-columns:1fr 1fr; row-gap:36px; }
+    .vcfoot-brand-col{ grid-column:1 / -1; }
+  }
+  @media (max-width:480px){
+    .vcfoot-inner{ grid-template-columns:1fr; }
+  }
+
+  .vcfoot-brand{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .vcfoot-brand svg{ width:30px; height:30px; flex:none; }
+  .vcfoot-brand span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; color:#fff; }
+  .vcfoot-brand span em{ font-style:normal; color:var(--hp-blue-light); }
+
+  .vcfoot-tagline{
+    font-size:13.5px; line-height:1.65; color:rgba(255,255,255,0.45);
+    max-width:280px; margin:0 0 20px;
+  }
+
+  /* live-status chip — same visual grammar as the top nav pill, closes the loop */
+  .vcfoot-status{
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(94,234,212,0.08);
+    border:1px solid rgba(94,234,212,0.22);
+    border-radius:999px;
+    padding:7px 14px;
+    font-size:12px; font-weight:600; color:var(--mint);
+    font-family:'Inter',sans-serif;
+    margin-bottom:22px;
+  }
+  .vcfoot-status .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--mint);
+    box-shadow:0 0 0 3px rgba(94,234,212,0.15);
+    flex:none;
+  }
+
+  .vcfoot-social{ display:flex; flex-wrap:wrap; gap:10px; }
+  .vcfoot-social a{
+    width:38px; height:38px; border-radius:10px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+    color:rgba(255,255,255,0.65);
+    display:flex; align-items:center; justify-content:center;
+    text-decoration:none;
+    transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+  }
+  .vcfoot-social a:hover{
+    background:rgba(59,123,255,0.18); border-color:rgba(59,123,255,0.4);
+    color:#fff; transform:translateY(-2px);
+  }
+  .vcfoot-social a svg{ width:17px; height:17px; }
+
+  .vcfoot-col h4{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.09em;
+    text-transform:uppercase; color:rgba(255,255,255,0.38);
+    margin:0 0 18px; font-weight:500;
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .vcfoot-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .vcfoot-col a{
+    color:rgba(255,255,255,0.6); text-decoration:none; font-size:14px;
+    display:inline-flex; align-items:center; gap:0;
+    transition:color .15s ease;
+  }
+  /* small sliding arrow on hover instead of a static underline — reads as "go" not "decoration" */
+  .vcfoot-col a::before{
+    content:'';
+    width:0; height:1px; background:var(--hp-blue-light);
+    margin-right:0; opacity:0;
+    transition:width .18s ease, margin-right .18s ease, opacity .18s ease;
+  }
+  .vcfoot-col a:hover{ color:#fff; }
+  .vcfoot-col a:hover::before{ width:10px; margin-right:8px; opacity:1; }
+
+  /* fourth column: community card, reusing the nav's community-pill gradient language */
+  .vcfoot-community{
+    border:1px solid transparent;
+    border-radius:14px;
+    padding:18px;
+    background:
+      linear-gradient(#0B0C1E,#0B0C1E) padding-box,
+      linear-gradient(135deg, rgba(255,107,91,0.5), rgba(94,158,255,0.5) 55%, rgba(94,234,212,0.5)) border-box;
+  }
+  .vcfoot-community p{
+    margin:0 0 14px; font-size:13px; line-height:1.55; color:rgba(255,255,255,0.55);
+  }
+  .vcfoot-community a{
+    display:inline-flex; align-items:center; gap:7px;
+    background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+    color:#fff; text-decoration:none;
+    font-size:13px; font-weight:600;
+    padding:9px 16px; border-radius:8px;
+    box-shadow:0 8px 18px rgba(59,123,255,0.3);
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .vcfoot-community a:hover{ transform:translateY(-1px); box-shadow:0 12px 22px rgba(59,123,255,0.4); }
+
+  .vcfoot-bottom{
+    position:relative; z-index:1;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding:20px 0;
+    max-width:1180px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    font-size:12.5px; color:rgba(255,255,255,0.35);
+  }
+  .vcfoot-bottom-right{ display:flex; align-items:center; gap:18px; }
+  .vcfoot-bottom-right a{ color:rgba(255,255,255,0.4); text-decoration:none; transition:color .15s ease; }
+  .vcfoot-bottom-right a:hover{ color:rgba(255,255,255,0.75); }
+  .vcfoot-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:rgba(255,255,255,0.4);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:999px; padding:4px 10px;
   }
 </style>
 
@@ -1732,7 +1817,7 @@
 <footer class="vcfoot">
   <div class="vcfoot-inner">
     <div class="vcfoot-brand-col">
-      <a class="vcfoot-brand" href="/">
+      <a class="vcfoot-brand" href="/" style="text-decoration:none;">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="vcfootLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1747,7 +1832,8 @@
         </svg>
         <span>Friend<em>Hub</em></span>
       </a>
-      <p class="vcfoot-tagline">Free random video chat built for instant connections — no accounts to fill in, nothing saved, just click and talk.</p>
+      <div class="vcfoot-status"><span class="dot"></span><span id="vcFootOnlineCount">…</span>&nbsp;people online right now</div>
+      <p class="vcfoot-tagline">FriendHub brings millions of people together from around the world — no accounts to fill in, nothing saved, just click and talk.</p>
       <div class="vcfoot-social">
         <a href="#" aria-label="Instagram">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1"/></svg>
@@ -1766,18 +1852,19 @@
         </a>
       </div>
     </div>
+
     <div class="vcfoot-col">
       <h4>Navigation</h4>
       <ul>
         <li><a href="/">Home</a></li>
         <li><a href="#top">Features</a></li>
         <li><a href="#safety">Safety</a></li>
-        <li><a href="/community">Community Chat</a></li>
         <li><a href="/blog">Blog</a></li>
         <li><a href="/">About</a></li>
         <li><a href="/support">Support</a></li>
       </ul>
     </div>
+
     <div class="vcfoot-col">
       <h4>Legal</h4>
       <ul>
@@ -1788,14 +1875,26 @@
         <li><a href="/contact">Contact</a></li>
       </ul>
     </div>
-  </div>
-  <div class="vcfoot-bottom">All rights reserved. FriendHub © 2026</div>
-</footer>
 
-<div class="vcinfo-foot" style="display:none;">
-  <div><strong>Live Chat</strong> — talk to strangers, no strings attached.</div>
-  <div>By using this site you agree to the Community Rules · Users must be 18 and over</div>
-</div>
+    <div class="vcfoot-col">
+      <h4>Community</h4>
+      <div class="vcfoot-community">
+        <p>Join the group chat — swap tips, meet regulars, talk between video calls.</p>
+        <a href="/community">Open Community Chat →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="vcfoot-bottom">
+    <span>© 2026 FriendHub. All rights reserved.</span>
+    <div class="vcfoot-bottom-right">
+      <span class="vcfoot-badge">🔒 Nothing saved</span>
+      <span class="vcfoot-badge">18+ only</span>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </div>
+  </div>
+</footer>
 
 <script>
 (function(){
@@ -2112,6 +2211,7 @@
   const onlineDebugEl = document.getElementById('vcOnlineDebug');
   const infoOnlineCountEl = document.getElementById('vcInfoOnlineCount');
   const navOnlineCountEl = document.getElementById('vcNavOnlineCount');
+  const footOnlineCountEl = document.getElementById('vcFootOnlineCount');
   const chatLog = document.getElementById('vcChatLog');
   const chatInput = document.getElementById('vcChatInput');
   const chatSendBtn = document.getElementById('vcChatSendBtn');
@@ -2199,10 +2299,25 @@
   let signingInAnon = false;
   let pendingCommunityRedirect = false; // true while the overlay is open specifically to gate Community Chat
 
+  // Separate from authReadyPromise on purpose: authReadyPromise resolves the
+  // moment onAuthStateChanged fires ONCE, which for a fresh visitor is the
+  // very first (user === null) callback — before signInAnonymously() has
+  // actually produced a uid. Anything awaiting authReadyPromise back then
+  // (ensureAnyAuth/touchPresence) would read myUid as null, skip its write,
+  // and the "people online" count would sit on "…" until the next 15s
+  // heartbeat happened to land after anonymous auth finished — which is
+  // exactly the "stuck count" symptom. uidReadyPromise instead resolves
+  // only once we actually HAVE a uid (anonymous or real), so the very first
+  // presence write and count query run with real auth.
+  let uidReadyResolve;
+  const uidReadyPromise = new Promise((res) => { uidReadyResolve = res; });
+  let uidResolved = false;
+
   auth.onAuthStateChanged((user) => {
     if (user) {
       myUid = user.uid;
       myUser = user;
+      if (!uidResolved) { uidResolved = true; uidReadyResolve(myUid); }
 
       if (!user.isAnonymous) {
         db.collection('users').doc(user.uid).set({
@@ -2348,9 +2463,10 @@
 
   // Just needs *some* uid (anonymous is fine) — used for presence/online-count
   // so casual visitors are counted without being pushed through Google sign-in.
+  // Waits for uidReadyPromise (a real uid), not authReadyPromise (just "we
+  // heard back once") — see the comment above where it's defined.
   async function ensureAnyAuth(){
-    if (!authReady) await authReadyPromise;
-    return myUid;
+    return uidReadyPromise;
   }
 
   // ---- live presence: every visitor heartbeats a doc; count = docs updated in the last 30s ----
@@ -2385,7 +2501,7 @@
   }
 
   function refreshOnlineCount(){
-    if (!onlineCountEl && !infoOnlineCountEl) return;
+    if (!onlineCountEl && !infoOnlineCountEl && !navOnlineCountEl && !footOnlineCountEl) return;
     const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - PRESENCE_STALE_MS);
     db.collection('presence').where('updatedAt', '>', cutoff).get().then((snap) => {
       // Using snap.size instead of the .count() aggregation shorthand — that
@@ -2394,9 +2510,10 @@
       // every refresh). Plain .get() + snap.size works everywhere and is
       // plenty cheap at the scale of a presence collection like this.
       const text = snap.size.toLocaleString();
-if (onlineCountEl) onlineCountEl.textContent = text;
-if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
-if (navOnlineCountEl) navOnlineCountEl.textContent = text;
+      if (onlineCountEl) onlineCountEl.textContent = text;
+      if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
+      if (navOnlineCountEl) navOnlineCountEl.textContent = text;
+      if (footOnlineCountEl) footOnlineCountEl.textContent = text;
       clearOnlineDebug();
     }).catch((err) => {
       // Surface this loudly — a silently-swallowed error here is exactly how a fake
@@ -2407,6 +2524,7 @@ if (navOnlineCountEl) navOnlineCountEl.textContent = text;
       if (onlineCountEl) onlineCountEl.textContent = '—';
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = '—';
       if (navOnlineCountEl) navOnlineCountEl.textContent = '—';
+      if (footOnlineCountEl) footOnlineCountEl.textContent = '—';
       if (!myUid && err && err.code === 'permission-denied') return; // expected in the instant before anonymous auth resolves
       console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
       showOnlineDebug('count query failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
