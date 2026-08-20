@@ -266,7 +266,8 @@
   .rgroup-hd{ display:flex; align-items:baseline; gap:8px; margin-bottom:2px; }
   .rgroup-hd .gname{ font-size:14px; font-weight:600; color:#fff; }
   .rgroup-hd .gtime{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); }
-  .rline{ font-size:14px; line-height:1.5; color:var(--paper); word-break:break-word; position:relative; }
+  .rline{ font-size:14px; line-height:1.5; color:var(--paper); word-break:break-word; position:relative; display:flex; align-items:flex-start; gap:4px; }
+  .rline-content{ min-width:0; flex:1 1 auto; }
   .rline .rline-time{
     display:none; position:absolute; left:-46px; top:2px; width:38px; text-align:right;
     font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--ink-faint);
@@ -275,13 +276,15 @@
   .rgroup.first-in-group{ margin-top:10px; }
 
   .rline-del{
-    display:none; position:absolute; right:-2px; top:0; background:var(--void-panel-2);
-    border:1px solid var(--line); color:var(--ink-faint); cursor:pointer;
-    width:22px; height:22px; border-radius:6px; align-items:center; justify-content:center;
+    display:none; align-items:center; justify-content:center;
+    background:none; border:none; color:var(--ink-faint); cursor:pointer;
+    width:22px; height:22px; border-radius:6px; flex:none;
+    vertical-align:middle; margin-left:2px;
   }
-  .rline-del:hover{ color:var(--coral); border-color:rgba(255,107,91,0.4); background:rgba(255,107,91,0.08); }
-  .rline-del svg{ width:12px; height:12px; }
-  .rline.mine:hover .rline-del{ display:flex; }
+  .rline-del:hover{ color:var(--coral); background:rgba(255,107,91,0.1); }
+  .rline-del:active{ background:rgba(255,107,91,0.18); }
+  .rline-del svg{ width:13px; height:13px; }
+  .rline.mine .rline-del{ display:inline-flex; }
   .rline.deleting{ opacity:0.4; pointer-events:none; }
 
   .rmsg-img-wrap{ margin-top:4px; max-width:280px; }
@@ -341,6 +344,43 @@
   }
   .rinput-attach-btn:hover{ color:#fff; background:rgba(237,231,218,0.07); }
   .rinput-attach-btn svg{ width:18px; height:18px; }
+
+  .rgif-wrap{ position:relative; flex:none; }
+  .rgif-btn svg{ width:22px; height:16px; }
+  .rgif-btn.active{ color:#fff; background:rgba(156,140,251,0.18); }
+  .rgif-popover{
+    display:none; position:absolute; bottom:calc(100% + 10px); left:0;
+    width:300px; max-height:360px; background:var(--void-panel-2);
+    border:1px solid var(--line); border-radius:12px; padding:10px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.45); z-index:50;
+    flex-direction:column; gap:8px;
+  }
+  .rgif-popover.open{ display:flex; }
+  .rgif-search{
+    display:flex; align-items:center; gap:7px; flex:none;
+    background:var(--void); border:1px solid var(--line); border-radius:8px;
+    padding:0 10px; height:32px;
+  }
+  .rgif-search:focus-within{ border-color:var(--violet); }
+  .rgif-search svg{ width:14px; height:14px; flex:none; color:var(--ink-faint); }
+  .rgif-search input{
+    flex:1 1 auto; background:none; border:none; color:var(--paper);
+    font-family:inherit; font-size:12.5px; height:100%; min-width:0;
+  }
+  .rgif-search input:focus{ outline:none; }
+  .rgif-search input::placeholder{ color:var(--ink-faint); }
+  .rgif-grid{
+    flex:1 1 auto; overflow-y:auto; display:grid;
+    grid-template-columns:1fr 1fr; gap:6px; min-height:120px; max-height:260px;
+  }
+  .rgif-item{
+    background:var(--void); border:none; border-radius:8px; padding:0; cursor:pointer;
+    overflow:hidden; aspect-ratio:1.4/1; position:relative;
+  }
+  .rgif-item img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .15s ease; }
+  .rgif-item:hover img{ transform:scale(1.05); }
+  .rgif-status{ flex:none; font-size:12px; color:var(--ink-faint); text-align:center; padding:2px 0; }
+  .rgif-attrib{ flex:none; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--ink-faint); text-align:right; opacity:0.7; }
   .rinput-row input{
     flex:1 1 auto; background:none; border:none; color:var(--paper);
     font-family:inherit; font-size:14.5px; padding:10px 0; min-width:0;
@@ -526,10 +566,24 @@
         </button>
       </div>
       <div class="rinput-row">
-        <input type="file" id="rFileInput" accept="image/*,.gif" style="display:none;">
-        <button class="rinput-attach-btn" id="rAttachBtn" aria-label="Send an image or GIF" title="Send an image or GIF">
+        <input type="file" id="rFileInput" accept="image/*" style="display:none;">
+        <button class="rinput-attach-btn" id="rAttachBtn" aria-label="Send an image" title="Send an image">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         </button>
+        <div class="rgif-wrap">
+          <button class="rinput-attach-btn rgif-btn" id="rGifBtn" aria-label="Send a GIF" title="Send a GIF">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><text x="12" y="15" font-size="7.5" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">GIF</text></svg>
+          </button>
+          <div class="rgif-popover" id="rGifPopover">
+            <div class="rgif-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="rGifSearchInput" placeholder="Search GIFs…" autocomplete="off">
+            </div>
+            <div class="rgif-grid" id="rGifGrid"></div>
+            <div class="rgif-status" id="rGifStatus"></div>
+            <div class="rgif-attrib">Powered by GIPHY</div>
+          </div>
+        </div>
         <input type="text" id="rInput" placeholder="Message this room…" maxlength="500">
         <button class="rsend" id="rSendBtn" disabled>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -800,6 +854,15 @@
 
   const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8MB
 
+  // ---- GIPHY (used for the GIF picker). The key below is GIPHY's public
+  // "beta" test key, shared across every app that hasn't registered its
+  // own — it works out of the box but is rate-limited (fine for trying
+  // things out, not for real traffic). For production, grab a free key at
+  // https://developers.giphy.com/dashboard/ and drop it in here.
+  const GIPHY_API_KEY = "dc6zaTOxFJmzC";
+  const GIPHY_SEARCH_URL = "https://api.giphy.com/v1/gifs/search";
+  const GIPHY_TRENDING_URL = "https://api.giphy.com/v1/gifs/trending";
+
   const navAccount = document.getElementById('rNavAccount');
   const navAvatar = document.getElementById('rNavAvatar');
   const navName = document.getElementById('rNavName');
@@ -833,9 +896,15 @@
   const attachSpinner = document.getElementById('rAttachSpinner');
   const attachRemoveBtn = document.getElementById('rAttachRemoveBtn');
 
+  const gifBtn = document.getElementById('rGifBtn');
+  const gifPopover = document.getElementById('rGifPopover');
+  const gifSearchInput = document.getElementById('rGifSearchInput');
+  const gifGrid = document.getElementById('rGifGrid');
+  const gifStatus = document.getElementById('rGifStatus');
+
+
   const lightbox = document.getElementById('rLightbox');
   const lightboxImg = document.getElementById('rLightboxImg');
-
   const confirmBackdrop = document.getElementById('rConfirmBackdrop');
   const confirmTitle = document.getElementById('rConfirmTitle');
   const confirmBody = document.getElementById('rConfirmBody');
@@ -949,11 +1018,14 @@
     timeMini.textContent = fmtTime(now);
     lineEl.appendChild(timeMini);
 
+    const contentEl = document.createElement('div');
+    contentEl.className = 'rline-content';
+
     if (m.text) {
       const textSpan = document.createElement('span');
       textSpan.className = 'rline-text';
       textSpan.textContent = m.text;
-      lineEl.appendChild(textSpan);
+      contentEl.appendChild(textSpan);
     }
 
     if (hasImage) {
@@ -966,8 +1038,10 @@
       imgEl.loading = 'lazy';
       imgEl.addEventListener('click', () => openLightbox(m.imageUrl));
       imgWrap.appendChild(imgEl);
-      lineEl.appendChild(imgWrap);
+      contentEl.appendChild(imgWrap);
     }
+
+    lineEl.appendChild(contentEl);
 
     if (mine && docId) {
       const delBtn = document.createElement('button');
@@ -984,7 +1058,7 @@
 
     bodyEl.appendChild(lineEl);
 
-    renderedLines.push({ text: m.text || '', groupEl, lineEl, textSpan: lineEl.querySelector('.rline-text'), docId });
+    renderedLines.push({ text: m.text || '', groupEl, lineEl, textSpan: contentEl.querySelector('.rline-text'), docId });
 
     logScroll.scrollTop = logScroll.scrollHeight;
 
@@ -1215,6 +1289,107 @@
 
   sendBtn.addEventListener('click', sendMessage);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+  /* ---------------- GIF picker (GIPHY) ---------------- */
+  let gifSearchDebounce = null;
+  let gifRequestSeq = 0; // guards against a slow older request overwriting a newer result
+
+  function openGifPopover(){
+    if (!myUser) return;
+    gifPopover.classList.add('open');
+    gifBtn.classList.add('active');
+    gifSearchInput.value = '';
+    gifSearchInput.focus();
+    loadGifs('', GIPHY_TRENDING_URL);
+  }
+  function closeGifPopover(){
+    gifPopover.classList.remove('open');
+    gifBtn.classList.remove('active');
+  }
+  gifBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (gifPopover.classList.contains('open')) closeGifPopover();
+    else openGifPopover();
+  });
+  document.addEventListener('click', (e) => {
+    if (gifPopover.classList.contains('open') && !gifPopover.contains(e.target) && e.target !== gifBtn && !gifBtn.contains(e.target)) {
+      closeGifPopover();
+    }
+  });
+
+  function loadGifs(query, baseUrl){
+    const seq = ++gifRequestSeq;
+    gifStatus.textContent = 'Loading…';
+    gifGrid.innerHTML = '';
+
+    const url = new URL(baseUrl);
+    url.searchParams.set('api_key', GIPHY_API_KEY);
+    url.searchParams.set('limit', '16');
+    url.searchParams.set('rating', 'pg-13');
+    if (query) url.searchParams.set('q', query);
+
+    fetch(url.toString())
+      .then((res) => res.json())
+      .then((data) => {
+        if (seq !== gifRequestSeq) return; // a newer search/trend request superseded this one
+        const items = (data && data.data) || [];
+        if (!items.length) {
+          gifStatus.textContent = query ? 'No GIFs found for “' + query + '.”' : 'No trending GIFs right now.';
+          return;
+        }
+        gifStatus.textContent = '';
+        items.forEach((gif) => {
+          const imgs = gif.images || {};
+          const thumbUrl = (imgs.fixed_width_small || imgs.fixed_width || imgs.preview_gif || {}).url;
+          const sendUrl = (imgs.fixed_height || imgs.downsized_medium || imgs.original || {}).url;
+          if (!thumbUrl || !sendUrl) return;
+
+          const btn = document.createElement('button');
+          btn.className = 'rgif-item';
+          btn.type = 'button';
+          const img = document.createElement('img');
+          img.src = thumbUrl;
+          img.alt = gif.title || 'GIF';
+          img.loading = 'lazy';
+          btn.appendChild(img);
+          btn.addEventListener('click', () => {
+            closeGifPopover();
+            sendGifMessage(sendUrl);
+          });
+          gifGrid.appendChild(btn);
+        });
+      })
+      .catch((err) => {
+        if (seq !== gifRequestSeq) return;
+        console.error('GIF search failed:', err);
+        gifStatus.textContent = 'Could not load GIFs — try again.';
+      });
+  }
+
+  gifSearchInput.addEventListener('input', () => {
+    const q = gifSearchInput.value.trim();
+    clearTimeout(gifSearchDebounce);
+    gifSearchDebounce = setTimeout(() => {
+      loadGifs(q, q ? GIPHY_SEARCH_URL : GIPHY_TRENDING_URL);
+    }, 350);
+  });
+  gifSearchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeGifPopover(); input.focus(); }
+  });
+
+  function sendGifMessage(url){
+    if (!myUser || !url) return;
+    db.collection('communityRooms').doc(topic).collection('messages').add({
+      sender: myUser.uid,
+      senderName: myUser.displayName || 'Someone',
+      senderPhoto: myUser.photoURL || null,
+      createdAt: FieldValue.serverTimestamp(),
+      imageUrl: url
+    }).catch((err) => {
+      console.error('send gif failed:', err);
+      alert('Could not send that GIF — please try again.');
+    });
+  }
 
   /* ---------------- lightbox for images ---------------- */
   function openLightbox(url){
