@@ -64,8 +64,28 @@
   .rnav-brand svg{ width:22px; height:22px; flex:none; }
   .rnav-brand span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; color:#fff; }
   .rnav-brand span em{ font-style:normal; color:var(--violet); }
-  .rnav-account{ display:flex; align-items:center; gap:8px; font-size:13px; }
+  .rnav-account{ display:flex; align-items:center; gap:8px; font-size:13px; position:relative; }
   .rnav-account img{ width:24px; height:24px; border-radius:50%; }
+  .rnav-account-btn{
+    display:flex; align-items:center; gap:8px; background:none; border:none; color:inherit;
+    cursor:pointer; padding:4px 6px; border-radius:8px; font-size:13px;
+  }
+  .rnav-account-btn:hover{ background:rgba(237,231,218,0.06); }
+  .rnav-account-menu{
+    display:none; position:absolute; right:0; top:calc(100% + 8px); min-width:200px;
+    background:var(--void-panel-2); border:1px solid var(--line); border-radius:10px;
+    padding:6px; box-shadow:0 12px 30px rgba(0,0,0,0.45); z-index:40;
+  }
+  .rnav-account-menu.open{ display:block; }
+  .rnav-account-menu button{
+    display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+    background:none; border:none; color:var(--paper); font-size:13px; font-weight:500;
+    padding:9px 10px; border-radius:7px; cursor:pointer;
+  }
+  .rnav-account-menu button:hover{ background:rgba(237,231,218,0.06); }
+  .rnav-account-menu button svg{ width:15px; height:15px; flex:none; color:var(--ink-faint); }
+  .rnav-account-menu button.danger{ color:var(--coral); }
+  .rnav-account-menu button.danger svg{ color:var(--coral); }
   .rnav-menu-btn{
     display:none; background:none; border:none; color:var(--paper);
     width:32px; height:32px; align-items:center; justify-content:center; cursor:pointer;
@@ -236,7 +256,7 @@
   .rlog-welcome h2{ font-size:22px; color:#fff; }
   .rlog-welcome p{ margin:6px 0 0; font-size:13.5px; color:var(--ink-soft); max-width:440px; line-height:1.5; }
 
-  .rgroup{ display:flex; gap:12px; padding:6px 6px; border-radius:8px; margin:0 -6px; }
+  .rgroup{ display:flex; gap:12px; padding:6px 6px; border-radius:8px; margin:0 -6px; position:relative; }
   .rgroup:hover{ background:rgba(237,231,218,0.025); }
   .rgroup.dim{ opacity:0.28; }
   .rgroup .gav{ flex:none; width:36px; }
@@ -254,6 +274,29 @@
   .rgroup:hover .rline .rline-time{ display:block; }
   .rgroup.first-in-group{ margin-top:10px; }
 
+  .rline-del{
+    display:none; position:absolute; right:-2px; top:0; background:var(--void-panel-2);
+    border:1px solid var(--line); color:var(--ink-faint); cursor:pointer;
+    width:22px; height:22px; border-radius:6px; align-items:center; justify-content:center;
+  }
+  .rline-del:hover{ color:var(--coral); border-color:rgba(255,107,91,0.4); background:rgba(255,107,91,0.08); }
+  .rline-del svg{ width:12px; height:12px; }
+  .rline.mine:hover .rline-del{ display:flex; }
+  .rline.deleting{ opacity:0.4; pointer-events:none; }
+
+  .rmsg-img-wrap{ margin-top:4px; max-width:280px; }
+  .rmsg-img{
+    display:block; max-width:100%; max-height:280px; border-radius:10px;
+    border:1px solid var(--line); cursor:zoom-in; background:var(--void-panel-2);
+  }
+
+  .rlightbox{
+    display:none; position:fixed; inset:0; background:rgba(8,8,18,0.88); z-index:100;
+    align-items:center; justify-content:center; padding:30px; cursor:zoom-out;
+  }
+  .rlightbox.open{ display:flex; }
+  .rlightbox img{ max-width:min(90vw,900px); max-height:88vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+
   .rsearch-hit{ scroll-margin-top:60px; }
   .rsearch-hit.current{ outline:1px solid rgba(156,140,251,0.5); outline-offset:2px; border-radius:6px; }
 
@@ -261,29 +304,59 @@
 
   /* ---------- input ---------- */
   .rinput-wrap{ flex:none; padding:0 18px 18px; }
+  .rattach-preview{
+    display:none; align-items:center; gap:10px;
+    background:var(--void-panel-2); border:1px solid var(--line); border-bottom:none;
+    border-radius:12px 12px 0 0; padding:8px 12px;
+  }
+  .rattach-preview.show{ display:flex; }
+  .rattach-preview img{ width:40px; height:40px; object-fit:cover; border-radius:7px; flex:none; }
+  .rattach-preview .info{ flex:1 1 auto; min-width:0; font-size:12px; color:var(--ink-soft); }
+  .rattach-preview .info b{ display:block; color:var(--paper); font-size:12.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rattach-preview .rm{
+    flex:none; background:none; border:none; color:var(--ink-faint); cursor:pointer;
+    width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:6px;
+  }
+  .rattach-preview .rm:hover{ color:var(--coral); background:rgba(255,107,91,0.1); }
+  .rattach-preview .rm svg{ width:13px; height:13px; }
+  .rattach-preview .spinner{
+    width:16px; height:16px; border-radius:50%; border:2px solid rgba(237,231,218,0.2);
+    border-top-color:var(--violet); flex:none; animation:rspin 0.7s linear infinite;
+  }
+  @keyframes rspin{ to{ transform:rotate(360deg); } }
+
   .rinput-row{
     display:flex; align-items:center; gap:8px;
     background:var(--void-panel-2); border:1px solid var(--line);
-    border-radius:12px; padding:5px 6px 5px 16px;
+    border-radius:12px; padding:5px 6px 5px 10px;
     transition:border-color .12s ease;
   }
+  .rattach-preview.show + .rinput-row{ border-radius:0 0 12px 12px; border-top:none; }
   .rinput-row:focus-within{ border-color:var(--violet); }
+  .rinput-attach-btn{
+    flex:none; display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:9px; border:none;
+    background:none; color:var(--ink-soft); cursor:pointer;
+    transition:color .12s ease, background .12s ease;
+  }
+  .rinput-attach-btn:hover{ color:#fff; background:rgba(237,231,218,0.07); }
+  .rinput-attach-btn svg{ width:18px; height:18px; }
   .rinput-row input{
     flex:1 1 auto; background:none; border:none; color:var(--paper);
-    font-family:inherit; font-size:14.5px; padding:10px 0;
+    font-family:inherit; font-size:14.5px; padding:10px 0; min-width:0;
   }
   .rinput-row input:focus{ outline:none; }
   .rinput-row input::placeholder{ color:var(--ink-faint); }
-  .rinput-row button{
+  .rinput-row button.rsend{
     flex:none; display:flex; align-items:center; justify-content:center;
     background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff; border:none;
     border-radius:9px; width:38px; height:38px; cursor:pointer;
     transition:filter .15s ease, transform .15s ease, opacity .15s ease;
   }
-  .rinput-row button:hover{ filter:brightness(1.08); }
-  .rinput-row button:active{ transform:translateY(1px); }
-  .rinput-row button:disabled{ opacity:0.45; cursor:not-allowed; }
-  .rinput-row button svg{ width:16px; height:16px; }
+  .rinput-row button.rsend:hover{ filter:brightness(1.08); }
+  .rinput-row button.rsend:active{ transform:translateY(1px); }
+  .rinput-row button.rsend:disabled{ opacity:0.45; cursor:not-allowed; }
+  .rinput-row button.rsend svg{ width:16px; height:16px; }
 
   .rnotfound{
     flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -296,6 +369,28 @@
     background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff;
     border-radius:10px; padding:11px 20px; font-weight:600; font-size:14px;
   }
+
+  /* confirm dialog */
+  .rconfirm-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(8,8,18,0.6); z-index:110;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .rconfirm-backdrop.open{ display:flex; }
+  .rconfirm{
+    width:100%; max-width:360px; background:var(--void-panel); border:1px solid var(--line);
+    border-radius:14px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .rconfirm h3{ font-size:16px; color:#fff; margin-bottom:8px; }
+  .rconfirm p{ font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0 0 18px; }
+  .rconfirm-row{ display:flex; gap:8px; justify-content:flex-end; }
+  .rconfirm-row button{
+    border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .rconfirm-cancel{ background:var(--void-panel-2); color:var(--paper); }
+  .rconfirm-cancel:hover{ background:rgba(237,231,218,0.1); }
+  .rconfirm-ok{ background:var(--coral); color:#fff; }
+  .rconfirm-ok:hover{ filter:brightness(1.08); }
+  .rconfirm-ok:disabled{ opacity:0.5; cursor:default; }
 
   /* ---------- responsive ---------- */
   @media (max-width:980px){
@@ -347,8 +442,16 @@
       </a>
     </div>
     <div class="rnav-account" id="rNavAccount" style="display:none;">
-      <img id="rNavAvatar" src="" alt="">
-      <span id="rNavName"></span>
+      <button class="rnav-account-btn" id="rNavAccountBtn">
+        <img id="rNavAvatar" src="" alt="">
+        <span id="rNavName"></span>
+      </button>
+      <div class="rnav-account-menu" id="rNavAccountMenu">
+        <button id="rClearMyMsgsBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Delete my messages here
+        </button>
+      </div>
     </div>
   </div>
 </nav>
@@ -414,9 +517,21 @@
     </div>
 
     <div class="rinput-wrap">
+      <div class="rattach-preview" id="rAttachPreview">
+        <img id="rAttachPreviewImg" src="" alt="">
+        <div class="info"><b id="rAttachPreviewName"></b><span id="rAttachPreviewStatus">Ready to send</span></div>
+        <div class="spinner" id="rAttachSpinner" style="display:none;"></div>
+        <button class="rm" id="rAttachRemoveBtn" aria-label="Remove attachment">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
       <div class="rinput-row">
+        <input type="file" id="rFileInput" accept="image/*,.gif" style="display:none;">
+        <button class="rinput-attach-btn" id="rAttachBtn" aria-label="Send an image or GIF" title="Send an image or GIF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </button>
         <input type="text" id="rInput" placeholder="Message this room…" maxlength="500">
-        <button id="rSendBtn" disabled>
+        <button class="rsend" id="rSendBtn" disabled>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
       </div>
@@ -435,6 +550,19 @@
   <h2>Room not found</h2>
   <p>That community doesn't exist, or the link is missing its topic. Head back and pick one from the list.</p>
   <a href="/community.html">Browse communities</a>
+</div>
+
+<div class="rlightbox" id="rLightbox"><img id="rLightboxImg" src="" alt=""></div>
+
+<div class="rconfirm-backdrop" id="rConfirmBackdrop">
+  <div class="rconfirm">
+    <h3 id="rConfirmTitle">Delete message?</h3>
+    <p id="rConfirmBody">This can't be undone.</p>
+    <div class="rconfirm-row">
+      <button class="rconfirm-cancel" id="rConfirmCancel">Cancel</button>
+      <button class="rconfirm-ok" id="rConfirmOk">Delete</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -625,18 +753,23 @@
 
 <!-- ============================================================
   Firebase: auth gate, live messages, send, presence/online count,
-  member list, and in-room message search.
+  member list, image/GIF attachments, message deletion, and
+  in-room message search.
   Reuses the same project as the main FriendHub page.
 
   Firestore layout used here (add rules for these — see notes below):
     /communityRooms/{topic}/messages/{messageId}
-      { text, sender (uid), senderName, senderPhoto, createdAt }
+      { text, sender (uid), senderName, senderPhoto, createdAt, imageUrl?, imagePath? }
     /roomPresence/{topic}_{uid}
       { topic, uid, name, photo, updatedAt }
+
+  Storage layout used here (add rules for this too — see notes below):
+    /roomUploads/{topic}/{uid}/{timestamp}_{filename}
 ============================================================= -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script>
 (function(){
   const topic = new URLSearchParams(window.location.search).get('topic');
@@ -652,11 +785,17 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const storage = firebase.storage();
   const FieldValue = firebase.firestore.FieldValue;
+
+  const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8MB
 
   const navAccount = document.getElementById('rNavAccount');
   const navAvatar = document.getElementById('rNavAvatar');
   const navName = document.getElementById('rNavName');
+  const navAccountBtn = document.getElementById('rNavAccountBtn');
+  const navAccountMenu = document.getElementById('rNavAccountMenu');
+  const clearMyMsgsBtn = document.getElementById('rClearMyMsgsBtn');
   const logScroll = document.getElementById('rLogScroll');
   const log = document.getElementById('rLog');
   const logWelcome = document.getElementById('rLogWelcome');
@@ -675,6 +814,24 @@
   const searchPrev = document.getElementById('rSearchPrev');
   const searchNext = document.getElementById('rSearchNext');
 
+  const fileInput = document.getElementById('rFileInput');
+  const attachBtn = document.getElementById('rAttachBtn');
+  const attachPreview = document.getElementById('rAttachPreview');
+  const attachPreviewImg = document.getElementById('rAttachPreviewImg');
+  const attachPreviewName = document.getElementById('rAttachPreviewName');
+  const attachPreviewStatus = document.getElementById('rAttachPreviewStatus');
+  const attachSpinner = document.getElementById('rAttachSpinner');
+  const attachRemoveBtn = document.getElementById('rAttachRemoveBtn');
+
+  const lightbox = document.getElementById('rLightbox');
+  const lightboxImg = document.getElementById('rLightboxImg');
+
+  const confirmBackdrop = document.getElementById('rConfirmBackdrop');
+  const confirmTitle = document.getElementById('rConfirmTitle');
+  const confirmBody = document.getElementById('rConfirmBody');
+  const confirmCancel = document.getElementById('rConfirmCancel');
+  const confirmOk = document.getElementById('rConfirmOk');
+
   if (!document.getElementById('rRoomFound') || document.getElementById('rRoomFound').style.display === 'none') {
     return; // unknown room — nothing below needs to run
   }
@@ -682,10 +839,13 @@
   let myUser = null;
   let unsubMessages = null;
 
-  // In-memory record of rendered message lines for search.
+  // In-memory record of rendered message lines for search + delete.
   const renderedLines = [];
   let lastGroup = null; // { senderKey, el, bodyEl, ts }
   const GROUP_WINDOW_MS = 5 * 60 * 1000;
+
+  // Pending attachment state.
+  let pendingUpload = null; // { file, previewUrl, downloadUrl, storagePath, uploading }
 
   auth.onAuthStateChanged((user) => {
     if (user && !user.isAnonymous) {
@@ -694,7 +854,7 @@
       navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
       navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
       input.disabled = false;
-      sendBtn.disabled = false;
+      updateSendBtnState();
       startRoom();
     } else {
       // Anonymous or fully signed out — chat rooms are a gated action, same
@@ -721,12 +881,16 @@
     return m.senderPhoto || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(m.senderName || 'U'));
   }
 
-  function addMessageEl(m, mine){
+  function addMessageEl(m, mine, docId){
     logWelcome.style.marginBottom = '4px';
     logEmpty.style.display = 'none';
 
     const senderKey = m.sender || m.senderName || 'unknown';
     const now = m.createdAt && m.createdAt.toDate ? m.createdAt.toDate() : new Date();
+    const hasImage = !!m.imageUrl;
+    // Don't group an image message into a text-only group visually — keep
+    // grouping logic the same (by sender + time window) but each line
+    // still renders its own content correctly either way.
     const canGroup = lastGroup && lastGroup.senderKey === senderKey && (now - lastGroup.ts) < GROUP_WINDOW_MS;
 
     let bodyEl, groupEl;
@@ -768,24 +932,71 @@
     }
 
     const lineEl = document.createElement('div');
-    lineEl.className = 'rline rsearch-hit';
+    lineEl.className = 'rline rsearch-hit' + (mine ? ' mine' : '');
+
     const timeMini = document.createElement('span');
     timeMini.className = 'rline-time';
     timeMini.textContent = fmtTime(now);
-    const textSpan = document.createElement('span');
-    textSpan.className = 'rline-text';
-    textSpan.textContent = m.text;
     lineEl.appendChild(timeMini);
-    lineEl.appendChild(textSpan);
+
+    if (m.text) {
+      const textSpan = document.createElement('span');
+      textSpan.className = 'rline-text';
+      textSpan.textContent = m.text;
+      lineEl.appendChild(textSpan);
+    }
+
+    if (hasImage) {
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'rmsg-img-wrap';
+      const imgEl = document.createElement('img');
+      imgEl.className = 'rmsg-img';
+      imgEl.src = m.imageUrl;
+      imgEl.alt = 'Shared image';
+      imgEl.loading = 'lazy';
+      imgEl.addEventListener('click', () => openLightbox(m.imageUrl));
+      imgWrap.appendChild(imgEl);
+      lineEl.appendChild(imgWrap);
+    }
+
+    if (mine && docId) {
+      const delBtn = document.createElement('button');
+      delBtn.className = 'rline-del';
+      delBtn.setAttribute('aria-label', 'Delete message');
+      delBtn.title = 'Delete message';
+      delBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        confirmDeleteMessage(docId, lineEl);
+      });
+      lineEl.appendChild(delBtn);
+    }
+
     bodyEl.appendChild(lineEl);
 
-    renderedLines.push({ text: m.text || '', groupEl, lineEl, textSpan });
+    renderedLines.push({ text: m.text || '', groupEl, lineEl, textSpan: lineEl.querySelector('.rline-text'), docId });
 
     logScroll.scrollTop = logScroll.scrollHeight;
 
     if (searchBox.classList.contains('open') && searchInput.value.trim()) {
       runSearch(searchInput.value.trim());
     }
+  }
+
+  function removeMessageEl(docId){
+    const idx = renderedLines.findIndex((l) => l.docId === docId);
+    if (idx === -1) return;
+    const entry = renderedLines[idx];
+    const groupEl = entry.groupEl;
+    entry.lineEl.remove();
+    renderedLines.splice(idx, 1);
+    // If that was the last line in its group, drop the whole group; if it
+    // was the group currently being appended to, clear that reference too.
+    if (!groupEl.querySelector('.rline')) {
+      groupEl.remove();
+      if (lastGroup && lastGroup.el === groupEl) lastGroup = null;
+    }
+    if (!log.querySelector('.rgroup')) logEmpty.style.display = 'block';
   }
 
   function startRoom(){
@@ -798,7 +1009,9 @@
         if (change.type === 'added') {
           const m = change.doc.data();
           if (!m.createdAt) return; // ignore the optimistic local echo firestore sometimes emits pre-write
-          addMessageEl(m, m.sender === myUser.uid);
+          addMessageEl(m, m.sender === myUser.uid, change.doc.id);
+        } else if (change.type === 'removed') {
+          removeMessageEl(change.doc.id);
         }
       });
     }, (err) => {
@@ -873,24 +1086,226 @@
       });
   }
 
+  /* ---------------- sending: text + image/GIF attachment ---------------- */
+
+  function updateSendBtnState(){
+    const hasText = input.value.trim().length > 0;
+    const hasAttachment = !!(pendingUpload && !pendingUpload.uploading);
+    sendBtn.disabled = !myUser || (!hasText && !hasAttachment);
+  }
+  input.addEventListener('input', updateSendBtnState);
+
+  attachBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    fileInput.value = ''; // allow re-selecting the same file later
+    if (!file) return;
+    startAttachmentUpload(file);
+  });
+
+  function startAttachmentUpload(file){
+    if (!myUser) return;
+    if (!/^image\//.test(file.type) && !/\.gif$/i.test(file.name)) {
+      alert('Please choose an image or GIF file.');
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      alert('That file is larger than 8MB — please pick a smaller image or GIF.');
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    pendingUpload = { file, previewUrl, downloadUrl: null, storagePath: null, uploading: true };
+
+    attachPreview.classList.add('show');
+    attachPreviewImg.src = previewUrl;
+    attachPreviewName.textContent = file.name;
+    attachPreviewStatus.textContent = 'Uploading…';
+    attachSpinner.style.display = 'block';
+    updateSendBtnState();
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const path = 'roomUploads/' + topic + '/' + myUser.uid + '/' + Date.now() + '_' + safeName;
+    const ref = storage.ref().child(path);
+
+    ref.put(file).then((snap) => snap.ref.getDownloadURL()).then((url) => {
+      if (!pendingUpload || pendingUpload.file !== file) return; // removed/replaced while uploading
+      pendingUpload.downloadUrl = url;
+      pendingUpload.storagePath = path;
+      pendingUpload.uploading = false;
+      attachPreviewStatus.textContent = 'Ready to send';
+      attachSpinner.style.display = 'none';
+      updateSendBtnState();
+    }).catch((err) => {
+      console.error('attachment upload failed:', err);
+      attachPreviewStatus.textContent = 'Upload failed — try again';
+      attachSpinner.style.display = 'none';
+      if (pendingUpload) pendingUpload.uploading = false;
+      updateSendBtnState();
+    });
+  }
+
+  function clearAttachment(){
+    if (pendingUpload) {
+      if (pendingUpload.previewUrl) URL.revokeObjectURL(pendingUpload.previewUrl);
+      // Best-effort cleanup if it finished uploading but user backed out.
+      if (pendingUpload.storagePath) {
+        storage.ref().child(pendingUpload.storagePath).delete().catch(() => {});
+      }
+    }
+    pendingUpload = null;
+    attachPreview.classList.remove('show');
+    attachPreviewImg.src = '';
+    updateSendBtnState();
+  }
+  attachRemoveBtn.addEventListener('click', clearAttachment);
+
   function sendMessage(){
     const text = input.value.trim();
-    if (!text || !myUser) return;
+    const attachment = (pendingUpload && !pendingUpload.uploading && pendingUpload.downloadUrl) ? pendingUpload : null;
+    if (!text && !attachment) return;
+    if (!myUser) return;
+    if (pendingUpload && pendingUpload.uploading) return; // still uploading, wait
+
     input.value = '';
-    db.collection('communityRooms').doc(topic).collection('messages').add({
-      text: text,
+    const payload = {
       sender: myUser.uid,
       senderName: myUser.displayName || 'Someone',
       senderPhoto: myUser.photoURL || null,
       createdAt: FieldValue.serverTimestamp()
-    }).catch((err) => {
+    };
+    if (text) payload.text = text;
+    if (attachment) {
+      payload.imageUrl = attachment.downloadUrl;
+      payload.imagePath = attachment.storagePath;
+    }
+
+    // Detach the preview from cleanup so clearAttachment() below doesn't
+    // delete the file we just referenced in the message.
+    const sentPreviewUrl = pendingUpload ? pendingUpload.previewUrl : null;
+    pendingUpload = null;
+    attachPreview.classList.remove('show');
+    attachPreviewImg.src = '';
+    if (sentPreviewUrl) URL.revokeObjectURL(sentPreviewUrl);
+    updateSendBtnState();
+
+    db.collection('communityRooms').doc(topic).collection('messages').add(payload).catch((err) => {
       console.error('send failed:', err);
       input.value = text; // restore so they don't lose what they typed
+      updateSendBtnState();
     });
   }
 
   sendBtn.addEventListener('click', sendMessage);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+  /* ---------------- lightbox for images ---------------- */
+  function openLightbox(url){
+    lightboxImg.src = url;
+    lightbox.classList.add('open');
+  }
+  lightbox.addEventListener('click', () => {
+    lightbox.classList.remove('open');
+    lightboxImg.src = '';
+  });
+
+  /* ---------------- delete: single message + all my messages ---------------- */
+  function showConfirm(title, body){
+    return new Promise((resolve) => {
+      confirmTitle.textContent = title;
+      confirmBody.textContent = body;
+      confirmBackdrop.classList.add('open');
+      confirmOk.disabled = false;
+      confirmOk.textContent = 'Delete';
+
+      function cleanup(result){
+        confirmBackdrop.classList.remove('open');
+        confirmOk.removeEventListener('click', onOk);
+        confirmCancel.removeEventListener('click', onCancel);
+        confirmBackdrop.removeEventListener('click', onBackdrop);
+        resolve(result);
+      }
+      function onOk(){ cleanup(true); }
+      function onCancel(){ cleanup(false); }
+      function onBackdrop(e){ if (e.target === confirmBackdrop) cleanup(false); }
+
+      confirmOk.addEventListener('click', onOk);
+      confirmCancel.addEventListener('click', onCancel);
+      confirmBackdrop.addEventListener('click', onBackdrop);
+    });
+  }
+
+  async function confirmDeleteMessage(docId, lineEl){
+    const ok = await showConfirm('Delete message?', 'This removes it for everyone in the room. This can\'t be undone.');
+    if (!ok) return;
+    lineEl.classList.add('deleting');
+    try {
+      const docRef = db.collection('communityRooms').doc(topic).collection('messages').doc(docId);
+      const snap = await docRef.get();
+      const data = snap.exists ? snap.data() : null;
+      await docRef.delete();
+      if (data && data.imagePath) {
+        storage.ref().child(data.imagePath).delete().catch(() => {});
+      }
+      // removeMessageEl() also runs from the 'removed' onSnapshot event;
+      // calling it here too is a harmless no-op if that already fired.
+      removeMessageEl(docId);
+    } catch (err) {
+      console.error('delete failed:', err);
+      lineEl.classList.remove('deleting');
+      alert('Could not delete that message — please try again.');
+    }
+  }
+
+  async function clearAllMyMessages(){
+    if (!myUser) return;
+    const ok = await showConfirm(
+      'Delete all your messages in this room?',
+      'This removes every message and image you\'ve sent in ' + (room ? room.name : 'this room') + '. This can\'t be undone.'
+    );
+    if (!ok) return;
+    navAccountMenu.classList.remove('open');
+    confirmOk.disabled = true;
+    try {
+      const snap = await db.collection('communityRooms').doc(topic).collection('messages')
+        .where('sender', '==', myUser.uid).get();
+      const batchSize = 400;
+      const docs = snap.docs;
+      for (let i = 0; i < docs.length; i += batchSize) {
+        const batch = db.batch();
+        docs.slice(i, i + batchSize).forEach((d) => batch.delete(d.ref));
+        await batch.commit();
+      }
+      // Clean up any images those messages referenced.
+      docs.forEach((d) => {
+        const data = d.data();
+        if (data.imagePath) storage.ref().child(data.imagePath).delete().catch(() => {});
+        removeMessageEl(d.id);
+      });
+    } catch (err) {
+      console.error('clear my messages failed:', err);
+      alert('Could not delete your messages — please try again.');
+    }
+  }
+
+  navAccountBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    navAccountMenu.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (navAccountMenu.classList.contains('open') && !navAccountMenu.contains(e.target) && e.target !== navAccountBtn && !navAccountBtn.contains(e.target)) {
+      navAccountMenu.classList.remove('open');
+    }
+  });
+  clearMyMsgsBtn.addEventListener('click', clearAllMyMessages);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (lightbox.classList.contains('open')) { lightbox.classList.remove('open'); lightboxImg.src = ''; }
+      if (confirmBackdrop.classList.contains('open')) confirmCancel.click();
+    }
+  });
 
   /* ---------------- in-room message search ---------------- */
   let searchHits = [];
@@ -910,7 +1325,7 @@
   function clearSearch(){
     renderedLines.forEach((l) => {
       l.groupEl.classList.remove('dim');
-      l.textSpan.innerHTML = escapeHtml(l.text);
+      if (l.textSpan) l.textSpan.innerHTML = escapeHtml(l.text);
       l.lineEl.classList.remove('current');
     });
     searchHits = [];
@@ -928,16 +1343,18 @@
 
     renderedLines.forEach((l) => {
       const textLower = l.text.toLowerCase();
-      const hasMatch = textLower.includes(qLower);
+      const hasMatch = !!l.text && textLower.includes(qLower);
       l.groupEl.classList.toggle('dim', !hasMatch);
-      if (hasMatch) {
-        const escaped = escapeHtml(l.text);
-        const re = new RegExp('(' + qLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
-        l.textSpan.innerHTML = escaped.replace(re, '<mark>$1</mark>');
-        searchHits.push(l);
-      } else {
-        l.textSpan.innerHTML = escapeHtml(l.text);
+      if (l.textSpan) {
+        if (hasMatch) {
+          const escaped = escapeHtml(l.text);
+          const re = new RegExp('(' + qLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+          l.textSpan.innerHTML = escaped.replace(re, '<mark>$1</mark>');
+        } else {
+          l.textSpan.innerHTML = escapeHtml(l.text);
+        }
       }
+      if (hasMatch) searchHits.push(l);
       l.lineEl.classList.remove('current');
     });
 
