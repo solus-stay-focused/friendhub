@@ -20,12 +20,12 @@
   html, body{
     margin:0;
     height:100%;
-    background:#0D0E1F;
+    background:#070B1C;
   }
 
   .vcapp{
-    --void:#14152B;
-    --void-deep:#0D0E1F;
+    --void:#0A1D31;
+    --void-deep:#070B1C;
     --paper:#EDE7DA;
     --mint:#5EEAD4;
     --coral:#FF6B5B;
@@ -61,7 +61,7 @@
     width:100%;
     flex:1 1 auto;
     min-height:0;
-    background:var(--void-deep);
+    background:#0B2638;
     border-radius:12px;
     overflow:hidden;
     position:relative;
@@ -75,7 +75,7 @@
     display:flex;
     flex-direction:row;
     position:relative;
-    background:var(--void-deep);
+    background:#0B2638;
   }
   @media (max-width:600px){
     .vcbox-stage{ flex-direction:column; }
@@ -85,7 +85,7 @@
     flex:1 1 50%;
     position:relative;
     overflow:hidden;
-    background:linear-gradient(135deg,#1B1D3D,#0D0E1F);
+    background:linear-gradient(135deg,#0B2638,#0C3148);
   }
   .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }
   @media (max-width:600px){
@@ -96,7 +96,7 @@
     position:absolute; left:14px; bottom:14px; z-index:3;
     font-size:11px;
     color:rgba(237,231,218,0.85);
-    background:rgba(13,14,31,0.6);
+    background:rgba(7,11,28,0.6);
     padding:5px 12px; border-radius:999px;
     border:1px solid rgba(237,231,218,0.15);
   }
@@ -120,7 +120,7 @@
   .vcbox-status{
     position:absolute; top:56px; left:16px; z-index:10;
     font-size:12px; color:var(--mint); letter-spacing:0.03em;
-    background:rgba(13,14,31,0.65);
+    background:rgba(7,11,28,0.65);
     padding:6px 14px; border-radius:999px;
     border:1px solid rgba(94,234,212,0.25);
     display:flex; align-items:center; gap:7px;
@@ -180,7 +180,7 @@
   .vcbox-snap-toast{
     position:absolute; bottom:16px; left:50%; z-index:41;
     transform:translate(-50%,10px);
-    background:rgba(13,14,31,0.9);
+    background:rgba(7,11,28,0.9);
     color:var(--mint);
     border:1px solid rgba(94,234,212,0.3);
     padding:8px 16px; border-radius:999px;
@@ -468,7 +468,7 @@
     margin-top:0;
     display:flex;
     flex-direction:column;
-    background:var(--void);
+    background:#0A1224;
     border:1px solid var(--line);
     border-radius:12px;
     overflow:hidden;
@@ -534,7 +534,7 @@
   }
   .vcapp-chat-input input{
     flex:1 1 auto;
-    background:var(--void-deep);
+    background:#080F20;
     border:1px solid var(--line);
     color:var(--paper);
     border-radius:10px;
@@ -574,7 +574,7 @@
     --hp-blue-light:#5E9EFF;
     --hp-blue-deep:#1E4FD8;
     --hp-navy:#0B0C1E;
-    background:rgba(11,12,30,0.92);
+    background:rgba(9,13,32,0.92);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid rgba(255,255,255,0.08);
@@ -705,8 +705,8 @@
     --hp-blue:#3B7BFF;
     --hp-blue-light:#5E9EFF;
     --hp-blue-deep:#1E4FD8;
-    --hp-black:#05060B;
-    --hp-bg:#0B0C1E;
+    --hp-black:#070B1C;
+    --hp-bg:#070B1C;
     --hp-card:rgba(255,255,255,0.05);
     --hp-card-border:rgba(255,255,255,0.09);
     --ink:#F5F4FB;
@@ -840,7 +840,7 @@
   .vcinfo-banner{
     position:relative; width:100%; cursor:grab;
     border-radius:20px; overflow:hidden; aspect-ratio:16/11;
-    background:linear-gradient(160deg,#2E2A57,#171735);
+    background:linear-gradient(160deg,#0B2638,#0C3148);
     box-shadow:0 30px 60px -25px rgba(59,123,255,0.4), 0 10px 24px rgba(5,6,11,0.2);
     touch-action:pan-y;
     user-select:none;
@@ -914,7 +914,7 @@
   .vcinfo-features{
     position:relative; z-index:2;
     max-width:1180px; margin:-46px auto 0;
-    background:#11122A; border:1px solid var(--hp-card-border); border-radius:28px;
+    background:#0A1D31; border:1px solid var(--hp-card-border); border-radius:28px;
     box-shadow:0 20px 50px -20px rgba(0,0,0,0.5);
     padding:34px 6vw;
     display:grid; grid-template-columns:repeat(3,1fr); gap:28px 24px;
@@ -1059,7 +1059,7 @@
   /* ---------- Google sign-in ---------- */
   .vcauth-overlay{
     position:fixed; inset:0; z-index:200;
-    background:rgba(13,14,31,0.82);
+    background:rgba(7,11,28,0.82);
     backdrop-filter:blur(4px);
     display:none;
     align-items:center; justify-content:center;
@@ -1069,7 +1069,7 @@
   .vcauth-overlay.open{ display:flex; }
   .vcauth-card{
     width:100%; max-width:380px;
-    background:#14152B;
+    background:#0A1D31;
     border:1px solid rgba(237,231,218,0.14);
     border-radius:18px;
     padding:28px 26px 24px;
@@ -1123,7 +1123,7 @@
   .vcnav-account img{ width:24px; height:24px; border-radius:50%; }
   .vcnav-account-menu{
     position:absolute; top:calc(100% + 8px); right:0; z-index:30;
-    background:#14152B; border:1px solid rgba(237,231,218,0.14);
+    background:#0A1D31; border:1px solid rgba(237,231,218,0.14);
     border-radius:10px; padding:6px; min-width:150px;
     box-shadow:0 18px 40px rgba(0,0,0,0.4);
     display:none;
@@ -1140,7 +1140,7 @@
   .vc-country-overlay{
     display:none;
     position:fixed; inset:0; z-index:300;
-    background:rgba(13,14,31,0.82);
+    background:rgba(7,11,28,0.82);
     backdrop-filter:blur(4px);
     align-items:center; justify-content:center;
     padding:24px;
@@ -1149,7 +1149,7 @@
   .vc-country-overlay.active{ display:flex; }
   .vc-country-modal{
     width:100%; max-width:640px; max-height:80vh;
-    background:#14152B;
+    background:#0A1D31;
     border:1px solid rgba(237,231,218,0.14);
     border-radius:18px;
     box-shadow:0 30px 70px rgba(0,0,0,0.5);
@@ -2039,7 +2039,7 @@
     if (!stage) return;
     flashScreen();
     loadHtml2Canvas().then(() => {
-      return window.html2canvas(stage, { backgroundColor: '#0D0E1F', useCORS: true, logging: false });
+      return window.html2canvas(stage, { backgroundColor: '#070B1C', useCORS: true, logging: false });
     }).then((canvas) => {
       const link = document.createElement('a');
       const stamp = new Date().toISOString().replace(/[:.]/g, '-');
