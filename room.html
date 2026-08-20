@@ -438,61 +438,38 @@
 </div>
 
 <script>
-  // Kept in sync with the same list on /community.html — same slug, name,
-  // icon, desc, tint/border for every entry so a card there always opens
-  // the matching room here.
-  const COMMUNITIES = [
+  // Small bootstrap list so the header/log can render instantly before the
+  // full list below has loaded. The real, authoritative list now lives in
+  // /community.html — loadFullCommunityList() fetches that page and pulls
+  // its COMMUNITIES array out at runtime, so every community that exists
+  // there (all of them, not just this short seed set) is available here
+  // too, without keeping two copies of the same giant array in sync by hand.
+  let COMMUNITIES = [
     { slug:"cooking",       name:"Cooking",            icon:"🍳", desc:"Recipes, techniques, and what's for dinner tonight.",      tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
     { slug:"sports",        name:"Sports",             icon:"⚽", desc:"Scores, highlights, and hot takes on every league.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
     { slug:"business",      name:"Business",           icon:"💼", desc:"Strategy, operations, and running a company day to day.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
     { slug:"learning",      name:"Learning",           icon:"📚", desc:"Study tips, courses, and figuring things out together.",  tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"coding",        name:"Coding",             icon:"💻", desc:"Debugging, side projects, and language wars.",            tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"startups",      name:"Startups",           icon:"🚀", desc:"Building, fundraising, and shipping v1.",                 tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"music",         name:"Music",              icon:"🎵", desc:"New releases, production, and playlist swaps.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"movies-tv",     name:"Movies & TV",        icon:"🎬", desc:"What to watch next, and spoiler-free discussion.",        tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"gaming",        name:"Gaming",             icon:"🎮", desc:"Squad-up chat, patch notes, and what you're grinding.",   tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"travel",        name:"Travel",             icon:"✈️", desc:"Trip planning, hidden gems, and flight-deal alerts.",     tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"fitness",       name:"Fitness",            icon:"🏋️", desc:"Training plans, form checks, and accountability.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    { slug:"photography",   name:"Photography",        icon:"📷", desc:"Gear talk, edits, and critique welcome.",                 tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"art-design",    name:"Art & Design",       icon:"🎨", desc:"Sketches, feedback, and design process chat.",            tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"books",         name:"Books",              icon:"📖", desc:"What you're reading and what's worth the hype.",         tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"finance",       name:"Finance & Investing",icon:"💰", desc:"Markets, budgeting, and long-term money talk.",           tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    { slug:"science",       name:"Science",            icon:"🔬", desc:"New research, weird facts, and honest questions.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"mental-health", name:"Mental Health",      icon:"🧠", desc:"Supportive, judgment-free peer conversation.",            tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"parenting",     name:"Parenting",          icon:"👶", desc:"Trading notes on the hardest job with no manual.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    { slug:"pets-animals",  name:"Pets & Animals",     icon:"🐾", desc:"Show off your pet, ask for advice, swap stories.",        tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"relationships", name:"Relationships & Dating", icon:"❤️", desc:"Advice, venting, and modern-dating chaos.",           tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"anime-manga",   name:"Anime & Manga",      icon:"🌸", desc:"Seasonal watch talk, manga chapters, and recs.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"food-dining",   name:"Food & Dining Out",  icon:"🍜", desc:"Restaurant finds, takeout wins, and food photos.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    { slug:"diy-home",      name:"DIY & Home Improvement", icon:"🔨", desc:"Fixer-upper projects, tools, and before/afters.",     tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"cars-moto",     name:"Cars & Motorcycles", icon:"🏎️", desc:"Builds, maintenance tips, and garage talk.",              tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"fashion-style", name:"Fashion & Style",    icon:"👗", desc:"Fit checks, thrift finds, and outfit advice.",            tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"comedy-memes",  name:"Comedy & Memes",     icon:"😂", desc:"Whatever's making the rounds, plus original bits.",       tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"history",       name:"History",            icon:"🏛️", desc:"Deep dives, debates, and today-in-history trivia.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"philosophy",    name:"Philosophy",         icon:"🦉", desc:"Big questions, thought experiments, friendly debate.",    tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"language-learning", name:"Language Learning", icon:"🗣️", desc:"Practice partners, resources, and progress check-ins.", tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"crypto-web3",   name:"Crypto & Web3",      icon:"⛓️", desc:"Market chat, projects, and separating signal from noise.",tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    { slug:"real-estate",   name:"Real Estate",        icon:"🏠", desc:"Buying, renting, investing, and market talk.",            tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"board-games",   name:"Board Games & Tabletop", icon:"🎲", desc:"Game nights, new releases, and rules debates.",        tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"outdoors-hiking", name:"Outdoors & Hiking",icon:"🥾", desc:"Trail reports, gear talk, and trip planning.",             tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"astrology-spirituality", name:"Astrology & Spirituality", icon:"🔮", desc:"Charts, practices, and open-minded chat.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"tech-gadgets",  name:"Tech & Gadgets",     icon:"📱", desc:"New releases, reviews, and which one to buy.",            tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"side-hustles",  name:"Side Hustles",       icon:"🛠️", desc:"Extra-income ideas and lessons from what worked.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    { slug:"writing-poetry",name:"Writing & Poetry",   icon:"✍️", desc:"Share drafts, get feedback, and talk craft.",              tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"theater-performing", name:"Theater & Performing Arts", icon:"🎭", desc:"Shows you've seen, roles you're chasing.",     tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"biology",        name:"Biology",           icon:"🧬", desc:"Life sciences chat — genetics, ecology, and weird organisms.", tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"wine",           name:"Wine",              icon:"🍷", desc:"Bottle recs, pairings, and tasting notes.",               tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"yoga-meditation", name:"Yoga & Meditation",icon:"🧘", desc:"Practice tips, mindfulness, and staying consistent.",      tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"running",       name:"Running",            icon:"🏃", desc:"Training plans, race talk, and PR celebrations.",         tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"cycling",       name:"Cycling",            icon:"🚴", desc:"Routes, gear, and gran fondo chatter.",                    tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    { slug:"space-astronomy", name:"Space & Astronomy",icon:"🔭", desc:"Launches, stargazing tips, and cosmic news.",              tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"sustainability", name:"Environment & Sustainability", icon:"🌱", desc:"Climate news, low-waste tips, and green living.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    { slug:"volunteering",  name:"Volunteering & Nonprofits", icon:"🤝", desc:"Causes, opportunities, and giving-back stories.",   tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    { slug:"lgbtq",         name:"LGBTQ+ Community",   icon:"🏳️‍🌈", desc:"A welcoming space to talk, share, and connect.",         tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    { slug:"military-veterans", name:"Military & Veterans", icon:"🎖️", desc:"Service stories, transition talk, and support.",      tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    { slug:"college-life",  name:"College Life",       icon:"🎓", desc:"Classes, campus life, and figuring it all out.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    { slug:"retirement-seniors", name:"Retirement & Seniors", icon:"🌤️", desc:"New chapters, hobbies, and staying connected.",     tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" }
+    { slug:"coding",        name:"Coding",             icon:"💻", desc:"Debugging, side projects, and language wars.",            tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" }
   ];
+
+  // Pulls the const COMMUNITIES = [ ... ]; array out of /community.html's
+  // markup and parses it, so this page always reflects every community
+  // that exists there — add one to community.html and it shows up here
+  // automatically, no manual copy needed.
+  async function loadFullCommunityList(){
+    try {
+      const res = await fetch('/community.html');
+      const html = await res.text();
+      const match = html.match(/const\s+COMMUNITIES\s*=\s*(\[[\s\S]*?\]);/);
+      if (!match) return null;
+      // eslint-disable-next-line no-new-func
+      const parsed = new Function('return (' + match[1] + ');')();
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    } catch (err) {
+      console.error('could not load full community list from /community.html:', err);
+    }
+    return null;
+  }
 
   const params = new URLSearchParams(window.location.search);
   const topic = params.get('topic');
@@ -595,6 +572,42 @@
     chanSearch.value = '';
     renderChannelList('');
     chanSearch.focus();
+  });
+
+  // Swap in the full list from /community.html once it's loaded, then
+  // re-resolve this room and re-render the sidebar against it — this is
+  // what makes every community added there show up here too.
+  loadFullCommunityList().then((fullList) => {
+    if (!fullList) return; // fetch/parse failed — keep the small seed list + fallbackRoom()
+    COMMUNITIES = fullList;
+
+    if (topic) {
+      const found = COMMUNITIES.find(c => c.slug === topic);
+      room = found || fallbackRoom(topic);
+      if (roomFoundEl.style.display !== 'none') {
+        document.title = room.name + ' — FriendHub Community';
+        document.getElementById('rHeadIcon').textContent = room.icon;
+        document.getElementById('rHeadIcon').style.setProperty('--tint', room.tint);
+        document.getElementById('rHeadIcon').style.setProperty('--tint-border', room.border);
+        document.getElementById('rHeadName').textContent = room.name;
+        document.getElementById('rHeadDesc').textContent = room.desc;
+        document.getElementById('rWelcomeIcon').textContent = room.icon;
+        document.getElementById('rWelcomeIcon').style.setProperty('--tint', room.tint);
+        document.getElementById('rWelcomeIcon').style.setProperty('--tint-border', room.border);
+        document.getElementById('rWelcomeTitle').textContent = 'Welcome to ' + room.name;
+        document.getElementById('rWelcomeDesc').textContent = room.desc + ' This is the start of the room — messages from the last little while show up below.';
+      } else if (found) {
+        // A topic that 404'd against the seed list turned out to be real —
+        // show the room now that we know about it.
+        roomFoundEl.style.display = 'flex';
+        notFoundEl.style.display = 'none';
+      }
+    }
+
+    renderChannelList(chanSearch.value);
+    if (sidebarList.querySelector('.active')) {
+      sidebarList.querySelector('.active').scrollIntoView({ block: 'center' });
+    }
   });
 
   // mobile channel-list toggle
