@@ -600,26 +600,32 @@
 .vcnav-status{
   display:flex;
   align-items:center;
-  gap:7px;
-  background:rgba(94,234,212,0.08);
-  border:1px solid rgba(94,234,212,0.25);
+  gap:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid transparent;
   border-radius:999px;
-  padding:7px 14px;
+  padding:7px 16px 7px 14px;
   font-size:12.5px;
-  font-weight:600;
-  color:#5EEAD4;
+  font-weight:500;
+  color:rgba(237,231,218,0.75);
   font-family:'Inter',sans-serif;
   white-space:nowrap;
   margin-left:-6vw;
+  background:
+    linear-gradient(rgba(255,255,255,0.04),rgba(255,255,255,0.04)) padding-box,
+    linear-gradient(120deg, rgba(255,107,91,0.35), rgba(94,158,255,0.35) 55%, rgba(94,234,212,0.35)) border-box;
 }
 .vcnav-status .dot{
-  width:7px; height:7px; border-radius:50%;
-  background:#5EEAD4;
-  box-shadow:0 0 0 3px rgba(94,234,212,0.15);
-  flex:none;
+  width:14px; height:14px; flex:none;
+  display:flex; align-items:center; justify-content:center;
+}
+.vcnav-status .dot svg{ width:100%; height:100%; }
+.vcnav-status strong{
+  color:#EDE7DA;
+  font-weight:700;
 }
 @media (max-width:640px){
-  .vcnav-status span.label{ display:none; }
+  .vcnav-status{ display:none; }
 }
   .vcnav-links{
     display:flex; align-items:center; gap:34px;
@@ -1305,7 +1311,12 @@
 <nav class="vcnav">
   <div class="vcnav-inner">
     <div class="vcnav-left">
-  <span class="vcnav-status"><span class="dot"></span><span id="vcNavOnlineCount">…</span><span class="label">&nbsp;active</span></span>
+  <span class="vcnav-status">
+  <span class="dot">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:#5EEAD4;"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z"/></svg>
+  </span>
+  <span>FriendHub brings <strong>millions</strong> of people together from around the world</span>
+</span>
   <a class="vcnav-brand" href="/">
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
