@@ -759,17 +759,18 @@
 
   Firestore layout used here (add rules for these — see notes below):
     /communityRooms/{topic}/messages/{messageId}
-      { text, sender (uid), senderName, senderPhoto, createdAt, imageUrl?, imagePath? }
+      { text, sender (uid), senderName, senderPhoto, createdAt, imageUrl? }
     /roomPresence/{topic}_{uid}
       { topic, uid, name, photo, updatedAt }
 
-  Storage layout used here (add rules for this too — see notes below):
-    /roomUploads/{topic}/{uid}/{timestamp}_{filename}
+  Image/GIF attachments are uploaded client-side straight to Cloudinary via
+  an unsigned upload preset (see CLOUDINARY_CLOUD_NAME / CLOUDINARY_UPLOAD_PRESET
+  below) — no Firebase Storage involved. Only the resulting secure_url gets
+  saved on the message doc.
 ============================================================= -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script>
 (function(){
   const topic = new URLSearchParams(window.location.search).get('topic');
@@ -785,8 +786,17 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
-  const storage = firebase.storage();
   const FieldValue = firebase.firestore.FieldValue;
+
+  // ---- Cloudinary (used instead of Firebase Storage for image/GIF
+  // attachments). Fill these in from your free Cloudinary dashboard:
+  //   1. Sign up at https://cloudinary.com (free tier)
+  //   2. CLOUD_NAME = the "Cloud name" shown on your dashboard home
+  //   3. Settings -> Upload -> Upload presets -> Add upload preset ->
+  //      set "Signing Mode" to "Unsigned" -> Save -> copy its name below
+  const CLOUDINARY_CLOUD_NAME = "bld5cxqf";
+  const CLOUDINARY_UPLOAD_PRESET = "friendhub_room_uploads";
+  const CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/image/upload";
 
   const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8MB
 
@@ -845,7 +855,7 @@
   const GROUP_WINDOW_MS = 5 * 60 * 1000;
 
   // Pending attachment state.
-  let pendingUpload = null; // { file, previewUrl, downloadUrl, storagePath, uploading }
+  let pendingUpload = null; // { file, previewUrl, downloadUrl, uploading }
 
   auth.onAuthStateChanged((user) => {
     if (user && !user.isAnonymous) {
@@ -1115,8 +1125,13 @@
       return;
     }
 
+    if (CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME' || CLOUDINARY_UPLOAD_PRESET === 'YOUR_UNSIGNED_PRESET') {
+      alert('Image uploads aren\'t configured yet — add your Cloudinary cloud name and unsigned upload preset in room.html.');
+      return;
+    }
+
     const previewUrl = URL.createObjectURL(file);
-    pendingUpload = { file, previewUrl, downloadUrl: null, storagePath: null, uploading: true };
+    pendingUpload = { file, previewUrl, downloadUrl: null, uploading: true };
 
     attachPreview.classList.add('show');
     attachPreviewImg.src = previewUrl;
@@ -1125,35 +1140,37 @@
     attachSpinner.style.display = 'block';
     updateSendBtnState();
 
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const path = 'roomUploads/' + topic + '/' + myUser.uid + '/' + Date.now() + '_' + safeName;
-    const ref = storage.ref().child(path);
+    const form = new FormData();
+    form.append('file', file);
+    form.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    form.append('folder', 'roomUploads/' + topic + '/' + myUser.uid);
 
-    ref.put(file).then((snap) => snap.ref.getDownloadURL()).then((url) => {
-      if (!pendingUpload || pendingUpload.file !== file) return; // removed/replaced while uploading
-      pendingUpload.downloadUrl = url;
-      pendingUpload.storagePath = path;
-      pendingUpload.uploading = false;
-      attachPreviewStatus.textContent = 'Ready to send';
-      attachSpinner.style.display = 'none';
-      updateSendBtnState();
-    }).catch((err) => {
-      console.error('attachment upload failed:', err);
-      attachPreviewStatus.textContent = 'Upload failed — try again';
-      attachSpinner.style.display = 'none';
-      if (pendingUpload) pendingUpload.uploading = false;
-      updateSendBtnState();
-    });
+    fetch(CLOUDINARY_UPLOAD_URL, { method: 'POST', body: form })
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (!pendingUpload || pendingUpload.file !== file) return; // removed/replaced while uploading
+        if (!ok || !data.secure_url) throw new Error((data && data.error && data.error.message) || 'Upload failed');
+        pendingUpload.downloadUrl = data.secure_url;
+        pendingUpload.uploading = false;
+        attachPreviewStatus.textContent = 'Ready to send';
+        attachSpinner.style.display = 'none';
+        updateSendBtnState();
+      }).catch((err) => {
+        console.error('attachment upload failed:', err);
+        attachPreviewStatus.textContent = 'Upload failed — try again';
+        attachSpinner.style.display = 'none';
+        if (pendingUpload) pendingUpload.uploading = false;
+        updateSendBtnState();
+      });
   }
 
   function clearAttachment(){
-    if (pendingUpload) {
-      if (pendingUpload.previewUrl) URL.revokeObjectURL(pendingUpload.previewUrl);
-      // Best-effort cleanup if it finished uploading but user backed out.
-      if (pendingUpload.storagePath) {
-        storage.ref().child(pendingUpload.storagePath).delete().catch(() => {});
-      }
-    }
+    // Cloudinary's unsigned upload flow has no safe client-side delete (that
+    // needs a signed request with your API secret, which can't live in
+    // browser code) — so backing out just drops the reference here. The
+    // file stays in your Cloudinary media library; clean those up from the
+    // Cloudinary dashboard occasionally if that matters to you.
+    if (pendingUpload && pendingUpload.previewUrl) URL.revokeObjectURL(pendingUpload.previewUrl);
     pendingUpload = null;
     attachPreview.classList.remove('show');
     attachPreviewImg.src = '';
@@ -1178,7 +1195,6 @@
     if (text) payload.text = text;
     if (attachment) {
       payload.imageUrl = attachment.downloadUrl;
-      payload.imagePath = attachment.storagePath;
     }
 
     // Detach the preview from cleanup so clearAttachment() below doesn't
@@ -1242,12 +1258,10 @@
     lineEl.classList.add('deleting');
     try {
       const docRef = db.collection('communityRooms').doc(topic).collection('messages').doc(docId);
-      const snap = await docRef.get();
-      const data = snap.exists ? snap.data() : null;
       await docRef.delete();
-      if (data && data.imagePath) {
-        storage.ref().child(data.imagePath).delete().catch(() => {});
-      }
+      // Note: this removes the message from chat, but any attached image
+      // stays in your Cloudinary media library (unsigned uploads can't be
+      // deleted from the browser — see the clearAttachment() comment above).
       // removeMessageEl() also runs from the 'removed' onSnapshot event;
       // calling it here too is a harmless no-op if that already fired.
       removeMessageEl(docId);
@@ -1277,12 +1291,7 @@
         docs.slice(i, i + batchSize).forEach((d) => batch.delete(d.ref));
         await batch.commit();
       }
-      // Clean up any images those messages referenced.
-      docs.forEach((d) => {
-        const data = d.data();
-        if (data.imagePath) storage.ref().child(data.imagePath).delete().catch(() => {});
-        removeMessageEl(d.id);
-      });
+      docs.forEach((d) => removeMessageEl(d.id));
     } catch (err) {
       console.error('clear my messages failed:', err);
       alert('Could not delete your messages — please try again.');
