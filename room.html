@@ -1135,7 +1135,14 @@
         membersCount.textContent = snap.size.toLocaleString();
         renderMembers(snap.docs.map((d) => d.data()));
       })
-      .catch(() => { onlineCountEl.textContent = '—'; });
+      .catch((err) => {
+        // This almost always means Firestore needs a composite index for
+        // this query (equality on `topic` + range on `updatedAt`). Open the
+        // browser console — Firestore's error includes a direct link that
+        // creates the exact index needed with one click.
+        console.error('online-count query failed (likely missing a Firestore composite index on roomPresence: topic ASC, updatedAt ASC) —', err);
+        onlineCountEl.textContent = '—';
+      });
   }
 
   function renderMembers(list){
