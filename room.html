@@ -1088,17 +1088,17 @@
     const messagesRef = db.collection('communityRooms').doc(topic).collection('messages')
       .orderBy('createdAt', 'asc').limitToLast(50);
 
-   unsubMessages = messagesRef.onSnapshot((snap) => {
-  snap.docChanges().forEach((change) => {
-    if (change.type === 'added') {
-      const m = change.doc.data();
-      if (!m.createdAt) m.createdAt = { toDate: () => new Date() }; // local echo — show now, real timestamp lands on the next snapshot
-      addMessageEl(m, m.sender === myUser.uid, change.doc.id);
-    } else if (change.type === 'removed') {
-      removeMessageEl(change.doc.id);
-    }
-  });
-});, (err) => {
+  unsubMessages = messagesRef.onSnapshot((snap) => {
+      snap.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const m = change.doc.data();
+          if (!m.createdAt) m.createdAt = { toDate: () => new Date() }; // local echo — show now, real timestamp lands on the next snapshot
+          addMessageEl(m, m.sender === myUser.uid, change.doc.id);
+        } else if (change.type === 'removed') {
+          removeMessageEl(change.doc.id);
+        }
+      });
+    }, (err) => {
       console.error('messages listener failed:', err);
       logEmpty.textContent = 'Could not load messages — check Firestore rules for /communityRooms.';
       logEmpty.style.display = 'block';
