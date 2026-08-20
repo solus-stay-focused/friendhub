@@ -379,7 +379,7 @@
   }
   .rgif-item img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .15s ease; }
   .rgif-item:hover img{ transform:scale(1.05); }
-  .rgif-status{ flex:none; font-size:12px; color:var(--ink-faint); text-align:center; padding:2px 0; }
+  .rgif-status{ flex:none; font-size:11.5px; line-height:1.4; color:var(--ink-faint); text-align:center; padding:2px 4px; }
   .rgif-attrib{ flex:none; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--ink-faint); text-align:right; opacity:0.7; }
   .rinput-row input{
     flex:1 1 auto; background:none; border:none; color:var(--paper);
@@ -1328,8 +1328,16 @@
     url.searchParams.set('rating', 'pg-13');
     if (query) url.searchParams.set('q', query);
 
-    fetch(url.toString())
-      .then((res) => res.json())
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // avoid hanging forever on a rate-limited/unreachable request
+
+    fetch(url.toString(), { signal: controller.signal })
+      .then((res) => {
+        clearTimeout(timeoutId);
+        if (res.status === 429) throw new Error('rate_limited');
+        if (!res.ok) throw new Error('http_' + res.status);
+        return res.json();
+      })
       .then((data) => {
         if (seq !== gifRequestSeq) return; // a newer search/trend request superseded this one
         const items = (data && data.data) || [];
@@ -1360,9 +1368,16 @@
         });
       })
       .catch((err) => {
+        clearTimeout(timeoutId);
         if (seq !== gifRequestSeq) return;
         console.error('GIF search failed:', err);
-        gifStatus.textContent = 'Could not load GIFs — try again.';
+        if (err && err.name === 'AbortError') {
+          gifStatus.textContent = 'Timed out — the shared demo key may be rate-limited. Add your own free GIPHY key for reliable results.';
+        } else if (err && err.message === 'rate_limited') {
+          gifStatus.textContent = 'Rate-limited — the shared demo key is overused. Add your own free GIPHY key.';
+        } else {
+          gifStatus.textContent = 'Could not load GIFs — try again.';
+        }
       });
   }
 
