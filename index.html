@@ -1817,23 +1817,16 @@
 <footer class="vcfoot">
   <div class="vcfoot-inner">
     <div class="vcfoot-brand-col">
-      <a class="vcfoot-brand" href="/" style="text-decoration:none;">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="vcfootLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#5E9EFF"/>
-              <stop offset="100%" stop-color="#1E4FD8"/>
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#vcfootLogoGrad)"/>
-          <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
-          <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
-          <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
-        </svg>
-        <span>Friend<em>Hub</em></span>
-      </a>
-      <div class="vcfoot-status"><span class="dot"></span><span id="vcFootOnlineCount">…</span>&nbsp;people online right now</div>
-      <p class="vcfoot-tagline">FriendHub brings millions of people together from around the world — no accounts to fill in, nothing saved, just click and talk.</p>
+<a class="vcfoot-brand" href="/" style="text-decoration:none;">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    ...
+  </svg>
+  <span>Friend<em>Hub</em></span>
+</a>
+
+<p class="vcfoot-tagline">
+  FriendHub brings millions of people together from around the world.
+</p>
       <div class="vcfoot-social">
         <a href="#" aria-label="Instagram">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1"/></svg>
@@ -2513,7 +2506,6 @@
       if (onlineCountEl) onlineCountEl.textContent = text;
       if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
       if (navOnlineCountEl) navOnlineCountEl.textContent = text;
-      if (footOnlineCountEl) footOnlineCountEl.textContent = text;
       clearOnlineDebug();
     }).catch((err) => {
       // Surface this loudly — a silently-swallowed error here is exactly how a fake
