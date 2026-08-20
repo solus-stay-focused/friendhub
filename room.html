@@ -77,16 +77,43 @@
 
   /* channel sidebar */
   .rsidebar{
-    width:248px; flex:none; background:var(--void-panel);
+    width:260px; flex:none; background:var(--void-panel);
     border-right:1px solid var(--line);
     display:flex; flex-direction:column;
     min-height:0;
   }
+  .rsidebar-search{
+    flex:none; padding:12px 12px 8px;
+  }
+  .rsidebar-search-box{
+    display:flex; align-items:center; gap:7px;
+    background:var(--void-panel-2); border:1px solid var(--line);
+    border-radius:8px; padding:0 10px; height:32px;
+    transition:border-color .12s ease;
+  }
+  .rsidebar-search-box:focus-within{ border-color:var(--violet); }
+  .rsidebar-search-box svg{ width:14px; height:14px; flex:none; color:var(--ink-faint); }
+  .rsidebar-search-box input{
+    flex:1 1 auto; background:none; border:none; color:var(--paper);
+    font-family:inherit; font-size:12.5px; height:100%; min-width:0;
+  }
+  .rsidebar-search-box input:focus{ outline:none; }
+  .rsidebar-search-box input::placeholder{ color:var(--ink-faint); }
+  .rsidebar-search-clear{
+    display:none; background:none; border:none; color:var(--ink-faint); cursor:pointer;
+    width:18px; height:18px; align-items:center; justify-content:center; flex:none; border-radius:5px;
+  }
+  .rsidebar-search-clear.show{ display:flex; }
+  .rsidebar-search-clear:hover{ color:#fff; background:rgba(237,231,218,0.08); }
+  .rsidebar-search-clear svg{ width:11px; height:11px; }
+
   .rsidebar-hd{
-    padding:16px 16px 10px;
+    padding:12px 16px 6px;
     font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
     letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-faint);
+    display:flex; align-items:center; justify-content:space-between;
   }
+  .rsidebar-hd .cnt{ opacity:0.7; }
   .rsidebar-list{ flex:1 1 auto; overflow-y:auto; padding:2px 10px 14px; display:flex; flex-direction:column; gap:2px; }
   .rchan{
     display:flex; align-items:center; gap:9px;
@@ -99,6 +126,7 @@
   .rchan.active{ background:var(--tint,rgba(156,140,251,0.16)); color:#fff; }
   .rchan.active .rchan-hash{ opacity:1; }
   .rchan-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rsidebar-noresults{ padding:14px 10px; font-size:12.5px; color:var(--ink-faint); text-align:center; }
 
   /* main column */
   .rmain-col{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; min-height:0; }
@@ -129,7 +157,7 @@
   }
   .rhead-online .dot{ width:6px; height:6px; border-radius:50%; background:var(--mint); box-shadow:0 0 0 3px rgba(94,234,212,0.15); }
 
-  /* search */
+  /* message search */
   .rsearch-wrap{ position:relative; flex:none; }
   .rsearch-btn{
     display:flex; align-items:center; justify-content:center;
@@ -327,7 +355,16 @@
 
 <div class="rbody" id="rRoomFound">
   <aside class="rsidebar" id="rSidebar">
-    <div class="rsidebar-hd">Text channels</div>
+    <div class="rsidebar-search">
+      <div class="rsidebar-search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="rChanSearch" placeholder="Search communities…" autocomplete="off">
+        <button class="rsidebar-search-clear" id="rChanSearchClear" aria-label="Clear">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="rsidebar-hd"><span>Text channels</span><span class="cnt" id="rChanCount"></span></div>
     <div class="rsidebar-list" id="rSidebarList"></div>
   </aside>
 
@@ -401,36 +438,102 @@
 </div>
 
 <script>
-  // Kept in sync with the same list on /community/index.html.
-  const COMMUNITIES = {
-    "cooking":       { name:"Cooking",             icon:"🍳", desc:"Recipes, techniques, and what's for dinner tonight.",      tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    "sports":        { name:"Sports",              icon:"⚽", desc:"Scores, highlights, and hot takes on every league.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    "business":      { name:"Business",            icon:"💼", desc:"Strategy, operations, and running a company day to day.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "learning":      { name:"Learning",             icon:"📚", desc:"Study tips, courses, and figuring things out together.",  tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    "coding":        { name:"Coding",               icon:"💻", desc:"Debugging, side projects, and language wars.",            tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "startups":      { name:"Startups",             icon:"🚀", desc:"Building, fundraising, and shipping v1.",                 tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    "music":         { name:"Music",                icon:"🎵", desc:"New releases, production, and playlist swaps.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    "movies-tv":     { name:"Movies & TV",          icon:"🎬", desc:"What to watch next, and spoiler-free discussion.",        tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "gaming":        { name:"Gaming",               icon:"🎮", desc:"Squad-up chat, patch notes, and what you're grinding.",   tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    "travel":        { name:"Travel",               icon:"✈️", desc:"Trip planning, hidden gems, and flight-deal alerts.",     tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    "fitness":       { name:"Fitness",              icon:"🏋️", desc:"Training plans, form checks, and accountability.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    "photography":   { name:"Photography",          icon:"📷", desc:"Gear talk, edits, and critique welcome.",                 tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    "art-design":    { name:"Art & Design",         icon:"🎨", desc:"Sketches, feedback, and design process chat.",            tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    "books":         { name:"Books",                icon:"📖", desc:"What you're reading and what's worth the hype.",         tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    "finance":       { name:"Finance & Investing",  icon:"💰", desc:"Markets, budgeting, and long-term money talk.",           tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    "science":       { name:"Science",              icon:"🔬", desc:"New research, weird facts, and honest questions.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
-    "mental-health": { name:"Mental Health",        icon:"🧠", desc:"Supportive, judgment-free peer conversation.",            tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
-    "parenting":     { name:"Parenting",            icon:"👶", desc:"Trading notes on the hardest job with no manual.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
-    "pets-animals":  { name:"Pets & Animals",       icon:"🐾", desc:"Show off your pet, ask for advice, swap stories.",        tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
-    "relationships": { name:"Relationships & Dating", icon:"❤️", desc:"Advice, venting, and modern-dating chaos.",             tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" }
-  };
+  // Kept in sync with the same list on /community.html — same slug, name,
+  // icon, desc, tint/border for every entry so a card there always opens
+  // the matching room here.
+  const COMMUNITIES = [
+    { slug:"cooking",       name:"Cooking",            icon:"🍳", desc:"Recipes, techniques, and what's for dinner tonight.",      tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"sports",        name:"Sports",             icon:"⚽", desc:"Scores, highlights, and hot takes on every league.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"business",      name:"Business",           icon:"💼", desc:"Strategy, operations, and running a company day to day.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"learning",      name:"Learning",           icon:"📚", desc:"Study tips, courses, and figuring things out together.",  tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"coding",        name:"Coding",             icon:"💻", desc:"Debugging, side projects, and language wars.",            tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"startups",      name:"Startups",           icon:"🚀", desc:"Building, fundraising, and shipping v1.",                 tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"music",         name:"Music",              icon:"🎵", desc:"New releases, production, and playlist swaps.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"movies-tv",     name:"Movies & TV",        icon:"🎬", desc:"What to watch next, and spoiler-free discussion.",        tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"gaming",        name:"Gaming",             icon:"🎮", desc:"Squad-up chat, patch notes, and what you're grinding.",   tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"travel",        name:"Travel",             icon:"✈️", desc:"Trip planning, hidden gems, and flight-deal alerts.",     tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"fitness",       name:"Fitness",            icon:"🏋️", desc:"Training plans, form checks, and accountability.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"photography",   name:"Photography",        icon:"📷", desc:"Gear talk, edits, and critique welcome.",                 tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"art-design",    name:"Art & Design",       icon:"🎨", desc:"Sketches, feedback, and design process chat.",            tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"books",         name:"Books",              icon:"📖", desc:"What you're reading and what's worth the hype.",         tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"finance",       name:"Finance & Investing",icon:"💰", desc:"Markets, budgeting, and long-term money talk.",           tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"science",       name:"Science",            icon:"🔬", desc:"New research, weird facts, and honest questions.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"mental-health", name:"Mental Health",      icon:"🧠", desc:"Supportive, judgment-free peer conversation.",            tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"parenting",     name:"Parenting",          icon:"👶", desc:"Trading notes on the hardest job with no manual.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"pets-animals",  name:"Pets & Animals",     icon:"🐾", desc:"Show off your pet, ask for advice, swap stories.",        tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"relationships", name:"Relationships & Dating", icon:"❤️", desc:"Advice, venting, and modern-dating chaos.",           tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"anime-manga",   name:"Anime & Manga",      icon:"🌸", desc:"Seasonal watch talk, manga chapters, and recs.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"food-dining",   name:"Food & Dining Out",  icon:"🍜", desc:"Restaurant finds, takeout wins, and food photos.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"diy-home",      name:"DIY & Home Improvement", icon:"🔨", desc:"Fixer-upper projects, tools, and before/afters.",     tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"cars-moto",     name:"Cars & Motorcycles", icon:"🏎️", desc:"Builds, maintenance tips, and garage talk.",              tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"fashion-style", name:"Fashion & Style",    icon:"👗", desc:"Fit checks, thrift finds, and outfit advice.",            tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"comedy-memes",  name:"Comedy & Memes",     icon:"😂", desc:"Whatever's making the rounds, plus original bits.",       tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"history",       name:"History",            icon:"🏛️", desc:"Deep dives, debates, and today-in-history trivia.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"philosophy",    name:"Philosophy",         icon:"🦉", desc:"Big questions, thought experiments, friendly debate.",    tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"language-learning", name:"Language Learning", icon:"🗣️", desc:"Practice partners, resources, and progress check-ins.", tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"crypto-web3",   name:"Crypto & Web3",      icon:"⛓️", desc:"Market chat, projects, and separating signal from noise.",tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"real-estate",   name:"Real Estate",        icon:"🏠", desc:"Buying, renting, investing, and market talk.",            tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"board-games",   name:"Board Games & Tabletop", icon:"🎲", desc:"Game nights, new releases, and rules debates.",        tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"outdoors-hiking", name:"Outdoors & Hiking",icon:"🥾", desc:"Trail reports, gear talk, and trip planning.",             tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"astrology-spirituality", name:"Astrology & Spirituality", icon:"🔮", desc:"Charts, practices, and open-minded chat.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"tech-gadgets",  name:"Tech & Gadgets",     icon:"📱", desc:"New releases, reviews, and which one to buy.",            tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"side-hustles",  name:"Side Hustles",       icon:"🛠️", desc:"Extra-income ideas and lessons from what worked.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"writing-poetry",name:"Writing & Poetry",   icon:"✍️", desc:"Share drafts, get feedback, and talk craft.",              tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"theater-performing", name:"Theater & Performing Arts", icon:"🎭", desc:"Shows you've seen, roles you're chasing.",     tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"biology",        name:"Biology",           icon:"🧬", desc:"Life sciences chat — genetics, ecology, and weird organisms.", tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"wine",           name:"Wine",              icon:"🍷", desc:"Bottle recs, pairings, and tasting notes.",               tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"yoga-meditation", name:"Yoga & Meditation",icon:"🧘", desc:"Practice tips, mindfulness, and staying consistent.",      tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"running",       name:"Running",            icon:"🏃", desc:"Training plans, race talk, and PR celebrations.",         tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"cycling",       name:"Cycling",            icon:"🚴", desc:"Routes, gear, and gran fondo chatter.",                    tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    { slug:"space-astronomy", name:"Space & Astronomy",icon:"🔭", desc:"Launches, stargazing tips, and cosmic news.",              tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"sustainability", name:"Environment & Sustainability", icon:"🌱", desc:"Climate news, low-waste tips, and green living.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
+    { slug:"volunteering",  name:"Volunteering & Nonprofits", icon:"🤝", desc:"Causes, opportunities, and giving-back stories.",   tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    { slug:"lgbtq",         name:"LGBTQ+ Community",   icon:"🏳️‍🌈", desc:"A welcoming space to talk, share, and connect.",         tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { slug:"military-veterans", name:"Military & Veterans", icon:"🎖️", desc:"Service stories, transition talk, and support.",      tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    { slug:"college-life",  name:"College Life",       icon:"🎓", desc:"Classes, campus life, and figuring it all out.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    { slug:"retirement-seniors", name:"Retirement & Seniors", icon:"🌤️", desc:"New chapters, hobbies, and staying connected.",     tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" }
+  ];
 
   const params = new URLSearchParams(window.location.search);
   const topic = params.get('topic');
-  const room = topic ? COMMUNITIES[topic] : null;
+
+  // Every card on /community.html links here as /room.html?topic={slug}.
+  // COMMUNITIES above covers the most active rooms (and drives the
+  // sidebar + its search box). For any other valid slug from the full
+  // community list, build a matching room on the fly from the slug
+  // itself, so every link from community.html always opens a real room
+  // instead of a dead end — only a missing/empty topic 404s.
+  const FALLBACK_TINTS = [
+    { tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    { tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)"  },
+    { tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)"  },
+    { tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)"  },
+    { tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)"  }
+  ];
+  function titleCaseSlug(slug){
+    return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+  function fallbackRoom(slug){
+    let hash = 0;
+    for (let i = 0; i < slug.length; i++) hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+    const palette = FALLBACK_TINTS[hash % FALLBACK_TINTS.length];
+    const name = titleCaseSlug(slug);
+    return {
+      slug: slug, name: name, icon: '💬',
+      desc: 'General discussion for ' + name + '.',
+      tint: palette.tint, border: palette.border
+    };
+  }
+
+  let room = topic ? COMMUNITIES.find(c => c.slug === topic) : null;
+  if (!room && topic) room = fallbackRoom(topic);
 
   const roomFoundEl = document.getElementById('rRoomFound');
   const notFoundEl = document.getElementById('rNotFound');
+  const sidebarList = document.getElementById('rSidebarList');
+  const chanCountEl = document.getElementById('rChanCount');
+  const chanSearch = document.getElementById('rChanSearch');
+  const chanSearchClear = document.getElementById('rChanSearchClear');
 
   if (!room) {
     roomFoundEl.style.display = 'none';
@@ -449,22 +552,50 @@
     document.getElementById('rWelcomeIcon').style.setProperty('--tint-border', room.border);
     document.getElementById('rWelcomeTitle').textContent = 'Welcome to ' + room.name;
     document.getElementById('rWelcomeDesc').textContent = room.desc + ' This is the start of the room — messages from the last little while show up below.';
-
-    // Build the channel sidebar from the same list.
-    const sidebarList = document.getElementById('rSidebarList');
-    Object.keys(COMMUNITIES).forEach((key) => {
-      const c = COMMUNITIES[key];
-      const el = document.createElement('a');
-      el.className = 'rchan' + (key === topic ? ' active' : '');
-      el.href = window.location.pathname + '?topic=' + encodeURIComponent(key);
-      el.style.setProperty('--tint', c.tint);
-      el.innerHTML = '<span class="rchan-hash">' + c.icon + '</span><span class="rchan-name">' + c.name + '</span>';
-      sidebarList.appendChild(el);
-    });
-    if (sidebarList.querySelector('.active')) {
-      requestAnimationFrame(() => sidebarList.querySelector('.active').scrollIntoView({ block: 'center' }));
-    }
   }
+
+  // ---- channel sidebar: render + search-filter across ALL communities ----
+  function renderChannelList(term){
+    const q = (term || '').trim().toLowerCase();
+    const list = q
+      ? COMMUNITIES.filter(c => c.name.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q))
+      : COMMUNITIES;
+
+    chanCountEl.textContent = q ? (list.length + ' match' + (list.length === 1 ? '' : 'es')) : list.length;
+    chanSearchClear.classList.toggle('show', !!term);
+
+    if (!list.length) {
+      sidebarList.innerHTML = '<div class="rsidebar-noresults">No communities match “' + escapeHtmlText(term) + '.”</div>';
+      return;
+    }
+
+    sidebarList.innerHTML = list.map((c) => {
+      const active = topic === c.slug ? ' active' : '';
+      return '<a class="rchan' + active + '" style="--tint:' + c.tint + ';" ' +
+        'href="/room.html?topic=' + encodeURIComponent(c.slug) + '">' +
+        '<span class="rchan-hash">' + c.icon + '</span>' +
+        '<span class="rchan-name">' + escapeHtmlText(c.name) + '</span>' +
+      '</a>';
+    }).join('');
+  }
+
+  function escapeHtmlText(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  renderChannelList('');
+  if (sidebarList.querySelector('.active')) {
+    requestAnimationFrame(() => sidebarList.querySelector('.active').scrollIntoView({ block: 'center' }));
+  }
+
+  chanSearch.addEventListener('input', () => renderChannelList(chanSearch.value));
+  chanSearchClear.addEventListener('click', () => {
+    chanSearch.value = '';
+    renderChannelList('');
+    chanSearch.focus();
+  });
 
   // mobile channel-list toggle
   const menuBtn = document.getElementById('rMenuBtn');
@@ -481,7 +612,7 @@
 
 <!-- ============================================================
   Firebase: auth gate, live messages, send, presence/online count,
-  member list, and in-room search.
+  member list, and in-room message search.
   Reuses the same project as the main FriendHub page.
 
   Firestore layout used here (add rules for these — see notes below):
@@ -538,8 +669,7 @@
   let myUser = null;
   let unsubMessages = null;
 
-  // In-memory record of rendered message groups/lines for search.
-  // Each entry: { text, lineEl, bubbleEl (span holding the text) }
+  // In-memory record of rendered message lines for search.
   const renderedLines = [];
   let lastGroup = null; // { senderKey, el, bodyEl, ts }
   const GROUP_WINDOW_MS = 5 * 60 * 1000;
@@ -788,7 +918,6 @@
       const hasMatch = textLower.includes(qLower);
       l.groupEl.classList.toggle('dim', !hasMatch);
       if (hasMatch) {
-        // highlight all occurrences, case-insensitive, on escaped text
         const escaped = escapeHtml(l.text);
         const re = new RegExp('(' + qLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
         l.textSpan.innerHTML = escaped.replace(re, '<mark>$1</mark>');
@@ -841,9 +970,12 @@
     searchIdx = (searchIdx - 1 + searchHits.length) % searchHits.length;
     focusHit();
   });
-  // keyboard shortcut: Ctrl/Cmd+F opens the in-room search instead of the browser's
+  // keyboard shortcut: Ctrl/Cmd+F opens the in-room message search instead
+  // of the browser's — but don't hijack it while the channel-search box in
+  // the sidebar already has focus.
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+      if (document.activeElement && document.activeElement.id === 'rChanSearch') return;
       e.preventDefault();
       openSearch();
     }
