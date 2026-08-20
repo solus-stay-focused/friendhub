@@ -13,343 +13,496 @@
   :root{
     --void:#14152B;
     --void-deep:#0D0E1F;
+    --rail:#0A0B1A;
+    --panel:#111226;
+    --panel-raise:#161834;
     --paper:#EDE7DA;
     --mint:#5EEAD4;
     --coral:#FF6B5B;
     --violet:#9C8CFB;
     --violet-deep:#5142C4;
-    --line:rgba(237,231,218,0.14);
-    --card:rgba(255,255,255,0.05);
-    --card-border:rgba(255,255,255,0.09);
-    --ink-soft:rgba(245,244,251,0.62);
+    --line:rgba(237,231,218,0.10);
+    --line-soft:rgba(237,231,218,0.07);
+    --ink-soft:rgba(245,244,251,0.56);
+    --ink-dim:rgba(245,244,251,0.36);
   }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; height:100%; background:var(--void-deep); }
+  html,body{ margin:0; height:100%; background:var(--void-deep); overflow:hidden; }
   body{
     font-family:'Inter',sans-serif;
     color:var(--paper);
     -webkit-font-smoothing:antialiased;
-    display:flex; flex-direction:column; min-height:100vh;
   }
   h1,h2,h3{ font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em; }
   a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(237,231,218,0.12); border-radius:99px; border:2px solid transparent; background-clip:padding-box; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(237,231,218,0.22); background-clip:padding-box; }
 
-  /* ---------- nav ---------- */
-  .rnav{
-    background:rgba(11,12,30,0.92);
-    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-    border-bottom:1px solid rgba(255,255,255,0.08);
-    flex:none;
-  }
-  .rnav-inner{
-    max-width:1400px; margin:0 auto;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:14px 6vw;
-  }
-  .rnav-left{ display:flex; align-items:center; gap:16px; }
-  .rnav-back{
-    display:flex; align-items:center; gap:6px;
-    font-size:13.5px; font-weight:600; color:rgba(255,255,255,0.65);
-    transition:color .15s ease;
-  }
-  .rnav-back:hover{ color:#fff; }
-  .rnav-back svg{ width:15px; height:15px; }
-  .rnav-brand{ display:flex; align-items:center; gap:9px; }
-  .rnav-brand svg{ width:26px; height:26px; flex:none; }
-  .rnav-brand span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; color:#fff; }
-  .rnav-brand span em{ font-style:normal; color:var(--violet); }
-  .rnav-account{ display:flex; align-items:center; gap:8px; font-size:13px; }
-  .rnav-account img{ width:26px; height:26px; border-radius:50%; }
+  /* ================= app shell ================= */
+  .app{ display:flex; height:100vh; width:100vw; }
 
-  /* ---------- room header ---------- */
-  .rhead{
-    padding:16px 6vw;
-    display:flex; align-items:center; justify-content:space-between;
-    gap:16px; flex-wrap:wrap;
+  /* ---------- server rail ---------- */
+  .rail{
+    flex:none; width:72px; background:var(--rail);
+    display:flex; flex-direction:column; align-items:center;
+    padding:14px 0; gap:10px;
+    border-right:1px solid var(--line);
+  }
+  .rail-item{
+    width:46px; height:46px; border-radius:16px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--panel); cursor:pointer; position:relative;
+    transition:border-radius .18s ease, background .18s ease;
+  }
+  .rail-item svg{ width:24px; height:24px; }
+  .rail-item.home:hover{ border-radius:13px; background:rgba(255,107,91,0.16); color:var(--coral); }
+  .rail-item.brand{
+    background:linear-gradient(135deg,#9C8CFB,#5142C4); border-radius:16px;
+  }
+  .rail-item.brand svg{ width:28px; height:28px; }
+  .rail-item.brand .pip{
+    position:absolute; left:-14px; top:50%; transform:translateY(-50%);
+    width:4px; height:22px; border-radius:0 4px 4px 0; background:#fff;
+  }
+  .rail-divider{ width:28px; height:1px; background:var(--line); margin:2px 0; }
+  .rail-tip{ color:var(--ink-dim); font-size:9.5px; letter-spacing:.04em; }
+
+  /* ---------- channel sidebar ---------- */
+  .chside{
+    flex:none; width:250px; background:var(--panel);
+    display:flex; flex-direction:column; min-width:0;
+    border-right:1px solid var(--line);
+    transition:margin-left .2s ease;
+  }
+  .chside-head{
+    flex:none; padding:16px 16px 12px;
     border-bottom:1px solid var(--line);
-    flex:none;
   }
-  .rhead-left{ display:flex; align-items:center; gap:14px; }
-  .rhead-icon{
-    flex:none; width:46px; height:46px; border-radius:13px;
-    display:flex; align-items:center; justify-content:center; font-size:22px;
+  .chside-head-top{ display:flex; align-items:center; gap:8px; }
+  .chside-head-top span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; color:#fff; }
+  .chside-head-top span em{ font-style:normal; color:var(--violet); }
+  .chside-back{
+    display:flex; align-items:center; gap:5px; margin-top:6px;
+    font-size:11.5px; font-weight:600; color:var(--ink-dim);
+  }
+  .chside-back:hover{ color:var(--paper); }
+  .chside-back svg{ width:12px; height:12px; }
+
+  .chsearch{ padding:12px 14px 8px; flex:none; }
+  .chsearch input{
+    width:100%; background:var(--void-deep); border:1px solid var(--line);
+    color:var(--paper); border-radius:8px; padding:8px 11px;
+    font-family:inherit; font-size:12.5px;
+  }
+  .chsearch input::placeholder{ color:var(--ink-dim); }
+  .chsearch input:focus{ outline:none; border-color:var(--violet); }
+
+  .ch-label{
+    padding:10px 16px 6px; flex:none;
+    font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-dim); font-weight:700;
+  }
+  .ch-list{ flex:1 1 auto; min-height:0; overflow-y:auto; padding:0 8px 10px; }
+  .ch-item{
+    display:flex; align-items:center; gap:9px;
+    padding:6.5px 9px; margin:1px 0; border-radius:6px;
+    font-size:13.5px; color:var(--ink-soft); cursor:pointer;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .ch-item:hover{ background:rgba(237,231,218,0.05); color:var(--paper); }
+  .ch-item.active{ background:rgba(156,140,251,0.16); color:#fff; }
+  .ch-item .em{ flex:none; font-size:14px; width:18px; text-align:center; }
+  .ch-item .nm{ overflow:hidden; text-overflow:ellipsis; }
+  .ch-empty{ padding:16px; font-size:12.5px; color:var(--ink-dim); text-align:center; }
+
+  .user-panel{
+    flex:none; display:flex; align-items:center; gap:9px;
+    padding:10px 12px; background:var(--void-deep);
+    border-top:1px solid var(--line);
+  }
+  .user-panel img{ width:32px; height:32px; border-radius:50%; flex:none; }
+  .user-panel .ustat{ position:relative; flex:none; }
+  .user-panel .ustat .dot{
+    position:absolute; right:-1px; bottom:-1px; width:9px; height:9px;
+    border-radius:50%; background:var(--mint); border:2px solid var(--void-deep);
+  }
+  .user-panel .uinfo{ min-width:0; flex:1 1 auto; }
+  .user-panel .uinfo .un{ font-size:13px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .user-panel .uinfo .us{ font-size:10.5px; color:var(--mint); }
+
+  /* ---------- main chat column ---------- */
+  .chat{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; background:var(--void-deep); }
+  #rRoomFound{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+
+  .chat-head{
+    flex:none; height:58px; padding:0 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    border-bottom:1px solid var(--line);
+    background:rgba(17,18,38,0.5);
+  }
+  .chat-head-left{ display:flex; align-items:center; gap:11px; min-width:0; }
+  .chat-head-icon{
+    flex:none; width:32px; height:32px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center; font-size:16px;
     background:var(--tint, rgba(156,140,251,0.14));
     border:1px solid var(--tint-border, rgba(156,140,251,0.32));
   }
-  .rhead h1{ font-size:19px; color:#fff; }
-  .rhead p{ margin:2px 0 0; font-size:13px; color:var(--ink-soft); }
-  .rhead-online{
-    display:flex; align-items:center; gap:7px;
-    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mint);
+  .chat-head-text{ min-width:0; }
+  .chat-head-text h1{ font-size:15.5px; color:#fff; line-height:1.2; }
+  .chat-head-text p{ margin:1px 0 0; font-size:11.5px; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .menu-btn{
+    display:none; flex:none; width:32px; height:32px; border-radius:8px;
+    background:transparent; border:1px solid var(--line); color:var(--paper);
+    align-items:center; justify-content:center; cursor:pointer;
+  }
+  .menu-btn svg{ width:16px; height:16px; }
+  .chat-head-online{
+    flex:none; display:flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--mint);
     background:rgba(94,234,212,0.08); border:1px solid rgba(94,234,212,0.22);
-    border-radius:999px; padding:7px 14px;
+    border-radius:999px; padding:5px 11px; white-space:nowrap;
   }
-  .rhead-online .dot{ width:7px; height:7px; border-radius:50%; background:var(--mint); box-shadow:0 0 0 3px rgba(94,234,212,0.15); }
+  .chat-head-online .dot{ width:6px; height:6px; border-radius:50%; background:var(--mint); box-shadow:0 0 0 3px rgba(94,234,212,0.15); }
 
-  /* ---------- chat area ---------- */
-  .rmain{
-    flex:1 1 auto; min-height:0;
-    max-width:900px; width:100%; margin:0 auto;
+  .chat-log{
+    flex:1 1 auto; min-height:0; overflow-y:auto;
+    padding:14px 0 8px;
     display:flex; flex-direction:column;
-    padding:0 6vw;
   }
-  .rlog{
-    flex:1 1 auto; min-height:0;
-    overflow-y:auto;
-    padding:20px 0;
-    display:flex; flex-direction:column; gap:14px;
-  }
-  .rmsg{ max-width:74%; display:flex; flex-direction:column; gap:4px; }
-  .rmsg.me{ align-self:flex-end; align-items:flex-end; }
-  .rmsg .who{
-    display:flex; align-items:center; gap:6px;
-    font-size:11.5px; color:rgba(237,231,218,0.45); font-weight:600;
-  }
-  .rmsg .who img{ width:16px; height:16px; border-radius:50%; }
-  .rmsg .bubble{
-    background:rgba(237,231,218,0.06);
-    border-radius:14px 14px 14px 4px;
-    padding:10px 14px;
-    font-size:14px; line-height:1.5;
-  }
-  .rmsg.me .bubble{
-    background:linear-gradient(135deg, rgba(94,234,212,0.22), rgba(94,234,212,0.1));
-    border-radius:14px 14px 4px 14px;
-  }
-  .rmsg.system{ align-self:center; max-width:none; }
-  .rmsg.system .bubble{
-    background:transparent; color:rgba(237,231,218,0.4);
-    font-style:italic; font-size:12.5px; padding:0;
-  }
-  .rlog-empty{
-    margin:auto; text-align:center; color:rgba(237,231,218,0.4); font-size:13.5px; padding:40px 20px;
+  .chat-log-empty{
+    margin:auto; text-align:center; color:var(--ink-dim); font-size:13px; padding:40px 20px;
   }
 
-  .rinput-row{
-    flex:none;
-    display:flex; align-items:center; gap:12px;
-    padding:16px 0 22px;
-    border-top:1px solid var(--line);
+  .mrow{ display:flex; gap:13px; padding:2.5px 18px; position:relative; }
+  .mrow:hover{ background:rgba(255,255,255,0.025); }
+  .mrow.start{ margin-top:9px; }
+  .avcol{ flex:none; width:36px; padding-top:1px; }
+  .avcol img{ width:36px; height:36px; border-radius:50%; display:block; }
+  .avcol .hovertime{ display:none; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-dim); text-align:center; padding-top:5px; }
+  .mrow:not(.start):hover .hovertime{ display:block; }
+  .mcontent{ min-width:0; flex:1 1 auto; }
+  .mhead{ display:flex; align-items:baseline; gap:8px; }
+  .mhead .mname{ font-size:14px; font-weight:600; color:#fff; }
+  .mhead .mname.mine{ color:var(--mint); }
+  .mhead .mtime{ font-size:10.5px; color:var(--ink-dim); font-family:'IBM Plex Mono',monospace; }
+  .mtext{ font-size:14px; line-height:1.48; color:var(--paper); word-wrap:break-word; }
+  .mimg{
+    margin-top:4px; max-width:320px; max-height:320px; border-radius:10px;
+    border:1px solid var(--line); cursor:pointer; display:block; object-fit:cover;
   }
-  .rinput-row input{
-    flex:1 1 auto;
-    background:var(--void); border:1px solid var(--line); color:var(--paper);
-    border-radius:12px; padding:14px 16px; font-family:inherit; font-size:14.5px;
+
+  .chat-input-wrap{ flex:none; padding:10px 18px 16px; }
+  .attach-preview{
+    display:none; align-items:center; gap:10px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:8px 10px; margin-bottom:8px;
   }
-  .rinput-row input::placeholder{ color:rgba(237,231,218,0.35); }
-  .rinput-row input:focus{ outline:none; border-color:var(--violet); }
-  .rinput-row button{
-    flex:none; display:flex; align-items:center; gap:8px;
+  .attach-preview.show{ display:flex; }
+  .attach-preview img{ width:44px; height:44px; border-radius:7px; object-fit:cover; flex:none; background:var(--void); }
+  .attach-preview img.broken{ visibility:hidden; }
+  .attach-preview .apname{ flex:1 1 auto; min-width:0; font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .attach-preview .apremove{
+    flex:none; width:24px; height:24px; border-radius:7px; border:none;
+    background:transparent; color:var(--ink-dim); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .attach-preview .apremove:hover{ background:rgba(255,107,91,0.14); color:var(--coral); }
+  .attach-preview .apremove svg{ width:14px; height:14px; }
+  .chat-input-row{
+    display:flex; align-items:center; gap:8px;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:5px 6px 5px 6px;
+  }
+  .chat-input-row:focus-within{ border-color:var(--violet); }
+  .chat-input-row .attach-btn{
+    flex:none; width:36px; height:36px; border-radius:9px; margin-left:2px;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent; border:none; color:var(--ink-dim); cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .chat-input-row .attach-btn:hover{ background:rgba(237,231,218,0.06); color:var(--paper); }
+  .chat-input-row .attach-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .chat-input-row .attach-btn:disabled:hover{ background:transparent; color:var(--ink-dim); }
+  .chat-input-row .attach-btn svg{ width:19px; height:19px; }
+  .chat-input-row .gif-btn{
+    flex:none; height:30px; padding:0 9px; border-radius:8px; margin-left:1px;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--line); color:var(--ink-dim); cursor:pointer;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:.02em;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .chat-input-row .gif-btn:hover{ background:rgba(237,231,218,0.06); color:var(--paper); border-color:var(--line); }
+  .chat-input-row .gif-btn.active{ background:rgba(156,140,251,0.16); color:#fff; border-color:rgba(156,140,251,0.4); }
+  .chat-input-row .gif-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  .gif-popover{
+    display:none; position:absolute; bottom:64px; left:18px; z-index:40;
+    width:320px; max-height:380px; background:var(--panel-raise);
+    border:1px solid var(--line); border-radius:12px;
+    box-shadow:0 12px 32px rgba(0,0,0,0.45);
+    flex-direction:column; overflow:hidden;
+  }
+  .gif-popover.show{ display:flex; }
+  .gif-popover-search{ flex:none; padding:10px; border-bottom:1px solid var(--line); }
+  .gif-popover-search input{
+    width:100%; background:var(--void-deep); border:1px solid var(--line);
+    color:var(--paper); border-radius:8px; padding:8px 11px;
+    font-family:inherit; font-size:12.5px;
+  }
+  .gif-popover-search input::placeholder{ color:var(--ink-dim); }
+  .gif-popover-search input:focus{ outline:none; border-color:var(--violet); }
+  .gif-popover-grid{
+    flex:1 1 auto; min-height:0; overflow-y:auto; padding:8px;
+    display:grid; grid-template-columns:1fr 1fr; gap:6px;
+  }
+  .gif-popover-grid img{
+    width:100%; height:100px; object-fit:cover; border-radius:7px;
+    cursor:pointer; display:block; background:var(--void);
+    transition:transform .12s ease, filter .12s ease;
+  }
+  .gif-popover-grid img:hover{ transform:scale(1.03); filter:brightness(1.08); }
+  .gif-popover-msg{ padding:24px 14px; text-align:center; font-size:12px; color:var(--ink-dim); grid-column:1 / -1; }
+  .gif-popover-attr{
+    flex:none; padding:6px 10px; font-size:9.5px; color:var(--ink-dim);
+    border-top:1px solid var(--line); text-align:center;
+  }
+  .chat-input-row input{
+    flex:1 1 auto; background:transparent; border:none; color:var(--paper);
+    font-family:inherit; font-size:14px; padding:9px 4px; min-width:0;
+  }
+  .chat-input-row input::placeholder{ color:var(--ink-dim); }
+  .chat-input-row input:focus{ outline:none; }
+  .chat-input-row button{
+    flex:none; width:36px; height:36px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
     background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff; border:none;
-    border-radius:12px; padding:0 22px; height:48px;
-    font-family:inherit; font-weight:600; font-size:14.5px; cursor:pointer;
-    box-shadow:0 4px 14px rgba(81,66,196,0.35);
-    transition:filter .15s ease, transform .15s ease;
+    cursor:pointer; transition:filter .15s ease, transform .15s ease, opacity .15s ease;
   }
-  .rinput-row button:hover{ filter:brightness(1.08); }
-  .rinput-row button:active{ transform:translateY(1px); }
-  .rinput-row button:disabled{ opacity:0.5; cursor:not-allowed; }
-  .rinput-row button svg{ width:16px; height:16px; flex:none; }
+  .chat-input-row button svg{ width:16px; height:16px; }
+  .chat-input-row button:hover{ filter:brightness(1.08); }
+  .chat-input-row button:active{ transform:translateY(1px); }
+  .chat-input-row button:disabled{ opacity:0.35; cursor:not-allowed; }
+  .chat-hint{ margin:6px 2px 0; font-size:10.5px; color:var(--ink-dim); }
 
-  .rnotfound{
+  .chat-notfound{
     flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:14px; text-align:center; padding:40px 20px;
+    gap:12px; text-align:center; padding:40px 20px;
   }
-  .rnotfound h2{ font-size:22px; color:#fff; }
-  .rnotfound p{ color:var(--ink-soft); font-size:14px; max-width:360px; }
-  .rnotfound a{
-    display:inline-flex; align-items:center; gap:8px;
-    background:linear-gradient(135deg,#8B7CF6,#5142C4); color:#fff;
-    border-radius:10px; padding:11px 20px; font-weight:600; font-size:14px;
+  .chat-notfound h2{ font-size:19px; color:#fff; }
+  .chat-notfound p{ color:var(--ink-soft); font-size:13.5px; max-width:340px; }
+
+  /* ---------- mobile ---------- */
+  .backdrop{ display:none; }
+  @media (max-width: 860px){
+    .rail{ position:fixed; z-index:30; height:100%; transform:translateX(-100%); transition:transform .2s ease; }
+    .chside{ position:fixed; left:72px; z-index:30; height:100%; transform:translateX(-140%); transition:transform .2s ease; }
+    .app.nav-open .rail, .app.nav-open .chside{ transform:translateX(0); }
+    .backdrop{
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:20;
+    }
+    .app.nav-open .backdrop{ display:block; }
+    .menu-btn{ display:flex; }
+    .mrow{ padding-left:12px; padding-right:12px; }
   }
 </style>
 </head>
 <body>
 
-<nav class="rnav">
-  <div class="rnav-inner">
-    <div class="rnav-left">
-      <a class="rnav-back" href="/community.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+<div class="app" id="rApp">
+  <div class="backdrop" id="rBackdrop"></div>
+
+  <!-- server rail -->
+  <aside class="rail">
+    <a class="rail-item home" href="/community.html" title="All communities">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    </a>
+    <div class="rail-divider"></div>
+    <div class="rail-item brand" title="FriendHub">
+      <div class="pip"></div>
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+      </svg>
+    </div>
+  </aside>
+
+  <!-- channel sidebar -->
+  <aside class="chside">
+    <div class="chside-head">
+      <div class="chside-head-top">
+        <span>Friend<em>Hub</em></span>
+      </div>
+      <a class="chside-back" href="/community.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         All communities
       </a>
-      <a class="rnav-brand" href="/">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="rnavLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#9C8CFB"/>
-              <stop offset="100%" stop-color="#5142C4"/>
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#rnavLogoGrad)"/>
-          <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
-          <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
-          <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
-        </svg>
-        <span>Friend<em>Hub</em></span>
-      </a>
     </div>
-    <div class="rnav-account" id="rNavAccount" style="display:none;">
-      <img id="rNavAvatar" src="" alt="">
-      <span id="rNavName"></span>
+    <div class="chsearch">
+      <input type="text" id="rChSearch" placeholder="Find a room">
     </div>
-  </div>
-</nav>
-
-<div id="rRoomFound">
-  <div class="rhead">
-    <div class="rhead-left">
-      <div class="rhead-icon" id="rHeadIcon"></div>
-      <div>
-        <h1 id="rHeadName"></h1>
-        <p id="rHeadDesc"></p>
+    <div class="ch-label">Rooms</div>
+    <div class="ch-list" id="rChList"></div>
+    <div class="user-panel" id="rUserPanel">
+      <div class="ustat"><img id="rNavAvatar" src="https://ui-avatars.com/api/?background=5142C4&color=fff&name=U" alt=""><span class="dot"></span></div>
+      <div class="uinfo">
+        <div class="un" id="rNavName">Signing in…</div>
+        <div class="us">Online</div>
       </div>
     </div>
-    <div class="rhead-online"><span class="dot"></span> <span id="rOnlineCount">…</span>&nbsp;here now</div>
-  </div>
+  </aside>
 
-  <div class="rmain">
-    <div class="rlog" id="rLog">
-      <div class="rlog-empty" id="rLogEmpty">No messages yet — say hi 👋</div>
-    </div>
-    <div class="rinput-row">
-      <input type="text" id="rInput" placeholder="Message this room…" maxlength="500">
-      <button id="rSendBtn" disabled>Send
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-      </button>
-    </div>
-  </div>
-</div>
+  <!-- main chat -->
+  <main class="chat">
+    <div id="rRoomFound">
+      <div class="chat-head">
+        <div class="chat-head-left">
+          <button class="menu-btn" id="rMenuBtn" aria-label="Open rooms">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="chat-head-icon" id="rHeadIcon"></div>
+          <div class="chat-head-text">
+            <h1 id="rHeadName"></h1>
+            <p id="rHeadDesc"></p>
+          </div>
+        </div>
+        <div class="chat-head-online"><span class="dot"></span><span id="rOnlineCount">…</span>&nbsp;here now</div>
+      </div>
 
-<div class="rnotfound" id="rNotFound" style="display:none;">
-  <h2>Room not found</h2>
-  <p>That community doesn't exist, or the link is missing its topic. Head back and pick one from the list.</p>
-  <a href="/community.html">Browse communities</a>
+      <div class="chat-log" id="rLog">
+        <div class="chat-log-empty" id="rLogEmpty">No messages yet — say hi 👋</div>
+      </div>
+
+      <div class="chat-input-wrap" style="position:relative;">
+        <div class="gif-popover" id="rGifPopover">
+          <div class="gif-popover-search">
+            <input type="text" id="rGifSearch" placeholder="Search GIFs">
+          </div>
+          <div class="gif-popover-grid" id="rGifGrid">
+            <div class="gif-popover-msg">Loading trending GIFs…</div>
+          </div>
+          <div class="gif-popover-attr">Powered by GIPHY</div>
+        </div>
+        <div class="attach-preview" id="rAttachPreview">
+          <img id="rAttachThumb" src="" alt="">
+          <span class="apname" id="rAttachName"></span>
+          <button class="apremove" id="rAttachRemove" aria-label="Remove image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="chat-input-row">
+          <input type="file" id="rFileInput" accept="image/*" hidden>
+          <button class="attach-btn" id="rAttachBtn" aria-label="Attach image" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
+          </button>
+          <button class="gif-btn" id="rGifBtn" aria-label="Send a GIF" type="button" disabled>GIF</button>
+          <input type="text" id="rInput" placeholder="Message this room…" maxlength="500">
+          <button id="rSendBtn" disabled aria-label="Send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-notfound" id="rNotFound" style="display:none;">
+      <h2>Room not found</h2>
+      <p>That community doesn't exist, or the link is missing its topic. Pick one from the sidebar instead.</p>
+    </div>
+  </main>
 </div>
 
 <script>
   // Kept in sync with the same list on /community/index.html.
   const COMMUNITIES = {
-    "cooking": { name:"Cooking", icon:"🍳", desc:"Recipes, techniques, and what's for dinner tonight.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "sports": { name:"Sports", icon:"⚽", desc:"Scores, highlights, and hot takes on every league.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "business": { name:"Business", icon:"💼", desc:"Strategy, operations, and running a company day to day.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "learning": { name:"Learning", icon:"📚", desc:"Study tips, courses, and figuring things out together.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "coding": { name:"Coding", icon:"💻", desc:"Debugging, side projects, and language wars.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "startups": { name:"Startups", icon:"🚀", desc:"Building, fundraising, and shipping v1.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "music": { name:"Music", icon:"🎵", desc:"New releases, production, and playlist swaps.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "movies-tv": { name:"Movies & TV", icon:"🎬", desc:"What to watch next, and spoiler-free discussion.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "gaming": { name:"Gaming", icon:"🎮", desc:"Squad-up chat, patch notes, and what you're grinding.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "travel": { name:"Travel", icon:"✈️", desc:"Trip planning, hidden gems, and flight-deal alerts.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "fitness": { name:"Fitness", icon:"🏋️", desc:"Training plans, form checks, and accountability.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "photography": { name:"Photography", icon:"📷", desc:"Gear talk, edits, and critique welcome.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "art-design": { name:"Art & Design", icon:"🎨", desc:"Sketches, feedback, and design process chat.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "books": { name:"Books", icon:"📖", desc:"What you're reading and what's worth the hype.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "finance": { name:"Finance & Investing", icon:"💰", desc:"Markets, budgeting, and long-term money talk.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "science": { name:"Science", icon:"🔬", desc:"New research, weird facts, and honest questions.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "mental-health": { name:"Mental Health", icon:"🧠", desc:"Supportive, judgment-free peer conversation.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "parenting": { name:"Parenting", icon:"👶", desc:"Trading notes on the hardest job with no manual.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "pets-animals": { name:"Pets & Animals", icon:"🐾", desc:"Show off your pet, ask for advice, swap stories.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "relationships": { name:"Relationships & Dating", icon:"❤️", desc:"Advice, venting, and modern-dating chaos.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "anime-manga": { name:"Anime & Manga", icon:"🌸", desc:"Seasonal watch talk, manga chapters, and recs.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "food-dining": { name:"Food & Dining Out", icon:"🍜", desc:"Restaurant finds, takeout wins, and food photos.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "diy-home": { name:"DIY & Home Improvement", icon:"🔨", desc:"Fixer-upper projects, tools, and before/afters.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "cars-moto": { name:"Cars & Motorcycles", icon:"🏎️", desc:"Builds, maintenance tips, and garage talk.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "fashion-style": { name:"Fashion & Style", icon:"👗", desc:"Fit checks, thrift finds, and outfit advice.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "comedy-memes": { name:"Comedy & Memes", icon:"😂", desc:"Whatever's making the rounds, plus original bits.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "history": { name:"History", icon:"🏛️", desc:"Deep dives, debates, and today-in-history trivia.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "philosophy": { name:"Philosophy", icon:"🦉", desc:"Big questions, thought experiments, friendly debate.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "language-learning": { name:"Language Learning", icon:"🗣️", desc:"Practice partners, resources, and progress check-ins.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "crypto-web3": { name:"Crypto & Web3", icon:"⛓️", desc:"Market chat, projects, and separating signal from noise.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "real-estate": { name:"Real Estate", icon:"🏠", desc:"Buying, renting, investing, and market talk.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "board-games": { name:"Board Games & Tabletop", icon:"🎲", desc:"Game nights, new releases, and rules debates.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "outdoors-hiking": { name:"Outdoors & Hiking", icon:"🥾", desc:"Trail reports, gear talk, and trip planning.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "astrology-spirituality": { name:"Astrology & Spirituality", icon:"🔮", desc:"Charts, practices, and open-minded chat.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "tech-gadgets": { name:"Tech & Gadgets", icon:"📱", desc:"New releases, reviews, and which one to buy.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "side-hustles": { name:"Side Hustles", icon:"🛠️", desc:"Extra-income ideas and lessons from what worked.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "writing-poetry": { name:"Writing & Poetry", icon:"✍️", desc:"Share drafts, get feedback, and talk craft.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "theater-performing": { name:"Theater & Performing Arts", icon:"🎭", desc:"Shows you've seen, roles you're chasing.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "biology": { name:"Biology", icon:"🧬", desc:"Life sciences chat — genetics, ecology, and weird organisms.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "wine": { name:"Wine", icon:"🍷", desc:"Bottle recs, pairings, and tasting notes.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "yoga-meditation": { name:"Yoga & Meditation", icon:"🧘", desc:"Practice tips, mindfulness, and staying consistent.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "running": { name:"Running", icon:"🏃", desc:"Training plans, race talk, and PR celebrations.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "cycling": { name:"Cycling", icon:"🚴", desc:"Routes, gear, and gran fondo chatter.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "space-astronomy": { name:"Space & Astronomy", icon:"🔭", desc:"Launches, stargazing tips, and cosmic news.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "sustainability": { name:"Environment & Sustainability", icon:"🌱", desc:"Climate news, low-waste tips, and green living.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "volunteering": { name:"Volunteering & Nonprofits", icon:"🤝", desc:"Causes, opportunities, and giving-back stories.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "lgbtq": { name:"LGBTQ+ Community", icon:"🏳️‍🌈", desc:"A welcoming space to talk, share, and connect.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "military-veterans": { name:"Military & Veterans", icon:"🎖️", desc:"Service stories, transition talk, and support.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "college-life": { name:"College Life", icon:"🎓", desc:"Classes, campus life, and figuring it all out.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "retirement-seniors": { name:"Retirement & Seniors", icon:"🌤️", desc:"New chapters, hobbies, and staying connected.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "pottery-ceramics": { name:"Pottery & Ceramics", icon:"🏺", desc:"Clay projects, glazing techniques, and studio tips.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "knitting-crochet": { name:"Knitting & Crochet", icon:"🧶", desc:"Patterns, projects, and handmade creations.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "sewing-quilting": { name:"Sewing & Quilting", icon:"🧵", desc:"Patterns, fabrics, repairs, and quilting projects.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "calligraphy": { name:"Calligraphy & Lettering", icon:"✒️", desc:"Beautiful writing, lettering practice, and pen tips.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "stained-glass": { name:"Stained Glass", icon:"🪟", desc:"Glass cutting, soldering, and colorful designs.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "model-building": { name:"Model Building", icon:"🛩️", desc:"Scale models, painting, detailing, and displays.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "lego-building": { name:"LEGO Building", icon:"🧱", desc:"Custom builds, collections, and creative challenges.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "cosplay": { name:"Cosplay", icon:"🦸", desc:"Costumes, props, makeup, and convention planning.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "magic-tricks": { name:"Magic & Illusions", icon:"🎩", desc:"Tricks, performances, and the secrets of illusion.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "stand-up-comedy": { name:"Stand-Up Comedy", icon:"🎙️", desc:"Jokes, open mics, writing, and performance feedback.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "podcasting": { name:"Podcasting", icon:"🎧", desc:"Show ideas, recording gear, editing, and growth tips.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "youtube-creators": { name:"YouTube Creators", icon:"▶️", desc:"Video ideas, thumbnails, editing, and channel growth.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "content-creators": { name:"Content Creators", icon:"📹", desc:"Social content, audience building, and creator workflows.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "blogging": { name:"Blogging & Newsletters", icon:"📰", desc:"Writing online, publishing consistently, and finding readers.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "public-speaking": { name:"Public Speaking", icon:"🗣️", desc:"Presentations, confidence, storytelling, and speech practice.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "debate": { name:"Debate & Discussion", icon:"⚖️", desc:"Arguments, critical thinking, and respectful disagreement.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "geography-maps": { name:"Geography & Maps", icon:"🗺️", desc:"Cartography, unusual places, and geographic discoveries.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "archaeology": { name:"Archaeology", icon:"🏺", desc:"Ancient cultures, discoveries, and fieldwork stories.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "true-crime": { name:"True Crime", icon:"🕵️", desc:"Cases, investigations, documentaries, and analysis.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "mysteries-paranormal": { name:"Mysteries & Paranormal", icon:"👻", desc:"Unsolved mysteries, strange events, and theories.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "birdwatching": { name:"Birdwatching", icon:"🦜", desc:"Bird sightings, identification, and nature photography.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "beekeeping": { name:"Beekeeping", icon:"🐝", desc:"Hive care, honey harvesting, and bee-friendly gardens.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "foraging": { name:"Foraging", icon:"🍄", desc:"Wild foods, identification, and responsible harvesting.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "camping": { name:"Camping", icon:"⛺", desc:"Campsites, equipment, outdoor cooking, and trip stories.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "rock-climbing": { name:"Rock Climbing", icon:"🧗", desc:"Bouldering, routes, technique, and climbing partners.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "surfing": { name:"Surfing", icon:"🏄", desc:"Wave reports, boards, technique, and surf trips.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "skateboarding": { name:"Skateboarding", icon:"🛹", desc:"Tricks, skate spots, board setups, and videos.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "martial-arts": { name:"Martial Arts", icon:"🥋", desc:"Training, discipline, techniques, and competition talk.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "swimming": { name:"Swimming", icon:"🏊", desc:"Workouts, stroke technique, races, and pool training.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "basketball": { name:"Basketball", icon:"🏀", desc:"Games, players, tactics, and pickup recommendations.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "football": { name:"Football", icon:"🏈", desc:"League news, tactics, fantasy talk, and game analysis.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "cricket": { name:"Cricket", icon:"🏏", desc:"Matches, players, tactics, and cricket culture.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "badminton": { name:"Badminton", icon:"🏸", desc:"Training drills, equipment, matches, and local play.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "table-tennis": { name:"Table Tennis", icon:"🏓", desc:"Paddles, serves, practice drills, and competitions.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "golf": { name:"Golf", icon:"⛳", desc:"Courses, swing tips, equipment, and golf stories.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "fishing": { name:"Fishing", icon:"🎣", desc:"Spots, techniques, equipment, and catch stories.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "sailing": { name:"Sailing & Boating", icon:"⛵", desc:"Boats, routes, maintenance, and life on the water.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "motorhomes-rv": { name:"Motorhomes & RV Travel", icon:"🚐", desc:"Road trips, vehicle builds, campsites, and travel tips.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "public-transit": { name:"Public Transit", icon:"🚇", desc:"Routes, systems, commuting tips, and urban mobility.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "local-dhaka": { name:"Dhaka Community", icon:"🏙️", desc:"Local events, neighborhoods, recommendations, and city life.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "expats": { name:"Expats & Relocation", icon:"🌍", desc:"Moving abroad, settling in, visas, and cultural adjustment.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "new-in-town": { name:"New in Town", icon:"📍", desc:"Meet people, discover places, and build a local network.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "minimalism": { name:"Minimalism", icon:"🧺", desc:"Decluttering, intentional living, and simpler routines.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "productivity": { name:"Productivity", icon:"✅", desc:"Planning systems, focus methods, and better workflows.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "personal-development": { name:"Personal Development", icon:"🌟", desc:"Habits, confidence, goals, and becoming your best self.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
-    "digital-nomads": { name:"Digital Nomads", icon:"💻", desc:"Remote work, travel routines, and location-independent life.", tint:"rgba(94,234,212,0.14)", border:"rgba(94,234,212,0.32)" },
-    "freelancing": { name:"Freelancing", icon:"🧑‍💻", desc:"Finding clients, pricing work, and managing projects.", tint:"rgba(255,184,77,0.14)", border:"rgba(255,184,77,0.32)" },
-    "remote-work": { name:"Remote Work", icon:"🏡", desc:"Home offices, collaboration, meetings, and work-life balance.", tint:"rgba(94,158,255,0.14)", border:"rgba(94,158,255,0.32)" },
-    "job-search": { name:"Job Search", icon:"🔎", desc:"Openings, applications, interviews, and career transitions.", tint:"rgba(255,107,91,0.14)", border:"rgba(255,107,91,0.32)" },
-    "scholarships": { name:"Scholarships & Grants", icon:"🎓", desc:"Funding opportunities, applications, and study resources.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" }
+    "cooking":       { name:"Cooking",             icon:"🍳", desc:"Recipes, techniques, and what's for dinner tonight.",      tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    "sports":        { name:"Sports",              icon:"⚽", desc:"Scores, highlights, and hot takes on every league.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    "business":      { name:"Business",            icon:"💼", desc:"Strategy, operations, and running a company day to day.", tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    "learning":      { name:"Learning",             icon:"📚", desc:"Study tips, courses, and figuring things out together.",  tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    "coding":        { name:"Coding",               icon:"💻", desc:"Debugging, side projects, and language wars.",            tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    "startups":      { name:"Startups",             icon:"🚀", desc:"Building, fundraising, and shipping v1.",                 tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    "music":         { name:"Music",                icon:"🎵", desc:"New releases, production, and playlist swaps.",          tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    "movies-tv":     { name:"Movies & TV",          icon:"🎬", desc:"What to watch next, and spoiler-free discussion.",        tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" },
+    "gaming":        { name:"Gaming",               icon:"🎮", desc:"Squad-up chat, patch notes, and what you're grinding.",   tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    "travel":        { name:"Travel",               icon:"✈️", desc:"Trip planning, hidden gems, and flight-deal alerts.",     tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    "fitness":       { name:"Fitness",              icon:"🏋️", desc:"Training plans, form checks, and accountability.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    "photography":   { name:"Photography",          icon:"📷", desc:"Gear talk, edits, and critique welcome.",                 tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    "art-design":    { name:"Art & Design",         icon:"🎨", desc:"Sketches, feedback, and design process chat.",            tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    "books":         { name:"Books",                icon:"📖", desc:"What you're reading and what's worth the hype.",         tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    "finance":       { name:"Finance & Investing",  icon:"💰", desc:"Markets, budgeting, and long-term money talk.",           tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    "science":       { name:"Science",              icon:"🔬", desc:"New research, weird facts, and honest questions.",       tint:"rgba(94,158,255,0.14)",  border:"rgba(94,158,255,0.32)" },
+    "mental-health": { name:"Mental Health",        icon:"🧠", desc:"Supportive, judgment-free peer conversation.",            tint:"rgba(94,234,212,0.14)",  border:"rgba(94,234,212,0.32)" },
+    "parenting":     { name:"Parenting",            icon:"👶", desc:"Trading notes on the hardest job with no manual.",        tint:"rgba(255,184,77,0.14)",  border:"rgba(255,184,77,0.32)" },
+    "pets-animals":  { name:"Pets & Animals",       icon:"🐾", desc:"Show off your pet, ask for advice, swap stories.",        tint:"rgba(255,107,91,0.14)",  border:"rgba(255,107,91,0.32)" },
+    "relationships": { name:"Relationships & Dating", icon:"❤️", desc:"Advice, venting, and modern-dating chaos.",             tint:"rgba(156,140,251,0.14)", border:"rgba(156,140,251,0.32)" }
   };
 
-  const params = new URLSearchParams(window.location.search);
-  const topic = params.get('topic');
-  const room = topic ? COMMUNITIES[topic] : null;
-
+  const appEl = document.getElementById('rApp');
+  const backdrop = document.getElementById('rBackdrop');
+  const menuBtn = document.getElementById('rMenuBtn');
+  const chList = document.getElementById('rChList');
+  const chSearch = document.getElementById('rChSearch');
   const roomFoundEl = document.getElementById('rRoomFound');
   const notFoundEl = document.getElementById('rNotFound');
 
-  if (!room) {
-    roomFoundEl.style.display = 'none';
-    notFoundEl.style.display = 'flex';
-  } else {
+  function openNav(){ appEl.classList.add('nav-open'); }
+  function closeNav(){ appEl.classList.remove('nav-open'); }
+  menuBtn.addEventListener('click', openNav);
+  backdrop.addEventListener('click', closeNav);
+
+  function renderChannelList(filter){
+    const q = (filter || '').trim().toLowerCase();
+    const currentTopic = new URLSearchParams(window.location.search).get('topic');
+    chList.innerHTML = '';
+    const entries = Object.entries(COMMUNITIES).filter(([key, room]) =>
+      !q || room.name.toLowerCase().includes(q)
+    );
+    if (!entries.length){
+      chList.innerHTML = '<div class="ch-empty">No rooms match “' + q + '”</div>';
+      return;
+    }
+    entries.forEach(([key, room]) => {
+      const item = document.createElement('a');
+      item.className = 'ch-item' + (key === currentTopic ? ' active' : '');
+      item.href = '/room.html?topic=' + key;
+      item.innerHTML = '<span class="em">' + room.icon + '</span><span class="nm">' + room.name + '</span>';
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeNav();
+        window.selectRoom(key);
+      });
+      chList.appendChild(item);
+    });
+  }
+  chSearch.addEventListener('input', () => renderChannelList(chSearch.value));
+  renderChannelList('');
+
+  window.currentTopic = null;
+  window.selectRoom = function(topic){
+    const room = COMMUNITIES[topic];
+    if (!room) {
+      roomFoundEl.style.display = 'none';
+      notFoundEl.style.display = 'flex';
+      return;
+    }
+    window.currentTopic = topic;
+    try { history.replaceState(null, '', '/room.html?topic=' + topic); } catch (e) { /* ignore (e.g. file:// preview) */ }
     document.title = room.name + ' — FriendHub Community';
+    roomFoundEl.style.display = 'flex';
+    notFoundEl.style.display = 'none';
     document.getElementById('rHeadIcon').textContent = room.icon;
     document.getElementById('rHeadIcon').style.setProperty('--tint', room.tint);
     document.getElementById('rHeadIcon').style.setProperty('--tint-border', room.border);
     document.getElementById('rHeadName').textContent = room.name;
     document.getElementById('rHeadDesc').textContent = room.desc;
-  }
+    renderChannelList(chSearch.value);
+    if (window.rMountRoom) window.rMountRoom(topic);
+  };
+
+  const initialTopic = new URLSearchParams(window.location.search).get('topic') || Object.keys(COMMUNITIES)[0];
+  window.selectRoom(initialTopic);
 </script>
 
 <!-- ============================================================
@@ -358,17 +511,21 @@
 
   Firestore layout used here (add rules for these — see notes below):
     /communityRooms/{topic}/messages/{messageId}
-      { text, sender (uid), senderName, senderPhoto, createdAt }
+      { text, imageUrl, imagePath, sender (uid), senderName, senderPhoto, createdAt }
     /roomPresence/{topic}_{uid}
       { topic, updatedAt }   -- same shape /community/index.html already reads
+
+  Storage layout:
+    /roomUploads/{topic}/{uid}_{timestamp}_{filename}
+    (add Storage rules allowing authenticated, non-anonymous users to write
+    under roomUploads/** and read publicly, mirroring the Firestore rules)
 ============================================================= -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script>
 (function(){
-  const topic = new URLSearchParams(window.location.search).get('topic');
-
   const firebaseConfig = {
     apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
     authDomain: "friendhub-9f934.firebaseapp.com",
@@ -380,9 +537,10 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const storage = firebase.storage();
   const FieldValue = firebase.firestore.FieldValue;
 
-  const navAccount = document.getElementById('rNavAccount');
+  const userPanel = document.getElementById('rUserPanel');
   const navAvatar = document.getElementById('rNavAvatar');
   const navName = document.getElementById('rNavName');
   const log = document.getElementById('rLog');
@@ -390,23 +548,38 @@
   const input = document.getElementById('rInput');
   const sendBtn = document.getElementById('rSendBtn');
   const onlineCountEl = document.getElementById('rOnlineCount');
-
-  if (!document.getElementById('rRoomFound') || document.getElementById('rRoomFound').style.display === 'none') {
-    return; // unknown room — nothing below needs to run
-  }
+  const fileInput = document.getElementById('rFileInput');
+  const attachBtn = document.getElementById('rAttachBtn');
+  const attachPreview = document.getElementById('rAttachPreview');
+  const attachThumb = document.getElementById('rAttachThumb');
+  const attachName = document.getElementById('rAttachName');
+  const attachRemove = document.getElementById('rAttachRemove');
+  const gifBtn = document.getElementById('rGifBtn');
+  const gifPopover = document.getElementById('rGifPopover');
+  const gifSearch = document.getElementById('rGifSearch');
+  const gifGrid = document.getElementById('rGifGrid');
 
   let myUser = null;
   let unsubMessages = null;
+  let presenceInterval = null;
+  let onlineInterval = null;
+  let activeTopic = null;
+  let lastRender = null; // { uid, ts } for message grouping
+  let pendingFile = null;
+  let pendingPreviewUrl = null;
+  let uploading = false;
 
   auth.onAuthStateChanged((user) => {
     if (user && !user.isAnonymous) {
       myUser = user;
-      navAccount.style.display = 'flex';
+      userPanel.style.display = 'flex';
       navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
       navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
       input.disabled = false;
-      sendBtn.disabled = false;
-      startRoom();
+      attachBtn.disabled = false;
+      gifBtn.disabled = false;
+      updateSendState();
+      if (window.currentTopic) mountRoom(window.currentTopic);
     } else {
       // Anonymous or fully signed out — chat rooms are a gated action, same
       // as Start on the main page, so bounce to home where the sign-in
@@ -421,26 +594,87 @@
     return div.innerHTML;
   }
 
-  function addMessageEl(m, mine){
-    logEmpty.style.display = 'none';
-    const row = document.createElement('div');
-    row.className = 'rmsg' + (mine ? ' me' : '');
-    const nameHtml = mine ? '' :
-      '<div class="who">' +
-        (m.senderPhoto ? '<img src="' + m.senderPhoto + '" alt="">' : '') +
-        '<span>' + escapeHtml(m.senderName || 'Someone') + '</span>' +
-      '</div>';
-    row.innerHTML = nameHtml + '<div class="bubble"></div>';
-    row.querySelector('.bubble').textContent = m.text;
-    log.appendChild(row);
-    log.scrollTop = log.scrollHeight;
+  function fmtTime(date){
+    if (!date) return '';
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   }
 
-  function startRoom(){
-    if (unsubMessages) return; // already listening
+  function addMessageEl(m, mine){
+    logEmpty.style.display = 'none';
+    const ts = m.createdAt && m.createdAt.toDate ? m.createdAt.toDate() : new Date();
+    const grouped = lastRender && lastRender.uid === m.sender && (ts - lastRender.ts) < 5 * 60 * 1000;
+
+    const row = document.createElement('div');
+    row.className = 'mrow' + (grouped ? '' : ' start');
+
+    const avcol = document.createElement('div');
+    avcol.className = 'avcol';
+    if (grouped) {
+      avcol.innerHTML = '<div class="hovertime">' + fmtTime(ts) + '</div>';
+    } else {
+      const img = document.createElement('img');
+      img.src = m.senderPhoto || ('https://ui-avatars.com/api/?background=5142C4&color=fff&name=' + encodeURIComponent(m.senderName || 'U'));
+      img.alt = '';
+      avcol.appendChild(img);
+    }
+
+    const content = document.createElement('div');
+    content.className = 'mcontent';
+    if (!grouped) {
+      const head = document.createElement('div');
+      head.className = 'mhead';
+      head.innerHTML =
+        '<span class="mname' + (mine ? ' mine' : '') + '">' + escapeHtml(m.senderName || 'Someone') + '</span>' +
+        '<span class="mtime">' + fmtTime(ts) + '</span>';
+      content.appendChild(head);
+    }
+    const mediaUrl = m.imageUrl || m.gifUrl;
+    if (mediaUrl) {
+      const imgEl = document.createElement('img');
+      imgEl.className = 'mimg';
+      imgEl.src = mediaUrl;
+      imgEl.alt = m.text ? m.text : (m.gifUrl ? 'GIF' : 'Shared image');
+      imgEl.loading = 'lazy';
+      imgEl.addEventListener('click', () => window.open(mediaUrl, '_blank'));
+      content.appendChild(imgEl);
+    }
+    if (m.text) {
+      const text = document.createElement('div');
+      text.className = 'mtext';
+      text.textContent = m.text;
+      content.appendChild(text);
+    }
+
+    row.appendChild(avcol);
+    row.appendChild(content);
+    log.appendChild(row);
+    log.scrollTop = log.scrollHeight;
+
+    lastRender = { uid: m.sender, ts: ts };
+  }
+
+  function teardownRoom(){
+    if (unsubMessages) { unsubMessages(); unsubMessages = null; }
+    if (presenceInterval) { clearInterval(presenceInterval); presenceInterval = null; }
+    if (onlineInterval) { clearInterval(onlineInterval); onlineInterval = null; }
+    if (myUser && activeTopic) {
+      db.collection('roomPresence').doc(activeTopic + '_' + myUser.uid).delete().catch(() => {});
+    }
+    log.innerHTML = '<div class="chat-log-empty" id="rLogEmpty">No messages yet — say hi 👋</div>';
+    lastRender = null;
+    onlineCountEl.textContent = '…';
+  }
+
+  function mountRoom(topic){
+    if (!myUser) return; // wait for auth
+    if (activeTopic === topic && unsubMessages) return; // already active
+    teardownRoom();
+    activeTopic = topic;
+
     const messagesRef = db.collection('communityRooms').doc(topic).collection('messages')
       .orderBy('createdAt', 'asc').limitToLast(50);
 
+    const localLogEmpty = document.getElementById('rLogEmpty');
     unsubMessages = messagesRef.onSnapshot((snap) => {
       snap.docChanges().forEach((change) => {
         if (change.type === 'added') {
@@ -451,55 +685,231 @@
       });
     }, (err) => {
       console.error('messages listener failed:', err);
-      logEmpty.textContent = 'Could not load messages — check Firestore rules for /communityRooms.';
-      logEmpty.style.display = 'block';
+      const el = document.getElementById('rLogEmpty');
+      if (el) {
+        el.textContent = 'Could not load messages — check Firestore rules for /communityRooms.';
+        el.style.display = 'block';
+      }
     });
 
     touchPresence();
-    setInterval(touchPresence, 15000);
+    presenceInterval = setInterval(touchPresence, 15000);
     refreshOnlineCount();
-    setInterval(refreshOnlineCount, 8000);
-    window.addEventListener('pagehide', () => {
-      if (myUser) db.collection('roomPresence').doc(topic + '_' + myUser.uid).delete().catch(() => {});
-    });
+    onlineInterval = setInterval(refreshOnlineCount, 8000);
   }
+  window.rMountRoom = mountRoom;
+
+  window.addEventListener('pagehide', () => {
+    if (myUser && activeTopic) db.collection('roomPresence').doc(activeTopic + '_' + myUser.uid).delete().catch(() => {});
+  });
 
   function touchPresence(){
-    if (!myUser) return;
-    db.collection('roomPresence').doc(topic + '_' + myUser.uid).set({
-      topic: topic,
+    if (!myUser || !activeTopic) return;
+    db.collection('roomPresence').doc(activeTopic + '_' + myUser.uid).set({
+      topic: activeTopic,
       updatedAt: FieldValue.serverTimestamp()
     }, { merge: true }).catch((err) => console.error('room presence write failed:', err));
   }
 
   function refreshOnlineCount(){
+    if (!activeTopic) return;
+    const topic = activeTopic;
     const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - 30000);
     db.collection('roomPresence')
       .where('topic', '==', topic)
       .where('updatedAt', '>', cutoff)
       .get()
-      .then((snap) => { onlineCountEl.textContent = snap.size.toLocaleString(); })
-      .catch(() => { onlineCountEl.textContent = '—'; });
+      .then((snap) => { if (activeTopic === topic) onlineCountEl.textContent = snap.size.toLocaleString(); })
+      .catch(() => { if (activeTopic === topic) onlineCountEl.textContent = '—'; });
   }
 
-  function sendMessage(){
-    const text = input.value.trim();
-    if (!text || !myUser) return;
-    input.value = '';
-    db.collection('communityRooms').doc(topic).collection('messages').add({
-      text: text,
+  function updateSendState(){
+    const hasContent = !!input.value.trim() || !!pendingFile;
+    sendBtn.disabled = !myUser || uploading || !hasContent;
+  }
+
+  function clearAttachment(){
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+    pendingFile = null;
+    pendingPreviewUrl = null;
+    fileInput.value = '';
+    attachPreview.classList.remove('show');
+    updateSendState();
+  }
+
+  attachBtn.addEventListener('click', () => { if (!attachBtn.disabled) fileInput.click(); });
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    // Some browsers/OS pickers (iPhone HEIC, some cloud pickers) report an
+    // empty or unrecognized MIME type even for real images. The <input
+    // accept="image/*"> already filters the picker itself, so only block
+    // when we positively know it's a non-image type — never on "unknown".
+    const looksNonImage = file.type && !file.type.startsWith('image/');
+    const extOk = /\.(jpe?g|png|gif|webp|heic|heif|bmp|svg|avif)$/i.test(file.name || '');
+    if (looksNonImage && !extOk) {
+      fileInput.value = '';
+      alert('That file doesn\'t look like an image. Please choose a photo (JPG, PNG, GIF, WEBP, HEIC…).');
+      return;
+    }
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+    pendingFile = file;
+    pendingPreviewUrl = URL.createObjectURL(file);
+    attachThumb.classList.remove('broken');
+    attachThumb.onerror = () => { attachThumb.classList.add('broken'); }; // HEIC etc. may not preview in-browser; name still shows
+    attachThumb.src = pendingPreviewUrl;
+    attachName.textContent = file.name;
+    attachPreview.classList.add('show');
+    closeGifPopover();
+    updateSendState();
+  });
+
+  attachRemove.addEventListener('click', clearAttachment);
+
+  // ---------------- GIF picker ----------------
+  // Public GIPHY demo key (rate-limited). Swap in your own GIPHY API key
+  // for production use: https://developers.giphy.com/
+  const GIPHY_KEY = 'GlVGYHkr3WSBnllca54iNt0yFbjz7L65';
+  let gifSearchTimer = null;
+  let gifRequestId = 0;
+
+  function openGifPopover(){
+    gifPopover.classList.add('show');
+    gifBtn.classList.add('active');
+    clearAttachment();
+    if (!gifGrid.dataset.loaded) {
+      loadGifs('');
+      gifGrid.dataset.loaded = '1';
+    }
+    setTimeout(() => gifSearch.focus(), 0);
+  }
+  function closeGifPopover(){
+    gifPopover.classList.remove('show');
+    gifBtn.classList.remove('active');
+  }
+  gifBtn.addEventListener('click', () => {
+    if (gifBtn.disabled) return;
+    if (gifPopover.classList.contains('show')) closeGifPopover();
+    else openGifPopover();
+  });
+  document.addEventListener('click', (e) => {
+    if (!gifPopover.classList.contains('show')) return;
+    if (gifPopover.contains(e.target) || e.target === gifBtn) return;
+    closeGifPopover();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGifPopover();
+  });
+
+  function loadGifs(query){
+    const myRequest = ++gifRequestId;
+    gifGrid.innerHTML = '<div class="gif-popover-msg">Loading GIFs…</div>';
+    const endpoint = query
+      ? 'https://api.giphy.com/v1/gifs/search?api_key=' + GIPHY_KEY + '&q=' + encodeURIComponent(query) + '&limit=15&rating=pg-13'
+      : 'https://api.giphy.com/v1/gifs/trending?api_key=' + GIPHY_KEY + '&limit=15&rating=pg-13';
+    fetch(endpoint).then((res) => {
+      if (!res.ok) throw new Error('GIPHY request failed: ' + res.status);
+      return res.json();
+    }).then((data) => {
+      if (myRequest !== gifRequestId) return; // stale response, a newer search superseded it
+      const results = (data && data.data) || [];
+      if (!results.length) {
+        gifGrid.innerHTML = '<div class="gif-popover-msg">No GIFs found — try another search.</div>';
+        return;
+      }
+      gifGrid.innerHTML = '';
+      results.forEach((g) => {
+        const thumb = g.images && (g.images.fixed_width_small || g.images.fixed_width);
+        const full = g.images && (g.images.original || g.images.fixed_width);
+        if (!thumb || !full) return;
+        const img = document.createElement('img');
+        img.src = thumb.url;
+        img.alt = g.title || 'GIF';
+        img.loading = 'lazy';
+        img.addEventListener('click', () => {
+          sendGif(full.url);
+          closeGifPopover();
+        });
+        gifGrid.appendChild(img);
+      });
+    }).catch((err) => {
+      if (myRequest !== gifRequestId) return;
+      console.error('GIF fetch failed:', err);
+      gifGrid.innerHTML = '<div class="gif-popover-msg">Couldn\'t load GIFs — check your connection.</div>';
+    });
+  }
+
+  gifSearch.addEventListener('input', () => {
+    clearTimeout(gifSearchTimer);
+    const q = gifSearch.value.trim();
+    gifSearchTimer = setTimeout(() => loadGifs(q), 300);
+  });
+
+  function sendGif(url){
+    if (!myUser || !activeTopic) return;
+    db.collection('communityRooms').doc(activeTopic).collection('messages').add({
+      text: null,
+      imageUrl: null,
+      imagePath: null,
+      gifUrl: url,
       sender: myUser.uid,
       senderName: myUser.displayName || 'Someone',
       senderPhoto: myUser.photoURL || null,
       createdAt: FieldValue.serverTimestamp()
+    }).catch((err) => console.error('gif send failed:', err));
+  }
+
+  function sendMessage(){
+    const text = input.value.trim();
+    const file = pendingFile;
+    if ((!text && !file) || !myUser || !activeTopic || uploading) return;
+
+    input.value = '';
+    clearAttachment(); // clears preview UI; pendingFile var already captured above
+    uploading = true;
+    updateSendState();
+
+    const topic = activeTopic;
+    const finishSend = (imageUrl, imagePath) => {
+      db.collection('communityRooms').doc(topic).collection('messages').add({
+        text: text || null,
+        imageUrl: imageUrl || null,
+        imagePath: imagePath || null,
+        gifUrl: null,
+        sender: myUser.uid,
+        senderName: myUser.displayName || 'Someone',
+        senderPhoto: myUser.photoURL || null,
+        createdAt: FieldValue.serverTimestamp()
+      }).catch((err) => {
+        console.error('send failed:', err);
+        input.value = text; // restore so they don't lose what they typed
+      }).finally(() => {
+        uploading = false;
+        updateSendState();
+      });
+    };
+
+    if (!file) {
+      finishSend(null, null);
+      return;
+    }
+
+    const path = 'roomUploads/' + topic + '/' + myUser.uid + '_' + Date.now() + '_' + file.name;
+    const ref = storage.ref().child(path);
+    ref.put(file).then((snap) => snap.ref.getDownloadURL()).then((url) => {
+      finishSend(url, path);
     }).catch((err) => {
-      console.error('send failed:', err);
-      input.value = text; // restore so they don't lose what they typed
+      console.error('image upload failed:', err);
+      uploading = false;
+      input.value = text;
+      updateSendState();
     });
   }
 
   sendBtn.addEventListener('click', sendMessage);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+  input.addEventListener('input', updateSendState);
 })();
 </script>
 
