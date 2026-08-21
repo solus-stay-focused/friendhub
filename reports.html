@@ -1,460 +1,795 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — FriendHub Reports</title>
-<meta name="robots" content="noindex, nofollow">
 
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%239C8CFB'/%3E%3Cstop offset='100%25' stop-color='%235142C4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M14 44a22 22 0 1 1 22 26l-7 10-2-12a22 22 0 0 1-13-24z' fill='%23fff'/%3E%3Cpath d='M86 48a22 22 0 1 0-22 26l7 10 2-12a22 22 0 0 0 13-24z' fill='%235EEAD4' fill-opacity='.88'/%3E%3C/svg%3E">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Admin — Banned Users | FriendHub</title>
+
+<meta
+  name="robots"
+  content="noindex, nofollow"
+>
+
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+>
 
 <style>
+
+/* ============================================================
+   FRIENDHUB ADMIN
+   ============================================================ */
 
 :root{
   --bg:#0B0F1A;
   --panel:#121A2C;
-  --panel-2:#0D1322;
+  --panel2:#0D1322;
   --line:#212C42;
   --text:#EDE7DA;
   --muted:#8B96AC;
+
   --violet:#9C8CFB;
-  --violet-dim:#5142C4;
+  --violet2:#5142C4;
+
   --mint:#5EEAD4;
+  --amber:#FFB84D;
+
   --red:#F87171;
+
+  --white:#FFFFFF;
 }
 
 *{
   box-sizing:border-box;
 }
 
+html,
 body{
   margin:0;
+  padding:0;
+  min-height:100%;
+}
+
+body{
   background:var(--bg);
   color:var(--text);
-  font-family:'Inter',sans-serif;
+
+  font-family:'Inter',system-ui,sans-serif;
+
   -webkit-font-smoothing:antialiased;
 }
 
 body::before{
+
   content:"";
+
   position:fixed;
+
   inset:0;
+
   z-index:-1;
+
   pointer-events:none;
+
   background:
+
     radial-gradient(
       640px 420px at 12% -6%,
       rgba(156,140,251,.13),
       transparent 60%
     ),
+
     radial-gradient(
       560px 380px at 96% 8%,
       rgba(94,234,212,.08),
       transparent 60%
     ),
+
     var(--bg);
 }
 
-a{
-  color:inherit;
-}
 
-button{
-  font-family:inherit;
-  cursor:pointer;
-}
-
-button:disabled{
-  opacity:.45;
-  cursor:not-allowed;
-}
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
 
 .topnav{
+
   position:sticky;
+
   top:0;
+
   z-index:50;
-  background:rgba(11,15,26,.85);
+
+  background:rgba(11,15,26,.88);
+
   backdrop-filter:blur(10px);
+
   border-bottom:1px solid var(--line);
 }
 
-.topnav-inner{
+.navin{
+
   max-width:1180px;
+
   margin:0 auto;
-  padding:16px 24px;
+
+  padding:14px 24px;
+
   display:flex;
+
   align-items:center;
+
   justify-content:space-between;
+
+  gap:16px;
 }
 
 .brand{
+
   display:flex;
+
   align-items:center;
-  gap:10px;
+
   text-decoration:none;
-}
 
-.brand svg{
-  width:28px;
-  height:28px;
-}
-
-.brand span{
-  font-family:'Space Grotesk',sans-serif;
-  font-weight:700;
-  font-size:17px;
   color:#fff;
+
+  font-family:'Space Grotesk',sans-serif;
+
+  font-weight:700;
+
+  font-size:17px;
 }
 
 .brand em{
+
   font-style:normal;
+
   color:var(--mint);
 }
 
-.tag{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:10.5px;
-  color:var(--violet);
-  background:rgba(156,140,251,.1);
-  border:1px solid rgba(156,140,251,.25);
-  padding:2px 8px;
-  border-radius:20px;
+.admin-tag{
+
   margin-left:8px;
+
+  color:var(--violet);
+
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:10px;
+
+  border:1px solid rgba(156,140,251,.25);
+
+  background:rgba(156,140,251,.08);
+
+  padding:3px 7px;
+
+  border-radius:20px;
 }
 
-.nav-actions{
+.actions{
+
   display:flex;
+
   align-items:center;
-  gap:10px;
+
+  gap:9px;
 }
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 .btn{
+
   display:inline-flex;
+
   align-items:center;
+
   justify-content:center;
+
   gap:7px;
-  text-decoration:none;
-  font-size:13.5px;
-  font-weight:600;
-  padding:9px 16px;
+
+  min-height:38px;
+
+  padding:8px 14px;
+
   border-radius:9px;
+
   border:1px solid var(--line);
+
   background:transparent;
+
   color:var(--text);
+
+  font-family:'Inter',sans-serif;
+
+  font-size:13px;
+
+  font-weight:600;
+
+  text-decoration:none;
+
+  cursor:pointer;
+
   transition:.15s;
 }
 
 .btn:hover{
-  border-color:var(--violet-dim);
+
+  border-color:var(--violet2);
+
   background:rgba(156,140,251,.07);
 }
 
-.btn-primary{
-  background:linear-gradient(
-    135deg,
-    var(--violet),
-    var(--violet-dim)
-  );
-  border-color:transparent;
-  color:#fff;
+.btn:disabled{
+
+  opacity:.45;
+
+  cursor:not-allowed;
 }
 
-main{
-  max-width:1180px;
-  margin:0 auto;
-  padding:40px 24px 90px;
-}
+.btn-danger{
 
-.page-head{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  margin-bottom:26px;
-  flex-wrap:wrap;
-}
-
-.back{
-  width:38px;
-  height:38px;
-  padding:0;
-}
-
-.page-head-copy{
-  flex:1;
-}
-
-.page-head h1{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:28px;
-  margin:0;
-}
-
-.page-head p{
-  color:var(--muted);
-  font-size:13px;
-  margin:5px 0 0;
-}
-
-.toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:14px;
-}
-
-.count{
-  font:12px 'IBM Plex Mono',monospace;
-  color:var(--muted);
-}
-
-.report-card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:17px 18px;
-  margin-bottom:10px;
-  transition:.15s;
-}
-
-.report-card:hover{
-  border-color:rgba(248,113,113,.35);
-}
-
-.report-top{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:14px;
-  margin-bottom:14px;
-}
-
-.reason{
-  font-family:'Space Grotesk',sans-serif;
-  font-weight:700;
-  font-size:15px;
-}
-
-.time{
-  font:10.5px 'IBM Plex Mono',monospace;
-  color:var(--muted);
-  white-space:nowrap;
-}
-
-/* INFORMATION BOX */
-
-.info-box{
-  background:var(--panel-2);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:13px 14px;
-  margin-bottom:10px;
-}
-
-.info-title{
-  font:10.5px 'IBM Plex Mono',monospace;
-  color:var(--violet);
-  letter-spacing:.08em;
-  margin-bottom:10px;
-  font-weight:600;
-}
-
-.info-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px 24px;
-}
-
-.info-row{
-  display:flex;
-  gap:10px;
-  min-width:0;
-  font:11px 'IBM Plex Mono',monospace;
-  color:var(--muted);
-}
-
-.info-row span:first-child{
-  min-width:100px;
-  color:var(--muted);
-}
-
-.info-row strong{
-  color:var(--text);
-  font-weight:500;
-  overflow-wrap:anywhere;
-}
-
-/* DETAILS */
-
-.details{
-  font-size:12.5px;
-  line-height:1.55;
-  background:rgba(255,255,255,.03);
-  border-radius:9px;
-  padding:10px;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  margin-top:10px;
-}
-
-/* SCREENSHOT */
-
-.screenshot-box{
-  background:var(--panel-2);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:12px;
-  margin-top:10px;
-}
-
-.report-shot-label{
-  font:10.5px 'IBM Plex Mono',monospace;
-  color:var(--muted);
-  margin-bottom:10px;
-  letter-spacing:.04em;
-}
-
-.report-shot-wrap{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:180px;
-  max-height:520px;
-  overflow:hidden;
-  background:#080C18;
-  border:1px solid var(--line);
-  border-radius:8px;
-}
-
-.report-shot{
-  display:block;
-  width:100%;
-  max-height:500px;
-  object-fit:contain;
-  cursor:zoom-in;
-}
-
-.no-screenshot{
-  min-height:150px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--muted);
-  font-size:12px;
-  font-family:'IBM Plex Mono',monospace;
-}
-
-/* ACTIONS */
-
-.report-actions{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-top:14px;
-  padding-top:13px;
-  border-top:1px solid var(--line);
-}
-
-.btn-ban{
   color:var(--red);
-  border-color:rgba(248,113,113,.3);
+
+  border-color:rgba(248,113,113,.30);
 }
 
-.btn-ban:hover{
+.btn-danger:hover{
+
   background:rgba(248,113,113,.08);
+
   border-color:rgba(248,113,113,.55);
 }
 
-.btn-remove{
-  color:var(--muted);
+
+/* WHITE BACK BUTTON */
+
+.back-white{
+
+  background:#fff;
+
+  color:#111827;
+
+  border-color:#fff;
+
+  font-weight:700;
 }
 
-.btn-remove:hover{
-  color:var(--red);
-  border-color:rgba(248,113,113,.35);
+.back-white:hover{
+
+  background:#EDEDED;
+
+  border-color:#EDEDED;
+
+  color:#111827;
 }
 
-/* LOGIN */
 
-.empty,
-.error{
-  padding:55px 20px;
-  text-align:center;
-  border:1px dashed var(--line);
-  border-radius:14px;
-  color:var(--muted);
-  font-size:13.5px;
+/* ============================================================
+   MAIN
+   ============================================================ */
+
+main{
+
+  max-width:1180px;
+
+  margin:0 auto;
+
+  padding:38px 24px 90px;
 }
 
-.error{
-  color:var(--red);
+
+/* ============================================================
+   HEAD
+   ============================================================ */
+
+.head{
+
+  display:flex;
+
+  align-items:flex-end;
+
+  justify-content:space-between;
+
+  gap:16px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:24px;
 }
 
-#loginScreen,
-#notAdmin{
-  max-width:430px;
-  margin:80px auto;
-  padding:32px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
+.head-left{
+
+  display:flex;
+
+  align-items:flex-start;
+
+  gap:12px;
 }
 
-#loginScreen h2,
-#notAdmin h2{
+.head h1{
+
+  margin:0;
+
   font-family:'Space Grotesk',sans-serif;
-  margin:0 0 8px;
+
+  font-size:28px;
+
+  line-height:1.2;
 }
 
-#loginScreen p,
-#notAdmin p{
+.head p{
+
+  margin:6px 0 0;
+
   color:var(--muted);
-  font-size:13.5px;
+
+  font-size:13px;
+}
+
+.summary{
+
+  display:flex;
+
+  gap:8px;
+
+  flex-wrap:wrap;
+}
+
+.pill{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  padding:5px 10px;
+
+  border-radius:999px;
+
+  border:1px solid var(--line);
+
+  color:var(--muted);
+
+  font:11px 'IBM Plex Mono',monospace;
+
+  white-space:nowrap;
+}
+
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
+.card{
+
+  background:var(--panel);
+
+  border:1px solid var(--line);
+
+  border-radius:14px;
+
+  padding:18px;
+
+  margin-bottom:14px;
+}
+
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+
+.controls{
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(220px,1fr)
+    190px
+    150px
+    auto;
+
+  gap:10px;
+
+  align-items:end;
+}
+
+.field label{
+
+  display:block;
+
+  margin-bottom:6px;
+
+  color:var(--muted);
+
+  font:10px 'IBM Plex Mono',monospace;
+
+  text-transform:uppercase;
+
+  letter-spacing:.04em;
+}
+
+.field input,
+.field select{
+
+  width:100%;
+
+  min-height:40px;
+
+  padding:9px 11px;
+
+  background:var(--panel2);
+
+  color:var(--text);
+
+  border:1px solid var(--line);
+
+  border-radius:8px;
+
+  outline:none;
+
+  font-family:'Inter',sans-serif;
+
+  font-size:13px;
+}
+
+.field input:focus,
+.field select:focus{
+
+  border-color:var(--violet);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(156,140,251,.10);
+}
+
+
+/* ============================================================
+   DATE CALENDAR
+   ============================================================ */
+
+.date-filter{
+
+  margin-top:15px;
+
+  padding-top:15px;
+
+  border-top:1px solid var(--line);
+}
+
+.date-filter-title{
+
+  color:var(--violet);
+
+  font:10px 'IBM Plex Mono',monospace;
+
+  letter-spacing:.08em;
+
+  font-weight:600;
+
+  margin-bottom:9px;
+}
+
+.date-row{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:9px;
+
+  flex-wrap:wrap;
+}
+
+.date-input{
+
+  min-height:40px;
+
+  padding:8px 11px;
+
+  background:var(--panel2);
+
+  color:var(--text);
+
+  border:1px solid var(--line);
+
+  border-radius:8px;
+
+  outline:none;
+
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:12px;
+}
+
+.date-input:focus{
+
+  border-color:var(--violet);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(156,140,251,.10);
+}
+
+.date-input::-webkit-calendar-picker-indicator{
+
+  filter:invert(1);
+
+  cursor:pointer;
+}
+
+.date-info{
+
+  margin-top:9px;
+
+  color:var(--muted);
+
+  font:10.5px 'IBM Plex Mono',monospace;
+}
+
+
+/* ============================================================
+   QUICK FILTERS
+   ============================================================ */
+
+.quick{
+
+  display:flex;
+
+  gap:8px;
+
+  flex-wrap:wrap;
+
+  margin-top:14px;
+}
+
+.quick .btn{
+
+  min-height:32px;
+
+  padding:6px 10px;
+
+  font-size:11px;
+}
+
+
+/* ============================================================
+   NOTICE
+   ============================================================ */
+
+.notice{
+
+  margin:13px 0 0;
+
+  color:var(--muted);
+
+  font-size:11.5px;
+
+  line-height:1.55;
+}
+
+.notice code{
+
+  color:var(--violet);
+
+  font-family:'IBM Plex Mono',monospace;
+}
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.table-wrap{
+
+  overflow-x:auto;
+
+  -webkit-overflow-scrolling:touch;
+}
+
+.row{
+
+  display:grid;
+
+  grid-template-columns:
+    1.3fr
+    1.1fr
+    .8fr
+    .9fr
+    auto;
+
+  gap:14px;
+
+  align-items:center;
+
+  min-width:800px;
+
+  padding:14px 4px;
+
+  border-bottom:1px solid var(--line);
+}
+
+.row:last-child{
+
+  border-bottom:0;
+}
+
+.th{
+
+  color:var(--muted);
+
+  font:10px 'IBM Plex Mono',monospace;
+
+  text-transform:uppercase;
+
+  letter-spacing:.04em;
+}
+
+.name{
+
+  font-size:13px;
+
+  font-weight:600;
+
+  color:var(--text);
+
+  overflow-wrap:anywhere;
+}
+
+.sub{
+
+  margin-top:4px;
+
+  color:var(--muted);
+
+  font:10px 'IBM Plex Mono',monospace;
+
+  overflow-wrap:anywhere;
+}
+
+.mono{
+
+  color:var(--text);
+
+  font:11px 'IBM Plex Mono',monospace;
+
+  overflow-wrap:anywhere;
+}
+
+.badge{
+
+  display:inline-block;
+
+  padding:4px 8px;
+
+  border-radius:999px;
+
+  color:var(--red);
+
+  background:rgba(248,113,113,.09);
+
+  border:1px solid rgba(248,113,113,.25);
+
+  font:10px 'IBM Plex Mono',monospace;
+}
+
+
+/* ============================================================
+   EMPTY / ERROR
+   ============================================================ */
+
+.empty{
+
+  padding:45px 20px;
+
+  text-align:center;
+
+  color:var(--muted);
+
+  font-size:13px;
+}
+
+.error{
+
+  color:var(--red);
+
   line-height:1.6;
 }
 
-#loginError{
-  display:none;
-  color:var(--red);
-  font-size:13px;
-  margin-top:12px;
+.hidden{
+
+  display:none!important;
 }
 
-#notAdmin{
-  display:none;
-  border-color:var(--red);
-}
 
-@media(max-width:650px){
+/* ============================================================
+   MOBILE
+   ============================================================ */
 
-  .topnav-inner,
-  main{
-    padding-left:15px;
-    padding-right:15px;
-  }
+@media(max-width:800px){
 
-  .info-grid{
+  .controls{
+
     grid-template-columns:1fr;
   }
 
-  .report-top{
-    flex-direction:column;
-    gap:5px;
+  .navin{
+
+    padding:13px 15px;
   }
 
-  .report-actions{
-    flex-direction:column;
+  main{
+
+    padding:28px 15px 70px;
   }
 
-  .report-actions .btn{
+  .head{
+
+    align-items:flex-start;
+  }
+
+  .head-left{
+
     width:100%;
   }
 
-  .nav-actions .btn:first-child{
+  .summary{
+
+    width:100%;
+  }
+
+  .date-row{
+
+    flex-direction:column;
+
+    align-items:stretch;
+  }
+
+  .date-row .btn,
+  .date-input{
+
+    width:100%;
+  }
+
+}
+
+@media(max-width:560px){
+
+  .actions .btn:first-child{
+
     display:none;
+  }
+
+  .brand{
+
+    font-size:15px;
+  }
+
+  .admin-tag{
+
+    font-size:8px;
+
+    padding:2px 5px;
+  }
+
+  .head h1{
+
+    font-size:24px;
   }
 
 }
@@ -462,79 +797,44 @@ main{
 </style>
 </head>
 
+
 <body>
+
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
 
 <nav class="topnav">
 
-  <div class="topnav-inner">
+  <div class="navin">
 
-    <a class="brand" href="/">
+    <a
+      class="brand"
+      href="admin-blog-updated.html"
+    >
 
-      <svg viewBox="0 0 100 100" aria-hidden="true">
+      Friend<em>Hub</em>
 
-        <defs>
-
-          <linearGradient
-            id="g"
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="100%"
-          >
-
-            <stop
-              offset="0%"
-              stop-color="#9C8CFB"
-            />
-
-            <stop
-              offset="100%"
-              stop-color="#5142C4"
-            />
-
-          </linearGradient>
-
-        </defs>
-
-        <rect
-          width="100"
-          height="100"
-          rx="22"
-          fill="url(#g)"
-        />
-
-        <path
-          d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z"
-          fill="#fff"
-        />
-
-        <path
-          d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z"
-          fill="#5EEAD4"
-          fill-opacity=".88"
-        />
-
-      </svg>
-
-      <span>
-        Friend<em>Hub</em>
-      </span>
-
-      <span class="tag">
+      <span class="admin-tag">
         ADMIN
       </span>
 
     </a>
 
-    <div class="nav-actions">
 
-      <a class="btn" href="./">
-        ← Blog admin
+    <div class="actions">
+
+      <a
+        class="btn"
+        href="reports.html"
+      >
+        Reports
       </a>
 
       <button
         class="btn"
-        id="signOutBtn"
+        id="signOut"
       >
         Sign out
       </button>
@@ -546,115 +846,402 @@ main{
 </nav>
 
 
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+
 <main>
 
-  <!-- LOGIN -->
 
-  <div id="loginScreen">
-
-    <h2>
-      Admin sign in
-    </h2>
-
-    <p>
-      Sign in with your FriendHub Google account
-      to view user reports.
-    </p>
-
-    <button
-      class="btn btn-primary"
-      id="googleSignInBtn"
-      style="width:100%;justify-content:center"
-    >
-      Continue with Google
-    </button>
-
-    <div id="loginError"></div>
-
-  </div>
-
-
-  <!-- NOT ADMIN -->
-
-  <div id="notAdmin">
-
-    <h2>
-      This account isn't an admin
-    </h2>
-
-    <p>
-      You are signed in, but this Google account
-      is not on the FriendHub admin list.
-    </p>
-
-  </div>
-
-
-  <!-- REPORTS -->
+  <!-- AUTH ERROR -->
 
   <div
-    id="reportsPage"
-    style="display:none"
+    id="authError"
+    class="card hidden"
+  ></div>
+
+
+  <!-- PAGE -->
+
+  <section
+    id="page"
+    class="hidden"
   >
 
-    <div class="page-head">
 
-      <a
-        class="btn back"
-        href="./"
-        aria-label="Back to admin"
-      >
-        ←
-      </a>
+    <!-- PAGE HEADER -->
 
-      <div class="page-head-copy">
+    <div class="head">
 
-        <h1>
-          🚩 User reports
-        </h1>
+      <div class="head-left">
 
-        <p>
-          Review reports submitted by FriendHub users.
-        </p>
+        <button
+          type="button"
+          class="btn back-white"
+          id="backBtn"
+        >
+          ← Back
+        </button>
+
+        <div>
+
+          <h1>
+            Banned users
+          </h1>
+
+          <p>
+            Search, filter, and unban users from one place.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="summary">
+
+        <span
+          class="pill"
+          id="countPill"
+        >
+          0 banned
+        </span>
+
+        <span
+          class="pill"
+          id="filteredPill"
+        >
+          0 shown
+        </span>
 
       </div>
 
     </div>
 
 
-    <div class="toolbar">
 
-      <span
-        class="count"
-        id="reportsCount"
-      >
-        Loading reports…
-      </span>
+    <!-- ========================================================
+         FILTER CARD
+         ======================================================== -->
 
-      <button
-        class="btn"
-        id="refreshBtn"
-      >
-        Refresh
-      </button>
+    <div class="card">
+
+
+      <div class="controls">
+
+
+        <!-- IP SEARCH -->
+
+        <div class="field">
+
+          <label>
+            Search by IP
+          </label>
+
+          <input
+            id="ipSearch"
+            type="text"
+            placeholder="e.g. 192.168.1.20"
+            autocomplete="off"
+          >
+
+        </div>
+
+
+        <!-- DURATION -->
+
+        <div class="field">
+
+          <label>
+            Banned for
+          </label>
+
+          <select id="duration">
+
+            <option value="all">
+              All ban durations
+            </option>
+
+            <option value="1h">
+              1 hour
+            </option>
+
+            <option value="6h">
+              6 hours
+            </option>
+
+            <option value="12h">
+              12 hours
+            </option>
+
+            <option value="24h">
+              24 hours
+            </option>
+
+            <option value="3d">
+              3 days
+            </option>
+
+            <option value="7d">
+              7 days
+            </option>
+
+            <option value="30d">
+              30 days
+            </option>
+
+            <option value="permanent">
+              Permanent
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- DATE -->
+
+        <div class="field">
+
+          <label>
+            Banned date
+          </label>
+
+          <input
+            id="banDate"
+            class="date-input"
+            type="date"
+          >
+
+        </div>
+
+
+        <!-- CLEAR -->
+
+        <button
+          class="btn"
+          id="clearBtn"
+          type="button"
+        >
+          Clear filters
+        </button>
+
+      </div>
+
+
+
+      <!-- CALENDAR AREA -->
+
+      <div class="date-filter">
+
+        <div class="date-filter-title">
+          📅 SELECT BAN DATE
+        </div>
+
+        <div class="date-row">
+
+          <input
+            id="calendarDate"
+            class="date-input"
+            type="date"
+          >
+
+          <button
+            class="btn"
+            id="todayBtn"
+            type="button"
+          >
+            Today
+          </button>
+
+          <button
+            class="btn"
+            id="clearDateBtn"
+            type="button"
+          >
+            Clear date
+          </button>
+
+        </div>
+
+
+        <div
+          class="date-info"
+          id="dateInfo"
+        >
+          Select a date to show users banned on that date.
+        </div>
+
+      </div>
+
+
+
+      <!-- QUICK DURATION BUTTONS -->
+
+      <div class="quick">
+
+        <button
+          class="btn"
+          data-duration="1h"
+          type="button"
+        >
+          1h
+        </button>
+
+        <button
+          class="btn"
+          data-duration="6h"
+          type="button"
+        >
+          6h
+        </button>
+
+        <button
+          class="btn"
+          data-duration="12h"
+          type="button"
+        >
+          12h
+        </button>
+
+        <button
+          class="btn"
+          data-duration="24h"
+          type="button"
+        >
+          24h
+        </button>
+
+        <button
+          class="btn"
+          data-duration="3d"
+          type="button"
+        >
+          3d
+        </button>
+
+        <button
+          class="btn"
+          data-duration="7d"
+          type="button"
+        >
+          7d
+        </button>
+
+        <button
+          class="btn"
+          data-duration="30d"
+          type="button"
+        >
+          30d
+        </button>
+
+        <button
+          class="btn"
+          data-duration="permanent"
+          type="button"
+        >
+          Permanent
+        </button>
+
+
+        <!-- UNBAN ALL -->
+
+        <button
+          class="btn btn-danger"
+          id="unbanFiltered"
+          type="button"
+        >
+          Unban all shown
+        </button>
+
+      </div>
+
+
+      <p class="notice">
+
+        The date filter checks the stored
+        <code>bannedAt</code>,
+        <code>createdAt</code>,
+        or
+        <code>timestamp</code>
+        field.
+
+        The duration filter checks
+        <code>banDuration</code>.
+
+      </p>
 
     </div>
 
 
-    <div id="reportsList"></div>
 
-  </div>
+    <!-- ========================================================
+         BANNED USER TABLE
+         ======================================================== -->
+
+    <div class="card">
+
+      <div class="table-wrap">
+
+        <div class="row th">
+
+          <div>
+            User
+          </div>
+
+          <div>
+            IP address
+          </div>
+
+          <div>
+            Ban duration
+          </div>
+
+          <div>
+            Banned at
+          </div>
+
+          <div>
+            Action
+          </div>
+
+        </div>
+
+
+        <div id="list">
+
+          <div class="empty">
+            Loading banned users…
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </section>
+
 
 </main>
 
 
+
 <script type="module">
 
-/* FIREBASE */
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
 
 import {
   initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 
 import {
   getAuth,
@@ -662,18 +1249,24 @@ import {
   signInWithPopup,
   onAuthStateChanged,
   signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 
 import {
   getFirestore,
   collection,
   getDocs,
-  deleteDoc,
   doc,
-  setDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  deleteDoc
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+
+
+/* ============================================================
+   FIREBASE CONFIG
+   ============================================================ */
 
 const firebaseConfig = {
 
@@ -699,597 +1292,288 @@ const firebaseConfig = {
 
 
 const ADMIN_EMAILS = [
+
   "anowar531237@gmail.com"
+
 ];
 
 
 const app =
   initializeApp(firebaseConfig);
 
+
 const auth =
   getAuth(app);
 
+
 const db =
   getFirestore(app);
+
 
 const provider =
   new GoogleAuthProvider();
 
 
-/* HELPERS */
-
 const $ =
   id => document.getElementById(id);
 
 
-const labels = {
 
-  nudity_sexual_content:
-    "Nudity or sexual content",
+/* ============================================================
+   DATA
+   ============================================================ */
 
-  harassment_abuse:
-    "Harassment or abusive behavior",
+let bans = [];
 
-  underage:
-    "Appears to be a minor",
 
-  spam_scam:
-    "Spam, scam, or advertising",
 
-  violence_threats:
-    "Violence or threats",
+/* ============================================================
+   SIGN OUT
+   ============================================================ */
 
-  other:
-    "Something else"
+$("signOut").onclick =
+  () => signOut(auth);
+
+
+
+/* ============================================================
+   BACK BUTTON
+   ============================================================ */
+
+$("backBtn").onclick = () => {
+
+  if(
+    window.history.length > 1
+  ){
+
+    window.history.back();
+
+  }else{
+
+    window.location.href =
+      "admin-blog-updated.html";
+
+  }
 
 };
 
 
-function esc(value){
 
-  return String(value ?? "")
-    .replace(
-      /[&<>"']/g,
-      character => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      }[character])
-    );
+/* ============================================================
+   AUTH
+   ============================================================ */
 
-}
+onAuthStateChanged(
+  auth,
+  async user => {
 
+    if(!user){
 
-function getValue(obj,...keys){
-
-  for(const key of keys){
-
-    if(
-      obj?.[key] !== undefined &&
-      obj?.[key] !== null &&
-      String(obj[key]).trim() !== ""
-    ){
-
-      return obj[key];
-
-    }
-
-  }
-
-  return "Unknown";
-
-}
+      $("page")
+        .classList
+        .add("hidden");
 
 
-function formatDate(timestamp){
-
-  try{
-
-    const d =
-      timestamp?.toDate
-        ? timestamp.toDate()
-        : new Date(timestamp);
-
-    return d.toLocaleString(
-      undefined,
-      {
-        year:"numeric",
-        month:"short",
-        day:"numeric",
-        hour:"numeric",
-        minute:"2-digit"
-      }
-    );
-
-  }catch{
-
-    return "Unknown time";
-
-  }
-
-}
+      $("authError")
+        .classList
+        .remove("hidden");
 
 
-/* LOAD REPORTS */
+      $("authError").innerHTML = `
 
-async function loadReports(){
+        <div class="error">
 
-  const list =
-    $("reportsList");
+          <b>
+            Please sign in as an admin.
+          </b>
 
-  const count =
-    $("reportsCount");
+          <br>
+          <br>
 
+          <button
+            class="btn"
+            id="login"
+            type="button"
+          >
+            Continue with Google
+          </button>
 
-  list.innerHTML =
-    '<div class="empty">Loading reports…</div>';
+        </div>
 
-
-  try{
-
-    const snapshot =
-      await getDocs(
-        collection(
-          db,
-          "reports"
-        )
-      );
+      `;
 
 
-    const reports =
-      snapshot.docs
-        .map(document => ({
-          id:document.id,
-          ...document.data()
-        }))
-        .sort(
-          (a,b) =>
-            (b.createdAt?.toMillis?.() || 0) -
-            (a.createdAt?.toMillis?.() || 0)
+      $("login").onclick =
+        () => signInWithPopup(
+          auth,
+          provider
         );
 
-
-    count.textContent =
-      reports.length === 1
-        ? "1 report"
-        : `${reports.length} reports`;
-
-
-    if(!reports.length){
-
-      list.innerHTML =
-        '<div class="empty">No reports yet. You’re all clear. ✓</div>';
 
       return;
 
     }
 
 
-    list.innerHTML =
-      reports.map(report => {
-
-        const ip =
-          getValue(
-            report,
-            "ipAddress",
-            "ip",
-            "clientIp"
-          );
-
+    if(
+      !ADMIN_EMAILS
+        .map(email => email.toLowerCase())
+        .includes(
+          String(user.email || "").toLowerCase()
+        )
+    ){
 
-        const country =
-          getValue(
-            report,
-            "country",
-            "countryName"
-          );
+      $("page")
+        .classList
+        .add("hidden");
 
 
-        const countryCode =
-          getValue(
-            report,
-            "countryCode",
-            "country_code"
-          );
-
+      $("authError")
+        .classList
+        .remove("hidden");
 
-        const countryDisplay =
-          country !== "Unknown"
-            ? `${esc(country)}${
-                countryCode !== "Unknown"
-                  ? ` (${esc(countryCode)})`
-                  : ""
-              }`
-            : "Unknown";
 
+      $("authError").innerHTML = `
 
-        const region =
-          getValue(
-            report,
-            "region",
-            "regionName",
-            "state"
-          );
+        <div class="error">
 
+          <b>
+            This account isn't an admin.
+          </b>
 
-        const city =
-          getValue(
-            report,
-            "city"
-          );
+          <br>
+          <br>
 
+          ${esc(user.email || "Unknown account")}
 
-        const isp =
-          getValue(
-            report,
-            "isp",
-            "internetServiceProvider"
-          );
+        </div>
 
+      `;
 
-        const asn =
-          getValue(
-            report,
-            "asn",
-            "AS",
-            "autonomousSystem"
-          );
 
+      return;
 
-        const reporterUid =
-          getValue(
-            report,
-            "reporterUid",
-            "reporterId"
-          );
+    }
 
 
-        const reportedUid =
-          getValue(
-            report,
-            "reportedUid",
-            "reportedUserUid",
-            "reportedUserId"
-          );
+    $("authError")
+      .classList
+      .add("hidden");
 
 
-        const callId =
-          getValue(
-            report,
-            "callId",
-            "callID"
-          );
+    $("page")
+      .classList
+      .remove("hidden");
 
 
-        const screenshotUrl =
-          getValue(
-            report,
-            "screenshotUrl",
-            "screenshotURL"
-          );
+    await loadBans();
 
+  }
+);
 
-        const details =
-          (report.details || "").trim() ||
-          "No additional details provided.";
 
 
-        return `
+/* ============================================================
+   LOAD BANNED USERS
+   ============================================================ */
 
-          <div
-            class="report-card"
-            data-report-id="${esc(report.id)}"
-          >
+/*
+ * IMPORTANT:
+ *
+ * Your Firestore rules use:
+ *
+ *     /bannedUsers/{uid}
+ *
+ * Therefore this page now reads:
+ *
+ *     bannedUsers
+ *
+ * instead of the old:
+ *
+ *     bans
+ */
 
-            <div class="report-top">
+async function loadBans(){
 
-              <div class="reason">
+  const list =
+    $("list");
 
-                🚩
-                ${esc(
-                  labels[report.reason] ||
-                  report.reason ||
-                  "Unknown reason"
-                )}
 
-              </div>
+  list.innerHTML = `
 
-              <div class="time">
+    <div class="empty">
+      Loading banned users…
+    </div>
 
-                ${esc(
-                  formatDate(
-                    report.createdAt
-                  )
-                )}
+  `;
 
-              </div>
 
-            </div>
+  try{
 
+    const snap =
+      await getDocs(
+        collection(
+          db,
+          "bannedUsers"
+        )
+      );
 
-            <!-- NETWORK INFORMATION -->
 
-            <div class="info-box">
+    bans =
+      snap.docs.map(
+        d => ({
 
-              <div class="info-title">
-                NETWORK INFORMATION
-              </div>
+          id:d.id,
 
-              <div class="info-grid">
+          ...d.data()
 
-                <div class="info-row">
+        })
+      );
 
-                  <span>
-                    IP Address
-                  </span>
 
-                  <strong>
-                    ${esc(ip)}
-                  </strong>
+    render();
 
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Country
-                  </span>
-
-                  <strong>
-                    ${countryDisplay}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Region
-                  </span>
-
-                  <strong>
-                    ${esc(region)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    City
-                  </span>
-
-                  <strong>
-                    ${esc(city)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    ISP
-                  </span>
-
-                  <strong>
-                    ${esc(isp)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    ASN
-                  </span>
-
-                  <strong>
-                    ${esc(asn)}
-                  </strong>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <!-- USER INFORMATION -->
-
-            <div class="info-box">
-
-              <div class="info-title">
-                USER INFORMATION
-              </div>
-
-              <div class="info-grid">
-
-                <div class="info-row">
-
-                  <span>
-                    Reporter UID
-                  </span>
-
-                  <strong>
-                    ${esc(reporterUid)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Reported UID
-                  </span>
-
-                  <strong>
-                    ${esc(reportedUid)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Call ID
-                  </span>
-
-                  <strong>
-                    ${esc(callId)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Report ID
-                  </span>
-
-                  <strong>
-                    ${esc(report.id)}
-                  </strong>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <!-- SCREENSHOT -->
-
-            <div class="screenshot-box">
-
-              <div class="report-shot-label">
-                STRANGER VIDEO SCREENSHOT
-              </div>
-
-
-              ${
-                screenshotUrl !== "Unknown"
-                  ? `
-
-                    <div class="report-shot-wrap">
-
-                      <a
-                        href="${esc(screenshotUrl)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-
-                        <img
-                          class="report-shot"
-                          src="${esc(screenshotUrl)}"
-                          alt="Screenshot of reported stranger video"
-                          loading="lazy"
-                        >
-
-                      </a>
-
-                    </div>
-
-                  `
-                  : `
-
-                    <div class="no-screenshot">
-
-                      No screenshot attached to this report.
-
-                    </div>
-
-                  `
-              }
-
-            </div>
-
-
-            <!-- DETAILS -->
-
-            <div class="details">
-
-              ${esc(details)}
-
-            </div>
-
-
-            <!-- ACTIONS -->
-
-            <div class="report-actions">
-
-              <button
-                type="button"
-                class="btn btn-ban"
-                data-ban-user="${esc(
-                  reportedUid !== "Unknown"
-                    ? reportedUid
-                    : ""
-                )}"
-                data-report-id="${esc(report.id)}"
-                ${
-                  reportedUid === "Unknown"
-                    ? "disabled"
-                    : ""
-                }
-              >
-
-                🚫 Ban user
-
-              </button>
-
-
-              <button
-                type="button"
-                class="btn btn-remove"
-                data-remove-report="${esc(report.id)}"
-              >
-
-                🗑 Remove report
-
-              </button>
-
-            </div>
-
-          </div>
-
-        `;
-
-      }).join("");
 
   }catch(error){
 
     console.error(
-      "Load reports failed:",
+      "Failed to load banned users:",
       error
     );
 
 
-    count.textContent =
-      "Could not load reports";
+    $("countPill")
+      .textContent =
+      "0 banned";
+
+
+    $("filteredPill")
+      .textContent =
+      "0 shown";
 
 
     list.innerHTML = `
 
-      <div class="error">
+      <div class="empty error">
 
-        Could not load reports.
+        Couldn't load banned users.
 
-        <br><br>
+        <br>
+        <br>
 
-        ${esc(
-          error.message ||
-          "Unknown error"
-        )}
+        <b>
+          ${esc(
+            error?.code ||
+            "Firestore permission error"
+          )}
+        </b>
+
+        <br>
+        <br>
+
+        Make sure your Firestore rules allow this
+        admin account to read
+        <code>bannedUsers</code>.
 
       </div>
 
@@ -1300,316 +1584,735 @@ async function loadReports(){
 }
 
 
-/* REMOVE REPORT */
 
-async function removeReport(reportId){
+/* ============================================================
+   GET BAN DURATION
+   ============================================================ */
 
-  if(!reportId){
+function getDuration(b){
 
-    alert(
-      "Invalid report ID."
-    );
+  const raw =
+    String(
+      b.banDuration ??
+      b.duration ??
+      b.bannedFor ??
+      b.banType ??
+      ""
+    )
+    .toLowerCase()
+    .trim();
 
-    return;
 
-  }
+  if(
+    raw.includes("permanent") ||
+    raw === "perm"
+  ){
 
-
-  const user =
-    auth.currentUser;
-
-
-  if(!user){
-
-    alert(
-      "You are not signed in."
-    );
-
-    return;
+    return "permanent";
 
   }
 
 
   if(
-    !ADMIN_EMAILS.includes(
-      user.email
+    raw === "1h" ||
+    raw.includes("1 hour") ||
+    raw.includes("1hr")
+  ){
+
+    return "1h";
+
+  }
+
+
+  if(
+    raw === "6h" ||
+    raw.includes("6 hour") ||
+    raw.includes("6hr")
+  ){
+
+    return "6h";
+
+  }
+
+
+  if(
+    raw === "12h" ||
+    raw.includes("12 hour") ||
+    raw.includes("12hr")
+  ){
+
+    return "12h";
+
+  }
+
+
+  if(
+    raw === "24h" ||
+    raw.includes("24 hour") ||
+    raw.includes("24hr")
+  ){
+
+    return "24h";
+
+  }
+
+
+  if(
+    raw === "3d" ||
+    raw.includes("3 day") ||
+    raw.includes("3d")
+  ){
+
+    return "3d";
+
+  }
+
+
+  if(
+    raw === "7d" ||
+    raw.includes("7 day") ||
+    raw.includes("7d")
+  ){
+
+    return "7d";
+
+  }
+
+
+  if(
+    raw === "30d" ||
+    raw.includes("30 day") ||
+    raw.includes("30d")
+  ){
+
+    return "30d";
+
+  }
+
+
+  if(raw.includes("30"))
+    return "30d";
+
+
+  if(raw.includes("7"))
+    return "7d";
+
+
+  if(raw.includes("3"))
+    return "3d";
+
+
+  if(raw.includes("24"))
+    return "24h";
+
+
+  if(raw.includes("12"))
+    return "12h";
+
+
+  if(raw.includes("6"))
+    return "6h";
+
+
+  if(raw.includes("1"))
+    return "1h";
+
+
+  return raw || "unknown";
+
+}
+
+
+
+/* ============================================================
+   GET IP
+   ============================================================ */
+
+function getIP(b){
+
+  return String(
+
+    b.ip ??
+    b.ipAddress ??
+    b.IP ??
+    b.address ??
+    b.clientIp ??
+    "—"
+
+  );
+
+}
+
+
+
+/* ============================================================
+   GET USER
+   ============================================================ */
+
+function getUser(b){
+
+  return (
+
+    b.username ??
+    b.displayName ??
+    b.name ??
+    b.email ??
+    b.uid ??
+    b.userId ??
+    b.id ??
+    "Unknown user"
+
+  );
+
+}
+
+
+
+/* ============================================================
+   GET BAN TIME
+   ============================================================ */
+
+function getBanValue(b){
+
+  return (
+
+    b.bannedAt ??
+    b.createdAt ??
+    b.timestamp ??
+    b.banAt ??
+    null
+
+  );
+
+}
+
+
+
+function getBanDate(b){
+
+  const value =
+    getBanValue(b);
+
+
+  if(!value){
+
+    return null;
+
+  }
+
+
+  if(
+    value &&
+    typeof value.toDate === "function"
+  ){
+
+    return value.toDate();
+
+  }
+
+
+  if(
+    value &&
+    typeof value.seconds === "number"
+  ){
+
+    return new Date(
+      value.seconds * 1000
+    );
+
+  }
+
+
+  if(value instanceof Date){
+
+    return value;
+
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if(
+    Number.isNaN(
+      date.getTime()
     )
   ){
 
-    alert(
-      "You are not authorized to remove reports."
-    );
+    return null;
+
+  }
+
+
+  return date;
+
+}
+
+
+
+/* ============================================================
+   DISPLAY BAN TIME
+   ============================================================ */
+
+function getTime(b){
+
+  const date =
+    getBanDate(b);
+
+
+  if(!date){
+
+    return "—";
+
+  }
+
+
+  return date.toLocaleString(
+    undefined,
+    {
+
+      year:"numeric",
+
+      month:"short",
+
+      day:"numeric",
+
+      hour:"numeric",
+
+      minute:"2-digit"
+
+    }
+  );
+
+}
+
+
+
+/* ============================================================
+   DATE KEY
+   ============================================================ */
+
+function dateKey(date){
+
+  if(!date){
+
+    return "";
+
+  }
+
+
+  const year =
+    date.getFullYear();
+
+
+  const month =
+    String(
+      date.getMonth() + 1
+    )
+    .padStart(2,"0");
+
+
+  const day =
+    String(
+      date.getDate()
+    )
+    .padStart(2,"0");
+
+
+  return `${year}-${month}-${day}`;
+
+}
+
+
+
+/* ============================================================
+   SELECTED DATE
+   ============================================================ */
+
+function getSelectedDate(){
+
+  return (
+    $("calendarDate").value ||
+    $("banDate").value ||
+    ""
+  );
+
+}
+
+
+
+/* ============================================================
+   FILTER USERS
+   ============================================================ */
+
+function filtered(){
+
+  const ip =
+    $("ipSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const duration =
+    $("duration").value;
+
+
+  const selectedDate =
+    getSelectedDate();
+
+
+  return bans.filter(
+    ban => {
+
+
+      /* IP */
+
+      const ipMatches =
+        !ip ||
+        getIP(ban)
+          .toLowerCase()
+          .includes(ip);
+
+
+      if(!ipMatches){
+
+        return false;
+
+      }
+
+
+      /* DURATION */
+
+      const durationMatches =
+        duration === "all" ||
+        getDuration(ban) === duration;
+
+
+      if(!durationMatches){
+
+        return false;
+
+      }
+
+
+      /* DATE */
+
+      if(selectedDate){
+
+        const banDate =
+          getBanDate(ban);
+
+
+        if(!banDate){
+
+          return false;
+
+        }
+
+
+        if(
+          dateKey(banDate) !==
+          selectedDate
+        ){
+
+          return false;
+
+        }
+
+      }
+
+
+      return true;
+
+    }
+  );
+
+}
+
+
+
+/* ============================================================
+   UPDATE DATE INFO
+   ============================================================ */
+
+function updateDateInfo(rows){
+
+  const selectedDate =
+    getSelectedDate();
+
+
+  if(!selectedDate){
+
+    $("dateInfo")
+      .textContent =
+      "Select a date to show users banned on that date.";
 
     return;
 
   }
 
 
-  const confirmed =
-    confirm(
-      "Are you sure you want to permanently remove this report?"
+  const date =
+    new Date(
+      selectedDate + "T00:00:00"
     );
 
 
-  if(!confirmed)
+  const formatted =
+    date.toLocaleDateString(
+      undefined,
+      {
+        year:"numeric",
+        month:"long",
+        day:"numeric"
+      }
+    );
+
+
+  $("dateInfo")
+    .textContent =
+    `${rows.length} user(s) banned on ${formatted}.`;
+
+}
+
+
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+function render(){
+
+  const rows =
+    filtered();
+
+
+  $("countPill")
+    .textContent =
+    `${bans.length} banned`;
+
+
+  $("filteredPill")
+    .textContent =
+    `${rows.length} shown`;
+
+
+  updateDateInfo(rows);
+
+
+  if(!rows.length){
+
+    $("list").innerHTML = `
+
+      <div class="empty">
+
+        No banned users match the current filters.
+
+      </div>
+
+    `;
+
     return;
 
+  }
 
-  const card =
-    document.querySelector(
-      `[data-report-id="${CSS.escape(reportId)}"]`
+
+  $("list").innerHTML =
+
+    rows.map(
+      ban => `
+
+        <div class="row">
+
+          <!-- USER -->
+
+          <div>
+
+            <div class="name">
+
+              ${esc(
+                getUser(ban)
+              )}
+
+            </div>
+
+            <div class="sub">
+
+              UID:
+              ${esc(
+                ban.uid ??
+                ban.userId ??
+                ban.id
+              )}
+
+            </div>
+
+          </div>
+
+
+          <!-- IP -->
+
+          <div class="mono">
+
+            ${esc(
+              getIP(ban)
+            )}
+
+          </div>
+
+
+          <!-- DURATION -->
+
+          <div>
+
+            <span class="badge">
+
+              ${esc(
+                getDuration(ban)
+              )}
+
+            </span>
+
+          </div>
+
+
+          <!-- BANNED AT -->
+
+          <div class="sub">
+
+            ${esc(
+              getTime(ban)
+            )}
+
+          </div>
+
+
+          <!-- ACTION -->
+
+          <div>
+
+            <button
+              class="btn btn-danger"
+              type="button"
+              data-unban="${esc(ban.id)}"
+            >
+              Unban
+            </button>
+
+          </div>
+
+        </div>
+
+      `
+    )
+    .join("");
+
+
+  document
+    .querySelectorAll(
+      "[data-unban]"
+    )
+    .forEach(
+      button => {
+
+        button.onclick = () =>
+          unban(
+            button.dataset.unban
+          );
+
+      }
+    );
+
+}
+
+
+
+/* ============================================================
+   UNBAN ONE USER
+   ============================================================ */
+
+async function unban(id){
+
+  const ban =
+    bans.find(
+      item => item.id === id
     );
 
 
-  const button =
-    card?.querySelector(
-      ".btn-remove"
-    );
+  const userName =
+    ban
+      ? getUser(ban)
+      : "this user";
+
+
+  if(
+    !confirm(
+      `Unban ${userName}?`
+    )
+  ){
+
+    return;
+
+  }
 
 
   try{
-
-    if(button){
-
-      button.disabled =
-        true;
-
-      button.textContent =
-        "Removing...";
-
-    }
-
 
     await deleteDoc(
       doc(
         db,
-        "reports",
-        reportId
-      )
-    );
-
-
-    /*
-      Remove the card immediately
-      instead of reloading everything.
-    */
-
-    if(card){
-
-      card.remove();
-
-    }
-
-
-    const remaining =
-      document.querySelectorAll(
-        ".report-card"
-      ).length;
-
-
-    $("reportsCount").textContent =
-      remaining === 1
-        ? "1 report"
-        : `${remaining} reports`;
-
-
-    if(remaining === 0){
-
-      $("reportsList").innerHTML =
-        '<div class="empty">No reports yet. You’re all clear. ✓</div>';
-
-      $("reportsCount").textContent =
-        "0 reports";
-
-    }
-
-  }catch(error){
-
-    console.error(
-      "Remove report failed:",
-      error
-    );
-
-
-    if(button){
-
-      button.disabled =
-        false;
-
-      button.textContent =
-        "🗑 Remove report";
-
-    }
-
-
-    alert(
-      "Could not remove this report.\n\n" +
-      (error.code
-        ? error.code + "\n"
-        : "") +
-      (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
-
-}
-
-
-/* BAN USER */
-
-async function banUser(
-  reportedUid,
-  reportId
-){
-
-  if(
-    !reportedUid ||
-    reportedUid === "Unknown"
-  ){
-
-    alert(
-      "Could not identify the reported user."
-    );
-
-    return;
-
-  }
-
-
-  const user =
-    auth.currentUser;
-
-
-  if(!user){
-
-    alert(
-      "You are not signed in."
-    );
-
-    return;
-
-  }
-
-
-  if(
-    !ADMIN_EMAILS.includes(
-      user.email
-    )
-  ){
-
-    alert(
-      "You are not authorized to ban users."
-    );
-
-    return;
-
-  }
-
-
-  const confirmed =
-    confirm(
-      "Are you sure you want to BAN this user?\n\n" +
-      "User ID:\n" +
-      reportedUid +
-      "\n\n" +
-      "The user will be added to the banned users list."
-    );
-
-
-  if(!confirmed)
-    return;
-
-
-  try{
-
-    await setDoc(
-
-      doc(
-        db,
         "bannedUsers",
-        reportedUid
-      ),
-
-      {
-
-        uid:
-          reportedUid,
-
-        banned:
-          true,
-
-        bannedAt:
-          serverTimestamp(),
-
-        bannedBy:
-          user.email ||
-          "unknown",
-
-        sourceReportId:
-          reportId
-
-      },
-
-      {
-        merge:true
-      }
-
-    );
-
-
-    alert(
-      "✅ User has been banned successfully."
-    );
-
-  }catch(error){
-
-    console.error(
-      "Ban failed:",
-      error
-    );
-
-
-    alert(
-      "Could not ban this user.\n\n" +
-      (
-        error.message ||
-        "Unknown error"
+        id
       )
     );
 
-  }
 
-}
-
-
-/* REPORT BUTTON EVENTS */
-
-$("reportsList").addEventListener(
-  "click",
-  event => {
-
-    /*
-      REMOVE REPORT
-    */
-
-    const removeButton =
-      event.target.closest(
-        "[data-remove-report]"
+    bans =
+      bans.filter(
+        item =>
+          item.id !== id
       );
 
 
-    if(removeButton){
+    render();
 
-      const reportId =
-        removeButton.getAttribute(
-          "data-remove-report"
-        );
 
-      removeReport(
-        reportId
+  }catch(error){
+
+    console.error(
+      "Unban error:",
+      error
+    );
+
+
+    alert(
+      "Couldn't unban this user. Check your Firestore rules."
+    );
+
+  }
+
+}
+
+
+
+/* ============================================================
+   UNBAN ALL SHOWN
+   ============================================================ */
+
+$("unbanFiltered").onclick =
+  async () => {
+
+
+    const rows =
+      filtered();
+
+
+    if(!rows.length){
+
+      alert(
+        "There are no users to unban."
       );
 
       return;
@@ -1617,165 +2320,294 @@ $("reportsList").addEventListener(
     }
 
 
-    /*
-      BAN USER
-    */
-
-    const banButton =
-      event.target.closest(
-        "[data-ban-user]"
-      );
+    const selectedDate =
+      getSelectedDate();
 
 
-    if(banButton){
-
-      const reportedUid =
-        banButton.getAttribute(
-          "data-ban-user"
-        );
+    let message =
+      `Unban ${rows.length} shown user(s)?`;
 
 
-      const reportId =
-        banButton.getAttribute(
-          "data-report-id"
-        );
+    if(selectedDate){
 
-
-      banUser(
-        reportedUid,
-        reportId
-      );
+      message +=
+        `\n\nOnly users matching the selected date will be unbanned.`;
 
     }
 
-  }
-);
-
-
-/* GOOGLE SIGN IN */
-
-$("googleSignInBtn").onclick =
-  async () => {
-
-    try{
-
-      await signInWithPopup(
-        auth,
-        provider
-      );
-
-    }catch(error){
-
-      console.error(
-        error
-      );
-
-
-      $("loginError").textContent =
-        error.message ||
-        "Sign-in failed";
-
-
-      $("loginError").style.display =
-        "block";
-
-    }
-
-  };
-
-
-/* SIGN OUT */
-
-$("signOutBtn").onclick =
-  () => {
-
-    signOut(
-      auth
-    );
-
-  };
-
-
-/* REFRESH */
-
-$("refreshBtn").onclick =
-  () => {
-
-    loadReports();
-
-  };
-
-
-/* AUTH STATE */
-
-onAuthStateChanged(
-  auth,
-  async user => {
 
     if(
-      user &&
-      ADMIN_EMAILS.includes(
-        user.email
-      )
+      !confirm(message)
     ){
 
-      $("loginScreen")
-        .style.display =
-        "none";
-
-
-      $("notAdmin")
-        .style.display =
-        "none";
-
-
-      $("reportsPage")
-        .style.display =
-        "block";
-
-
-      await loadReports();
+      return;
 
     }
 
-    else if(user){
 
-      $("loginScreen")
-        .style.display =
-        "none";
+    const button =
+      $("unbanFiltered");
 
 
-      $("reportsPage")
-        .style.display =
-        "none";
+    button.disabled =
+      true;
 
 
-      $("notAdmin")
-        .style.display =
-        "block";
+    button.textContent =
+      "Unbanning…";
+
+
+    const idsToRemove =
+      new Set(
+        rows.map(
+          row => row.id
+        )
+      );
+
+
+    let failed = 0;
+
+
+    for(
+      const ban of rows
+    ){
+
+      try{
+
+        await deleteDoc(
+          doc(
+            db,
+            "bannedUsers",
+            ban.id
+          )
+        );
+
+      }catch(error){
+
+        console.error(
+          "Failed to unban:",
+          ban.id,
+          error
+        );
+
+        failed++;
+
+      }
 
     }
 
-    else{
 
-      $("loginScreen")
-        .style.display =
-        "block";
+    if(failed === 0){
 
+      bans =
+        bans.filter(
+          ban =>
+            !idsToRemove.has(
+              ban.id
+            )
+        );
 
-      $("notAdmin")
-        .style.display =
-        "none";
+    }else{
 
+      /*
+       * Reload from Firestore so the
+       * displayed list stays accurate.
+       */
 
-      $("reportsPage")
-        .style.display =
-        "none";
+      await loadBans();
 
     }
 
-  }
-);
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "Unban all shown";
+
+
+    if(failed > 0){
+
+      alert(
+        `${failed} user(s) could not be unbanned.`
+      );
+
+    }
+
+  };
+
+
+
+/* ============================================================
+   IP SEARCH
+   ============================================================ */
+
+$("ipSearch").oninput =
+  render;
+
+
+
+/* ============================================================
+   DURATION SELECT
+   ============================================================ */
+
+$("duration").onchange =
+  render;
+
+
+
+/* ============================================================
+   MAIN DATE PICKER
+   ============================================================ */
+
+$("banDate").onchange =
+  () => {
+
+    $("calendarDate").value =
+      $("banDate").value;
+
+    render();
+
+  };
+
+
+
+/* ============================================================
+   CALENDAR DATE
+   ============================================================ */
+
+$("calendarDate").onchange =
+  () => {
+
+    $("banDate").value =
+      $("calendarDate").value;
+
+    render();
+
+  };
+
+
+
+/* ============================================================
+   TODAY
+   ============================================================ */
+
+$("todayBtn").onclick =
+  () => {
+
+    const now =
+      new Date();
+
+
+    const today =
+      dateKey(now);
+
+
+    $("banDate").value =
+      today;
+
+
+    $("calendarDate").value =
+      today;
+
+
+    render();
+
+  };
+
+
+
+/* ============================================================
+   CLEAR DATE
+   ============================================================ */
+
+$("clearDateBtn").onclick =
+  () => {
+
+    $("banDate").value =
+      "";
+
+    $("calendarDate").value =
+      "";
+
+    render();
+
+  };
+
+
+
+/* ============================================================
+   CLEAR EVERYTHING
+   ============================================================ */
+
+$("clearBtn").onclick =
+  () => {
+
+    $("ipSearch").value =
+      "";
+
+    $("duration").value =
+      "all";
+
+    $("banDate").value =
+      "";
+
+    $("calendarDate").value =
+      "";
+
+    render();
+
+  };
+
+
+
+/* ============================================================
+   QUICK DURATION BUTTONS
+   ============================================================ */
+
+document
+  .querySelectorAll(
+    "[data-duration]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () => {
+
+          $("duration").value =
+            button.dataset.duration;
+
+          render();
+
+        };
+
+    }
+  );
+
+
+
+/* ============================================================
+   ESCAPE HTML
+   ============================================================ */
+
+function esc(value){
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    value ?? "";
+
+
+  return div.innerHTML;
+
+}
+
 
 </script>
 
