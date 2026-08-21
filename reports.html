@@ -4,17 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — FriendHub Reports</title>
-
 <meta name="robots" content="noindex, nofollow">
-
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%239C8CFB%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235142C4%22%2F%3E%0A%3C%2FlinearGradient%3E%3C%2Fdefs%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22url%28%23g%29%22%2F%3E%0A%3Cpath%20d%3D%22M14%2C44%20a22%2C22%200%201%2C1%2022%2C26%20l-7%2C10%20l-2%2C-12%20a22%2C22%200%200%2C1%20-13%2C-24%20z%22%20fill%3D%22%23fff%22%2F%3E%0A%3Cpath%20d%3D%22M86%2C48%20a22%2C22%200%201%2C0%20-22%2C26%20l7%2C10%20l2%2C-12%20a22%2C22%200%200%2C0%2013%2C-24%20z%22%20fill%3D%22%235EEAD4%22%20fill-opacity%3D%22.88%22%2F%3E%0A%3C%2Fsvg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#0B0F1A;
+  --bg:#080C18;
   --panel:#121A2C;
   --panel-2:#0D1322;
   --line:#212C42;
@@ -76,7 +73,7 @@ button:disabled{
   position:sticky;
   top:0;
   z-index:50;
-  background:rgba(11,15,26,.85);
+  background:rgba(8,12,24,.88);
   backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
 }
@@ -162,9 +159,16 @@ button:disabled{
   color:#fff;
 }
 
-.btn-danger{
-  color:var(--red);
-  border-color:rgba(248,113,113,.3);
+.copy-btn{
+  margin-left:auto;
+  padding:6px 10px;
+  font-size:11px;
+  border-radius:7px;
+}
+
+.copy-btn.copied{
+  color:var(--mint);
+  border-color:rgba(94,234,212,.35);
 }
 
 main{
@@ -249,22 +253,44 @@ main{
   white-space:nowrap;
 }
 
-.meta{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px 22px;
+.info-box{
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:13px 14px;
   margin-bottom:10px;
 }
 
-.meta div{
+.info-title{
   font:10.5px 'IBM Plex Mono',monospace;
-  color:var(--muted);
-  overflow-wrap:anywhere;
+  color:var(--violet);
+  letter-spacing:.08em;
+  font-weight:600;
 }
 
-.meta strong{
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 24px;
+}
+
+.info-row{
+  display:flex;
+  gap:10px;
+  min-width:0;
+  font:11px 'IBM Plex Mono',monospace;
+  color:var(--muted);
+}
+
+.info-row span:first-child{
+  min-width:92px;
+  color:var(--muted);
+}
+
+.info-row strong{
   color:var(--text);
   font-weight:500;
+  overflow-wrap:anywhere;
 }
 
 .details{
@@ -277,26 +303,50 @@ main{
   overflow-wrap:anywhere;
 }
 
-.report-shot{
-  display:block;
-  width:100%;
-  max-width:720px;
-  max-height:520px;
-  object-fit:contain;
-  background:#080C18;
+.screenshot-box{
+  background:var(--panel-2);
   border:1px solid var(--line);
   border-radius:10px;
-  margin:12px 0 10px;
-  cursor:zoom-in;
+  padding:12px;
+  margin-bottom:10px;
 }
 
 .report-shot-label{
   font:10.5px 'IBM Plex Mono',monospace;
   color:var(--muted);
-  margin-top:12px;
+  margin-bottom:10px;
+  letter-spacing:.04em;
 }
 
-/* REPORT ACTIONS */
+.report-shot-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:180px;
+  max-height:520px;
+  overflow:hidden;
+  background:#080C18;
+  border:1px solid var(--line);
+  border-radius:8px;
+}
+
+.report-shot{
+  display:block;
+  width:100%;
+  max-height:500px;
+  object-fit:contain;
+  cursor:zoom-in;
+}
+
+.no-screenshot{
+  min-height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+  font-size:12px;
+  font-family:'IBM Plex Mono',monospace;
+}
 
 .report-actions{
   display:flex;
@@ -383,7 +433,7 @@ main{
     padding-right:15px;
   }
 
-  .meta{
+  .info-grid{
     grid-template-columns:1fr;
   }
 
@@ -410,15 +460,15 @@ main{
 <body>
 
 <nav class="topnav">
+
   <div class="topnav-inner">
 
     <a class="brand" href="/">
 
-      <svg
-        viewBox="0 0 100 100"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+
         <defs>
+
           <linearGradient
             id="g"
             x1="0%"
@@ -426,15 +476,19 @@ main{
             x2="100%"
             y2="100%"
           >
+
             <stop
               offset="0%"
               stop-color="#9C8CFB"
             />
+
             <stop
               offset="100%"
               stop-color="#5142C4"
             />
+
           </linearGradient>
+
         </defs>
 
         <rect
@@ -454,6 +508,7 @@ main{
           fill="#5EEAD4"
           fill-opacity=".88"
         />
+
       </svg>
 
       <span>
@@ -482,12 +537,11 @@ main{
     </div>
 
   </div>
+
 </nav>
 
 
 <main>
-
-  <!-- LOGIN -->
 
   <div id="loginScreen">
 
@@ -513,8 +567,6 @@ main{
   </div>
 
 
-  <!-- NOT ADMIN -->
-
   <div id="notAdmin">
 
     <h2>
@@ -528,8 +580,6 @@ main{
 
   </div>
 
-
-  <!-- REPORTS -->
 
   <div
     id="reportsPage"
@@ -611,14 +661,6 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import {
-  getStorage,
-  ref as storageRef,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-
-/* FIREBASE */
 
 const firebaseConfig = {
 
@@ -648,21 +690,21 @@ const ADMIN_EMAILS = [
 ];
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+  initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+const auth =
+  getAuth(app);
 
-const db = getFirestore(app);
+const db =
+  getFirestore(app);
 
-const storage = getStorage(app);
+const provider =
+  new GoogleAuthProvider();
 
-const provider = new GoogleAuthProvider();
 
-
-/* HELPERS */
-
-const $ = id =>
-  document.getElementById(id);
+const $ =
+  id => document.getElementById(id);
 
 
 const labels = {
@@ -692,7 +734,7 @@ function esc(v){
 
   return String(v ?? '')
     .replace(
-      /[&<>\"']/g,
+      /[&<>"']/g,
       c => ({
         '&':'&amp;',
         '<':'&lt;',
@@ -734,7 +776,28 @@ function date(ts){
 }
 
 
-/* LOAD REPORTS */
+function val(obj,...keys){
+
+  for(
+    const key of keys
+  ){
+
+    if(
+      obj?.[key] !== undefined &&
+      obj?.[key] !== null &&
+      String(obj[key]).trim() !== ''
+    ){
+
+      return obj[key];
+
+    }
+
+  }
+
+  return 'Not collected';
+
+}
+
 
 async function loadReports(){
 
@@ -753,16 +816,21 @@ async function loadReports(){
 
     const snap =
       await getDocs(
-        collection(db,'reports')
+        collection(
+          db,
+          'reports'
+        )
       );
 
 
     const reports =
       snap.docs
-        .map(d => ({
-          id:d.id,
-          ...d.data()
-        }))
+        .map(
+          d => ({
+            id:d.id,
+            ...d.data()
+          })
+        )
         .sort(
           (a,b) =>
             (b.createdAt?.toMillis?.() || 0) -
@@ -787,166 +855,418 @@ async function loadReports(){
 
 
     list.innerHTML =
-      reports.map(r => `
+      reports.map(r => {
 
-        <div
-          class="report-card"
-          data-report-id="${esc(r.id)}"
-        >
-
-          <div class="report-top">
-
-            <div class="reason">
-
-              🚩
-              ${esc(
-                labels[r.reason] ||
-                r.reason ||
-                'Unknown reason'
-              )}
-
-            </div>
-
-            <div class="time">
-
-              ${esc(
-                date(r.createdAt)
-              )}
-
-            </div>
-
-          </div>
+        const ip =
+          val(
+            r,
+            'ipAddress',
+            'ip',
+            'clientIp'
+          );
 
 
-          <div class="meta">
+        const country =
+          val(
+            r,
+            'country',
+            'countryName'
+          );
 
-            <div>
 
-              Reporter:
-              <strong>
+        const countryCode =
+          val(
+            r,
+            'countryCode',
+            'country_code'
+          );
+
+
+        const countryDisplay =
+          country !== 'Not collected'
+            ? `${esc(country)}${
+                countryCode !== 'Not collected'
+                  ? ` (${esc(countryCode)})`
+                  : ''
+              }`
+            : 'Not collected';
+
+
+        const region =
+          val(
+            r,
+            'region',
+            'regionName',
+            'state'
+          );
+
+
+        const city =
+          val(
+            r,
+            'city'
+          );
+
+
+        const isp =
+          val(
+            r,
+            'isp',
+            'internetServiceProvider'
+          );
+
+
+        const asn =
+          val(
+            r,
+            'asn',
+            'AS',
+            'autonomousSystem'
+          );
+
+
+        const reporterUid =
+          val(
+            r,
+            'reporterUid',
+            'reporterId'
+          );
+
+
+        const reportedUid =
+          val(
+            r,
+            'reportedUid',
+            'reportedUserUid',
+            'reportedUserId'
+          );
+
+
+        const callId =
+          val(
+            r,
+            'callId',
+            'callID'
+          );
+
+
+        const screenshotUrl =
+          r.screenshotUrl ||
+          r.screenshotURL ||
+          '';
+
+
+        const details =
+          (r.details || '').trim() ||
+          'No additional details provided.';
+
+
+        return `
+
+          <div
+            class="report-card"
+            data-report-id="${esc(r.id)}"
+          >
+
+            <div class="report-top">
+
+              <div class="reason">
+
+                🚩
                 ${esc(
-                  r.reporterUid ||
-                  'Unknown'
+                  labels[r.reason] ||
+                  r.reason ||
+                  'Unknown reason'
                 )}
-              </strong>
 
-            </div>
+              </div>
 
+              <div class="time">
 
-            <div>
-
-              Reported user:
-              <strong>
                 ${esc(
-                  r.reportedUid ||
-                  'Unknown'
+                  date(r.createdAt)
                 )}
-              </strong>
+
+              </div>
 
             </div>
 
 
-            <div>
+            <div class="info-box">
 
-              Call ID:
-              <strong>
-                ${esc(
-                  r.callId ||
-                  'Unknown'
-                )}
-              </strong>
+              <div
+                style="
+                  display:flex;
+                  align-items:center;
+                  gap:10px;
+                  margin-bottom:10px
+                "
+              >
 
-            </div>
-
-
-            <div>
-
-              Report ID:
-              <strong>
-                ${esc(r.id)}
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          ${
-            r.screenshotUrl
-              ? `
-
-                <div class="report-shot-label">
-                  STRANGER VIDEO SCREENSHOT
+                <div
+                  class="info-title"
+                  style="margin:0"
+                >
+                  NETWORK INFORMATION
                 </div>
 
-                <a
-                  href="${esc(r.screenshotUrl)}"
-                  target="_blank"
-                  rel="noopener"
+                <button
+                  type="button"
+                  class="btn copy-btn"
+                  onclick="copyNetworkInfo(this)"
                 >
+                  Copy
+                </button>
 
-                  <img
-                    class="report-shot"
-                    src="${esc(r.screenshotUrl)}"
-                    alt="Screenshot of reported stranger video"
-                    loading="lazy"
-                  >
-
-                </a>
-
-              `
-              : ''
-          }
+              </div>
 
 
-          <div class="details">
+              <div class="info-grid">
 
-            ${esc(
-              (r.details || '').trim() ||
-              'No additional details provided.'
-            )}
+                <div class="info-row">
+
+                  <span>
+                    IP Address
+                  </span>
+
+                  <strong>
+                    ${esc(ip)}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    Country
+                  </span>
+
+                  <strong>
+                    ${countryDisplay}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    Region
+                  </span>
+
+                  <strong>
+                    ${esc(region)}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    City
+                  </span>
+
+                  <strong>
+                    ${esc(city)}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    ISP
+                  </span>
+
+                  <strong>
+                    ${esc(isp)}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    ASN
+                  </span>
+
+                  <strong>
+                    ${esc(asn)}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+              <div class="info-title">
+                USER INFORMATION
+              </div>
+
+              <div class="info-grid">
+
+                <div class="info-row">
+
+                  <span>
+                    Reporter UID
+                  </span>
+
+                  <strong>
+                    ${esc(reporterUid)}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    Reported UID
+                  </span>
+
+                  <strong>
+                    ${esc(reportedUid)}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    Call ID
+                  </span>
+
+                  <strong>
+                    ${esc(callId)}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                  <span>
+                    Report ID
+                  </span>
+
+                  <strong>
+                    ${esc(r.id)}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="screenshot-box">
+
+              <div class="report-shot-label">
+                STRANGER VIDEO SCREENSHOT
+              </div>
+
+
+              ${
+                screenshotUrl
+                  ? `
+
+                    <div class="report-shot-wrap">
+
+                      <a
+                        href="${esc(screenshotUrl)}"
+                        target="_blank"
+                        rel="noopener"
+                      >
+
+                        <img
+                          class="report-shot"
+                          src="${esc(screenshotUrl)}"
+                          alt="Screenshot of reported stranger video"
+                          loading="lazy"
+                        >
+
+                      </a>
+
+                    </div>
+
+                  `
+                  : `
+
+                    <div class="no-screenshot">
+
+                      No screenshot attached to this report.
+
+                    </div>
+
+                  `
+              }
+
+            </div>
+
+
+            <div class="details">
+
+              ${esc(details)}
+
+            </div>
+
+
+            <div class="report-actions">
+
+              <button
+                class="btn btn-ban"
+                onclick="
+                  banUser(
+                    '${esc(
+                      reportedUid !== 'Not collected'
+                        ? reportedUid
+                        : ''
+                    )}',
+                    '${esc(r.id)}'
+                  )
+                "
+                ${
+                  reportedUid === 'Not collected'
+                    ? 'disabled'
+                    : ''
+                }
+              >
+
+                🚫 Ban user
+
+              </button>
+
+
+              <button
+                class="btn btn-remove"
+                onclick="
+                  removeReport(
+                    '${esc(r.id)}'
+                  )
+                "
+              >
+
+                🗑 Remove report
+
+              </button>
+
+            </div>
 
           </div>
 
+        `;
 
-          <!-- ACTIONS -->
-
-          <div class="report-actions">
-
-            <button
-              class="btn btn-ban"
-              onclick="
-                banUser(
-                  '${esc(r.reportedUid || '')}',
-                  '${esc(r.id)}'
-                )
-              "
-              ${!r.reportedUid ? 'disabled' : ''}
-            >
-
-              🚫 Ban user
-
-            </button>
-
-
-            <button
-              class="btn btn-remove"
-              onclick="
-                removeReport(
-                  '${esc(r.id)}'
-                )
-              "
-            >
-
-              🗑 Remove report
-
-            </button>
-
-          </div>
-
-        </div>
-
-      `).join('');
+      }).join('');
 
 
   }catch(err){
@@ -965,13 +1285,16 @@ async function loadReports(){
 
         <br><br>
 
-        Check your Firestore/Storage rules and
-        make sure this admin can read the reports
-        collection and screenshot files.
+        Check your Firestore rules
+        and make sure this admin can
+        read the reports collection.
 
         <br><br>
 
-        ${esc(err.message || '')}
+        ${esc(
+          err.message ||
+          ''
+        )}
 
       </div>
 
@@ -982,14 +1305,97 @@ async function loadReports(){
 }
 
 
-/* BAN USER */
+window.copyNetworkInfo =
+  async function(button){
+
+    const box =
+      button.closest('.info-box');
+
+    if(!box)
+      return;
+
+
+    const rows =
+      [...box.querySelectorAll('.info-row')];
+
+
+    const text =
+      rows.map(row => {
+
+        const label =
+          row.querySelector(
+            'span'
+          )?.textContent.trim() ||
+          '';
+
+        const value =
+          row.querySelector(
+            'strong'
+          )?.textContent.trim() ||
+          '';
+
+        return `${label}: ${value}`;
+
+      }).join('\n');
+
+
+    try{
+
+      await navigator.clipboard.writeText(
+        text
+      );
+
+
+      const oldText =
+        button.textContent;
+
+
+      button.textContent =
+        '✓ Copied';
+
+      button.classList.add(
+        'copied'
+      );
+
+
+      setTimeout(() => {
+
+        button.textContent =
+          oldText;
+
+        button.classList.remove(
+          'copied'
+        );
+
+      },1500);
+
+
+    }catch(err){
+
+      console.error(
+        'Copy failed:',
+        err
+      );
+
+
+      alert(
+        'Could not copy the network information.'
+      );
+
+    }
+
+  };
+
 
 window.banUser =
-  async function(reportedUid, reportId){
+  async function(
+    reportedUid,
+    reportId
+  ){
 
     if(
       !reportedUid ||
-      reportedUid === 'Unknown'
+      reportedUid === 'Not collected'
     ){
 
       alert(
@@ -1068,16 +1474,16 @@ window.banUser =
 
       alert(
         'Could not ban this user.\n\n' +
-        (err.message ||
-          'Unknown error')
+        (
+          err.message ||
+          'Unknown error'
+        )
       );
 
     }
 
   };
 
-
-/* REMOVE REPORT */
 
 window.removeReport =
   async function(reportId){
@@ -1127,16 +1533,16 @@ window.removeReport =
 
       alert(
         'Could not remove this report.\n\n' +
-        (err.message ||
-          'Unknown error')
+        (
+          err.message ||
+          'Unknown error'
+        )
       );
 
     }
 
   };
 
-
-/* GOOGLE SIGN IN */
 
 $('googleSignInBtn').onclick =
   async () => {
@@ -1164,19 +1570,13 @@ $('googleSignInBtn').onclick =
   };
 
 
-/* SIGN OUT */
-
 $('signOutBtn').onclick =
   () => signOut(auth);
 
 
-/* REFRESH */
-
 $('refreshBtn').onclick =
   loadReports;
 
-
-/* AUTH STATE */
 
 onAuthStateChanged(
   auth,
@@ -1190,13 +1590,16 @@ onAuthStateChanged(
     ){
 
       $('loginScreen')
-        .style.display = 'none';
+        .style.display =
+        'none';
 
       $('notAdmin')
-        .style.display = 'none';
+        .style.display =
+        'none';
 
       $('reportsPage')
-        .style.display = 'block';
+        .style.display =
+        'block';
 
       await loadReports();
 
@@ -1205,26 +1608,32 @@ onAuthStateChanged(
     else if(user){
 
       $('loginScreen')
-        .style.display = 'none';
+        .style.display =
+        'none';
 
       $('reportsPage')
-        .style.display = 'none';
+        .style.display =
+        'none';
 
       $('notAdmin')
-        .style.display = 'block';
+        .style.display =
+        'block';
 
     }
 
     else{
 
       $('loginScreen')
-        .style.display = 'block';
+        .style.display =
+        'block';
 
       $('notAdmin')
-        .style.display = 'none';
+        .style.display =
+        'none';
 
       $('reportsPage')
-        .style.display = 'none';
+        .style.display =
+        'none';
 
     }
 
