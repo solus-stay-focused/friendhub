@@ -1037,6 +1037,77 @@
   }
   .vcnav-account-menu button:hover{ background:rgba(255,255,255,0.06); }
 
+  /* ---------- Report modal ---------- */
+  .vc-report-overlay{
+    display:none;
+    position:fixed; inset:0; z-index:300;
+    background:rgba(7,11,28,0.82);
+    backdrop-filter:blur(4px);
+    align-items:center; justify-content:center;
+    padding:20px;
+    font-family:'Inter',sans-serif;
+  }
+  .vc-report-overlay.active{ display:flex; }
+  .vc-report-modal{
+    width:100%; max-width:420px;
+    background:#0A1D31;
+    border:1px solid rgba(237,231,218,0.14);
+    border-radius:18px;
+    box-shadow:0 30px 70px rgba(0,0,0,0.5);
+    overflow:hidden;
+  }
+  .vc-report-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px;
+    border-bottom:1px solid rgba(237,231,218,0.12);
+  }
+  .vc-report-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15.5px; color:#EDE7DA; }
+  .vc-report-body{ padding:18px; }
+  .vc-report-sub{ margin:0 0 16px; font-size:13px; line-height:1.5; color:rgba(237,231,218,0.6); }
+  .vc-report-reasons{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .vc-report-reason{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(237,231,218,0.05);
+    border:1px solid rgba(237,231,218,0.1);
+    border-radius:10px;
+    padding:11px 13px;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .vc-report-reason:hover{ background:rgba(237,231,218,0.09); }
+  .vc-report-reason input{ accent-color:#FF6B5B; width:16px; height:16px; flex:none; }
+  .vc-report-reason:has(input:checked){
+    border-color:rgba(255,107,91,0.5);
+    background:rgba(255,107,91,0.1);
+  }
+  .vc-report-reason-label{ font-size:13.5px; color:#EDE7DA; font-weight:500; }
+  .vc-report-details{
+    width:100%; resize:vertical; min-height:60px;
+    background:#080F20; border:1px solid rgba(237,231,218,0.14);
+    color:#EDE7DA; border-radius:10px; padding:11px 13px;
+    font-family:inherit; font-size:13px; line-height:1.5;
+    margin-bottom:8px; box-sizing:border-box;
+  }
+  .vc-report-details:focus{ outline:none; border-color:#5E9EFF; }
+  .vc-report-error{
+    display:none; font-size:12.5px; color:#FF6B5B; margin-bottom:8px;
+  }
+  .vc-report-error.show{ display:block; }
+  .vc-report-actions{ display:flex; gap:10px; margin-top:6px; }
+  .vc-report-cancel{
+    flex:1; background:rgba(237,231,218,0.08); border:1px solid rgba(237,231,218,0.14);
+    color:#EDE7DA; border-radius:10px; padding:11px; font-family:inherit;
+    font-weight:600; font-size:13.5px; cursor:pointer;
+  }
+  .vc-report-cancel:hover{ background:rgba(237,231,218,0.14); }
+  .vc-report-submit{
+    flex:1.4; background:linear-gradient(135deg,#FF6B5B,#E23F44); color:#fff; border:none;
+    border-radius:10px; padding:11px; font-family:inherit; font-weight:700; font-size:13.5px;
+    cursor:pointer; transition:filter .15s ease;
+  }
+  .vc-report-submit:hover{ filter:brightness(1.08); }
+  .vc-report-submit:disabled{ opacity:0.45; cursor:not-allowed; filter:none; }
+
   /* ---------- All-countries modal (hidden until .active; centered overlay) ---------- */
   .vc-country-overlay{
     display:none;
@@ -1519,16 +1590,12 @@
         </div>
       </div>
     </div>
-
-    <div class="vcapp-meta" style="justify-content:flex-end;">
-      <span class="rules">Community rules · Safety tips</span>
-    </div>
   </div>
 
   <div class="vcapp-chat">
     <div class="vcapp-chat-head">
       <span>Chat</span>
-      <span class="rules">Report</span>
+      <span class="rules" id="vcReportOpenBtn">Report</span>
     </div>
     <div class="vcapp-chat-log" id="vcChatLog"></div>
     <div class="vcapp-chat-input">
@@ -1545,6 +1612,56 @@
         <button type="button" class="vc-country-modal-close" onclick="closeCountryModal()" aria-label="Close">✕</button>
       </div>
       <div class="vc-country-grid" id="vcCountryGrid"></div>
+    </div>
+  </div>
+
+  <!-- ============= Report modal ============= -->
+  <div class="vc-report-overlay" id="vcReportOverlay" onclick="closeReportModal(event)">
+    <div class="vc-report-modal" role="dialog" aria-modal="true" aria-label="Report this user">
+      <div class="vc-report-head">
+        <span class="vc-report-title">🚩 Report this user</span>
+        <button type="button" class="vc-country-modal-close" onclick="closeReportModal()" aria-label="Close">✕</button>
+      </div>
+
+      <div class="vc-report-body">
+        <p class="vc-report-sub">Tell us what happened. This ends the current call and sends a report to our moderation team.</p>
+
+        <div class="vc-report-reasons" id="vcReportReasons">
+          <label class="vc-report-reason">
+            <input type="radio" name="vcReportReason" value="nudity_sexual_content">
+            <span class="vc-report-reason-label">Nudity or sexual content</span>
+          </label>
+          <label class="vc-report-reason">
+            <input type="radio" name="vcReportReason" value="harassment_abuse">
+            <span class="vc-report-reason-label">Harassment or abusive behavior</span>
+          </label>
+          <label class="vc-report-reason">
+            <input type="radio" name="vcReportReason" value="underage">
+            <span class="vc-report-reason-label">Appears to be a minor</span>
+          </label>
+          <label class="vc-report-reason">
+            <input type="radio" name="vcReportReason" value="spam_scam">
+            <span class="vc-report-reason-label">Spam, scam, or advertising</span>
+          </label>
+          <label class="vc-report-reason">
+            <input type="radio" name="vcReportReason" value="violence_threats">
+            <span class="vc-report-reason-label">Violence or threats</span>
+          </label>
+          <label class="vc-report-reason">
+            <input type="radio" name="vcReportReason" value="other">
+            <span class="vc-report-reason-label">Something else</span>
+          </label>
+        </div>
+
+        <textarea id="vcReportDetails" class="vc-report-details" rows="3" placeholder="Optional — add any details that might help (max 500 chars)" maxlength="500"></textarea>
+
+        <div class="vc-report-error" id="vcReportError"></div>
+
+        <div class="vc-report-actions">
+          <button type="button" class="vc-report-cancel" onclick="closeReportModal()">Cancel</button>
+          <button type="button" class="vc-report-submit" id="vcReportSubmitBtn" onclick="submitReport()" disabled>Submit report</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2008,6 +2125,9 @@
   document.addEventListener('keydown', (e) => {
     const overlay = document.getElementById('vcCountryOverlay');
     if (overlay && overlay.classList.contains('active') && e.key === 'Escape') closeCountryModal();
+
+    const reportOverlay = document.getElementById('vcReportOverlay');
+    if (reportOverlay && reportOverlay.classList.contains('active') && e.key === 'Escape') closeReportModal();
   });
 
   // ---- custom "I am" gender dropdown ----
@@ -2248,6 +2368,7 @@
   let pc = null;
   let callId = null;
   let role = null; // 'caller' | 'callee'
+  let otherUid = null;
   let unsubWaitingPool = null;
   let unsubIncomingCalls = null;
   let unsubCallDoc = null;
@@ -2618,7 +2739,12 @@
         snap.docChanges().forEach((change) => {
           if (change.type === 'added' && !inCall) {
             const data = change.doc.data();
-            enterCall(change.doc.id, data.caller === myUid ? 'caller' : 'callee');
+            const isCaller = data.caller === myUid;
+            enterCall(
+              change.doc.id,
+              isCaller ? 'caller' : 'callee',
+              isCaller ? data.callee : data.caller
+            );
           }
         });
       });
@@ -2667,7 +2793,7 @@
         });
         // matched! stop looking — enterCall for the caller side happens directly here,
         // the callee side picks it up via the onSnapshot listener above.
-        enterCall(newCallId, 'caller');
+        enterCall(newCallId, 'caller', otherUid);
         return;
       } catch (e) {
         // race lost (someone else grabbed this candidate, or I got grabbed) — try next / wait
@@ -2676,12 +2802,13 @@
     }
   }
 
-  async function enterCall(id, myRole){
+  async function enterCall(id, myRole, matchedUid){
     if (inCall) return;
     inCall = true;
     matching = false;
     callId = id;
     role = myRole;
+    otherUid = matchedUid || null;
 
     if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
     db.collection('waitingPool').doc(myUid).delete().catch(() => {});
@@ -2756,6 +2883,70 @@
     });
   }
 
+  // ---- report modal ----
+  const reportOverlay = document.getElementById('vcReportOverlay');
+  const reportSubmitBtn = document.getElementById('vcReportSubmitBtn');
+  const reportError = document.getElementById('vcReportError');
+  const reportDetails = document.getElementById('vcReportDetails');
+  const reportOpenBtn = document.getElementById('vcReportOpenBtn');
+
+  document.querySelectorAll('input[name="vcReportReason"]').forEach((r) => {
+    r.addEventListener('change', () => {
+      reportSubmitBtn.disabled = false;
+    });
+  });
+
+  if (reportOpenBtn) {
+    reportOpenBtn.addEventListener('click', () => {
+      if (!inCall) {
+        addChatMsg('system', 'Start a call before reporting someone.');
+        return;
+      }
+
+      reportError.classList.remove('show');
+      reportError.textContent = '';
+      reportSubmitBtn.disabled = true;
+      reportDetails.value = '';
+      document.querySelectorAll('input[name="vcReportReason"]').forEach((r) => {
+        r.checked = false;
+      });
+      reportOverlay.classList.add('active');
+    });
+  }
+
+  window.closeReportModal = function(e){
+    if (e && e.target && e.target.id !== 'vcReportOverlay') return;
+    reportOverlay.classList.remove('active');
+  };
+
+  window.submitReport = async function(){
+    const checked = document.querySelector('input[name="vcReportReason"]:checked');
+    if (!checked || !inCall) return;
+
+    reportSubmitBtn.disabled = true;
+    reportError.classList.remove('show');
+
+    try {
+      await db.collection('reports').add({
+        reporterUid: myUid,
+        reportedUid: otherUid || null,
+        callId: callId || null,
+        reason: checked.value,
+        details: reportDetails.value.trim().slice(0, 500),
+        createdAt: FieldValue.serverTimestamp()
+      });
+
+      reportOverlay.classList.remove('active');
+      addChatMsg('system', 'Report submitted — thanks. Ending this call.');
+      await endCall();
+    } catch (err) {
+      console.error('report submit failed:', err);
+      reportError.textContent = 'Could not submit report — please try again.';
+      reportError.classList.add('show');
+      reportSubmitBtn.disabled = false;
+    }
+  };
+
   async function endCall(goIdle){
     if (unsubIncomingCalls) { unsubIncomingCalls(); unsubIncomingCalls = null; }
     if (unsubCallDoc) { unsubCallDoc(); unsubCallDoc = null; }
@@ -2778,7 +2969,7 @@
       touchPresence('browsing');
     }
 
-    callId = null; role = null; matching = false; inCall = false;
+    callId = null; role = null; otherUid = null; matching = false; inCall = false;
     setStatus('CAMERA/MIC BLOCKED', true);
     startBtn.disabled = false;
   }
