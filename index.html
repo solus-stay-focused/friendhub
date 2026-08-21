@@ -1037,6 +1037,81 @@
   }
   .vcnav-account-menu button:hover{ background:rgba(255,255,255,0.06); }
 
+  /* ---------- Profile + notifications ---------- */
+  .vcnav-profile-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.06); color:#EDE7DA;
+    border:1px solid rgba(255,255,255,0.12); border-radius:999px;
+    padding:5px 11px 5px 5px; font-family:'Inter',sans-serif;
+    font-size:13px; font-weight:600; cursor:pointer;
+    transition:background .15s ease,border-color .15s ease;
+  }
+  .vcnav-profile-btn:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.22); }
+  .vcnav-profile-btn img{ width:28px; height:28px; border-radius:50%; object-fit:cover; background:#1E4FD8; }
+  .vcnav-notify-btn{
+    position:relative; width:38px; height:38px; border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.06); color:#EDE7DA;
+    border:1px solid rgba(255,255,255,0.12); cursor:pointer;
+  }
+  .vcnav-notify-btn:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.22); }
+  .vcnav-notify-badge{
+    position:absolute; top:-3px; right:-3px; min-width:17px; height:17px;
+    padding:0 4px; border-radius:999px; background:#FF6B5B; color:#fff;
+    font:700 9px/17px 'Inter',sans-serif; text-align:center; border:2px solid #090D20;
+    display:none;
+  }
+  .vc-profile-overlay,.vc-notify-overlay{
+    display:none; position:fixed; inset:0; z-index:500;
+    background:rgba(7,11,28,.82); backdrop-filter:blur(5px);
+    align-items:center; justify-content:center; padding:20px; font-family:'Inter',sans-serif;
+  }
+  .vc-profile-overlay.active,.vc-notify-overlay.active{ display:flex; }
+  .vc-profile-card,.vc-notify-card{
+    width:100%; max-width:460px; max-height:88vh; overflow:auto;
+    background:#0A1D31; border:1px solid rgba(237,231,218,.14);
+    border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.55);
+  }
+  .vc-profile-head,.vc-notify-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px; border-bottom:1px solid rgba(237,231,218,.12);
+  }
+  .vc-profile-head h3,.vc-notify-head h3{ margin:0; color:#fff; font-family:'Space Grotesk',sans-serif; font-size:18px; }
+  .vc-modal-close{
+    width:32px; height:32px; border-radius:50%; border:1px solid rgba(237,231,218,.14);
+    background:rgba(237,231,218,.07); color:#EDE7DA; cursor:pointer;
+  }
+  .vc-profile-body{ padding:22px; }
+  .vc-profile-avatar-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:20px; }
+  .vc-profile-avatar{ width:92px; height:92px; border-radius:50%; object-fit:cover; border:3px solid rgba(94,158,255,.55); background:#1E4FD8; }
+  .vc-profile-upload{ font-size:12px; color:#5E9EFF; cursor:pointer; text-decoration:underline; }
+  .vc-profile-field{ margin-bottom:15px; }
+  .vc-profile-field label{ display:block; margin-bottom:7px; color:rgba(237,231,218,.55); font:11px 'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.05em; }
+  .vc-profile-field input{
+    width:100%; box-sizing:border-box; background:#080F20; color:#EDE7DA;
+    border:1px solid rgba(237,231,218,.14); border-radius:10px; padding:12px 13px;
+    font:14px 'Inter',sans-serif;
+  }
+  .vc-profile-field input:focus{ outline:none; border-color:#5E9EFF; }
+  .vc-profile-readonly{ color:rgba(237,231,218,.72); font:12px 'IBM Plex Mono',monospace; word-break:break-all; }
+  .vc-profile-actions{ display:flex; gap:10px; margin-top:18px; }
+  .vc-profile-save,.vc-profile-signout{
+    flex:1; border:none; border-radius:10px; padding:12px; cursor:pointer;
+    font:700 13px 'Inter',sans-serif;
+  }
+  .vc-profile-save{ color:#fff; background:linear-gradient(135deg,#5E9EFF,#1E4FD8); }
+  .vc-profile-signout{ color:#fff; background:rgba(255,107,91,.14); border:1px solid rgba(255,107,91,.35); }
+  .vc-profile-msg{ min-height:18px; margin-top:10px; font-size:12px; color:#5EEAD4; }
+  .vc-notify-body{ padding:10px 18px 18px; }
+  .vc-notify-item{ padding:14px 4px; border-bottom:1px solid rgba(237,231,218,.09); }
+  .vc-notify-item.unread{ background:rgba(94,158,255,.06); border-radius:10px; padding-left:10px; padding-right:10px; }
+  .vc-notify-item strong{ display:block; color:#fff; font-size:13px; margin-bottom:4px; }
+  .vc-notify-item p{ margin:0; color:rgba(237,231,218,.62); font-size:12.5px; line-height:1.5; }
+  .vc-notify-time{ margin-top:6px; color:rgba(237,231,218,.35); font:10px 'IBM Plex Mono',monospace; }
+  .vc-notify-empty{ padding:35px 10px; text-align:center; color:rgba(237,231,218,.45); font-size:13px; }
+  .vc-notify-mark{ margin-left:auto; background:none; border:0; color:#5E9EFF; cursor:pointer; font-size:11px; }
+  @media(max-width:900px){ .vcnav-profile-btn span{ display:none; } .vcnav-profile-btn{ padding:5px; } }
+
   /* ---------- Report modal ---------- */
   .vc-report-overlay{
     display:none;
@@ -1400,16 +1475,44 @@
     <div class="vcnav-actions">
       <a href="/" class="vcnav-signin" id="vcNavSignIn">👤 Sign in</a>
       <a href="/" class="vcnav-getstarted" id="vcNavGetStarted">Get Started</a>
-      <div class="vcnav-account" id="vcNavAccount">
-        <img id="vcNavAvatar" src="" alt="">
-        <span id="vcNavName"></span>
-        <div class="vcnav-account-menu" id="vcNavAccountMenu">
-          <button type="button" id="vcNavSignOutBtn">Sign out</button>
-        </div>
-      </div>
+      <button type="button" class="vcnav-notify-btn" id="vcNavNotifyBtn" style="display:none" aria-label="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+        <span class="vcnav-notify-badge" id="vcNavNotifyBadge">0</span>
+      </button>
+      <button type="button" class="vcnav-profile-btn" id="vcNavProfileBtn" style="display:none" aria-label="Open profile">
+        <img id="vcNavAvatar" src="" alt="Profile">
+        <span id="vcNavName">Profile</span>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- ============= Profile modal ============= -->
+<div class="vc-profile-overlay" id="vcProfileOverlay" onclick="closeVcProfile(event)">
+  <div class="vc-profile-card" role="dialog" aria-modal="true" aria-label="Your FriendHub profile">
+    <div class="vc-profile-head"><h3>👤 My Profile</h3><button class="vc-modal-close" type="button" onclick="closeVcProfile()">✕</button></div>
+    <div class="vc-profile-body">
+      <div class="vc-profile-avatar-wrap">
+        <img class="vc-profile-avatar" id="vcProfileAvatar" src="" alt="Profile picture">
+        <label class="vc-profile-upload">Change profile picture<input id="vcProfilePhotoInput" type="file" accept="image/*" hidden></label>
+      </div>
+      <div class="vc-profile-field"><label>Name</label><input id="vcProfileName" maxlength="60" placeholder="Your name"></div>
+      <div class="vc-profile-field"><label>FriendHub UID</label><div class="vc-profile-readonly" id="vcProfileUid">—</div></div>
+      <div class="vc-profile-field"><label>Joined FriendHub</label><div class="vc-profile-readonly" id="vcProfileCreated">—</div></div>
+      <div class="vc-profile-field"><label>Email</label><div class="vc-profile-readonly" id="vcProfileEmail">—</div></div>
+      <div class="vc-profile-actions"><button class="vc-profile-save" id="vcProfileSaveBtn">Save changes</button><button class="vc-profile-signout" id="vcProfileSignOutBtn">Sign out</button></div>
+      <div class="vc-profile-msg" id="vcProfileMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= Notifications modal ============= -->
+<div class="vc-notify-overlay" id="vcNotifyOverlay" onclick="closeVcNotifications(event)">
+  <div class="vc-notify-card" role="dialog" aria-modal="true" aria-label="Notifications">
+    <div class="vc-notify-head"><h3>🔔 Notifications</h3><button class="vc-modal-close" type="button" onclick="closeVcNotifications()">✕</button></div>
+    <div class="vc-notify-body" id="vcNotifyBody"><div class="vc-notify-empty">Sign in to see your notifications.</div></div>
+  </div>
+</div>
 
 <!-- ============= Google sign-in overlay ============= -->
 <div class="vcauth-overlay" id="vcAuthOverlay">
@@ -2168,1058 +2271,4 @@
     if (e.key === 'Escape' && vcGenderWrap && vcGenderWrap.classList.contains('open')) {
       vcGenderWrap.classList.remove('open');
       vcGenderPanel.classList.remove('open');
-      vcGenderBtn.setAttribute('aria-expanded', 'false');
-    }
-  });
-})();
-</script>
-
-<script>
-// ---- Full Screen + Settings toolbar on the video box ----
-(function(){
-  const vcbox = document.querySelector('.vcbox');
-  const vcapp = document.querySelector('.vcapp');
-  const stage = document.querySelector('.vcbox-stage');
-  const toolbar = document.getElementById('vcToolbar');
-  const fsLabel = document.getElementById('vcFullscreenLabel');
-  const settingsPanel = document.getElementById('vcSettingsPanel');
-  const settingsBtn = document.getElementById('vcSettingsBtn');
-
-  window.vcToggleFullscreen = function(){
-    if (!vcapp) return;
-    if (!document.fullscreenElement) {
-      (vcapp.requestFullscreen || vcapp.webkitRequestFullscreen || vcapp.msRequestFullscreen)
-        .call(vcapp)
-        .catch(() => {});
-    } else {
-      (document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen)
-        .call(document)
-        .catch(() => {});
-    }
-  };
-
-  function syncFullscreenLabel(){
-    const isFs = !!document.fullscreenElement;
-    if (fsLabel) fsLabel.textContent = isFs ? 'Exit Full Screen' : 'Full Screen';
-    if (vcapp) vcapp.classList.toggle('vcbox-fullscreen', isFs);
-  }
-  document.addEventListener('fullscreenchange', syncFullscreenLabel);
-  document.addEventListener('webkitfullscreenchange', syncFullscreenLabel);
-
-  window.vcToggleSettings = function(){
-    if (settingsPanel) settingsPanel.classList.toggle('open');
-  };
-
-  document.addEventListener('click', (e) => {
-    if (!settingsPanel || !settingsPanel.classList.contains('open')) return;
-    if (settingsPanel.contains(e.target) || (settingsBtn && settingsBtn.contains(e.target))) return;
-    settingsPanel.classList.remove('open');
-  });
-
-  // Buttons stay hidden until the box is clicked, then show for 2 seconds.
-  let hideTimer = null;
-  function showToolbar(){
-    if (!toolbar) return;
-    toolbar.classList.add('visible');
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-      toolbar.classList.remove('visible');
-      if (settingsPanel) settingsPanel.classList.remove('open');
-    }, 2000);
-  }
-  if (stage) stage.addEventListener('click', showToolbar);
-
-  // ---- Snap (screenshot) ----
-  const snapBtn = document.getElementById('vcSnapBtn');
-  let html2canvasPromise = null;
-  function loadHtml2Canvas(){
-    if (window.html2canvas) return Promise.resolve();
-    if (html2canvasPromise) return html2canvasPromise;
-    html2canvasPromise = new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-    return html2canvasPromise;
-  }
-
-  function flashScreen(){
-    const flash = document.createElement('div');
-    flash.className = 'vcbox-snap-flash';
-    if (vcbox) vcbox.appendChild(flash);
-    requestAnimationFrame(() => flash.classList.add('go'));
-    setTimeout(() => flash.remove(), 400);
-  }
-
-  function toast(msg){
-    const t = document.createElement('div');
-    t.className = 'vcbox-snap-toast';
-    t.textContent = msg;
-    if (vcbox) vcbox.appendChild(t);
-    requestAnimationFrame(() => t.classList.add('show'));
-    setTimeout(() => {
-      t.classList.remove('show');
-      setTimeout(() => t.remove(), 250);
-    }, 1800);
-  }
-
-  window.vcTakeSnapshot = function(){
-    if (!stage) return;
-    flashScreen();
-    loadHtml2Canvas().then(() => {
-      return window.html2canvas(stage, { backgroundColor: '#070B1C', useCORS: true, logging: false });
-    }).then((canvas) => {
-      const link = document.createElement('a');
-      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-      link.download = 'friendhub-snap-' + stamp + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      toast('Snapshot saved ✓');
-    }).catch(() => {
-      toast('Could not save snapshot');
-    });
-  };
-})();
-</script>
-
-<!-- ============================================================
-  REAL MATCHMAKING + WEBRTC CALLING
-  Fill in firebaseConfig below with your own project's keys
-  (Firebase console → Project settings → your web app).
-  Requires: Anonymous auth enabled, Firestore enabled.
-============================================================= -->
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-
-<script>
-(function(){
-  // ---- 1. FIREBASE CONFIG — replace with your own project's config ----
-  const firebaseConfig = {
-    apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
-    authDomain: "friendhub-9f934.firebaseapp.com",
-    projectId: "friendhub-9f934",
-    storageBucket: "friendhub-9f934.firebasestorage.app",
-    messagingSenderId: "97544296104",
-    appId: "1:97544296104:web:d7f7d27e86f1af748e949d"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  const storage = firebase.storage();
-  const FieldValue = firebase.firestore.FieldValue;
-  const googleProvider = new firebase.auth.GoogleAuthProvider();
-
-  // STUN only — for reliability on restrictive networks (mobile data, corporate
-  // wifi, etc.) add a TURN server here too, e.g. one from Twilio or metered.ca:
-  // { urls: 'turn:your.turn.server:3478', username: '...', credential: '...' }
-  const RTC_CONFIG = {
-    iceCandidatePoolSize: 10,
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' }
-      // IMPORTANT: add a TURN server here for users behind strict NAT/firewalls.
-      // Example:
-      // {
-      //   urls: 'turn:YOUR-TURN-HOST:3478',
-      //   username: 'YOUR-TURN-USERNAME',
-      //   credential: 'YOUR-TURN-CREDENTIAL'
-      // }
-    ]
-  };
-
-  const WAITING_STALE_MS = 30000;
-  let matchInProgress = false;
-  let matchRetryTimer = null;
-
-  // ---- DOM refs ----
-  const startBtn = document.getElementById('vcStartBtn');
-  const stopBtn = document.getElementById('vcStopBtn');
-  const leaveBtn = document.getElementById('vcLeaveBtn');
-  const localVideo = document.getElementById('vcLocalVideo');
-  const remoteVideo = document.getElementById('vcRemoteVideo');
-  const placeholder = document.getElementById('vcPlaceholder');
-  const placeholderText = document.getElementById('vcPlaceholderText');
-  const phIdle = document.getElementById('vcPhIdle');
-  const phSearching = document.getElementById('vcPhSearching');
-  const localPlaceholder = document.getElementById('vcLocalPlaceholder');
-  const enableCameraBtn = document.getElementById('vcEnableCameraBtn');
-  const pressStartBtn = document.getElementById('vcPressStartBtn');
-  const statusEl = document.getElementById('vcStatus');
-  const statusText = document.getElementById('vcStatusText');
-  const onlineCountEl = document.getElementById('vcOnlineCount');
-  const onlineDebugEl = document.getElementById('vcOnlineDebug');
-  const infoOnlineCountEl = document.getElementById('vcInfoOnlineCount');
-  const navOnlineCountEl = document.getElementById('vcNavOnlineCount');
-  const footOnlineCountEl = document.getElementById('vcFootOnlineCount');
-  const chatLog = document.getElementById('vcChatLog');
-  const chatInput = document.getElementById('vcChatInput');
-  const chatSendBtn = document.getElementById('vcChatSendBtn');
-
-  // ---- auth DOM refs ----
-  const authOverlay = document.getElementById('vcAuthOverlay');
-  const authGoogleBtn = document.getElementById('vcAuthGoogleBtn');
-  const authAgeCheck = document.getElementById('vcAuthAgeCheck');
-  const authError = document.getElementById('vcAuthError');
-  const navSignIn = document.getElementById('vcNavSignIn');
-  const navGetStarted = document.getElementById('vcNavGetStarted');
-  const navAccount = document.getElementById('vcNavAccount');
-  const navAvatar = document.getElementById('vcNavAvatar');
-  const navName = document.getElementById('vcNavName');
-  const navAccountMenu = document.getElementById('vcNavAccountMenu');
-  const navSignOutBtn = document.getElementById('vcNavSignOutBtn');
-  const navCommunityLink = document.getElementById('vcNavCommunityLink');
-
-  // ---- state ----
-  let myUid = null;
-  let myUser = null; // Firebase User object once signed in (anonymous or Google)
-  let localStream = null;
-  let pc = null;
-  let callId = null;
-  let role = null; // 'caller' | 'callee'
-  let otherUid = null;
-  let unsubWaitingPool = null;
-  let unsubIncomingCalls = null;
-  let unsubCallDoc = null;
-  let unsubCandidates = null;
-  let unsubMessages = null;
-  let matching = false;
-  let inCall = false;
-
-  function setStatus(text, blocked){
-    statusText.textContent = text;
-    statusEl.classList.toggle('blocked', !!blocked);
-  }
-  function setPlaceholder(state, text){
-    // state: 'idle' | 'searching' | 'hidden' (kept name for minimal diff elsewhere)
-    if (state === 'hidden' || state === false){
-      placeholder.style.display = 'none';
-      remoteVideo.style.display = 'block';
-      return;
-    }
-    placeholder.style.display = 'flex';
-    remoteVideo.style.display = 'none';
-    if (state === 'searching' || state === true){
-      phIdle.style.display = 'none';
-      phSearching.style.display = 'flex';
-      if (text && placeholderText) placeholderText.textContent = text;
-    } else {
-      phIdle.style.display = 'flex';
-      phSearching.style.display = 'none';
-    }
-  }
-
-  function addChatMsg(who, text, mine){
-    const row = document.createElement('div');
-    row.className = 'vcapp-msg' + (mine ? ' me' : (who === 'system' ? ' system' : ''));
-    if (who === 'system'){
-      row.innerHTML = '<div class="bubble"></div>';
-      row.querySelector('.bubble').textContent = text;
-    } else {
-      row.innerHTML = '<div class="who"></div><div class="bubble"></div>';
-      row.querySelector('.who').textContent = mine ? 'You' : 'Stranger';
-      row.querySelector('.bubble').textContent = text;
-    }
-    chatLog.appendChild(row);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
-
-  // ---- Auth ----
-  // Two tiers, on purpose:
-  //  - Anonymous auth fires immediately for every visitor. It's *only* used to
-  //    give everyone a uid so presence/online-count works for casual browsers,
-  //    matching "no account required" in the marketing copy, and to let people
-  //    browse the marketing/info section freely.
-  //  - Google sign-in is still required to actually start a call or open
-  //    Community Chat, since that's where we collect the 18+ / community-rules
-  //    confirmation. The header UI and account chip only reflect real
-  //    (non-anonymous) sign-in.
-  let authReady = false;
-  let authReadyResolve;
-  const authReadyPromise = new Promise((res) => { authReadyResolve = res; });
-  let signingInAnon = false;
-  let pendingCommunityRedirect = false; // true while the overlay is open specifically to gate Community Chat
-
-  // Separate from authReadyPromise on purpose: authReadyPromise resolves the
-  // moment onAuthStateChanged fires ONCE, which for a fresh visitor is the
-  // very first (user === null) callback — before signInAnonymously() has
-  // actually produced a uid. Anything awaiting authReadyPromise back then
-  // (ensureAnyAuth/touchPresence) would read myUid as null, skip its write,
-  // and the "people online" count would sit on "…" until the next 15s
-  // heartbeat happened to land after anonymous auth finished — which is
-  // exactly the "stuck count" symptom. uidReadyPromise instead resolves
-  // only once we actually HAVE a uid (anonymous or real), so the very first
-  // presence write and count query run with real auth.
-  let uidReadyResolve;
-  const uidReadyPromise = new Promise((res) => { uidReadyResolve = res; });
-  let uidResolved = false;
-
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      myUid = user.uid;
-      myUser = user;
-      if (!uidResolved) { uidResolved = true; uidReadyResolve(myUid); }
-
-      if (!user.isAnonymous) {
-        db.collection('users').doc(user.uid).set({
-          displayName: user.displayName || null,
-          email: user.email || null,
-          photoURL: user.photoURL || null,
-          lastSignInAt: FieldValue.serverTimestamp(),
-          createdAt: FieldValue.serverTimestamp()
-        }, { merge: true }).catch((err) => console.error('user profile write failed:', err));
-        renderSignedIn(user);
-        closeAuthOverlay();
-        if (pendingCommunityRedirect) {
-          pendingCommunityRedirect = false;
-          window.location.href = '/community';
-        }
-      } else {
-        renderSignedOut();
-      }
-    } else {
-      myUid = null;
-      myUser = null;
-      renderSignedOut();
-      // Nobody signed in yet on this tab — get an anonymous uid right away so
-      // presence/online-count starts working immediately, without forcing the
-      // Google sign-in prompt on every casual visitor.
-      if (!signingInAnon) {
-        signingInAnon = true;
-        auth.signInAnonymously()
-          .catch((err) => console.error('anonymous sign-in failed:', err))
-          .finally(() => { signingInAnon = false; });
-      }
-    }
-    if (!authReady) { authReady = true; authReadyResolve(); }
-  });
-
-  function renderSignedIn(user){
-    navSignIn.style.display = 'none';
-    navGetStarted.style.display = 'none';
-    navAccount.classList.add('show');
-    navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=1E4FD8&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
-    navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
-  }
-  function renderSignedOut(){
-    navSignIn.style.display = '';
-    navGetStarted.style.display = '';
-    navAccount.classList.remove('show');
-    navAccountMenu.classList.remove('open');
-  }
-
-  function openAuthOverlay(message){
-    authError.classList.remove('show');
-    if (message) { authError.textContent = message; authError.classList.add('show'); }
-    authOverlay.classList.add('open');
-  }
-  function closeAuthOverlay(){
-    authOverlay.classList.remove('open');
-    pendingCommunityRedirect = false;
-  }
-
-  authAgeCheck.addEventListener('change', () => {
-    authGoogleBtn.disabled = !authAgeCheck.checked;
-  });
-
-  authGoogleBtn.addEventListener('click', async () => {
-    if (!authAgeCheck.checked) return;
-    authGoogleBtn.disabled = true;
-    authError.classList.remove('show');
-    try {
-      if (myUser && myUser.isAnonymous) {
-        // Upgrade the existing anonymous session so the same uid (and any
-        // presence/history tied to it) carries over into the Google account.
-        try {
-          await myUser.linkWithPopup(googleProvider);
-        } catch (linkErr) {
-          if (linkErr && linkErr.code === 'auth/credential-already-in-use') {
-            await auth.signInWithPopup(googleProvider);
-          } else {
-            throw linkErr;
-          }
-        }
-      } else {
-        await auth.signInWithPopup(googleProvider);
-      }
-      // onAuthStateChanged handles the rest (closes overlay, updates header,
-      // and redirects to /community if that's what triggered the overlay).
-    } catch (err) {
-      console.error('Google sign-in failed:', err);
-      const code = err && err.code ? err.code : '';
-      let msg = 'Sign-in failed. Please try again.';
-      if (code === 'auth/popup-closed-by-user') msg = 'Sign-in window closed — try again.';
-      else if (code === 'auth/popup-blocked') msg = 'Your browser blocked the sign-in popup — allow popups and try again.';
-      else if (code === 'auth/unauthorized-domain') msg = 'This domain isn\'t authorized for sign-in yet (Firebase Console → Authentication → Settings → Authorized domains).';
-      openAuthOverlay(msg);
-    } finally {
-      authGoogleBtn.disabled = !authAgeCheck.checked;
-    }
-  });
-
-  navSignIn.addEventListener('click', (e) => { e.preventDefault(); openAuthOverlay(); });
-  navGetStarted.addEventListener('click', (e) => { e.preventDefault(); openAuthOverlay(); });
-  navAccount.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navAccountMenu.classList.toggle('open');
-  });
-  document.addEventListener('click', () => navAccountMenu.classList.remove('open'));
-  navSignOutBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    await endCall();
-    auth.signOut();
-  });
-
-  // ---- Community Chat nav link: same sign-in gate as Start, before navigating away ----
-  if (navCommunityLink) {
-    navCommunityLink.addEventListener('click', async (e) => {
-      e.preventDefault();
-      if (!authReady) await authReadyPromise;
-      if (myUid && myUser && !myUser.isAnonymous) {
-        window.location.href = '/community';
-        return;
-      }
-      pendingCommunityRedirect = true;
-      document.getElementById('vcAuthTitle').textContent = 'Sign in to join Community Chat';
-      document.getElementById('vcAuthSubtitle').textContent = 'Create a free account with Google to join the community conversation.';
-      openAuthOverlay();
-    });
-  }
-
-  // Waits until we know the auth state, then makes sure a *real* (non-anonymous)
-  // Google account is signed in before letting them into matching/calling —
-  // prompts the sign-in overlay instead of silently letting anonymous auth
-  // (which now exists for every visitor) count as "signed in" here.
-  async function ensureAuth(promptOnMissing){
-    if (promptOnMissing === undefined) promptOnMissing = true;
-    if (!authReady) await authReadyPromise;
-    if (myUid && myUser && !myUser.isAnonymous) return myUid;
-    if (promptOnMissing) {
-      document.getElementById('vcAuthTitle').textContent = 'Sign in to FriendHub';
-      document.getElementById('vcAuthSubtitle').textContent = 'Create a free account with Google to start meeting new people.';
-      openAuthOverlay();
-    }
-    throw new Error('sign-in-required');
-  }
-
-  // Just needs *some* uid (anonymous is fine) — used for presence/online-count
-  // so casual visitors are counted without being pushed through Google sign-in.
-  // Waits for uidReadyPromise (a real uid), not authReadyPromise (just "we
-  // heard back once") — see the comment above where it's defined.
-  async function ensureAnyAuth(){
-    return uidReadyPromise;
-  }
-
-  // ---- live presence: every visitor heartbeats a doc; count = docs updated in the last 30s ----
-  const PRESENCE_HEARTBEAT_MS = 15000;  // how often we refresh our own presence doc
-  const PRESENCE_STALE_MS = 30000;      // a doc older than this is treated as "gone" (closed tab, dead connection, etc.)
-  let presenceState = 'browsing';       // browsing | waiting | in-call
-
-  function showOnlineDebug(msg){
-    if (!onlineDebugEl) return;
-    onlineDebugEl.textContent = '(' + msg + ')';
-    onlineDebugEl.style.display = 'inline';
-  }
-  function clearOnlineDebug(){
-    if (!onlineDebugEl) return;
-    onlineDebugEl.style.display = 'none';
-  }
-
-  async function touchPresence(state){
-    if (state) presenceState = state;
-    const uid = await ensureAnyAuth();
-    if (!uid) return; // anonymous sign-in hasn't resolved yet — next heartbeat retries
-    try {
-      await db.collection('presence').doc(uid).set({
-        state: presenceState,
-        updatedAt: FieldValue.serverTimestamp()
-      }, { merge: true });
-      clearOnlineDebug();
-    } catch (err) {
-      console.error('presence heartbeat failed:', err);
-      showOnlineDebug('presence write failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
-    }
-  }
-
-  function refreshOnlineCount(){
-    if (!onlineCountEl && !infoOnlineCountEl && !navOnlineCountEl && !footOnlineCountEl) return;
-    const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - PRESENCE_STALE_MS);
-    db.collection('presence').where('updatedAt', '>', cutoff).get().then((snap) => {
-      // Using snap.size instead of the .count() aggregation shorthand — that
-      // API isn't available in every SDK build (was throwing
-      // "db.collection(...).count is not a function" and silently killing
-      // every refresh). Plain .get() + snap.size works everywhere and is
-      // plenty cheap at the scale of a presence collection like this.
-      const text = snap.size.toLocaleString();
-      if (onlineCountEl) onlineCountEl.textContent = text;
-      if (infoOnlineCountEl) infoOnlineCountEl.textContent = text;
-      if (navOnlineCountEl) navOnlineCountEl.textContent = text;
-      clearOnlineDebug();
-    }).catch((err) => {
-      // Surface this loudly — a silently-swallowed error here is exactly how a fake
-      // number keeps showing forever. Check: (1) Anonymous auth enabled in Firebase
-      // Console → Authentication → Sign-in method, (2) Firestore rules allow
-      // `read` on /presence for signed-in users, (3) this file is the one actually
-      // deployed (hard-refresh / check the deployed source).
-      if (onlineCountEl) onlineCountEl.textContent = '—';
-      if (infoOnlineCountEl) infoOnlineCountEl.textContent = '—';
-      if (navOnlineCountEl) navOnlineCountEl.textContent = '—';
-      if (footOnlineCountEl) footOnlineCountEl.textContent = '—';
-      if (!myUid && err && err.code === 'permission-denied') return; // expected in the instant before anonymous auth resolves
-      console.error('[FriendHub] online count query failed — number will stay stuck until this is fixed:', err);
-      showOnlineDebug('count query failed: ' + (err && err.code ? err.code : err && err.message ? err.message : 'unknown'));
-    });
-  }
-
-  // Mark ourselves present the moment the page loads — not just once a call starts —
-  // so the count reflects everyone actually browsing the site right now. We wait for
-  // the first touchPresence (which waits on anonymous auth) before the first count query,
-  // since the query needs request.auth != null to pass the Firestore rules.
-  touchPresence('browsing').then(refreshOnlineCount);
-  setInterval(() => touchPresence(), PRESENCE_HEARTBEAT_MS);
-  setInterval(refreshOnlineCount, 5000);
-
-  // Best-effort cleanup when the tab actually closes (not required for accuracy —
-  // the count only ever includes docs heartbeated within the last 30s regardless —
-  // but this keeps the collection tidy). Pair this with a Firestore TTL policy on
-  // the `updatedAt` field (Firebase Console → Firestore → TTL) to auto-delete
-  // abandoned docs after a day or two, since a stopped heartbeat alone won't remove them.
-  window.addEventListener('pagehide', () => {
-    if (myUid) db.collection('presence').doc(myUid).delete().catch(() => {});
-  });
-
-  // ---- Enable Camera (pre-call preview): grabs the stream early so "You" shows live video ----
-  enableCameraBtn.addEventListener('click', async () => {
-    if (localStream) return;
-    enableCameraBtn.disabled = true;
-    try {
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      localVideo.srcObject = localStream;
-      localVideo.style.display = 'block';
-      localPlaceholder.style.display = 'none';
-      setStatus('CAMERA/MIC READY', false);
-    } catch (err) {
-      setStatus('CAMERA/MIC BLOCKED', true);
-      console.error('getUserMedia failed:', err);
-    } finally {
-      enableCameraBtn.disabled = false;
-    }
-  });
-
-  // ---- Press Start (inside the "Ready to Connect?" panel) just triggers the main Start button ----
-  pressStartBtn.addEventListener('click', () => startBtn.click());
-
-  // ---- start button: get camera/mic, mark presence, join the waiting pool ----
-  startBtn.addEventListener('click', async () => {
-    if (inCall || matching) return;
-    startBtn.disabled = true;
-
-    if (!localStream) {
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localVideo.srcObject = localStream;
-        localVideo.style.display = 'block';
-        localPlaceholder.style.display = 'none';
-        setStatus('CAMERA/MIC READY', false);
-      } catch (err) {
-        setStatus('CAMERA/MIC BLOCKED', true);
-        startBtn.disabled = false;
-        console.error('getUserMedia failed:', err);
-        return;
-      }
-    }
-
-    // Fast path: anonymous auth is already running for every visitor.
-    try {
-      await ensureAnyAuth();
-      if (!myUid) throw new Error('uid-not-ready');
-    } catch (err) {
-      startBtn.disabled = false;
-      console.error('[FriendHub] anonymous auth is not ready:', err);
-      return;
-    }
-
-    setPlaceholder('searching', 'looking for someone to chat with…');
-    matching = true;
-    await touchPresence('waiting');
-
-    try {
-      await db.collection('waitingPool').doc(myUid).set({
-        createdAt: FieldValue.serverTimestamp()
-      });
-    } catch (err) {
-      console.error('[FriendHub] waiting pool write failed:', err);
-      matching = false;
-      startBtn.disabled = false;
-      setPlaceholder('idle');
-      return;
-    }
-
-    // Someone else may match this user. The call is only marked "active"
-    // after the caller has written the offer, so the callee never races an
-    // incomplete call document.
-    unsubIncomingCalls = db.collection('calls')
-      .where('participants', 'array-contains', myUid)
-      .where('status', '==', 'active')
-      .onSnapshot((snap) => {
-        snap.docChanges().forEach((change) => {
-          if (change.type !== 'added' || inCall) return;
-          const data = change.doc.data();
-          const isCaller = data.caller === myUid;
-          enterCall(
-            change.doc.id,
-            isCaller ? 'caller' : 'callee',
-            isCaller ? data.callee : data.caller
-          ).catch((err) => console.error('[FriendHub] enterCall failed:', err));
-        });
-      }, (err) => console.error('[FriendHub] incoming call listener failed:', err));
-
-    // Do not run overlapping match queries. One snapshot can fire several
-    // times while Firestore is updating the pool.
-    tryMatch();
-
-    unsubWaitingPool = db.collection('waitingPool')
-      .onSnapshot(() => {
-        if (matching && !inCall) scheduleTryMatch();
-      }, (err) => console.error('[FriendHub] waiting pool listener failed:', err));
-  });
-
-  function scheduleTryMatch() {
-    if (matchRetryTimer || matchInProgress || !matching || inCall) return;
-    matchRetryTimer = setTimeout(() => {
-      matchRetryTimer = null;
-      tryMatch().catch((err) => console.error('[FriendHub] match retry failed:', err));
-    }, 50);
-  }
-
-  async function tryMatch() {
-    if (!matching || inCall || matchInProgress || !myUid) return;
-    matchInProgress = true;
-
-    try {
-      const cutoff = Date.now() - WAITING_STALE_MS;
-      const candidates = await db.collection('waitingPool')
-        .orderBy('createdAt')
-        .limit(20)
-        .get();
-
-      for (const doc of candidates.docs) {
-        if (!matching || inCall) break;
-        if (doc.id === myUid) continue;
-
-        const data = doc.data();
-        const ts = data.createdAt;
-        if (ts && ts.toMillis && ts.toMillis() < cutoff) continue;
-
-        const otherUid = doc.id;
-
-        try {
-          const newCallId = await db.runTransaction(async (tx) => {
-            const meRef = db.collection('waitingPool').doc(myUid);
-            const otherRef = db.collection('waitingPool').doc(otherUid);
-            const meSnap = await tx.get(meRef);
-            const otherSnap = await tx.get(otherRef);
-
-            if (!meSnap.exists || !otherSnap.exists) {
-              throw new Error('already-taken');
-            }
-
-            const callRef = db.collection('calls').doc();
-
-            // Keep the call hidden from the callee until the caller has
-            // completed WebRTC offer creation.
-            tx.set(callRef, {
-              participants: [myUid, otherUid],
-              caller: myUid,
-              callee: otherUid,
-              status: 'waiting',
-              createdAt: FieldValue.serverTimestamp()
-            });
-            tx.delete(meRef);
-            tx.delete(otherRef);
-
-            return callRef.id;
-          });
-
-          await enterCall(newCallId, 'caller', otherUid);
-          return;
-        } catch (e) {
-          // Another browser won the race; immediately try the next candidate.
-          continue;
-        }
-      }
-    } finally {
-      matchInProgress = false;
-      if (matching && !inCall) scheduleTryMatch();
-    }
-  }
-
-  async function enterCall(id, myRole, matchedUid) {
-    if (inCall) return;
-
-    inCall = true;
-    matching = false;
-    callId = id;
-    role = myRole;
-    otherUid = matchedUid || null;
-
-    if (matchRetryTimer) {
-      clearTimeout(matchRetryTimer);
-      matchRetryTimer = null;
-    }
-    if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
-    if (unsubIncomingCalls) { unsubIncomingCalls(); unsubIncomingCalls = null; }
-
-    db.collection('waitingPool').doc(myUid).delete().catch(() => {});
-    touchPresence('in-call');
-
-    setPlaceholder('hidden');
-    addChatMsg('system', "Connecting you to a stranger…");
-
-    pc = new RTCPeerConnection(RTC_CONFIG);
-    localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
-
-    let remoteDescriptionReady = false;
-    const pendingRemoteCandidates = [];
-
-    pc.onconnectionstatechange = () => {
-      const state = pc.connectionState;
-      console.log('[FriendHub] WebRTC connection state:', state);
-
-      if (state === 'connected') {
-        addChatMsg('system', 'Connected. Say hi!');
-      } else if (state === 'failed') {
-        addChatMsg('system', 'Connection failed. Trying another person…');
-        endCall(true).then(() => {
-          startBtn.click();
-        }).catch(() => {});
-      }
-    };
-
-    pc.oniceconnectionstatechange = () => {
-      console.log('[FriendHub] ICE state:', pc.iceConnectionState);
-    };
-
-    pc.ontrack = (event) => {
-      const stream = event.streams && event.streams[0];
-      if (!stream) return;
-      remoteVideo.srcObject = stream;
-      remoteVideo.style.display = 'block';
-      placeholder.style.display = 'none';
-    };
-
-    const callRef = db.collection('calls').doc(callId);
-    const myCandidates = callRef.collection(
-      role === 'caller' ? 'callerCandidates' : 'calleeCandidates'
-    );
-    const theirCandidates = callRef.collection(
-      role === 'caller' ? 'calleeCandidates' : 'callerCandidates'
-    );
-
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        myCandidates.add(event.candidate.toJSON())
-          .catch((err) => console.error('[FriendHub] ICE candidate write failed:', err));
-      }
-    };
-
-    // Always listen for the other side's candidates, but don't feed them to
-    // WebRTC until the remote SDP is installed. The old code silently dropped
-    // candidates that arrived too early.
-    unsubCandidates = theirCandidates.onSnapshot((snap) => {
-      snap.docChanges().forEach((change) => {
-        if (change.type !== 'added') return;
-        const candidate = new RTCIceCandidate(change.doc.data());
-
-        if (!remoteDescriptionReady) {
-          pendingRemoteCandidates.push(candidate);
-        } else {
-          pc.addIceCandidate(candidate).catch((err) =>
-            console.error('[FriendHub] addIceCandidate failed:', err)
-          );
-        }
-      });
-    }, (err) => console.error('[FriendHub] ICE listener failed:', err));
-
-    async function setRemoteAndFlush(description) {
-      if (!description || remoteDescriptionReady) return;
-      await pc.setRemoteDescription(new RTCSessionDescription(description));
-      remoteDescriptionReady = true;
-
-      while (pendingRemoteCandidates.length) {
-        const candidate = pendingRemoteCandidates.shift();
-        try {
-          await pc.addIceCandidate(candidate);
-        } catch (err) {
-          console.error('[FriendHub] buffered ICE candidate failed:', err);
-        }
-      }
-    }
-
-    if (role === 'caller') {
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-
-      // Only now make the call visible to the callee. This removes the
-      // old race where the callee could read the call before "offer" existed.
-      await callRef.update({
-        offer: { type: offer.type, sdp: offer.sdp },
-        status: 'active'
-      });
-
-      unsubCallDoc = callRef.onSnapshot(async (snap) => {
-        const data = snap.data();
-        if (!data || !data.answer || remoteDescriptionReady) return;
-        try {
-          await setRemoteAndFlush(data.answer);
-        } catch (err) {
-          console.error('[FriendHub] failed to set answer:', err);
-        }
-      }, (err) => console.error('[FriendHub] call listener failed:', err));
-    } else {
-      // The caller only publishes "active" after the offer is present, so
-      // this read should contain an offer. Keep a defensive retry anyway.
-      let data = (await callRef.get()).data();
-      let attempts = 0;
-
-      while ((!data || !data.offer) && attempts < 20 && !inCall) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        data = (await callRef.get()).data();
-        attempts++;
-      }
-
-      if (!data || !data.offer) {
-        throw new Error('offer-timeout');
-      }
-
-      await setRemoteAndFlush(data.offer);
-
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      await callRef.update({
-        answer: { type: answer.type, sdp: answer.sdp }
-      });
-    }
-
-    unsubMessages = callRef.collection('messages').orderBy('createdAt').onSnapshot((snap) => {
-      snap.docChanges().forEach((change) => {
-        if (change.type === 'added') {
-          const m = change.doc.data();
-          if (m.sender !== myUid) addChatMsg('them', m.text, false);
-        }
-      });
-    }, (err) => console.error('[FriendHub] message listener failed:', err));
-  }
-
-  chatSendBtn.addEventListener('click', sendChat);
-  chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
-  function sendChat(){
-    const text = chatInput.value.trim();
-    if (!text || !inCall || !callId) return;
-    chatInput.value = '';
-    addChatMsg('me', text, true);
-    db.collection('calls').doc(callId).collection('messages').add({
-      sender: myUid, text, createdAt: FieldValue.serverTimestamp()
-    });
-  }
-
-  // ---- report modal ----
-  const reportOverlay = document.getElementById('vcReportOverlay');
-  const reportSubmitBtn = document.getElementById('vcReportSubmitBtn');
-  const reportError = document.getElementById('vcReportError');
-  const reportDetails = document.getElementById('vcReportDetails');
-  const reportOpenBtn = document.getElementById('vcReportOpenBtn');
-
-  document.querySelectorAll('input[name="vcReportReason"]').forEach((r) => {
-    r.addEventListener('change', () => {
-      reportSubmitBtn.disabled = false;
-    });
-  });
-
-  if (reportOpenBtn) {
-    reportOpenBtn.addEventListener('click', () => {
-      if (!inCall) {
-        addChatMsg('system', 'Start a call before reporting someone.');
-        return;
-      }
-
-      reportError.classList.remove('show');
-      reportError.textContent = '';
-      reportSubmitBtn.disabled = true;
-      reportDetails.value = '';
-      document.querySelectorAll('input[name="vcReportReason"]').forEach((r) => {
-        r.checked = false;
-      });
-      reportOverlay.classList.add('active');
-    });
-  }
-
-  window.closeReportModal = function(e){
-    if (e && e.target && e.target.id !== 'vcReportOverlay') return;
-    reportOverlay.classList.remove('active');
-  };
-
-  // Capture the stranger's actual WebRTC video frame and upload it with the report.
-  // html2canvas cannot reliably capture <video> pixels, so we draw remoteVideo to a canvas.
-  async function captureStrangerFrame(){
-    if (!remoteVideo) throw new Error('Remote video element not found.');
-    if (remoteVideo.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
-      throw new Error('Stranger video is not ready.');
-    }
-    if (!remoteVideo.videoWidth || !remoteVideo.videoHeight) {
-      throw new Error('Stranger video has no frame dimensions.');
-    }
-
-    const canvas = document.createElement('canvas');
-    const maxWidth = 1280;
-    const scale = Math.min(1, maxWidth / remoteVideo.videoWidth);
-    canvas.width = Math.max(1, Math.round(remoteVideo.videoWidth * scale));
-    canvas.height = Math.max(1, Math.round(remoteVideo.videoHeight * scale));
-
-    const ctx = canvas.getContext('2d', {alpha:false});
-    if (!ctx) throw new Error('Could not create canvas context.');
-    ctx.drawImage(remoteVideo, 0, 0, canvas.width, canvas.height);
-
-    return new Promise((resolve, reject) => {
-      canvas.toBlob(blob => {
-        if (!blob || blob.size === 0) return reject(new Error('Screenshot is empty.'));
-        resolve(blob);
-      }, 'image/jpeg', 0.82);
-    });
-  }
-
-  async function uploadReportScreenshot(blob){
-    const safeCallId = String(callId || 'unknown').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const safeUid = String(otherUid || 'unknown').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const path = `reportScreenshots/${safeCallId}/${Date.now()}_${safeUid}.jpg`;
-    const ref = storage.ref().child(path);
-    await ref.put(blob, {contentType:'image/jpeg', cacheControl:'private,max-age=3600'});
-    return ref.getDownloadURL();
-  }
-
-  window.submitReport = async function(){
-    const checked = document.querySelector('input[name="vcReportReason"]:checked');
-
-    if (!checked) {
-      reportError.textContent = 'Please select a reason for the report.';
-      reportError.classList.add('show');
-      return;
-    }
-
-    if (!inCall) {
-      reportError.textContent = 'The call has already ended. Please start another call.';
-      reportError.classList.add('show');
-      return;
-    }
-
-    reportSubmitBtn.disabled = true;
-    reportSubmitBtn.textContent = 'Submitting...';
-    reportError.classList.remove('show');
-    reportError.textContent = '';
-
-    let screenshotUrl = null;
-
-    // Try to capture and upload the screenshot first.
-    // A screenshot failure must NOT prevent the report itself from being sent.
-    try {
-      const screenshotBlob = await captureStrangerFrame();
-
-      if (!screenshotBlob || screenshotBlob.size === 0) {
-        throw new Error('Screenshot blob is empty.');
-      }
-
-      screenshotUrl = await uploadReportScreenshot(screenshotBlob);
-      console.log('[FriendHub] report screenshot uploaded:', screenshotUrl);
-
-    } catch (shotErr) {
-      console.warn('[FriendHub] report screenshot failed:', shotErr);
-      screenshotUrl = null;
-    }
-
-    try {
-      await db.collection('reports').add({
-        reporterUid: myUid,
-        reportedUid: otherUid || null,
-        callId: callId || null,
-        reason: checked.value,
-        details: reportDetails.value.trim().slice(0, 500),
-        screenshotUrl: screenshotUrl,
-        screenshotCapturedAt: screenshotUrl ? FieldValue.serverTimestamp() : null,
-        createdAt: FieldValue.serverTimestamp()
-      });
-
-      reportOverlay.classList.remove('active');
-
-      addChatMsg(
-        'system',
-        screenshotUrl
-          ? 'Report submitted with a screenshot — thanks. Ending this call.'
-          : 'Report submitted — thanks. Ending this call.'
-      );
-
-      await endCall();
-
-    } catch (err) {
-      console.error('[FriendHub] report submit failed:', err);
-
-      reportError.textContent =
-        'Could not submit the report. Please try again.';
-
-      reportError.classList.add('show');
-      reportSubmitBtn.disabled = false;
-      reportSubmitBtn.textContent = 'Submit report';
-      return;
-    }
-
-    reportSubmitBtn.disabled = false;
-    reportSubmitBtn.textContent = 'Submit report';
-  };
-
-  async function endCall(goIdle){
-    if (unsubIncomingCalls) { unsubIncomingCalls(); unsubIncomingCalls = null; }
-    if (unsubCallDoc) { unsubCallDoc(); unsubCallDoc = null; }
-    if (unsubCandidates) { unsubCandidates(); unsubCandidates = null; }
-    if (unsubMessages) { unsubMessages(); unsubMessages = null; }
-    if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
-    if (matchRetryTimer) { clearTimeout(matchRetryTimer); matchRetryTimer = null; }
-    matchInProgress = false;
-
-    if (pc) { pc.close(); pc = null; }
-    // Keep the local camera stream alive so reconnecting does not require
-    // another permission prompt or another getUserMedia negotiation.
-    if (localStream) {
-      localVideo.srcObject = localStream;
-      localVideo.style.display = 'block';
-      localPlaceholder.style.display = 'none';
-    } else {
-      localVideo.srcObject = null;
-      localVideo.style.display = 'none';
-      localPlaceholder.style.display = 'flex';
-    }
-    remoteVideo.srcObject = null;
-    setPlaceholder('idle');
-    chatLog.innerHTML = '';
-
-    if (myUid) {
-      db.collection('waitingPool').doc(myUid).delete().catch(() => {});
-      if (callId) db.collection('calls').doc(callId).update({ status: 'ended' }).catch(() => {});
-      touchPresence('browsing');
-    }
-
-    callId = null; role = null; otherUid = null; matching = false; inCall = false;
-    setStatus(localStream ? 'CAMERA/MIC READY' : 'CAMERA/MIC BLOCKED', !localStream);
-    startBtn.disabled = false;
-  }
-
-  stopBtn.addEventListener('click', () => endCall());
-  leaveBtn.addEventListener('click', () => endCall());
-  window.addEventListener('beforeunload', () => {
-    if (myUid) {
-      navigator.sendBeacon && db.collection('waitingPool').doc(myUid).delete().catch(() => {});
-    }
-  });
-})();
-</script>
+      vcGenderBtn.s
