@@ -2315,13 +2315,23 @@
   // wifi, etc.) add a TURN server here too, e.g. one from Twilio or metered.ca:
   // { urls: 'turn:your.turn.server:3478', username: '...', credential: '...' }
   const RTC_CONFIG = {
+    iceCandidatePoolSize: 10,
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' }
+      // IMPORTANT: add a TURN server here for users behind strict NAT/firewalls.
+      // Example:
+      // {
+      //   urls: 'turn:YOUR-TURN-HOST:3478',
+      //   username: 'YOUR-TURN-USERNAME',
+      //   credential: 'YOUR-TURN-CREDENTIAL'
+      // }
     ]
   };
 
-  const WAITING_STALE_MS = 20000; // ignore waiting-pool entries older than this (dead tabs)
+  const WAITING_STALE_MS = 30000;
+  let matchInProgress = false;
+  let matchRetryTimer = null;
 
   // ---- DOM refs ----
   const startBtn = document.getElementById('vcStartBtn');
@@ -2704,6 +2714,7 @@
   startBtn.addEventListener('click', async () => {
     if (inCall || matching) return;
     startBtn.disabled = true;
+
     if (!localStream) {
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -2719,147 +2730,277 @@
       }
     }
 
+    // Fast path: anonymous auth is already running for every visitor.
     try {
-      await ensureAuth(); // prompts the Google sign-in overlay if not signed in
+      await ensureAnyAuth();
+      if (!myUid) throw new Error('uid-not-ready');
     } catch (err) {
       startBtn.disabled = false;
+      console.error('[FriendHub] anonymous auth is not ready:', err);
       return;
     }
+
     setPlaceholder('searching', 'looking for someone to chat with…');
     matching = true;
-
     await touchPresence('waiting');
-    await db.collection('waitingPool').doc(myUid).set({ createdAt: FieldValue.serverTimestamp() });
 
-    // Someone else's client may pair me into a call — watch for that.
+    try {
+      await db.collection('waitingPool').doc(myUid).set({
+        createdAt: FieldValue.serverTimestamp()
+      });
+    } catch (err) {
+      console.error('[FriendHub] waiting pool write failed:', err);
+      matching = false;
+      startBtn.disabled = false;
+      setPlaceholder('idle');
+      return;
+    }
+
+    // Someone else may match this user. The call is only marked "active"
+    // after the caller has written the offer, so the callee never races an
+    // incomplete call document.
     unsubIncomingCalls = db.collection('calls')
       .where('participants', 'array-contains', myUid)
       .where('status', '==', 'active')
       .onSnapshot((snap) => {
         snap.docChanges().forEach((change) => {
-          if (change.type === 'added' && !inCall) {
-            const data = change.doc.data();
-            const isCaller = data.caller === myUid;
-            enterCall(
-              change.doc.id,
-              isCaller ? 'caller' : 'callee',
-              isCaller ? data.callee : data.caller
-            );
-          }
+          if (change.type !== 'added' || inCall) return;
+          const data = change.doc.data();
+          const isCaller = data.caller === myUid;
+          enterCall(
+            change.doc.id,
+            isCaller ? 'caller' : 'callee',
+            isCaller ? data.callee : data.caller
+          ).catch((err) => console.error('[FriendHub] enterCall failed:', err));
         });
-      });
+      }, (err) => console.error('[FriendHub] incoming call listener failed:', err));
 
-    // Try to match immediately, then re-try whenever the pool changes.
+    // Do not run overlapping match queries. One snapshot can fire several
+    // times while Firestore is updating the pool.
     tryMatch();
-    unsubWaitingPool = db.collection('waitingPool').onSnapshot(() => {
-      if (matching && !inCall) tryMatch();
-    });
+
+    unsubWaitingPool = db.collection('waitingPool')
+      .onSnapshot(() => {
+        if (matching && !inCall) scheduleTryMatch();
+      }, (err) => console.error('[FriendHub] waiting pool listener failed:', err));
   });
 
-  async function tryMatch(){
-    if (!matching || inCall) return;
-    const cutoff = Date.now() - WAITING_STALE_MS;
-    const candidates = await db.collection('waitingPool')
-      .orderBy('createdAt')
-      .limit(10)
-      .get();
+  function scheduleTryMatch() {
+    if (matchRetryTimer || matchInProgress || !matching || inCall) return;
+    matchRetryTimer = setTimeout(() => {
+      matchRetryTimer = null;
+      tryMatch().catch((err) => console.error('[FriendHub] match retry failed:', err));
+    }, 50);
+  }
 
-    for (const doc of candidates.docs) {
-      if (doc.id === myUid) continue;
-      const ts = doc.data().createdAt;
-      if (ts && ts.toMillis && ts.toMillis() < cutoff) continue; // stale/dead tab
+  async function tryMatch() {
+    if (!matching || inCall || matchInProgress || !myUid) return;
+    matchInProgress = true;
 
-      const otherUid = doc.id;
-      try {
-        const newCallId = await db.runTransaction(async (tx) => {
-          const meRef = db.collection('waitingPool').doc(myUid);
-          const otherRef = db.collection('waitingPool').doc(otherUid);
-          const meSnap = await tx.get(meRef);
-          const otherSnap = await tx.get(otherRef);
-          if (!meSnap.exists || !otherSnap.exists) {
-            throw new Error('already-taken');
-          }
-          const callRef = db.collection('calls').doc();
-          tx.set(callRef, {
-            participants: [myUid, otherUid],
-            caller: myUid,
-            callee: otherUid,
-            status: 'active',
-            createdAt: FieldValue.serverTimestamp()
+    try {
+      const cutoff = Date.now() - WAITING_STALE_MS;
+      const candidates = await db.collection('waitingPool')
+        .orderBy('createdAt')
+        .limit(20)
+        .get();
+
+      for (const doc of candidates.docs) {
+        if (!matching || inCall) break;
+        if (doc.id === myUid) continue;
+
+        const data = doc.data();
+        const ts = data.createdAt;
+        if (ts && ts.toMillis && ts.toMillis() < cutoff) continue;
+
+        const otherUid = doc.id;
+
+        try {
+          const newCallId = await db.runTransaction(async (tx) => {
+            const meRef = db.collection('waitingPool').doc(myUid);
+            const otherRef = db.collection('waitingPool').doc(otherUid);
+            const meSnap = await tx.get(meRef);
+            const otherSnap = await tx.get(otherRef);
+
+            if (!meSnap.exists || !otherSnap.exists) {
+              throw new Error('already-taken');
+            }
+
+            const callRef = db.collection('calls').doc();
+
+            // Keep the call hidden from the callee until the caller has
+            // completed WebRTC offer creation.
+            tx.set(callRef, {
+              participants: [myUid, otherUid],
+              caller: myUid,
+              callee: otherUid,
+              status: 'waiting',
+              createdAt: FieldValue.serverTimestamp()
+            });
+            tx.delete(meRef);
+            tx.delete(otherRef);
+
+            return callRef.id;
           });
-          tx.delete(meRef);
-          tx.delete(otherRef);
-          return callRef.id;
-        });
-        // matched! stop looking — enterCall for the caller side happens directly here,
-        // the callee side picks it up via the onSnapshot listener above.
-        enterCall(newCallId, 'caller', otherUid);
-        return;
-      } catch (e) {
-        // race lost (someone else grabbed this candidate, or I got grabbed) — try next / wait
-        continue;
+
+          await enterCall(newCallId, 'caller', otherUid);
+          return;
+        } catch (e) {
+          // Another browser won the race; immediately try the next candidate.
+          continue;
+        }
       }
+    } finally {
+      matchInProgress = false;
+      if (matching && !inCall) scheduleTryMatch();
     }
   }
 
-  async function enterCall(id, myRole, matchedUid){
+  async function enterCall(id, myRole, matchedUid) {
     if (inCall) return;
+
     inCall = true;
     matching = false;
     callId = id;
     role = myRole;
     otherUid = matchedUid || null;
 
+    if (matchRetryTimer) {
+      clearTimeout(matchRetryTimer);
+      matchRetryTimer = null;
+    }
     if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
+    if (unsubIncomingCalls) { unsubIncomingCalls(); unsubIncomingCalls = null; }
+
     db.collection('waitingPool').doc(myUid).delete().catch(() => {});
     touchPresence('in-call');
 
     setPlaceholder('hidden');
-    addChatMsg('system', "You've been connected to a stranger. Say hi!");
+    addChatMsg('system', "Connecting you to a stranger…");
 
     pc = new RTCPeerConnection(RTC_CONFIG);
     localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
 
+    let remoteDescriptionReady = false;
+    const pendingRemoteCandidates = [];
+
+    pc.onconnectionstatechange = () => {
+      const state = pc.connectionState;
+      console.log('[FriendHub] WebRTC connection state:', state);
+
+      if (state === 'connected') {
+        addChatMsg('system', 'Connected. Say hi!');
+      } else if (state === 'failed') {
+        addChatMsg('system', 'Connection failed. Trying another person…');
+        endCall(true).then(() => {
+          startBtn.click();
+        }).catch(() => {});
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log('[FriendHub] ICE state:', pc.iceConnectionState);
+    };
+
     pc.ontrack = (event) => {
-      remoteVideo.srcObject = event.streams[0];
+      const stream = event.streams && event.streams[0];
+      if (!stream) return;
+      remoteVideo.srcObject = stream;
       remoteVideo.style.display = 'block';
+      placeholder.style.display = 'none';
     };
 
     const callRef = db.collection('calls').doc(callId);
-    const myCandidates = callRef.collection(role === 'caller' ? 'callerCandidates' : 'calleeCandidates');
-    const theirCandidates = callRef.collection(role === 'caller' ? 'calleeCandidates' : 'callerCandidates');
+    const myCandidates = callRef.collection(
+      role === 'caller' ? 'callerCandidates' : 'calleeCandidates'
+    );
+    const theirCandidates = callRef.collection(
+      role === 'caller' ? 'calleeCandidates' : 'callerCandidates'
+    );
 
     pc.onicecandidate = (event) => {
-      if (event.candidate) myCandidates.add(event.candidate.toJSON());
+      if (event.candidate) {
+        myCandidates.add(event.candidate.toJSON())
+          .catch((err) => console.error('[FriendHub] ICE candidate write failed:', err));
+      }
     };
+
+    // Always listen for the other side's candidates, but don't feed them to
+    // WebRTC until the remote SDP is installed. The old code silently dropped
+    // candidates that arrived too early.
+    unsubCandidates = theirCandidates.onSnapshot((snap) => {
+      snap.docChanges().forEach((change) => {
+        if (change.type !== 'added') return;
+        const candidate = new RTCIceCandidate(change.doc.data());
+
+        if (!remoteDescriptionReady) {
+          pendingRemoteCandidates.push(candidate);
+        } else {
+          pc.addIceCandidate(candidate).catch((err) =>
+            console.error('[FriendHub] addIceCandidate failed:', err)
+          );
+        }
+      });
+    }, (err) => console.error('[FriendHub] ICE listener failed:', err));
+
+    async function setRemoteAndFlush(description) {
+      if (!description || remoteDescriptionReady) return;
+      await pc.setRemoteDescription(new RTCSessionDescription(description));
+      remoteDescriptionReady = true;
+
+      while (pendingRemoteCandidates.length) {
+        const candidate = pendingRemoteCandidates.shift();
+        try {
+          await pc.addIceCandidate(candidate);
+        } catch (err) {
+          console.error('[FriendHub] buffered ICE candidate failed:', err);
+        }
+      }
+    }
 
     if (role === 'caller') {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      await callRef.update({ offer: { type: offer.type, sdp: offer.sdp } });
+
+      // Only now make the call visible to the callee. This removes the
+      // old race where the callee could read the call before "offer" existed.
+      await callRef.update({
+        offer: { type: offer.type, sdp: offer.sdp },
+        status: 'active'
+      });
 
       unsubCallDoc = callRef.onSnapshot(async (snap) => {
         const data = snap.data();
-        if (data && data.answer && pc.currentRemoteDescription === null) {
-          await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        if (!data || !data.answer || remoteDescriptionReady) return;
+        try {
+          await setRemoteAndFlush(data.answer);
+        } catch (err) {
+          console.error('[FriendHub] failed to set answer:', err);
         }
-      });
+      }, (err) => console.error('[FriendHub] call listener failed:', err));
     } else {
-      const snap = await callRef.get();
-      const data = snap.data();
-      await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+      // The caller only publishes "active" after the offer is present, so
+      // this read should contain an offer. Keep a defensive retry anyway.
+      let data = (await callRef.get()).data();
+      let attempts = 0;
+
+      while ((!data || !data.offer) && attempts < 20 && !inCall) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        data = (await callRef.get()).data();
+        attempts++;
+      }
+
+      if (!data || !data.offer) {
+        throw new Error('offer-timeout');
+      }
+
+      await setRemoteAndFlush(data.offer);
+
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      await callRef.update({ answer: { type: answer.type, sdp: answer.sdp } });
-    }
-
-    unsubCandidates = theirCandidates.onSnapshot((snap) => {
-      snap.docChanges().forEach((change) => {
-        if (change.type === 'added') {
-          pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(() => {});
-        }
+      await callRef.update({
+        answer: { type: answer.type, sdp: answer.sdp }
       });
-    });
+    }
 
     unsubMessages = callRef.collection('messages').orderBy('createdAt').onSnapshot((snap) => {
       snap.docChanges().forEach((change) => {
@@ -2868,7 +3009,7 @@
           if (m.sender !== myUid) addChatMsg('them', m.text, false);
         }
       });
-    });
+    }, (err) => console.error('[FriendHub] message listener failed:', err));
   }
 
   chatSendBtn.addEventListener('click', sendChat);
@@ -2953,12 +3094,21 @@
     if (unsubCandidates) { unsubCandidates(); unsubCandidates = null; }
     if (unsubMessages) { unsubMessages(); unsubMessages = null; }
     if (unsubWaitingPool) { unsubWaitingPool(); unsubWaitingPool = null; }
+    if (matchRetryTimer) { clearTimeout(matchRetryTimer); matchRetryTimer = null; }
+    matchInProgress = false;
 
     if (pc) { pc.close(); pc = null; }
-    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-    localVideo.srcObject = null;
-    localVideo.style.display = 'none';
-    localPlaceholder.style.display = 'flex';
+    // Keep the local camera stream alive so reconnecting does not require
+    // another permission prompt or another getUserMedia negotiation.
+    if (localStream) {
+      localVideo.srcObject = localStream;
+      localVideo.style.display = 'block';
+      localPlaceholder.style.display = 'none';
+    } else {
+      localVideo.srcObject = null;
+      localVideo.style.display = 'none';
+      localPlaceholder.style.display = 'flex';
+    }
     remoteVideo.srcObject = null;
     setPlaceholder('idle');
     chatLog.innerHTML = '';
@@ -2970,7 +3120,7 @@
     }
 
     callId = null; role = null; otherUid = null; matching = false; inCall = false;
-    setStatus('CAMERA/MIC BLOCKED', true);
+    setStatus(localStream ? 'CAMERA/MIC READY' : 'CAMERA/MIC BLOCKED', !localStream);
     startBtn.disabled = false;
   }
 
