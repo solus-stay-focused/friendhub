@@ -3102,26 +3102,44 @@
 
   window.submitReport = async function(){
     const checked = document.querySelector('input[name="vcReportReason"]:checked');
-    if (!checked || !inCall) return;
+
+    if (!checked) {
+      reportError.textContent = 'Please select a reason for the report.';
+      reportError.classList.add('show');
+      return;
+    }
+
+    if (!inCall) {
+      reportError.textContent = 'The call has already ended. Please start another call.';
+      reportError.classList.add('show');
+      return;
+    }
 
     reportSubmitBtn.disabled = true;
+    reportSubmitBtn.textContent = 'Submitting...';
     reportError.classList.remove('show');
+    reportError.textContent = '';
 
+    let screenshotUrl = null;
+
+    // Try to capture and upload the screenshot first.
+    // A screenshot failure must NOT prevent the report itself from being sent.
     try {
-      // Take the snapshot BEFORE ending the call, while the stranger's video still exists.
-      let screenshotUrl = null;
-      try {
-        const screenshotBlob = await captureStrangerFrame();
-        screenshotUrl = await uploadReportScreenshot(screenshotBlob);
-        if (!screenshotUrl) throw new Error('Screenshot upload did not return a URL.');
-      } catch (shotErr) {
-        console.error('[FriendHub] report screenshot failed:', shotErr);
-        reportError.textContent = 'We could not attach the screenshot. Please try again.';
-        reportError.classList.add('show');
-        reportSubmitBtn.disabled = false;
-        return;
+      const screenshotBlob = await captureStrangerFrame();
+
+      if (!screenshotBlob || screenshotBlob.size === 0) {
+        throw new Error('Screenshot blob is empty.');
       }
 
+      screenshotUrl = await uploadReportScreenshot(screenshotBlob);
+      console.log('[FriendHub] report screenshot uploaded:', screenshotUrl);
+
+    } catch (shotErr) {
+      console.warn('[FriendHub] report screenshot failed:', shotErr);
+      screenshotUrl = null;
+    }
+
+    try {
       await db.collection('reports').add({
         reporterUid: myUid,
         reportedUid: otherUid || null,
@@ -3134,16 +3152,30 @@
       });
 
       reportOverlay.classList.remove('active');
-      addChatMsg('system', screenshotUrl
-        ? 'Report submitted with a screenshot — thanks. Ending this call.'
-        : 'Report submitted — thanks. Ending this call.');
+
+      addChatMsg(
+        'system',
+        screenshotUrl
+          ? 'Report submitted with a screenshot — thanks. Ending this call.'
+          : 'Report submitted — thanks. Ending this call.'
+      );
+
       await endCall();
+
     } catch (err) {
-      console.error('report submit failed:', err);
-      reportError.textContent = 'Could not submit report — please try again.';
+      console.error('[FriendHub] report submit failed:', err);
+
+      reportError.textContent =
+        'Could not submit the report. Please try again.';
+
       reportError.classList.add('show');
       reportSubmitBtn.disabled = false;
+      reportSubmitBtn.textContent = 'Submit report';
+      return;
     }
+
+    reportSubmitBtn.disabled = false;
+    reportSubmitBtn.textContent = 'Submit report';
   };
 
   async function endCall(goIdle){
