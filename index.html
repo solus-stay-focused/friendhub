@@ -3065,8 +3065,12 @@
   // Capture the stranger's actual WebRTC video frame and upload it with the report.
   // html2canvas cannot reliably capture <video> pixels, so we draw remoteVideo to a canvas.
   async function captureStrangerFrame(){
-    if (!remoteVideo || !remoteVideo.videoWidth || !remoteVideo.videoHeight) {
-      throw new Error('The stranger video is not ready for a screenshot.');
+    if (!remoteVideo) throw new Error('Remote video element not found.');
+    if (remoteVideo.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      throw new Error('Stranger video is not ready.');
+    }
+    if (!remoteVideo.videoWidth || !remoteVideo.videoHeight) {
+      throw new Error('Stranger video has no frame dimensions.');
     }
 
     const canvas = document.createElement('canvas');
@@ -3076,9 +3080,14 @@
     canvas.height = Math.max(1, Math.round(remoteVideo.videoHeight * scale));
 
     const ctx = canvas.getContext('2d', {alpha:false});
+    if (!ctx) throw new Error('Could not create canvas context.');
     ctx.drawImage(remoteVideo, 0, 0, canvas.width, canvas.height);
+
     return new Promise((resolve, reject) => {
-      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Could not create screenshot.')), 'image/jpeg', 0.82);
+      canvas.toBlob(blob => {
+        if (!blob || blob.size === 0) return reject(new Error('Screenshot is empty.'));
+        resolve(blob);
+      }, 'image/jpeg', 0.82);
     });
   }
 
@@ -3104,9 +3113,13 @@
       try {
         const screenshotBlob = await captureStrangerFrame();
         screenshotUrl = await uploadReportScreenshot(screenshotBlob);
+        if (!screenshotUrl) throw new Error('Screenshot upload did not return a URL.');
       } catch (shotErr) {
-        console.warn('report screenshot failed:', shotErr);
-        // Still submit the report if the browser could not capture/upload the frame.
+        console.error('[FriendHub] report screenshot failed:', shotErr);
+        reportError.textContent = 'We could not attach the screenshot. Please try again.';
+        reportError.classList.add('show');
+        reportSubmitBtn.disabled = false;
+        return;
       }
 
       await db.collection('reports').add({
