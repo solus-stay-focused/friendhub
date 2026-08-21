@@ -3,15 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Admin — FriendHub Reports</title>
+
 <meta name="robots" content="noindex, nofollow">
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%239C8CFB'/%3E%3Cstop offset='100%25' stop-color='%235142C4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M14 44a22 22 0 1 1 22 26l-7 10-2-12a22 22 0 0 1-13-24z' fill='%23fff'/%3E%3Cpath d='M86 48a22 22 0 1 0-22 26l7 10 2-12a22 22 0 0 0 13-24z' fill='%235EEAD4' fill-opacity='.88'/%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
+
 :root{
   --bg:#0B0F1A;
   --panel:#121A2C;
@@ -136,7 +140,7 @@ button:disabled{
   justify-content:center;
   gap:7px;
   text-decoration:none;
-  font-size:13.5px;
+  font-size:13px;
   font-weight:600;
   padding:9px 16px;
   border-radius:9px;
@@ -159,6 +163,21 @@ button:disabled{
   );
   border-color:transparent;
   color:#fff;
+}
+
+.btn-ban{
+  color:var(--red);
+  border-color:rgba(248,113,113,.3);
+}
+
+.btn-ban:hover{
+  background:rgba(248,113,113,.08);
+  border-color:rgba(248,113,113,.6);
+}
+
+.btn-remove:hover{
+  color:var(--red);
+  border-color:rgba(248,113,113,.4);
 }
 
 main{
@@ -215,12 +234,7 @@ main{
   border:1px solid var(--line);
   border-radius:14px;
   padding:17px 18px;
-  margin-bottom:10px;
-  transition:.15s;
-}
-
-.report-card:hover{
-  border-color:rgba(248,113,113,.35);
+  margin-bottom:12px;
 }
 
 .report-top{
@@ -255,33 +269,40 @@ main{
   font:10.5px 'IBM Plex Mono',monospace;
   color:var(--violet);
   letter-spacing:.08em;
-  margin-bottom:10px;
+  margin-bottom:11px;
   font-weight:600;
 }
 
 .info-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px 24px;
+  gap:9px 24px;
 }
 
 .info-row{
   display:flex;
-  gap:10px;
+  align-items:flex-start;
+  gap:8px;
   min-width:0;
   font:11px 'IBM Plex Mono',monospace;
-  color:var(--muted);
 }
 
-.info-row span:first-child{
-  min-width:92px;
+.info-label{
   color:var(--muted);
+  flex-shrink:0;
 }
 
-.info-row strong{
+.info-value{
   color:var(--text);
   font-weight:500;
   overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+.copy-btn{
+  padding:2px 6px;
+  font-size:10px;
+  margin-left:4px;
 }
 
 .details{
@@ -289,7 +310,7 @@ main{
   line-height:1.55;
   background:rgba(255,255,255,.03);
   border-radius:9px;
-  padding:10px;
+  padding:12px;
   white-space:pre-wrap;
   overflow-wrap:anywhere;
   margin-top:10px;
@@ -349,25 +370,6 @@ main{
   border-top:1px solid var(--line);
 }
 
-.btn-ban{
-  color:var(--red);
-  border-color:rgba(248,113,113,.3);
-}
-
-.btn-ban:hover{
-  background:rgba(248,113,113,.08);
-  border-color:rgba(248,113,113,.55);
-}
-
-.btn-remove{
-  color:var(--muted);
-}
-
-.btn-remove:hover{
-  color:var(--red);
-  border-color:rgba(248,113,113,.35);
-}
-
 .empty,
 .error{
   padding:55px 20px;
@@ -409,6 +411,7 @@ main{
   display:none;
   color:var(--red);
   font-size:13px;
+  line-height:1.5;
   margin-top:12px;
 }
 
@@ -445,13 +448,16 @@ main{
   .nav-actions .btn:first-child{
     display:none;
   }
+
 }
+
 </style>
 </head>
 
 <body>
 
 <nav class="topnav">
+
   <div class="topnav-inner">
 
     <a class="brand" href="/">
@@ -518,16 +524,14 @@ main{
         ← Blog admin
       </a>
 
-      <button
-        class="btn"
-        id="signOutBtn"
-      >
+      <button class="btn" id="signOutBtn">
         Sign out
       </button>
 
     </div>
 
   </div>
+
 </nav>
 
 
@@ -535,9 +539,7 @@ main{
 
   <div id="loginScreen">
 
-    <h2>
-      Admin sign in
-    </h2>
+    <h2>Admin sign in</h2>
 
     <p>
       Sign in with your FriendHub Google account
@@ -547,7 +549,7 @@ main{
     <button
       class="btn btn-primary"
       id="googleSignInBtn"
-      style="width:100%"
+      style="width:100%;"
     >
       Continue with Google
     </button>
@@ -559,9 +561,7 @@ main{
 
   <div id="notAdmin">
 
-    <h2>
-      This account isn't an admin
-    </h2>
+    <h2>This account isn't an admin</h2>
 
     <p>
       You are signed in, but this Google account
@@ -571,10 +571,7 @@ main{
   </div>
 
 
-  <div
-    id="reportsPage"
-    style="display:none"
-  >
+  <div id="reportsPage" style="display:none;">
 
     <div class="page-head">
 
@@ -588,9 +585,7 @@ main{
 
       <div class="page-head-copy">
 
-        <h1>
-          🚩 User reports
-        </h1>
+        <h1>🚩 User reports</h1>
 
         <p>
           Review reports submitted by FriendHub users.
@@ -652,6 +647,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
+/* =========================
+   FIREBASE
+========================= */
+
 const firebaseConfig = {
 
   apiKey:
@@ -693,109 +692,171 @@ const provider =
   new GoogleAuthProvider();
 
 
-const $ =
-  id => document.getElementById(id);
+/* =========================
+   HELPERS
+========================= */
+
+const $ = id =>
+  document.getElementById(id);
 
 
 const labels = {
 
   nudity_sexual_content:
-    'Nudity or sexual content',
+    "Nudity or sexual content",
 
   harassment_abuse:
-    'Harassment or abusive behavior',
+    "Harassment or abusive behavior",
 
   underage:
-    'Appears to be a minor',
+    "Appears to be a minor",
 
   spam_scam:
-    'Spam, scam, or advertising',
+    "Spam, scam, or advertising",
 
   violence_threats:
-    'Violence or threats',
+    "Violence or threats",
 
   other:
-    'Something else'
+    "Something else"
 
 };
 
 
-function esc(v){
+function esc(value){
 
-  return String(v ?? '')
+  return String(value ?? "")
     .replace(
       /[&<>"']/g,
-      c => ({
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#039;'
-      }[c])
-    );
+      function(character){
 
-}
+        return {
 
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          '"':"&quot;",
+          "'":"&#039;"
 
-function date(ts){
+        }[character];
 
-  try{
-
-    const d =
-      ts?.toDate
-        ? ts.toDate()
-        : new Date(ts);
-
-    return d.toLocaleString(
-      undefined,
-      {
-        year:'numeric',
-        month:'short',
-        day:'numeric',
-        hour:'numeric',
-        minute:'2-digit'
       }
     );
 
-  }catch{
-
-    return 'Unknown time';
-
-  }
-
 }
 
 
-function val(obj,...keys){
+function getValue(object, keys){
 
-  for(
-    const key of keys
-  ){
+  for(const key of keys){
+
+    const value =
+      object?.[key];
 
     if(
-      obj?.[key] !== undefined &&
-      obj?.[key] !== null &&
-      String(obj[key]).trim() !== ''
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
     ){
 
-      return obj[key];
+      return String(value);
 
     }
 
   }
 
-  return 'Unknown';
+  return "Unknown";
 
 }
 
 
+function formatDate(timestamp){
+
+  try{
+
+    const date =
+      timestamp?.toDate
+        ? timestamp.toDate()
+        : new Date(timestamp);
+
+    return date.toLocaleString(
+      undefined,
+      {
+        year:"numeric",
+        month:"short",
+        day:"numeric",
+        hour:"numeric",
+        minute:"2-digit"
+      }
+    );
+
+  }catch{
+
+    return "Unknown time";
+
+  }
+
+}
+
+
+/* =========================
+   COPY
+========================= */
+
+async function copyText(value, button){
+
+  if(
+    !value ||
+    value === "Unknown"
+  ){
+    return;
+  }
+
+  try{
+
+    await navigator.clipboard.writeText(value);
+
+    const oldText =
+      button.textContent;
+
+    button.textContent =
+      "✓ Copied";
+
+    setTimeout(
+      () => {
+        button.textContent =
+          oldText;
+      },
+      1200
+    );
+
+  }catch(error){
+
+    console.error(
+      "Copy failed:",
+      error
+    );
+
+    alert(
+      "Could not copy this value."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   LOAD REPORTS
+========================= */
+
 async function loadReports(){
 
   const list =
-    $('reportsList');
+    $("reportsList");
 
   const count =
-    $('reportsCount');
+    $("reportsCount");
 
 
   list.innerHTML =
@@ -804,37 +865,45 @@ async function loadReports(){
 
   try{
 
-    const snap =
+    const snapshot =
       await getDocs(
         collection(
           db,
-          'reports'
+          "reports"
         )
       );
 
 
     const reports =
-      snap.docs
+      snapshot.docs
         .map(
-          d => ({
-            id:d.id,
-            ...d.data()
+          document => ({
+            id:document.id,
+            ...document.data()
           })
         )
         .sort(
-          (a,b) =>
-            (b.createdAt?.toMillis?.() || 0) -
-            (a.createdAt?.toMillis?.() || 0)
+          (a,b) => {
+
+            const timeA =
+              a.createdAt?.toMillis?.() || 0;
+
+            const timeB =
+              b.createdAt?.toMillis?.() || 0;
+
+            return timeB - timeA;
+
+          }
         );
 
 
     count.textContent =
       reports.length === 1
-        ? '1 report'
+        ? "1 report"
         : `${reports.length} reports`;
 
 
-    if(!reports.length){
+    if(reports.length === 0){
 
       list.innerHTML =
         '<div class="empty">No reports yet. You’re all clear. ✓</div>';
@@ -845,375 +914,386 @@ async function loadReports(){
 
 
     list.innerHTML =
-      reports.map(r => {
-
-        const ip =
-          val(
-            r,
-            'ipAddress',
-            'ip',
-            'clientIp'
-          );
-
+      reports
+        .map(
+          report =>
+            createReportHTML(report)
+        )
+        .join("");
 
-        const country =
-          val(
-            r,
-            'country',
-            'countryName'
-          );
 
+    attachReportEvents();
 
-        const countryCode =
-          val(
-            r,
-            'countryCode',
-            'country_code'
-          );
-
+  }catch(error){
 
-        const countryDisplay =
-          country !== 'Unknown'
-            ? `${esc(country)}${
-                countryCode !== 'Unknown'
-                  ? ` (${esc(countryCode)})`
-                  : ''
-              }`
-            : 'Unknown';
+    console.error(
+      "Could not load reports:",
+      error
+    );
 
+    count.textContent =
+      "Could not load reports";
 
-        const region =
-          val(
-            r,
-            'region',
-            'regionName',
-            'state'
-          );
+    list.innerHTML = `
 
+      <div class="error">
 
-        const city =
-          val(
-            r,
-            'city'
-          );
+        Could not load reports.
 
+        <br><br>
 
-        const isp =
-          val(
-            r,
-            'isp',
-            'internetServiceProvider'
-          );
+        ${esc(
+          error?.message ||
+          "Check your Firestore rules."
+        )}
 
+      </div>
 
-        const asn =
-          val(
-            r,
-            'asn',
-            'AS',
-            'autonomousSystem'
-          );
+    `;
 
+  }
+
+}
 
-        const screenshotUrl =
-          val(
-            r,
-            'screenshotUrl',
-            'screenshotURL'
-          );
 
+/* =========================
+   CREATE REPORT HTML
+========================= */
+
+function createReportHTML(report){
+
+  const ip =
+    getValue(
+      report,
+      [
+        "ipAddress",
+        "ip",
+        "clientIp"
+      ]
+    );
+
+
+  const country =
+    getValue(
+      report,
+      [
+        "country",
+        "countryName"
+      ]
+    );
 
-        const reporterUid =
-          val(
-            r,
-            'reporterUid',
-            'reporterId'
-          );
 
+  const countryCode =
+    getValue(
+      report,
+      [
+        "countryCode",
+        "country_code"
+      ]
+    );
+
+
+  const region =
+    getValue(
+      report,
+      [
+        "region",
+        "regionName",
+        "state"
+      ]
+    );
 
-        const reportedUid =
-          val(
-            r,
-            'reportedUid',
-            'reportedUserUid',
-            'reportedUserId'
-          );
 
+  const city =
+    getValue(
+      report,
+      [
+        "city"
+      ]
+    );
+
+
+  const isp =
+    getValue(
+      report,
+      [
+        "isp",
+        "internetServiceProvider"
+      ]
+    );
+
+
+  const asn =
+    getValue(
+      report,
+      [
+        "asn",
+        "AS",
+        "autonomousSystem"
+      ]
+    );
 
-        const callId =
-          val(
-            r,
-            'callId',
-            'callID'
-          );
 
+  const reporterUid =
+    getValue(
+      report,
+      [
+        "reporterUid",
+        "reporterId"
+      ]
+    );
 
-        const details =
-          (r.details || '').trim() ||
-          'No additional details provided.';
 
+  const reportedUid =
+    getValue(
+      report,
+      [
+        "reportedUid",
+        "reportedUserUid",
+        "reportedUserId"
+      ]
+    );
 
-        return `
 
-          <div
-            class="report-card"
-            data-report-id="${esc(r.id)}"
-          >
+  const callId =
+    getValue(
+      report,
+      [
+        "callId",
+        "callID"
+      ]
+    );
 
-            <div class="report-top">
 
-              <div class="reason">
+  const screenshotUrl =
+    getValue(
+      report,
+      [
+        "screenshotUrl",
+        "screenshotURL"
+      ]
+    );
 
-                🚩
-                ${esc(
-                  labels[r.reason] ||
-                  r.reason ||
-                  'Unknown reason'
-                )}
 
-              </div>
+  const reason =
+    labels[report.reason] ||
+    report.reason ||
+    "Unknown reason";
 
-              <div class="time">
 
-                ${esc(
-                  date(r.createdAt)
-                )}
+  const details =
+    String(
+      report.details || ""
+    ).trim() ||
+    "No additional details provided.";
 
-              </div>
 
-            </div>
+  const countryDisplay =
+    country !== "Unknown"
+      ? `${esc(country)}${
+          countryCode !== "Unknown"
+            ? ` (${esc(countryCode)})`
+            : ""
+        }`
+      : "Unknown";
 
 
-            <div class="info-box">
+  const banDisabled =
+    reportedUid === "Unknown";
 
-              <div class="info-title">
-                NETWORK INFORMATION
-              </div>
 
-              <div class="info-grid">
+  return `
 
-                <div class="info-row">
+    <div
+      class="report-card"
+      data-report-id="${esc(report.id)}"
+      data-reported-uid="${esc(
+        reportedUid === "Unknown"
+          ? ""
+          : reportedUid
+      )}"
+    >
 
-                  <span>
-                    IP Address
-                  </span>
 
-                  <strong>
-                    ${esc(ip)}
-                  </strong>
+      <div class="report-top">
 
-                </div>
+        <div class="reason">
 
+          🚩 ${esc(reason)}
 
-                <div class="info-row">
+        </div>
 
-                  <span>
-                    Country
-                  </span>
+        <div class="time">
 
-                  <strong>
-                    ${countryDisplay}
-                  </strong>
+          ${esc(
+            formatDate(report.createdAt)
+          )}
 
-                </div>
+        </div>
 
+      </div>
 
-                <div class="info-row">
 
-                  <span>
-                    Region
-                  </span>
+      <!-- NETWORK -->
 
-                  <strong>
-                    ${esc(region)}
-                  </strong>
+      <div class="info-box">
 
-                </div>
+        <div class="info-title">
+          NETWORK INFORMATION
+        </div>
 
 
-                <div class="info-row">
+        <div class="info-grid">
 
-                  <span>
-                    City
-                  </span>
 
-                  <strong>
-                    ${esc(city)}
-                  </strong>
+          <div class="info-row">
 
-                </div>
+            <span class="info-label">
+              IP Address
+            </span>
 
-
-                <div class="info-row">
-
-                  <span>
-                    ISP
-                  </span>
-
-                  <strong>
-                    ${esc(isp)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    ASN
-                  </span>
-
-                  <strong>
-                    ${esc(asn)}
-                  </strong>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="info-box">
-
-              <div class="info-title">
-                USER INFORMATION
-              </div>
-
-              <div class="info-grid">
-
-                <div class="info-row">
-
-                  <span>
-                    Reporter UID
-                  </span>
-
-                  <strong>
-                    ${esc(reporterUid)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Reported UID
-                  </span>
-
-                  <strong>
-                    ${esc(reportedUid)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Call ID
-                  </span>
-
-                  <strong>
-                    ${esc(callId)}
-                  </strong>
-
-                </div>
-
-
-                <div class="info-row">
-
-                  <span>
-                    Report ID
-                  </span>
-
-                  <strong>
-                    ${esc(r.id)}
-                  </strong>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="screenshot-box">
-
-              <div class="report-shot-label">
-                STRANGER VIDEO SCREENSHOT
-              </div>
-
+            <strong class="info-value">
+              ${esc(ip)}
 
               ${
-                screenshotUrl !== 'Unknown'
+                ip !== "Unknown"
                   ? `
-
-                    <div class="report-shot-wrap">
-
-                      <a
-                        href="${esc(screenshotUrl)}"
-                        target="_blank"
-                        rel="noopener"
-                      >
-
-                        <img
-                          class="report-shot"
-                          src="${esc(screenshotUrl)}"
-                          alt="Screenshot of reported stranger video"
-                          loading="lazy"
-                        >
-
-                      </a>
-
-                    </div>
-
+                    <button
+                      class="btn copy-btn"
+                      data-copy="${esc(ip)}"
+                    >
+                      Copy
+                    </button>
                   `
-                  : `
-
-                    <div class="no-screenshot">
-
-                      No screenshot attached to this report.
-
-                    </div>
-
-                  `
+                  : ""
               }
 
-            </div>
+            </strong>
+
+          </div>
 
 
-            <div class="details">
+          <div class="info-row">
 
-              ${esc(details)}
+            <span class="info-label">
+              Country
+            </span>
 
-            </div>
+            <strong class="info-value">
+              ${countryDisplay}
+            </strong>
 
-
-            <div class="report-actions">
-
-              <button
-                class="btn btn-ban"
-                onclick="
-                  banUser(
-                    '${esc(
-                      reportedUid !== 'Unknown'
-                        ? reportedUid
-                        : ''
-                    )}',
-                    '${esc(r.id)}'
-                  )
-                "
-                ${
-                  reportedUid === 'Unknown'
-                    ? 'disabled'
-                    : ''
-                }
-              >
-
-                🚫 Ban user
-
-              </button>
+          </div>
 
 
-       
+          <div class="info-row">
+
+            <span class="info-label">
+              Region
+            </span>
+
+            <strong class="info-value">
+              ${esc(region)}
+            </strong>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              City
+            </span>
+
+            <strong class="info-value">
+              ${esc(city)}
+            </strong>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              ISP
+            </span>
+
+            <strong class="info-value">
+              ${esc(isp)}
+            </strong>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              ASN
+            </span>
+
+            <strong class="info-value">
+              ${esc(asn)}
+            </strong>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+
+      <!-- USER -->
+
+      <div class="info-box">
+
+        <div class="info-title">
+          USER INFORMATION
+        </div>
+
+
+        <div class="info-grid">
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Reporter UID
+            </span>
+
+            <strong class="info-value">
+              ${esc(reporterUid)}
+
+              ${
+                reporterUid !== "Unknown"
+                  ? `
+                    <button
+                      class="btn copy-btn"
+                      data-copy="${esc(reporterUid)}"
+                    >
+                      Copy
+                    </button>
+                  `
+                  : ""
+              }
+
+            </strong>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Reported UID
+            </span>
+
+            <strong class="info-value">
+              ${esc(reportedUid)}
+
+              ${
+                reportedUid !== "Unknown"
+                  ? `
+                    <button
+                      class="btn copy-btn"
+                      data-copy="${esc(reportedU
