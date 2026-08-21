@@ -5,643 +5,2202 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — FriendHub Blog</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%20role%3D%22img%22%20aria-label%3D%22FriendHub%22%3E%20%20%3Cdefs%3E%20%20%20%20%3ClinearGradient%20id%3D%22navBgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%239C8CFB%22/%3E%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235142C4%22/%3E%20%20%20%20%3C/linearGradient%3E%20%20%3C/defs%3E%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22url%28%23navBgGrad%29%22/%3E%20%20%3Cpath%20d%3D%22M14%2C44%20a22%2C22%200%201%2C1%2022%2C26%20l-7%2C10%20l-2%2C-12%20a22%2C22%200%200%2C1%20-13%2C-24%20z%22%20fill%3D%22%23FFFFFF%22/%3E%20%20%3Cpath%20d%3D%22M86%2C48%20a22%2C22%200%201%2C0%20-22%2C26%20l7%2C10%20l2%2C-12%20a22%2C22%200%200%2C0%2013%2C-24%20z%22%20fill%3D%22%235EEAD4%22%20fill-opacity%3D%220.88%22/%3E%20%20%3Cpath%20d%3D%22M79%2C17%20l2.6%2C6.4%206.4%2C2.6%20-6.4%2C2.6%20-2.6%2C6.4%20-2.6%2C-6.4%20-6.4%2C-2.6%206.4%2C-2.6%20z%22%20fill%3D%22%23FFB84D%22/%3E%3C/svg%3E">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%20role%3D%22img%22%20aria-label%3D%22FriendHub%22%3E%20%20%3Cdefs%3E%20%20%20%20%3ClinearGradient%20id%3D%22navBgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%239C8CFB%22/%3E%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235142C4%22/%3E%20%20%20%20%20%3C/linearGradient%3E%20%20%3C/defs%3E%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22url%28%23navBgGrad%29%22/%3E%20%20%3Cpath%20d%3D%22M14%2C44%20a22%2C22%200%201%2C1%2022%2C26%20l-7%2C10%20l-2%2C-12%20a22%2C22%200%200%2C1%20-13%2C-24%20z%22%20fill%3D%22%23FFFFFF%22/%3E%20%20%3Cpath%20d%3D%22M86%2C48%20a22%2C22%200%201%2C0%20-22%2C26%20l7%2C10%20l2%2C-12%20a22%2C22%200%200%2C0%2013%2C-24%20z%22%20fill%3D%22%235EEAD4%22%20fill-opacity%3D%220.88%22/%3E%20%20%3Cpath%20d%3D%22M79%2C17%20l2.6%2C6.4%206.4%2C2.6%20-6.4%2C2.6%20-2.6%2C6.4%20-2.6%2C-6.4%20-6.4%2C-2.6%206.4%2C-2.6%20z%22%20fill%3D%22%23FFB84D%22/%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --bg:#0B0F1A; --panel:#121A2C; --panel-2:#0D1322; --line:#212C42;
-    --text:#EDE7DA; --muted:#8B96AC; --violet:#9C8CFB; --violet-dim:#5142C4;
-    --mint:#5EEAD4; --amber:#FFB84D; --red:#F87171;
+:root{
+  --bg:#0B0F1A;
+  --panel:#121A2C;
+  --panel-2:#0D1322;
+  --line:#212C42;
+  --text:#EDE7DA;
+  --muted:#8B96AC;
+  --violet:#9C8CFB;
+  --violet-dim:#5142C4;
+  --mint:#5EEAD4;
+  --amber:#FFB84D;
+  --red:#F87171;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,sans-serif;
+}
+
+a{
+  color:inherit;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+.topnav{
+  position:sticky;
+  top:0;
+  z-index:100;
+  border-bottom:1px solid var(--line);
+  background:rgba(11,15,26,.9);
+  backdrop-filter:blur(12px);
+}
+
+.navin{
+  max-width:1180px;
+  margin:auto;
+  padding:15px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.brand{
+  text-decoration:none;
+  font-family:"Space Grotesk",sans-serif;
+  font-size:18px;
+  font-weight:700;
+}
+
+.brand em{
+  font-style:normal;
+  color:var(--mint);
+}
+
+.nav-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:9px 13px;
+  background:transparent;
+  color:var(--text);
+  text-decoration:none;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:600;
+  transition:.18s ease;
+}
+
+.btn:hover{
+  border-color:var(--violet-dim);
+  background:rgba(156,140,251,.08);
+}
+
+.btn.primary{
+  border-color:var(--violet-dim);
+  background:var(--violet-dim);
+  color:white;
+}
+
+.btn.primary:hover{
+  background:var(--violet);
+  border-color:var(--violet);
+}
+
+.btn.danger{
+  color:var(--red);
+  border-color:rgba(248,113,113,.3);
+}
+
+.btn.mint{
+  color:var(--mint);
+  border-color:rgba(94,234,212,.3);
+}
+
+.report-nav-btn{
+  position:relative;
+}
+
+.report-badge{
+  min-width:18px;
+  height:18px;
+  padding:0 5px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  background:var(--red);
+  color:white;
+  font-size:10px;
+  font-weight:700;
+}
+
+.report-badge.show{
+  display:inline-flex;
+}
+
+.page{
+  max-width:1180px;
+  margin:auto;
+  padding:38px 24px 80px;
+}
+
+.hero{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:20px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+
+.hero h1{
+  margin:0;
+  font-family:"Space Grotesk",sans-serif;
+  font-size:30px;
+}
+
+.hero p{
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:18px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.stat{
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:17px;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-family:"IBM Plex Mono",monospace;
+  font-size:11px;
+  text-transform:uppercase;
+}
+
+.stat-value{
+  margin-top:7px;
+  font-size:24px;
+  font-weight:700;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+.field label{
+  display:block;
+  margin-bottom:7px;
+  color:var(--muted);
+  font-size:12px;
+  font-family:"IBM Plex Mono",monospace;
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:11px 12px;
+  outline:none;
+  background:var(--panel-2);
+  color:var(--text);
+}
+
+.field textarea{
+  min-height:150px;
+  resize:vertical;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus{
+  border-color:var(--violet);
+}
+
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+
+.toolbar h2{
+  margin:0;
+  font-size:18px;
+}
+
+.toolbar-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.table-wrap{
+  overflow:auto;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+.table th,
+.table td{
+  text-align:left;
+  padding:13px 10px;
+  border-bottom:1px solid var(--line);
+  vertical-align:middle;
+}
+
+.table th{
+  color:var(--muted);
+  font:11px "IBM Plex Mono",monospace;
+  text-transform:uppercase;
+}
+
+.table td{
+  font-size:13px;
+}
+
+.status{
+  display:inline-flex;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  font:11px "IBM Plex Mono",monospace;
+}
+
+.status.published{
+  color:var(--mint);
+  border-color:rgba(94,234,212,.25);
+}
+
+.status.draft{
+  color:var(--amber);
+  border-color:rgba(255,184,77,.25);
+}
+
+.empty{
+  padding:45px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.notice{
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--panel-2);
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.65);
+}
+
+.modal-box{
+  width:min(720px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:22px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.modal-head h2{
+  margin:0;
+  font-size:20px;
+}
+
+.close{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:25px;
+  cursor:pointer;
+}
+
+.auth-screen{
+  min-height:75vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px;
+}
+
+.auth-box{
+  width:min(440px,100%);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:28px;
+  text-align:center;
+}
+
+.auth-box h1{
+  margin:0 0 8px;
+}
+
+.auth-box p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.loading{
+  padding:40px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.toast{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:500;
+  padding:12px 15px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--panel);
+  box-shadow:0 12px 40px rgba(0,0,0,.3);
+  font-size:13px;
+}
+
+@media(max-width:800px){
+
+  .grid{
+    grid-template-columns:1fr;
   }
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
-  .mono{font-family:'IBM Plex Mono',monospace;}
-  a{color:inherit;}
-  button{font-family:inherit;cursor:pointer;}
-  input, textarea, select{font-family:inherit;}
 
-  body::before{
-    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:
-      radial-gradient(640px 420px at 12% -6%, rgba(156,140,251,0.13), transparent 60%),
-      radial-gradient(560px 380px at 96% 8%, rgba(94,234,212,0.08), transparent 60%),
-      var(--bg);
+  .form-grid{
+    grid-template-columns:1fr;
   }
 
-  nav.topnav{
-    position:sticky;top:0;z-index:50;background:rgba(11,15,26,0.85);
-    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  .field.full{
+    grid-column:auto;
   }
-  .topnav-inner{max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
-  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
-  .brand svg{width:28px;height:28px;flex-shrink:0;}
-  .brand span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;color:#fff;}
-  .brand span em{font-style:normal;color:var(--mint);}
-  .brand .tag{
-    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--violet);background:rgba(156,140,251,0.1);
-    border:1px solid rgba(156,140,251,0.25);padding:2px 8px;border-radius:20px;margin-left:8px;
+
+  .navin{
+    padding:13px 15px;
   }
-  .nav-actions{display:flex;align-items:center;gap:10px;}
-  .btn{
-    display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:13.5px;font-weight:600;
-    padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--text);
-    transition:border-color .15s, background .15s, color .15s;
+
+  .page{
+    padding:28px 15px 60px;
   }
-  .btn:hover{border-color:var(--violet-dim);background:rgba(156,140,251,0.07);}
-  .btn-primary{background:linear-gradient(135deg, var(--violet), var(--violet-dim));border-color:transparent;color:#fff;}
-  .btn-primary:hover{filter:brightness(1.08);}
-  .btn-danger{color:var(--red);border-color:rgba(248,113,113,0.3);}
-  .btn-danger:hover{background:rgba(248,113,113,0.08);border-color:var(--red);}
-  .btn-sm{padding:6px 12px;font-size:12.5px;}
-  .btn[disabled]{opacity:0.5;cursor:not-allowed;}
 
-  .report-nav-btn{position:relative;min-width:42px;justify-content:center;padding:9px 12px;color:var(--red);}
-  .report-nav-btn svg{width:17px;height:17px;}
-  .report-badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:none;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:10px;font-weight:700;line-height:1;border:2px solid var(--bg);}
-  .report-badge.show{display:flex;}
-
-  main{max-width:1180px;margin:0 auto;padding:40px 24px 90px;}
-
-  /* ---- LOGIN ---- */
-  #loginScreen{max-width:400px;margin:80px auto;padding:36px;background:var(--panel);border:1px solid var(--line);border-radius:16px;}
-  #loginScreen h1{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 6px;}
-  #loginScreen p{color:var(--muted);font-size:13.5px;margin:0 0 24px;}
-  .field{margin-bottom:16px;}
-  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;}
-  .field input, .field textarea, .field select{
-    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);
-    padding:10px 12px;font-size:14px;outline:none;transition:border-color .15s;
+  .hero h1{
+    font-size:25px;
   }
-  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--violet);}
-  .field .hint{font-size:11.5px;color:var(--muted);margin-top:5px;}
-  #loginError{color:var(--red);font-size:13px;margin-top:12px;display:none;}
-
-  /* ---- DASHBOARD ---- */
-  #dashboard{display:none;}
-  .dash-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px;}
-  .dash-head h1{font-family:'Space Grotesk',sans-serif;font-size:26px;margin:0;}
-  .dash-head p{color:var(--muted);font-size:13.5px;margin:4px 0 0;}
-
-  .post-row{
-    display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--panel);
-    border:1px solid var(--line);border-radius:12px;margin-bottom:10px;
-  }
-  .post-row .cover-thumb{width:52px;height:52px;border-radius:8px;background:var(--panel-2);flex-shrink:0;object-fit:cover;}
-  .post-row .info{flex:1;min-width:0;}
-  .post-row .info h3{margin:0 0 4px;font-size:15px;font-family:'Space Grotesk',sans-serif;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .post-row .info .meta{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
-  .status-pill{font-size:10.5px;padding:2px 9px;border-radius:20px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;}
-  .status-pill.published{color:var(--mint);background:rgba(94,234,212,0.1);border:1px solid rgba(94,234,212,0.3);}
-  .status-pill.draft{color:var(--amber);background:rgba(255,184,77,0.1);border:1px solid rgba(255,184,77,0.3);}
-  .post-row .actions{display:flex;gap:8px;flex-shrink:0;}
-
-  .empty-state{text-align:center;color:var(--muted);padding:60px 20px;border:1px dashed var(--line);border-radius:14px;font-size:14px;}
-
-  /* ---- EDITOR ---- */
-  #editorScreen{display:none;}
-  .editor-head{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
-  .editor-head h1{font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0;flex:1;}
-  .back-arrow{
-    width:36px;height:36px;border-radius:9px;border:1px solid var(--line);display:flex;align-items:center;
-    justify-content:center;background:transparent;color:var(--text);flex-shrink:0;
-  }
-  .back-arrow:hover{border-color:var(--violet-dim);background:rgba(156,140,251,0.07);}
-  .back-arrow svg{width:16px;height:16px;}
-
-  .editor-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:start;}
-  @media (max-width:860px){.editor-grid{grid-template-columns:1fr;}}
-
-  .panel-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px;}
-  .panel-card h2{
-    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.06em;color:var(--violet);
-    text-transform:uppercase;margin:0 0 18px;display:flex;align-items:center;gap:8px;
-  }
-  .panel-card h2 .n{color:var(--mint);}
-  textarea#content{min-height:280px;resize:vertical;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6;}
-  textarea#excerpt{min-height:70px;resize:vertical;}
-
-  .char-count{font-size:11px;color:var(--muted);text-align:right;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
-  .char-count.over{color:var(--red);}
-
-  .serp-preview{
-    background:#fff;border-radius:10px;padding:16px 18px;margin-top:6px;
-  }
-  .serp-preview .serp-url{color:#4d5156;font-size:12.5px;font-family:arial,sans-serif;margin-bottom:2px;}
-  .serp-preview .serp-title{color:#1a0dab;font-size:17px;font-family:arial,sans-serif;line-height:1.3;margin-bottom:2px;}
-  .serp-preview .serp-desc{color:#4d5156;font-size:13px;font-family:arial,sans-serif;line-height:1.4;}
-
-  .editor-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap;}
-  #saveStatus{font-size:12.5px;color:var(--mint);margin-right:auto;align-self:center;display:none;font-family:'IBM Plex Mono',monospace;}
-
-  .cover-preview-wrap{width:100%;height:140px;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);
-    overflow:hidden;margin-top:8px;display:flex;align-items:center;justify-content:center;}
-  .cover-preview-wrap img{width:100%;height:100%;object-fit:cover;}
-  .cover-preview-wrap .placeholder{color:var(--muted);font-size:12px;}
-
-  #toast{
-    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 20px;font-size:13.5px;
-    box-shadow:0 12px 30px -12px rgba(0,0,0,0.6);transition:opacity .2s, transform .2s;pointer-events:none;z-index:100;
-  }
-  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+}
 </style>
 </head>
+
 <body>
 
+<!-- =====================================================
+     TOP NAVIGATION
+===================================================== -->
+
 <nav class="topnav">
-  <div class="topnav-inner">
-    <a class="brand" href="/">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs><linearGradient id="adminLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#9C8CFB"/><stop offset="100%" stop-color="#5142C4"/>
-        </linearGradient></defs>
-        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#adminLogoGrad)"/>
-        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
-        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
-        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
-      </svg>
-      <span>Friend<em>Hub</em></span>
-      <span class="tag">ADMIN</span>
+
+  <div class="navin">
+
+    <a class="brand" href="#">
+      Friend<em>Hub</em>
+      <span style="font-size:10px;color:var(--violet);margin-left:6px">
+        ADMIN
+      </span>
     </a>
+
     <div class="nav-actions">
-      <a class="btn report-nav-btn" id="reportsBtn" href="reports.html" aria-label="View reports" title="View reports" style="display:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 4h16v13H7l-3 3V4z"/><path d="M8 8h8M8 12h5"/>
+
+      <!-- REPORTS -->
+
+      <a
+        class="btn report-nav-btn"
+        id="reportsBtn"
+        href="reports.html"
+        aria-label="View reports"
+        title="View reports"
+        style="display:none;"
+      >
+
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M4 4h16v13H7l-3 3V4z"/>
+          <path d="M8 8h8M8 12h5"/>
         </svg>
-        <span class="report-badge" id="reportBadge">0</span>
+
+        Reports
+
+        <span
+          class="report-badge"
+          id="reportBadge"
+        >
+          0
+        </span>
+
       </a>
-      <a class="btn" href="/blog" target="_blank" rel="noopener">View blog ↗</a>
-      <button class="btn" id="signOutBtn" style="display:none;">Sign out</button>
+
+
+      <!-- =================================================
+           NEW UNBAN BUTTON
+           THIS IS BESIDE THE REPORT BUTTON
+      ================================================== -->
+
+      <a
+        class="btn mint"
+        id="unbanNavBtn"
+        href="unban.html"
+        aria-label="Manage banned users"
+        title="Manage banned users"
+        style="display:none;"
+      >
+
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="m17 11 2 2 4-4"/>
+        </svg>
+
+        Unban
+
+      </a>
+
+
+      <button
+        class="btn"
+        id="signOutBtn"
+        style="display:none;"
+      >
+        Sign out
+      </button>
+
     </div>
+
   </div>
+
 </nav>
 
-<main>
 
-  <!-- LOGIN -->
-  <div id="loginScreen">
-    <h1>Admin sign in</h1>
-    <p>Sign in with your FriendHub Google account to manage blog posts.</p>
-    <button class="btn btn-primary" id="googleSignInBtn" style="width:100%;justify-content:center;gap:10px;">
-      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.4c-2.1 1.6-4.8 2.5-7.7 2.5-5.3 0-9.7-3.1-11.3-7.6l-6.7 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.6 5.4C41.9 35.9 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+<!-- =====================================================
+     AUTH SCREEN
+===================================================== -->
+
+<section
+  id="authScreen"
+  class="auth-screen"
+>
+
+  <div class="auth-box">
+
+    <h1>FriendHub Admin</h1>
+
+    <p>
+      Sign in with your authorized administrator
+      Google account to continue.
+    </p>
+
+    <button
+      class="btn primary"
+      id="loginBtn"
+    >
       Continue with Google
     </button>
-    <div id="loginError"></div>
+
+    <p
+      id="authMessage"
+      style="margin-top:15px;"
+    ></p>
+
   </div>
 
-  <!-- NOT AUTHORIZED — shown when a Google account signs in but isn't on the admin list -->
-  <div id="notAdminBanner" style="display:none;max-width:520px;margin:80px auto;padding:32px 36px;background:var(--panel);border:1px solid var(--red);border-radius:16px;">
-    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:20px;margin:0 0 10px;">This account isn't an admin</h1>
-    <p style="color:var(--muted);font-size:13.5px;margin:0 0 18px;line-height:1.6;">
-      You're signed in as <strong id="notAdminEmail" style="color:var(--text);"></strong>, but this email isn't on the admin list. Ask the site owner to add it in <span class="mono">ADMIN_EMAILS</span> (in this file) and in the Firestore security rules, then refresh.
-    </p>
-    <button class="btn" id="notAdminSignOutBtn" style="width:100%;justify-content:center;">Sign out</button>
-  </div>
+</section>
 
-  <!-- DASHBOARD (post list) -->
-  <div id="dashboard">
-    <div class="dash-head">
-      <div>
-        <h1>Blog posts</h1>
-        <p id="postCount">Loading…</p>
-      </div>
-      <button class="btn btn-primary" id="newPostBtn">+ New post</button>
+
+<!-- =====================================================
+     ADMIN PAGE
+===================================================== -->
+
+<main
+  id="adminPage"
+  class="page hidden"
+>
+
+  <section class="hero">
+
+    <div>
+
+      <h1>
+        Blog Administration
+      </h1>
+
+      <p>
+        Manage FriendHub blog posts and moderation tools.
+      </p>
+
     </div>
-    <div id="postList"></div>
-  </div>
 
-  <!-- EDITOR -->
-  <div id="editorScreen">
-    <div class="editor-head">
-      <button class="back-arrow" id="backBtn" aria-label="Back to post list">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <div>
+
+      <button
+        class="btn primary"
+        id="newPostBtn"
+      >
+        + New post
       </button>
-      <h1 id="editorTitle">New post</h1>
+
     </div>
 
-    <div class="editor-grid">
-      <!-- LEFT: content -->
-      <div>
-        <div class="panel-card">
-          <h2>Content</h2>
-          <div class="field">
-            <label for="title">Title</label>
-            <input type="text" id="title" placeholder="10 tips for staying safe on random video chat">
-          </div>
-          <div class="field">
-            <label for="slug">URL slug</label>
-            <input type="text" id="slug" placeholder="staying-safe-on-video-chat">
-            <div class="hint">Post will live at friendhub.space/blog-post?slug=<span id="slugPreview">your-slug</span></div>
-          </div>
-          <div class="field">
-            <label for="excerpt">Excerpt (shown on blog index &amp; used as fallback meta description)</label>
-            <textarea id="excerpt" maxlength="200" placeholder="A short one- or two-sentence summary of the post."></textarea>
-            <div class="char-count" id="excerptCount">0 / 200</div>
-          </div>
-          <div class="field">
-            <label for="content">Content (HTML)</label>
-            <textarea id="content" placeholder="&lt;p&gt;Write your post content here using basic HTML tags like &lt;p&gt;, &lt;h2&gt;, &lt;strong&gt;, &lt;a&gt;, &lt;ul&gt;.&lt;/p&gt;"></textarea>
-            <div class="hint">Rendered as raw HTML on blog-post.html — keep it to safe, simple tags.</div>
-          </div>
-        </div>
+  </section>
+
+
+  <!-- ===================================================
+       STATISTICS
+  ==================================================== -->
+
+  <section class="grid">
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Total posts
       </div>
 
-      <!-- RIGHT: metadata + SEO -->
-      <div>
-        <div class="panel-card">
-          <h2>Publishing</h2>
-          <div class="field">
-            <label for="status">Status</label>
-            <select id="status">
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="tags">Tags (comma-separated, max 3 shown)</label>
-            <input type="text" id="tags" placeholder="safety, video chat, tips">
-          </div>
-          <div class="field">
-            <label for="coverImageUrl">Cover image URL</label>
-            <input type="text" id="coverImageUrl" placeholder="https://...">
-            <div class="cover-preview-wrap" id="coverPreviewWrap">
-              <span class="placeholder">No image URL yet</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-card">
-          <h2>SEO <span class="n">·</span> search appearance</h2>
-          <div class="field">
-            <label for="metaTitle">Meta title (optional — falls back to Title)</label>
-            <input type="text" id="metaTitle" maxlength="70" placeholder="Leave blank to reuse the post title">
-            <div class="char-count" id="metaTitleCount">0 / 70</div>
-          </div>
-          <div class="field">
-            <label for="metaDescription">Meta description (optional — falls back to Excerpt)</label>
-            <textarea id="metaDescription" maxlength="160" placeholder="Leave blank to reuse the excerpt"></textarea>
-            <div class="char-count" id="metaDescCount">0 / 160</div>
-          </div>
-          <div class="field">
-            <label>Google preview</label>
-            <div class="serp-preview">
-              <div class="serp-url">friendhub.space › blog-post › <span id="serpSlug">your-slug</span></div>
-              <div class="serp-title" id="serpTitle">Your post title</div>
-              <div class="serp-desc" id="serpDesc">Your meta description or excerpt will appear here.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="editor-footer">
-          <span id="saveStatus">Saved ✓</span>
-          <button class="btn btn-danger" id="deleteBtn" style="display:none;">Delete post</button>
-          <button class="btn" id="saveDraftBtn">Save draft</button>
-          <button class="btn btn-primary" id="publishBtn">Save &amp; publish</button>
-        </div>
+      <div
+        class="stat-value"
+        id="totalPosts"
+      >
+        0
       </div>
+
     </div>
-  </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Published
+      </div>
+
+      <div
+        class="stat-value"
+        id="publishedPosts"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Drafts
+      </div>
+
+      <div
+        class="stat-value"
+        id="draftPosts"
+      >
+        0
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================================================
+       BLOG POSTS
+  ==================================================== -->
+
+  <section class="card">
+
+    <div class="toolbar">
+
+      <h2>
+        Blog posts
+      </h2>
+
+      <div class="toolbar-actions">
+
+        <button
+          class="btn"
+          id="refreshBtn"
+        >
+          Refresh
+        </button>
+
+        <select
+          class="btn"
+          id="statusFilter"
+        >
+          <option value="all">
+            All posts
+          </option>
+
+          <option value="published">
+            Published
+          </option>
+
+          <option value="draft">
+            Drafts
+          </option>
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="postsLoading"
+      class="loading"
+    >
+      Loading posts...
+    </div>
+
+
+    <div
+      id="postsEmpty"
+      class="empty hidden"
+    >
+      No blog posts found.
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table
+        class="table"
+        id="postsTable"
+      >
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Title
+            </th>
+
+            <th>
+              Author
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Date
+            </th>
+
+            <th>
+              Actions
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="postsBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <div class="notice">
+
+      <strong>Admin tools:</strong>
+
+      Use the <strong>Reports</strong> button to manage reports.
+
+      Use the new <strong>Unban</strong> button beside it to open
+      the banned-user management page.
+
+    </div>
+
+  </section>
 
 </main>
 
-<div id="toast"></div>
+
+<!-- =====================================================
+     POST MODAL
+===================================================== -->
+
+<div
+  class="modal hidden"
+  id="postModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h2 id="modalTitle">
+        New blog post
+      </h2>
+
+      <button
+        class="close"
+        id="closeModal"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <form id="postForm">
+
+      <input
+        type="hidden"
+        id="postId"
+      >
+
+
+      <div class="form-grid">
+
+        <div
+          class="field full"
+        >
+
+          <label>
+            Title
+          </label>
+
+          <input
+            id="postTitle"
+            required
+            placeholder="Post title"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Author
+          </label>
+
+          <input
+            id="postAuthor"
+            placeholder="Author name"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Status
+          </label>
+
+          <select id="postStatus">
+
+            <option value="draft">
+              Draft
+            </option>
+
+            <option value="published">
+              Published
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div
+          class="field full"
+        >
+
+          <label>
+            Excerpt
+          </label>
+
+          <textarea
+            id="postExcerpt"
+            placeholder="Short description"
+          ></textarea>
+
+        </div>
+
+
+        <div
+          class="field full"
+        >
+
+          <label>
+            Content
+          </label>
+
+          <textarea
+            id="postContent"
+            style="min-height:260px"
+            placeholder="Write your blog post..."
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          justify-content:flex-end;
+          gap:8px;
+          margin-top:8px;
+        "
+      >
+
+        <button
+          type="button"
+          class="btn"
+          id="cancelPost"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="btn primary"
+          id="savePostBtn"
+        >
+          Save post
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<div
+  id="toast"
+  class="toast hidden"
+></div>
+
+
+<!-- =====================================================
+     FIREBASE
+===================================================== -->
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getFirestore, collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp, orderBy, query
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Same FriendHub Firebase project as index.html.
+import {
+  initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+  query,
+  orderBy
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+
+/* =====================================================
+   FIREBASE CONFIG
+===================================================== */
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
-  authDomain: "friendhub-9f934.firebaseapp.com",
-  projectId: "friendhub-9f934",
-  storageBucket: "friendhub-9f934.firebasestorage.app",
-  messagingSenderId: "97544296104",
-  appId: "1:97544296104:web:d7f7d27e86f1af748e949d"
+
+  apiKey:
+  "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
+
+  authDomain:
+  "friendhub-9f934.firebaseapp.com",
+
+  projectId:
+  "friendhub-9f934",
+
+  storageBucket:
+  "friendhub-9f934.firebasestorage.app",
+
+  messagingSenderId:
+  "97544296104",
+
+  appId:
+  "1:97544296104:web:d7f7d27e86f1af748e949d"
+
 };
 
-// ---- Who's allowed to post -----------------------------------------------
-// This list ONLY controls what this page shows/hides — it is NOT security by
-// itself, since anyone can view page source. The real gate has to be the
-// Firestore rules below (they check the same emails server-side). Add every
-// admin's Google account email here AND in the Firestore rules.
+
+
+/* =====================================================
+   ADMIN EMAILS
+===================================================== */
+
 const ADMIN_EMAILS = [
   "anowar531237@gmail.com"
 ];
-/*  Paste this into Firebase Console → Firestore Database → Rules — it's what
-    actually stops non-admins from writing posts, even if they inspect/edit
-    the JS on this page:
 
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /blogPosts/{postId} {
-          allow read: if true;
-          allow write: if request.auth != null &&
-            request.auth.token.email in [
-              "you@gmail.com"
-            ];
-        }
-      }
-    }
-*/
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
 
-const $ = (id) => document.getElementById(id);
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+const app =
+  initializeApp(firebaseConfig);
+
+const auth =
+  getAuth(app);
+
+const db =
+  getFirestore(app);
+
+const provider =
+  new GoogleAuthProvider();
+
+
+
+const $ =
+  id => document.getElementById(id);
+
+
+
+let currentUser = null;
 let posts = [];
-let editingId = null; // null = new post
 
-/* ---------- AUTH ---------- */
-function hideAllAuthScreens() {
-  $("loginScreen").style.display = "none";
-  $("notAdminBanner").style.display = "none";
-  $("dashboard").style.display = "none";
-  $("editorScreen").style.display = "none";
-}
 
-onAuthStateChanged(auth, async (user) => {
-  if (user && ADMIN_EMAILS.includes(user.email)) {
-    $("signOutBtn").style.display = "inline-flex";
-    $("reportsBtn").style.display = "inline-flex";
-    hideAllAuthScreens();
-    showDashboard();
-    const ok = await loadPosts();
-    if (ok) {
-      // Load the red report badge for admins without opening the modal.
-      try {
-        const reportSnap = await getDocs(collection(db, 'reports'));
-        const reportBadge = $('reportBadge');
-        const reportCount = reportSnap.size;
-        reportBadge.textContent = reportCount > 99 ? '99+' : reportCount;
-        reportBadge.classList.toggle('show', reportCount > 0);
-      } catch (reportErr) {
-        console.warn('Could not load report count:', reportErr);
-      }
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const authScreen =
+  $("authScreen");
+
+const adminPage =
+  $("adminPage");
+
+const loginBtn =
+  $("loginBtn");
+
+const signOutBtn =
+  $("signOutBtn");
+
+const authMessage =
+  $("authMessage");
+
+const unbanNavBtn =
+  $("unbanNavBtn");
+
+
+
+/* =====================================================
+   GOOGLE LOGIN
+===================================================== */
+
+loginBtn.onclick =
+  async () => {
+
+    try{
+
+      authMessage.textContent =
+        "Opening Google sign in...";
+
+      await signInWithPopup(
+        auth,
+        provider
+      );
+
     }
-    if (!ok) {
-      // Signed in + on the client-side admin list, but Firestore rules still
-      // rejected the write/read — almost always means the rules above
-      // haven't been updated with this email yet.
-      hideAllAuthScreens();
-      $("notAdminBanner").style.display = "block";
-      $("notAdminEmail").textContent = user.email;
+
+    catch(error){
+
+      console.error(error);
+
+      authMessage.textContent =
+        error.message ||
+        "Unable to sign in.";
+
     }
-  } else if (user) {
-    // Signed in with Google, but not an admin email.
-    hideAllAuthScreens();
-    $("notAdminBanner").style.display = "block";
-    $("notAdminEmail").textContent = user.email;
-    $("signOutBtn").style.display = "inline-flex";
-    $("reportsBtn").style.display = "none";
-  } else {
-    hideAllAuthScreens();
-    $("loginScreen").style.display = "block";
-    $("signOutBtn").style.display = "none";
-    $("reportsBtn").style.display = "none";
-    $("reportBadge").classList.remove("show");
-  }
-});
 
-$("googleSignInBtn").addEventListener("click", async () => {
-  $("loginError").style.display = "none";
-  try {
-    await signInWithPopup(auth, googleProvider);
-  } catch (err) {
-    console.error(err);
-    $("loginError").textContent = "Couldn't sign in — please try again.";
-    $("loginError").style.display = "block";
-  }
-});
-
-$("signOutBtn").addEventListener("click", () => signOut(auth));
-$("notAdminSignOutBtn").addEventListener("click", () => signOut(auth));
-
-/* ---------- VIEW SWITCHING ---------- */
-function showDashboard() {
-  $("dashboard").style.display = "block";
-  $("editorScreen").style.display = "none";
-}
-function showEditor() {
-  $("dashboard").style.display = "none";
-  $("editorScreen").style.display = "block";
-}
-
-$("newPostBtn").addEventListener("click", () => openEditor(null));
-$("backBtn").addEventListener("click", () => { showDashboard(); });
-
-/* ---------- LOAD & RENDER POST LIST ---------- */
-async function loadPosts() {
-  $("postCount").textContent = "Loading…";
-  try {
-    const q = query(collection(db, "blogPosts"), orderBy("updatedAt", "desc"));
-    const snap = await getDocs(q);
-    posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderPostList();
-    return true;
-  } catch (err) {
-    console.error(err);
-    if (err.code === "permission-denied") {
-      // Not yet an approved admin — let the caller show the UID banner instead.
-      return false;
-    }
-    $("postList").innerHTML = '<div class="empty-state">Couldn\'t load posts. Check your Firebase config and Firestore rules.</div>';
-    $("postCount").textContent = "Error loading posts";
-    return true; // real error, not a permissions issue — stay on dashboard with the message
-  }
-}
-
-function renderPostList() {
-  $("postCount").textContent = posts.length === 1 ? "1 post" : `${posts.length} posts`;
-  if (posts.length === 0) {
-    $("postList").innerHTML = '<div class="empty-state">No posts yet — click "New post" to write your first one.</div>';
-    return;
-  }
-  $("postList").innerHTML = posts.map(p => {
-    const cover = p.coverImageUrl
-      ? `<img class="cover-thumb" src="${escapeHtml(p.coverImageUrl)}" alt="">`
-      : `<div class="cover-thumb"></div>`;
-    const dateStr = p.publishedAt?.toDate
-      ? p.publishedAt.toDate().toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" })
-      : "not published";
-    return `
-      <div class="post-row">
-        ${cover}
-        <div class="info">
-          <h3>${escapeHtml(p.title || "(untitled)")}</h3>
-          <div class="meta">
-            <span class="status-pill ${p.status === 'published' ? 'published' : 'draft'}">${p.status || 'draft'}</span>
-            <span>·</span>
-            <span>${dateStr}</span>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn btn-sm" data-edit="${p.id}">Edit</button>
-        </div>
-      </div>`;
-  }).join("");
-
-  document.querySelectorAll("[data-edit]").forEach(btn => {
-    btn.addEventListener("click", () => openEditor(btn.getAttribute("data-edit")));
-  });
-}
-
-/* ---------- EDITOR ---------- */
-function openEditor(id) {
-  editingId = id;
-  const p = id ? posts.find(x => x.id === id) : null;
-
-  $("editorTitle").textContent = p ? "Edit post" : "New post";
-  $("title").value = p?.title || "";
-  $("slug").value = p?.slug || "";
-  $("excerpt").value = p?.excerpt || "";
-  $("content").value = p?.content || "";
-  $("status").value = p?.status || "draft";
-  $("tags").value = (p?.tags || []).join(", ");
-  $("coverImageUrl").value = p?.coverImageUrl || "";
-  $("metaTitle").value = p?.metaTitle || "";
-  $("metaDescription").value = p?.metaDescription || "";
-  $("deleteBtn").style.display = p ? "inline-flex" : "none";
-  $("saveStatus").style.display = "none";
-
-  updateCoverPreview();
-  updateCounts();
-  updateSerpPreview();
-  showEditor();
-}
-
-function slugify(str) {
-  return (str || "").toLowerCase().trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-$("title").addEventListener("input", () => {
-  if (!editingId && !$("slug").dataset.manual) {
-    $("slug").value = slugify($("title").value);
-  }
-  updateSerpPreview();
-});
-$("slug").addEventListener("input", () => {
-  $("slug").dataset.manual = "1";
-  $("slug").value = slugify($("slug").value);
-  updateSerpPreview();
-});
-$("excerpt").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
-$("metaTitle").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
-$("metaDescription").addEventListener("input", () => { updateCounts(); updateSerpPreview(); });
-$("coverImageUrl").addEventListener("input", updateCoverPreview);
-
-function updateCounts() {
-  setCount("excerptCount", $("excerpt").value.length, 200);
-  setCount("metaTitleCount", $("metaTitle").value.length, 70);
-  setCount("metaDescCount", $("metaDescription").value.length, 160);
-}
-function setCount(elId, len, max) {
-  const el = $(elId);
-  el.textContent = `${len} / ${max}`;
-  el.classList.toggle("over", len > max);
-}
-
-function updateSerpPreview() {
-  const slug = $("slug").value || "your-slug";
-  $("slugPreview").textContent = slug;
-  $("serpSlug").textContent = slug;
-  $("serpTitle").textContent = $("metaTitle").value || $("title").value || "Your post title";
-  $("serpDesc").textContent = $("metaDescription").value || $("excerpt").value || "Your meta description or excerpt will appear here.";
-}
-
-function updateCoverPreview() {
-  const url = $("coverImageUrl").value.trim();
-  const wrap = $("coverPreviewWrap");
-  if (!url) { wrap.innerHTML = '<span class="placeholder">No image URL yet</span>'; return; }
-  wrap.innerHTML = `<img src="${escapeHtml(url)}" alt="" onerror="this.parentElement.innerHTML='<span class=&quot;placeholder&quot;>Couldn\\'t load image</span>'">`;
-}
-
-function escapeHtml(str) {
-  const d = document.createElement("div");
-  d.textContent = str || "";
-  return d.innerHTML;
-}
-
-/* ---------- SAVE / PUBLISH / DELETE ---------- */
-$("saveDraftBtn").addEventListener("click", () => savePost("draft"));
-$("publishBtn").addEventListener("click", () => savePost("published"));
-
-async function savePost(status) {
-  const slug = $("slug").value.trim();
-  const title = $("title").value.trim();
-  if (!title || !slug) {
-    showToast("Title and slug are required.");
-    return;
-  }
-
-  const existing = editingId ? posts.find(x => x.id === editingId) : null;
-  const data = {
-    title,
-    slug,
-    excerpt: $("excerpt").value.trim(),
-    content: $("content").value,
-    status,
-    tags: $("tags").value.split(",").map(t => t.trim()).filter(Boolean),
-    coverImageUrl: $("coverImageUrl").value.trim(),
-    metaTitle: $("metaTitle").value.trim(),
-    metaDescription: $("metaDescription").value.trim(),
-    updatedAt: serverTimestamp(),
   };
-  if (status === "published" && !(existing?.publishedAt)) {
-    data.publishedAt = serverTimestamp();
-  } else if (existing?.publishedAt) {
-    data.publishedAt = existing.publishedAt;
+
+
+
+/* =====================================================
+   SIGN OUT
+===================================================== */
+
+signOutBtn.onclick =
+  async () => {
+
+    await signOut(auth);
+
+  };
+
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+onAuthStateChanged(
+  auth,
+  async user => {
+
+    currentUser = user;
+
+
+    if(!user){
+
+      authScreen
+        .classList
+        .remove("hidden");
+
+      adminPage
+        .classList
+        .add("hidden");
+
+      loginBtn
+        .style
+        .display =
+        "inline-flex";
+
+      signOutBtn
+        .style
+        .display =
+        "none";
+
+      unbanNavBtn
+        .style
+        .display =
+        "none";
+
+      return;
+
+    }
+
+
+
+    /* ================================================
+       CHECK ADMIN
+    ================================================= */
+
+    if(
+      !ADMIN_EMAILS
+        .includes(
+          user.email
+        )
+    ){
+
+      authScreen
+        .classList
+        .remove("hidden");
+
+      adminPage
+        .classList
+        .add("hidden");
+
+      unbanNavBtn
+        .style
+        .display =
+        "none";
+
+      signOutBtn
+        .style
+        .display =
+        "inline-flex";
+
+      authMessage.innerHTML =
+
+        `
+        <span style="color:#F87171">
+          This Google account is not authorized
+          as an administrator.
+        </span>
+        <br><br>
+        Signed in as:
+        <strong>${escapeHtml(user.email)}</strong>
+        `;
+
+      return;
+
+    }
+
+
+
+    /* ================================================
+       AUTHORIZED ADMIN
+    ================================================= */
+
+    authScreen
+      .classList
+      .add("hidden");
+
+    adminPage
+      .classList
+      .remove("hidden");
+
+    signOutBtn
+      .style
+      .display =
+      "inline-flex";
+
+
+    /* =================================================
+       SHOW REPORTS + UNBAN
+    ================================================= */
+
+    $("reportsBtn")
+      .style
+      .display =
+      "inline-flex";
+
+
+    unbanNavBtn
+      .style
+      .display =
+      "inline-flex";
+
+
+    await loadPosts();
+
+    await loadReportCount();
+
   }
 
-  try {
-    const docId = editingId || slug;
-    await setDoc(doc(db, "blogPosts", docId), data, { merge: true });
-    editingId = docId;
-    $("deleteBtn").style.display = "inline-flex";
-    showToast(status === "published" ? "Published ✓" : "Draft saved ✓");
-    await loadPosts();
-  } catch (err) {
-    console.error(err);
-    showToast("Couldn't save — check your connection and Firestore rules.");
+);
+
+
+
+/* =====================================================
+   LOAD POSTS
+===================================================== */
+
+async function loadPosts(){
+
+  $("postsLoading")
+    .classList
+    .remove("hidden");
+
+  $("postsEmpty")
+    .classList
+    .add("hidden");
+
+
+  try{
+
+    const snapshot =
+      await getDocs(
+        collection(
+          db,
+          "posts"
+        )
+      );
+
+
+    posts =
+      snapshot.docs.map(
+        item => ({
+          id:item.id,
+          ...item.data()
+        })
+      );
+
+
+    posts.sort(
+      (a,b) => {
+
+        const aTime =
+          getTimestamp(
+            a.createdAt
+          );
+
+        const bTime =
+          getTimestamp(
+            b.createdAt
+          );
+
+        return bTime - aTime;
+
+      }
+    );
+
+
+    renderPosts();
+
   }
+
+  catch(error){
+
+    console.error(
+      "Loading posts failed:",
+      error
+    );
+
+
+    $("postsBody")
+      .innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="5"
+            style="
+              color:#F87171;
+              padding:30px;
+              text-align:center;
+            "
+          >
+
+            Failed to load blog posts.
+
+            <br><br>
+
+            ${escapeHtml(
+              error.message
+            )}
+
+          </td>
+
+        </tr>
+
+      `;
+
+  }
+
+  finally{
+
+    $("postsLoading")
+      .classList
+      .add("hidden");
+
+  }
+
 }
 
-$("deleteBtn").addEventListener("click", async () => {
-  if (!editingId) return;
-  if (!confirm("Delete this post? This can't be undone.")) return;
-  try {
-    await deleteDoc(doc(db, "blogPosts", editingId));
-    showToast("Post deleted");
-    editingId = null;
-    await loadPosts();
-    showDashboard();
-  } catch (err) {
-    console.error(err);
-    showToast("Couldn't delete post.");
-  }
-});
 
-function showToast(msg) {
-  const t = $("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => t.classList.remove("show"), 2600);
+
+/* =====================================================
+   RENDER POSTS
+===================================================== */
+
+function renderPosts(){
+
+  const filter =
+    $("statusFilter").value;
+
+
+  let list =
+    posts;
+
+
+  if(
+    filter !== "all"
+  ){
+
+    list =
+      posts.filter(
+        post =>
+          String(
+            post.status ||
+            "draft"
+          ).toLowerCase()
+          === filter
+      );
+
+  }
+
+
+
+  $("totalPosts")
+    .textContent =
+    posts.length;
+
+
+  $("publishedPosts")
+    .textContent =
+    posts.filter(
+      p =>
+        String(
+          p.status || ""
+        ).toLowerCase()
+        === "published"
+    ).length;
+
+
+  $("draftPosts")
+    .textContent =
+    posts.filter(
+      p =>
+        String(
+          p.status || ""
+        ).toLowerCase()
+        !== "published"
+    ).length;
+
+
+
+  if(!list.length){
+
+    $("postsEmpty")
+      .classList
+      .remove("hidden");
+
+    $("postsBody")
+      .innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  $("postsEmpty")
+    .classList
+    .add("hidden");
+
+
+
+  $("postsBody").innerHTML =
+
+    list.map(
+      post => {
+
+        const status =
+          String(
+            post.status ||
+            "draft"
+          ).toLowerCase();
+
+
+        return `
+
+          <tr>
+
+            <td>
+
+              <strong>
+                ${escapeHtml(
+                  post.title ||
+                  "Untitled"
+                )}
+              </strong>
+
+              ${
+                post.excerpt
+                ?
+                `
+                <div
+                  style="
+                    color:var(--muted);
+                    font-size:11px;
+                    margin-top:5px;
+                  "
+                >
+                  ${escapeHtml(
+                    post.excerpt
+                  )}
+                </div>
+                `
+                :
+                ""
+              }
+
+            </td>
+
+
+            <td>
+
+              ${escapeHtml(
+                post.author ||
+                "Admin"
+              )}
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="status ${
+                  status === "published"
+                  ? "published"
+                  : "draft"
+                }"
+              >
+
+                ${
+                  status === "published"
+                  ? "Published"
+                  : "Draft"
+                }
+
+              </span>
+
+            </td>
+
+
+            <td>
+
+              ${formatDate(
+                post.createdAt
+              )}
+
+            </td>
+
+
+            <td>
+
+              <div
+                style="
+                  display:flex;
+                  gap:6px;
+                  flex-wrap:wrap;
+                "
+              >
+
+                <button
+                  class="btn"
+                  data-edit="${escapeHtml(post.id)}"
+                >
+                  Edit
+                </button>
+
+                <button
+                  class="btn danger"
+                  data-delete="${escapeHtml(post.id)}"
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    ).join("");
+
+
+
+  document
+    .querySelectorAll(
+      "[data-edit]"
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          () =>
+            openEditPost(
+              button.dataset.edit
+            );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      "[data-delete]"
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          () =>
+            deletePost(
+              button.dataset.delete
+            );
+
+      }
+    );
+
 }
+
+
+
+/* =====================================================
+   NEW POST
+===================================================== */
+
+$("newPostBtn").onclick =
+  () => {
+
+    $("modalTitle")
+      .textContent =
+      "New blog post";
+
+
+    $("postId").value =
+      "";
+
+    $("postTitle").value =
+      "";
+
+    $("postAuthor").value =
+      currentUser?.displayName ||
+      "Admin";
+
+    $("postStatus").value =
+      "draft";
+
+    $("postExcerpt").value =
+      "";
+
+    $("postContent").value =
+      "";
+
+
+    $("postModal")
+      .classList
+      .remove("hidden");
+
+  };
+
+
+
+/* =====================================================
+   EDIT POST
+===================================================== */
+
+function openEditPost(id){
+
+  const post =
+    posts.find(
+      item =>
+        item.id === id
+    );
+
+
+  if(!post)
+    return;
+
+
+  $("modalTitle")
+    .textContent =
+    "Edit blog post";
+
+
+  $("postId").value =
+    post.id;
+
+
+  $("postTitle").value =
+    post.title ||
+    "";
+
+
+  $("postAuthor").value =
+    post.author ||
+    "Admin";
+
+
+  $("postStatus").value =
+    post.status ||
+    "draft";
+
+
+  $("postExcerpt").value =
+    post.excerpt ||
+    "";
+
+
+  $("postContent").value =
+    post.content ||
+    "";
+
+
+  $("postModal")
+    .classList
+    .remove("hidden");
+
+}
+
+
+
+/* =====================================================
+   SAVE POST
+===================================================== */
+
+$("postForm").onsubmit =
+  async event => {
+
+    event.preventDefault();
+
+
+    const id =
+      $("postId").value;
+
+
+    const data = {
+
+      title:
+        $("postTitle")
+          .value
+          .trim(),
+
+      author:
+        $("postAuthor")
+          .value
+          .trim() ||
+        "Admin",
+
+      status:
+        $("postStatus")
+          .value,
+
+      excerpt:
+        $("postExcerpt")
+          .value
+          .trim(),
+
+      content:
+        $("postContent")
+          .value,
+
+      updatedAt:
+        serverTimestamp()
+
+    };
+
+
+    if(!data.title){
+
+      alert(
+        "Please enter a title."
+      );
+
+      return;
+
+    }
+
+
+
+    $("savePostBtn")
+      .disabled =
+      true;
+
+
+    try{
+
+      if(id){
+
+        await updateDoc(
+          doc(
+            db,
+            "posts",
+            id
+          ),
+          data
+        );
+
+
+        showToast(
+          "Post updated."
+        );
+
+      }
+
+      else{
+
+        data.createdAt =
+          serverTimestamp();
+
+
+        await addDoc(
+          collection(
+            db,
+            "posts"
+          ),
+          data
+        );
+
+
+        showToast(
+          "Post created."
+        );
+
+      }
+
+
+      closeModal();
+
+      await loadPosts();
+
+    }
+
+    catch(error){
+
+      console.error(error);
+
+      alert(
+        error.message ||
+        "Could not save the post."
+      );
+
+    }
+
+    finally{
+
+      $("savePostBtn")
+        .disabled =
+        false;
+
+    }
+
+  };
+
+
+
+/* =====================================================
+   DELETE POST
+===================================================== */
+
+async function deletePost(id){
+
+  const post =
+    posts.find(
+      item =>
+        item.id === id
+    );
+
+
+  if(!post)
+    return;
+
+
+  const confirmed =
+    confirm(
+      `Delete "${post.title || "Untitled"}"?`
+    );
+
+
+  if(!confirmed)
+    return;
+
+
+  try{
+
+    await deleteDoc(
+      doc(
+        db,
+        "posts",
+        id
+      )
+    );
+
+
+    showToast(
+      "Post deleted."
+    );
+
+
+    await loadPosts();
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    alert(
+      error.message ||
+      "Could not delete the post."
+    );
+
+  }
+
+}
+
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+function closeModal(){
+
+  $("postModal")
+    .classList
+    .add("hidden");
+
+}
+
+
+$("closeModal").onclick =
+  closeModal;
+
+
+$("cancelPost").onclick =
+  closeModal;
+
+
+$("postModal").onclick =
+  event => {
+
+    if(
+      event.target ===
+      $("postModal")
+    ){
+
+      closeModal();
+
+    }
+
+  };
+
+
+
+/* =====================================================
+   REFRESH
+===================================================== */
+
+$("refreshBtn").onclick =
+  async () => {
+
+    await loadPosts();
+
+    await loadReportCount();
+
+  };
+
+
+
+/* =====================================================
+   FILTER
+===================================================== */
+
+$("statusFilter").onchange =
+  renderPosts;
+
+
+
+/* =====================================================
+   REPORT COUNT
+===================================================== */
+
+async function loadReportCount(){
+
+  try{
+
+    const snapshot =
+      await getDocs(
+        collection(
+          db,
+          "reports"
+        )
+      );
+
+
+    const count =
+      snapshot.size;
+
+
+    $("reportBadge")
+      .textContent =
+      count;
+
+
+    if(count > 0){
+
+      $("reportBadge")
+        .classList
+        .add("show");
+
+    }
+
+    else{
+
+      $("reportBadge")
+        .classList
+        .remove("show");
+
+    }
+
+  }
+
+  catch(error){
+
+    console.error(
+      "Report count error:",
+      error
+    );
+
+  }
+
+}
+
+
+
+/* =====================================================
+   DATE HELPERS
+===================================================== */
+
+function getTimestamp(value){
+
+  if(
+    value &&
+    typeof value.toMillis ===
+    "function"
+  ){
+
+    return value.toMillis();
+
+  }
+
+
+  if(
+    value &&
+    typeof value.toDate ===
+    "function"
+  ){
+
+    return value
+      .toDate()
+      .getTime();
+
+  }
+
+
+  if(
+    typeof value ===
+    "number"
+  ){
+
+    return value;
+
+  }
+
+
+  if(value){
+
+    const time =
+      new Date(value)
+        .getTime();
+
+
+    return Number.isNaN(time)
+      ? 0
+      : time;
+
+  }
+
+
+  return 0;
+
+}
+
+
+
+function formatDate(value){
+
+  const time =
+    getTimestamp(value);
+
+
+  if(!time)
+    return "—";
+
+
+  return new Date(time)
+    .toLocaleDateString(
+      undefined,
+      {
+        year:"numeric",
+        month:"short",
+        day:"numeric"
+      }
+    );
+
+}
+
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value){
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    value == null
+      ? ""
+      : String(value);
+
+
+  return div.innerHTML;
+
+}
+
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+let toastTimer = null;
+
+
+function showToast(message){
+
+  const toast =
+    $("toast");
+
+
+  toast.textContent =
+    message;
+
+
+  toast.classList
+    .remove("hidden");
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+  toastTimer =
+    setTimeout(
+      () => {
+
+        toast.classList
+          .add("hidden");
+
+      },
+      2500
+    );
+
+}
+
 </script>
+
 </body>
 </html>
