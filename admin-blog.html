@@ -5,21 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Admin — FriendHub Blog</title>
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="noindex,nofollow">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
+
 :root{
   --bg:#0B0F1A;
   --panel:#121A2C;
-  --panel-2:#0D1322;
+  --panel2:#0D1322;
   --line:#212C42;
   --text:#EDE7DA;
   --muted:#8B96AC;
   --violet:#9C8CFB;
-  --violet-dim:#5142C4;
+  --violet2:#5142C4;
   --mint:#5EEAD4;
   --amber:#FFB84D;
   --red:#F87171;
@@ -69,7 +70,13 @@ button{
 
 a{
   color:inherit;
+  text-decoration:none;
 }
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 .topnav{
   position:sticky;
@@ -94,26 +101,24 @@ a{
   display:flex;
   align-items:center;
   gap:8px;
-  text-decoration:none;
 }
 
-.brand-text{
+.brand-name{
   font-family:"Space Grotesk",sans-serif;
-  font-weight:700;
   font-size:17px;
+  font-weight:700;
 }
 
-.brand-text em{
+.brand-name em{
   color:var(--mint);
   font-style:normal;
 }
 
 .admin-tag{
-  font-family:"IBM Plex Mono",monospace;
-  font-size:10px;
+  font:10px "IBM Plex Mono",monospace;
   color:var(--violet);
-  border:1px solid rgba(156,140,251,.25);
   background:rgba(156,140,251,.08);
+  border:1px solid rgba(156,140,251,.25);
   padding:2px 7px;
   border-radius:20px;
 }
@@ -122,7 +127,6 @@ a{
   display:flex;
   align-items:center;
   gap:8px;
-  flex-wrap:wrap;
 }
 
 .btn{
@@ -130,19 +134,18 @@ a{
   align-items:center;
   justify-content:center;
   gap:7px;
-  text-decoration:none;
-  font-size:13px;
-  font-weight:600;
   padding:9px 13px;
   border-radius:9px;
   border:1px solid var(--line);
   background:transparent;
   color:var(--text);
+  font-size:13px;
+  font-weight:600;
   transition:.15s;
 }
 
 .btn:hover{
-  border-color:var(--violet-dim);
+  border-color:var(--violet2);
   background:rgba(156,140,251,.08);
 }
 
@@ -150,15 +153,10 @@ a{
   background:linear-gradient(
     135deg,
     var(--violet),
-    var(--violet-dim)
+    var(--violet2)
   );
   border-color:transparent;
-  color:white;
-}
-
-.btn-danger{
-  color:var(--red);
-  border-color:rgba(248,113,113,.3);
+  color:#fff;
 }
 
 .btn-mint{
@@ -166,12 +164,17 @@ a{
   border-color:rgba(94,234,212,.3);
 }
 
+.btn-danger{
+  color:var(--red);
+  border-color:rgba(248,113,113,.3);
+}
+
 .btn-sm{
   padding:6px 11px;
   font-size:12px;
 }
 
-.report-nav-btn{
+.report-btn{
   position:relative;
 }
 
@@ -181,33 +184,42 @@ a{
   right:-6px;
   min-width:18px;
   height:18px;
+  padding:0 5px;
   display:none;
   align-items:center;
   justify-content:center;
-  border-radius:999px;
   background:var(--red);
-  color:white;
+  color:#fff;
+  border-radius:999px;
+  border:2px solid var(--bg);
   font-size:10px;
   font-weight:700;
-  border:2px solid var(--bg);
 }
 
 .report-badge.show{
   display:flex;
 }
 
+
+/* =========================================================
+   MAIN
+========================================================= */
+
 main{
   max-width:1180px;
   margin:auto;
-  padding:40px 24px 90px;
+  padding:32px 24px 80px;
 }
 
-/* LOGIN */
+
+/* =========================================================
+   LOGIN
+========================================================= */
 
 #loginScreen{
   max-width:400px;
   margin:80px auto;
-  padding:36px;
+  padding:34px;
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:16px;
@@ -220,21 +232,26 @@ main{
 }
 
 #loginScreen p{
+  margin:0 0 22px;
   color:var(--muted);
   font-size:13px;
-  margin:0 0 24px;
+  line-height:1.5;
 }
 
 #loginError{
+  display:none;
+  margin-top:12px;
   color:var(--red);
   font-size:13px;
-  margin-top:12px;
-  display:none;
 }
 
-/* NOT ADMIN */
+
+/* =========================================================
+   NOT ADMIN
+========================================================= */
 
 #notAdminBanner{
+  display:none;
   max-width:520px;
   margin:80px auto;
   padding:32px;
@@ -244,100 +261,194 @@ main{
 }
 
 #notAdminBanner h1{
+  margin:0 0 10px;
   font-family:"Space Grotesk",sans-serif;
   font-size:20px;
-  margin:0 0 10px;
 }
 
 #notAdminBanner p{
   color:var(--muted);
-  font-size:13.5px;
+  font-size:13px;
   line-height:1.6;
 }
 
-/* DASHBOARD */
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
 
 #dashboard{
   display:none;
 }
 
-.dash-head{
+.dashboard-head{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:15px;
   flex-wrap:wrap;
-  margin-bottom:28px;
+  margin-bottom:22px;
 }
 
-.dash-head h1{
+.dashboard-head h1{
+  margin:0;
   font-family:"Space Grotesk",sans-serif;
   font-size:27px;
-  margin:0;
 }
 
-.dash-head p{
-  color:var(--muted);
-  font-size:13.5px;
+.dashboard-head p{
   margin:5px 0 0;
+  color:var(--muted);
+  font-size:13px;
 }
 
-.post-row{
-  display:flex;
-  align-items:center;
-  gap:16px;
-  padding:16px 18px;
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.stat-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:15px;
+}
+
+.stat-label{
+  color:var(--muted);
+  font:10px "IBM Plex Mono",monospace;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+.stat-number{
+  margin-top:6px;
+  font-family:"Space Grotesk",sans-serif;
+  font-size:24px;
+  font-weight:700;
+}
+
+
+/* =========================================================
+   POSTS PANEL
+========================================================= */
+
+.posts-panel{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:12px;
-  margin-bottom:10px;
+  overflow:hidden;
 }
 
-.cover-thumb{
-  width:54px;
-  height:54px;
+.posts-panel-head{
+  padding:16px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid var(--line);
+}
+
+.posts-panel-title{
+  font-family:"Space Grotesk",sans-serif;
+  font-weight:600;
+  font-size:15px;
+}
+
+.posts-controls{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.posts-controls select{
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--line);
   border-radius:8px;
-  background:var(--panel-2);
-  flex-shrink:0;
-  object-fit:cover;
+  padding:7px 9px;
+  font-size:12px;
 }
 
-.post-info{
-  flex:1;
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-head{
+  display:grid;
+  grid-template-columns:1.7fr .8fr .7fr .7fr .7fr;
+  gap:10px;
+  padding:12px 18px;
+  color:var(--muted);
+  font:10px "IBM Plex Mono",monospace;
+  text-transform:uppercase;
+  border-bottom:1px solid var(--line);
+}
+
+.post-item{
+  display:grid;
+  grid-template-columns:1.7fr .8fr .7fr .7fr .7fr;
+  gap:10px;
+  align-items:center;
+  padding:13px 18px;
+  border-bottom:1px solid rgba(33,44,66,.7);
+}
+
+.post-item:last-child{
+  border-bottom:0;
+}
+
+.post-title{
   min-width:0;
 }
 
-.post-info h3{
-  margin:0 0 5px;
+.post-title-main{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
   font-family:"Space Grotesk",sans-serif;
-  font-size:15px;
+  font-size:14px;
+  font-weight:600;
+}
+
+.post-slug{
+  margin-top:3px;
+  color:var(--muted);
+  font:10px "IBM Plex Mono",monospace;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.meta{
-  display:flex;
-  align-items:center;
-  gap:8px;
+.post-author,
+.post-date{
   color:var(--muted);
-  font-family:"IBM Plex Mono",monospace;
   font-size:11px;
 }
 
-.status{
-  padding:2px 8px;
+.status-pill{
+  display:inline-flex;
+  width:max-content;
+  padding:3px 8px;
   border-radius:20px;
-  font-size:10px;
+  font:10px "IBM Plex Mono",monospace;
 }
 
-.status.published{
+.status-published{
   color:var(--mint);
   background:rgba(94,234,212,.1);
   border:1px solid rgba(94,234,212,.3);
 }
 
-.status.draft{
+.status-draft{
   color:var(--amber);
   background:rgba(255,184,77,.1);
   border:1px solid rgba(255,184,77,.3);
@@ -345,18 +456,27 @@ main{
 
 .post-actions{
   display:flex;
-  gap:7px;
+  justify-content:flex-end;
 }
 
-.empty{
+.empty-state{
   text-align:center;
+  padding:55px 20px;
   color:var(--muted);
-  padding:60px 20px;
-  border:1px dashed var(--line);
-  border-radius:14px;
+  font-size:13px;
 }
 
-/* EDITOR */
+.error-state{
+  text-align:center;
+  padding:45px 20px;
+  color:var(--red);
+  font-size:13px;
+}
+
+
+/* =========================================================
+   EDITOR
+========================================================= */
 
 #editorScreen{
   display:none;
@@ -366,48 +486,46 @@ main{
   display:flex;
   align-items:center;
   gap:14px;
-  margin-bottom:28px;
+  margin-bottom:25px;
 }
 
 .editor-head h1{
   margin:0;
-  flex:1;
   font-family:"Space Grotesk",sans-serif;
-  font-size:24px;
+  font-size:25px;
 }
 
 .back-btn{
   width:36px;
   height:36px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:9px;
   border:1px solid var(--line);
+  border-radius:9px;
   background:transparent;
   color:var(--text);
+  font-size:18px;
 }
 
 .editor-grid{
   display:grid;
   grid-template-columns:1.4fr 1fr;
-  gap:24px;
+  gap:22px;
+  align-items:start;
 }
 
 .panel-card{
+  margin-bottom:18px;
+  padding:21px;
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:14px;
-  padding:22px;
-  margin-bottom:20px;
 }
 
 .panel-card h2{
   margin:0 0 18px;
   color:var(--violet);
-  font-family:"IBM Plex Mono",monospace;
-  font-size:11px;
+  font:11px "IBM Plex Mono",monospace;
   text-transform:uppercase;
+  letter-spacing:.05em;
 }
 
 .field{
@@ -418,21 +536,20 @@ main{
   display:block;
   margin-bottom:6px;
   color:var(--muted);
-  font-family:"IBM Plex Mono",monospace;
-  font-size:12px;
+  font:11px "IBM Plex Mono",monospace;
 }
 
 .field input,
 .field textarea,
 .field select{
   width:100%;
-  background:var(--panel-2);
+  padding:10px 12px;
+  background:var(--panel2);
+  color:var(--text);
   border:1px solid var(--line);
   border-radius:8px;
-  color:var(--text);
-  padding:10px 12px;
-  font-size:14px;
   outline:none;
+  font-size:14px;
 }
 
 .field input:focus,
@@ -444,44 +561,38 @@ main{
 textarea#content{
   min-height:280px;
   resize:vertical;
-  font-family:"IBM Plex Mono",monospace;
-  font-size:13px;
   line-height:1.6;
+  font:13px "IBM Plex Mono",monospace;
 }
 
 textarea#excerpt{
-  min-height:80px;
+  min-height:75px;
   resize:vertical;
 }
 
 .hint{
   margin-top:5px;
   color:var(--muted);
-  font-size:11.5px;
+  font-size:11px;
 }
 
 .char-count{
-  text-align:right;
   margin-top:4px;
   color:var(--muted);
-  font:11px "IBM Plex Mono",monospace;
-}
-
-.char-count.over{
-  color:var(--red);
+  text-align:right;
+  font:10px "IBM Plex Mono",monospace;
 }
 
 .cover-preview{
-  width:100%;
   height:140px;
   margin-top:8px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  background:var(--panel-2);
   display:flex;
   align-items:center;
   justify-content:center;
   overflow:hidden;
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:8px;
 }
 
 .cover-preview img{
@@ -496,57 +607,61 @@ textarea#excerpt{
 }
 
 .serp-preview{
-  background:white;
-  border-radius:10px;
-  padding:16px;
+  padding:15px;
+  background:#fff;
+  border-radius:9px;
 }
 
 .serp-url{
   color:#4d5156;
-  font-size:12px;
+  font:12px Arial,sans-serif;
 }
 
 .serp-title{
-  color:#1a0dab;
-  font-size:17px;
   margin:3px 0;
+  color:#1a0dab;
+  font:17px Arial,sans-serif;
 }
 
 .serp-desc{
   color:#4d5156;
-  font-size:13px;
-  line-height:1.4;
+  font:13px/1.4 Arial,sans-serif;
 }
 
 .editor-footer{
   display:flex;
-  gap:8px;
+  align-items:center;
   justify-content:flex-end;
+  gap:8px;
   flex-wrap:wrap;
 }
 
 #saveStatus{
-  color:var(--mint);
-  font:12px "IBM Plex Mono",monospace;
-  margin-right:auto;
-  align-self:center;
   display:none;
+  margin-right:auto;
+  color:var(--mint);
+  font:11px "IBM Plex Mono",monospace;
 }
+
+
+/* =========================================================
+   TOAST
+========================================================= */
 
 #toast{
   position:fixed;
-  bottom:24px;
   left:50%;
-  transform:translateX(-50%) translateY(20px);
-  opacity:0;
+  bottom:24px;
+  z-index:100;
+  padding:12px 20px;
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:10px;
-  padding:12px 20px;
-  font-size:13px;
-  transition:.2s;
+  transform:translateX(-50%) translateY(20px);
+  opacity:0;
   pointer-events:none;
-  z-index:100;
+  transition:.2s;
+  font-size:13px;
 }
 
 #toast.show{
@@ -554,32 +669,53 @@ textarea#excerpt{
   transform:translateX(-50%) translateY(0);
 }
 
-@media(max-width:860px){
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:800px){
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .table-head{
+    display:none;
+  }
+
+  .post-item{
+    grid-template-columns:1fr auto;
+    gap:8px;
+  }
+
+  .post-author,
+  .post-date{
+    display:none;
+  }
+
+  .post-actions{
+    grid-column:2;
+    grid-row:1;
+  }
 
   .editor-grid{
     grid-template-columns:1fr;
   }
 
-  .topnav-inner{
-    padding:13px 15px;
-  }
-
-  main{
-    padding:28px 15px 70px;
-  }
-
-  .post-row{
-    align-items:flex-start;
-  }
-
-  .post-actions{
-    flex-direction:column;
-  }
 }
 
-@media(max-width:560px){
+@media(max-width:600px){
 
-  .brand .admin-tag{
+  .topnav-inner{
+    padding:12px 14px;
+  }
+
+  .brand-name{
+    font-size:15px;
+  }
+
+  .admin-tag{
     display:none;
   }
 
@@ -588,29 +724,48 @@ textarea#excerpt{
   }
 
   .nav-actions .btn{
-    padding:7px 9px;
+    padding:7px 8px;
     font-size:11px;
   }
 
-  .post-row{
-    flex-wrap:wrap;
+  .nav-actions .view-blog{
+    display:none;
   }
 
-  .post-info{
-    width:calc(100% - 70px);
+  main{
+    padding:25px 14px 70px;
   }
 
-  .post-actions{
+  .dashboard-head h1{
+    font-size:24px;
+  }
+
+  .posts-panel-head{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .posts-controls{
     width:100%;
-    flex-direction:row;
   }
+
+  .posts-controls button,
+  .posts-controls select{
+    flex:1;
+  }
+
 }
+
 </style>
 </head>
 
+
 <body>
 
-<!-- ================= NAV ================= -->
+
+<!-- =====================================================
+     NAV
+===================================================== -->
 
 <nav class="topnav">
 
@@ -618,7 +773,7 @@ textarea#excerpt{
 
     <a class="brand" href="/">
 
-      <span class="brand-text">
+      <span class="brand-name">
         Friend<em>Hub</em>
       </span>
 
@@ -628,29 +783,15 @@ textarea#excerpt{
 
     </a>
 
+
     <div class="nav-actions">
 
-      <!-- REPORTS -->
-
       <a
-        class="btn report-nav-btn"
+        class="btn report-btn"
         id="reportsBtn"
         href="reports.html"
         style="display:none;"
-        title="Reports"
       >
-
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M4 4h16v13H7l-3 3V4z"/>
-          <path d="M8 8h8M8 12h5"/>
-        </svg>
 
         Reports
 
@@ -662,39 +803,20 @@ textarea#excerpt{
       </a>
 
 
-      <!-- UNBAN -->
-
       <a
         class="btn btn-mint"
-        id="unbanNavBtn"
+        id="unbanBtn"
         href="unban.html"
         style="display:none;"
-        title="Manage banned users"
       >
-
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="m17 11 2 2 4-4"/>
-        </svg>
-
         Unban
-
       </a>
 
 
       <a
-        class="btn"
+        class="btn view-blog"
         href="/blog"
         target="_blank"
-        rel="noopener"
       >
         View blog ↗
       </a>
@@ -717,7 +839,10 @@ textarea#excerpt{
 
 <main>
 
-<!-- ================= LOGIN ================= -->
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
 
 <div id="loginScreen">
 
@@ -743,12 +868,11 @@ textarea#excerpt{
 </div>
 
 
-<!-- ================= NOT ADMIN ================= -->
+<!-- =====================================================
+     NOT ADMIN
+===================================================== -->
 
-<div
-  id="notAdminBanner"
-  style="display:none;"
->
+<div id="notAdminBanner">
 
   <h1>
     This account isn't an admin
@@ -771,23 +895,27 @@ textarea#excerpt{
 </div>
 
 
-<!-- ================= DASHBOARD ================= -->
+<!-- =====================================================
+     DASHBOARD
+===================================================== -->
 
 <div id="dashboard">
 
-  <div class="dash-head">
+
+  <div class="dashboard-head">
 
     <div>
 
       <h1>
-        Blog posts
+        Blog Administration
       </h1>
 
-      <p id="postCount">
-        Loading…
+      <p>
+        Manage FriendHub blog posts and moderation tools.
       </p>
 
     </div>
+
 
     <button
       class="btn btn-primary"
@@ -799,21 +927,153 @@ textarea#excerpt{
   </div>
 
 
-  <div id="postList"></div>
+  <!-- STATS -->
+
+  <div class="stats">
+
+    <div class="stat-card">
+
+      <div class="stat-label">
+        Total Posts
+      </div>
+
+      <div
+        class="stat-number"
+        id="totalPosts"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-label">
+        Published
+      </div>
+
+      <div
+        class="stat-number"
+        id="publishedPosts"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-label">
+        Drafts
+      </div>
+
+      <div
+        class="stat-number"
+        id="draftPosts"
+      >
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- POSTS -->
+
+  <div class="posts-panel">
+
+    <div class="posts-panel-head">
+
+      <div class="posts-panel-title">
+        Blog posts
+      </div>
+
+
+      <div class="posts-controls">
+
+        <button
+          class="btn btn-sm"
+          id="refreshBtn"
+        >
+          Refresh
+        </button>
+
+
+        <select id="filterPosts">
+
+          <option value="all">
+            All posts
+          </option>
+
+          <option value="published">
+            Published
+          </option>
+
+          <option value="draft">
+            Drafts
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-head">
+
+      <div>
+        TITLE
+      </div>
+
+      <div>
+        AUTHOR
+      </div>
+
+      <div>
+        STATUS
+      </div>
+
+      <div>
+        DATE
+      </div>
+
+      <div>
+        ACTIONS
+      </div>
+
+    </div>
+
+
+    <div id="postList">
+
+      <div class="empty-state">
+        Loading posts…
+      </div>
+
+    </div>
+
+  </div>
+
 
 </div>
 
 
-<!-- ================= EDITOR ================= -->
+<!-- =====================================================
+     EDITOR
+===================================================== -->
 
 <div id="editorScreen">
+
 
   <div class="editor-head">
 
     <button
       class="back-btn"
       id="backBtn"
-      aria-label="Back"
     >
       ←
     </button>
@@ -826,6 +1086,7 @@ textarea#excerpt{
 
 
   <div class="editor-grid">
+
 
     <!-- LEFT -->
 
@@ -919,6 +1180,7 @@ textarea#excerpt{
 
     <div>
 
+
       <div class="panel-card">
 
         <h2>
@@ -974,7 +1236,7 @@ textarea#excerpt{
 
           <div
             class="cover-preview"
-            id="coverPreviewWrap"
+            id="coverPreview"
           >
 
             <span class="placeholder">
@@ -1046,10 +1308,12 @@ textarea#excerpt{
           <div class="serp-preview">
 
             <div class="serp-url">
+
               friendhub.space › blog-post ›
               <span id="serpSlug">
                 your-slug
               </span>
+
             </div>
 
             <div
@@ -1080,6 +1344,7 @@ textarea#excerpt{
           Saved ✓
         </span>
 
+
         <button
           class="btn btn-danger"
           id="deleteBtn"
@@ -1088,12 +1353,14 @@ textarea#excerpt{
           Delete post
         </button>
 
+
         <button
           class="btn"
           id="saveDraftBtn"
         >
           Save draft
         </button>
+
 
         <button
           class="btn btn-primary"
@@ -1110,6 +1377,7 @@ textarea#excerpt{
 
 </div>
 
+
 </main>
 
 
@@ -1117,6 +1385,11 @@ textarea#excerpt{
 
 
 <script type="module">
+
+
+/* =========================================================
+   FIREBASE
+========================================================= */
 
 import {
   initializeApp
@@ -1143,18 +1416,11 @@ import {
   doc,
   setDoc,
   deleteDoc,
-  serverTimestamp,
-  orderBy,
-  query
+  serverTimestamp
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-
-
-/* =====================================================
-   FIREBASE
-===================================================== */
 
 const firebaseConfig = {
 
@@ -1179,7 +1445,6 @@ const firebaseConfig = {
 };
 
 
-
 const ADMIN_EMAILS = [
   "anowar531237@gmail.com"
 ];
@@ -1194,7 +1459,7 @@ const auth =
 const db =
   getFirestore(app);
 
-const googleProvider =
+const provider =
   new GoogleAuthProvider();
 
 
@@ -1207,12 +1472,11 @@ let posts = [];
 let editingId = null;
 
 
-
-/* =====================================================
+/* =========================================================
    AUTH
-===================================================== */
+========================================================= */
 
-function hideAllAuthScreens(){
+function hideScreens(){
 
   $("loginScreen")
     .style.display =
@@ -1252,73 +1516,29 @@ onAuthStateChanged(
         .style.display =
         "inline-flex";
 
-      $("unbanNavBtn")
+      $("unbanBtn")
         .style.display =
         "inline-flex";
 
 
-      hideAllAuthScreens();
+      hideScreens();
 
-      showDashboard();
-
-
-      const ok =
-        await loadPosts();
+      $("dashboard")
+        .style.display =
+        "block";
 
 
-      if(ok){
+      await loadPosts();
 
-        try{
-
-          const reportSnap =
-            await getDocs(
-              collection(
-                db,
-                "reports"
-              )
-            );
-
-
-          const count =
-            reportSnap.size;
-
-
-          $("reportBadge")
-            .textContent =
-            count > 99
-              ? "99+"
-              : count;
-
-
-          $("reportBadge")
-            .classList
-            .toggle(
-              "show",
-              count > 0
-            );
-
-        }
-
-        catch(error){
-
-          console.warn(
-            "Could not load report count:",
-            error
-          );
-
-        }
-
-      }
-
+      await loadReportCount();
 
       return;
-
     }
 
 
     if(user){
 
-      hideAllAuthScreens();
+      hideScreens();
 
       $("notAdminBanner")
         .style.display =
@@ -1332,20 +1552,11 @@ onAuthStateChanged(
         .style.display =
         "inline-flex";
 
-      $("reportsBtn")
-        .style.display =
-        "none";
-
-      $("unbanNavBtn")
-        .style.display =
-        "none";
-
       return;
-
     }
 
 
-    hideAllAuthScreens();
+    hideScreens();
 
     $("loginScreen")
       .style.display =
@@ -1359,155 +1570,203 @@ onAuthStateChanged(
       .style.display =
       "none";
 
-    $("unbanNavBtn")
+    $("unbanBtn")
       .style.display =
       "none";
 
-    $("reportBadge")
-      .classList
-      .remove("show");
-
   }
-
 );
 
 
-
-/* =====================================================
+/* =========================================================
    LOGIN
-===================================================== */
+========================================================= */
 
 $("googleSignInBtn")
-  .addEventListener(
-    "click",
-    async () => {
+  .onclick =
+  async () => {
+
+    $("loginError")
+      .style.display =
+      "none";
+
+    try{
+
+      await signInWithPopup(
+        auth,
+        provider
+      );
+
+    }
+
+    catch(error){
+
+      console.error(error);
+
+      $("loginError")
+        .textContent =
+        "Couldn't sign in. Please try again.";
 
       $("loginError")
         .style.display =
-        "none";
-
-      try{
-
-        await signInWithPopup(
-          auth,
-          googleProvider
-        );
-
-      }
-
-      catch(error){
-
-        console.error(error);
-
-        $("loginError")
-          .textContent =
-          "Couldn't sign in — please try again.";
-
-        $("loginError")
-          .style.display =
-          "block";
-
-      }
+        "block";
 
     }
-  );
+
+  };
 
 
 $("signOutBtn")
   .onclick =
-  () => signOut(auth);
+  () =>
+    signOut(auth);
 
 
 $("notAdminSignOutBtn")
   .onclick =
-  () => signOut(auth);
+  () =>
+    signOut(auth);
 
 
+/* =========================================================
+   REPORT COUNT
+========================================================= */
 
-/* =====================================================
-   VIEW SWITCHING
-===================================================== */
-
-function showDashboard(){
-
-  $("dashboard")
-    .style.display =
-    "block";
-
-  $("editorScreen")
-    .style.display =
-    "none";
-
-}
-
-
-function showEditor(){
-
-  $("dashboard")
-    .style.display =
-    "none";
-
-  $("editorScreen")
-    .style.display =
-    "block";
-
-}
-
-
-$("newPostBtn")
-  .onclick =
-  () => openEditor(null);
-
-
-$("backBtn")
-  .onclick =
-  () => showDashboard();
-
-
-
-/* =====================================================
-   LOAD POSTS
-
-   IMPORTANT:
-   Your actual collection is "blogPosts".
-===================================================== */
-
-async function loadPosts(){
-
-  $("postCount")
-    .textContent =
-    "Loading…";
-
+async function loadReportCount(){
 
   try{
 
-    const q =
-      query(
+    const snap =
+      await getDocs(
         collection(
           db,
-          "blogPosts"
-        ),
-        orderBy(
-          "updatedAt",
-          "desc"
+          "reports"
         )
       );
 
 
+    const count =
+      snap.size;
+
+
+    $("reportBadge")
+      .textContent =
+      count > 99
+        ? "99+"
+        : count;
+
+
+    $("reportBadge")
+      .classList
+      .toggle(
+        "show",
+        count > 0
+      );
+
+  }
+
+  catch(error){
+
+    console.warn(
+      "Report count error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD POSTS
+========================================================= */
+
+/*
+  IMPORTANT FIX:
+
+  Do NOT use:
+
+      orderBy("updatedAt", "desc")
+
+  because old blog documents may not have updatedAt.
+
+  Instead we load every document from blogPosts and
+  sort them in JavaScript.
+
+  This means old and new posts will both appear.
+*/
+
+async function loadPosts(){
+
+  $("postList")
+    .innerHTML = `
+      <div class="empty-state">
+        Loading posts…
+      </div>
+    `;
+
+
+  $("totalPosts")
+    .textContent =
+    "…";
+
+  $("publishedPosts")
+    .textContent =
+    "…";
+
+  $("draftPosts")
+    .textContent =
+    "…";
+
+
+  try{
+
     const snap =
-      await getDocs(q);
+      await getDocs(
+        collection(
+          db,
+          "blogPosts"
+        )
+      );
 
 
     posts =
       snap.docs.map(
-        d => ({
-          id:d.id,
-          ...d.data()
+        item => ({
+          id:item.id,
+          ...item.data()
         })
       );
 
 
-    renderPostList();
+    /* Sort safely even if updatedAt is missing */
+
+    posts.sort(
+      (a,b) => {
+
+        const aTime =
+          getTimestamp(
+            a.updatedAt ||
+            a.publishedAt ||
+            a.createdAt
+          );
+
+        const bTime =
+          getTimestamp(
+            b.updatedAt ||
+            b.publishedAt ||
+            b.createdAt
+          );
+
+        return bTime - aTime;
+
+      }
+    );
+
+
+    updateStats();
+
+    renderPosts();
 
     return true;
 
@@ -1516,103 +1775,206 @@ async function loadPosts(){
   catch(error){
 
     console.error(
-      "Firestore error:",
+      "BLOG LOAD ERROR:",
       error
     );
 
 
-    if(
-      error.code ===
-      "permission-denied"
-    ){
-
-      $("postList")
-        .innerHTML = `
-
-          <div
-            class="empty"
-            style="color:var(--red)"
-          >
-
-            Missing or insufficient permissions.
-
-            <br><br>
-
-            Make sure your Firestore rules
-            allow your admin email to read
-            <strong>blogPosts</strong>.
-
-          </div>
-
-        `;
-
-      $("postCount")
-        .textContent =
-        "Permission denied";
-
-      return true;
-
-    }
-
-
     $("postList")
       .innerHTML = `
-
-        <div class="empty">
-
-          Couldn't load posts.
-
+        <div class="error-state">
+          Failed to load blog posts.
           <br><br>
-
           ${escapeHtml(
-            error.message
+            error.message ||
+            "Unknown Firestore error"
           )}
-
         </div>
-
       `;
 
 
-    $("postCount")
+    $("totalPosts")
       .textContent =
-      "Error loading posts";
+      "0";
+
+    $("publishedPosts")
+      .textContent =
+      "0";
+
+    $("draftPosts")
+      .textContent =
+      "0";
 
 
-    return true;
+    return false;
 
   }
 
 }
 
 
+/* =========================================================
+   TIMESTAMP HELPER
+========================================================= */
 
-/* =====================================================
-   RENDER POSTS
-===================================================== */
+function getTimestamp(value){
 
-function renderPostList(){
+  if(!value)
+    return 0;
 
-  $("postCount")
+
+  if(
+    typeof value.toMillis ===
+    "function"
+  ){
+
+    return value.toMillis();
+
+  }
+
+
+  if(
+    typeof value.toDate ===
+    "function"
+  ){
+
+    return value
+      .toDate()
+      .getTime();
+
+  }
+
+
+  if(value instanceof Date){
+
+    return value.getTime();
+
+  }
+
+
+  const number =
+    Number(value);
+
+
+  if(
+    !Number.isNaN(number)
+  ){
+
+    return number;
+
+  }
+
+
+  const parsed =
+    Date.parse(value);
+
+
+  return Number.isNaN(parsed)
+    ? 0
+    : parsed;
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateStats(){
+
+  const total =
+    posts.length;
+
+
+  const published =
+    posts.filter(
+      p =>
+        p.status ===
+        "published"
+    ).length;
+
+
+  const drafts =
+    posts.filter(
+      p =>
+        p.status !==
+        "published"
+    ).length;
+
+
+  $("totalPosts")
     .textContent =
-    posts.length === 1
-      ? "1 post"
-      : `${posts.length} posts`;
+    total;
 
 
-  if(posts.length === 0){
+  $("publishedPosts")
+    .textContent =
+    published;
+
+
+  $("draftPosts")
+    .textContent =
+    drafts;
+
+}
+
+
+/* =========================================================
+   RENDER POSTS
+========================================================= */
+
+function renderPosts(){
+
+  const filter =
+    $("filterPosts")
+      .value;
+
+
+  let visible =
+    posts;
+
+
+  if(
+    filter ===
+    "published"
+  ){
+
+    visible =
+      posts.filter(
+        p =>
+          p.status ===
+          "published"
+      );
+
+  }
+
+
+  if(
+    filter ===
+    "draft"
+  ){
+
+    visible =
+      posts.filter(
+        p =>
+          p.status !==
+          "published"
+      );
+
+  }
+
+
+  if(
+    visible.length ===
+    0
+  ){
 
     $("postList")
       .innerHTML = `
 
-        <div class="empty">
+        <div class="empty-state">
 
-          No posts yet.
-
-          <br><br>
-
-          Click
-          <strong>New post</strong>
-          to create one.
+          No posts found.
 
         </div>
 
@@ -1623,57 +1985,11 @@ function renderPostList(){
   }
 
 
-  $("postList").innerHTML =
+  $("postList")
+    .innerHTML =
 
-    posts.map(
+    visible.map(
       p => {
-
-        const cover =
-          p.coverImageUrl
-
-          ?
-
-          `
-          <img
-            class="cover-thumb"
-            src="${escapeHtml(
-              p.coverImageUrl
-            )}"
-            alt=""
-          >
-          `
-
-          :
-
-          `
-          <div class="cover-thumb"></div>
-          `;
-
-
-        let date =
-          "not published";
-
-
-        if(
-          p.publishedAt &&
-          typeof p.publishedAt.toDate ===
-          "function"
-        ){
-
-          date =
-            p.publishedAt
-              .toDate()
-              .toLocaleDateString(
-                undefined,
-                {
-                  year:"numeric",
-                  month:"short",
-                  day:"numeric"
-                }
-              );
-
-        }
-
 
         const status =
           p.status ===
@@ -1682,36 +1998,80 @@ function renderPostList(){
             : "draft";
 
 
+        const date =
+          formatDate(
+            p.updatedAt ||
+            p.publishedAt ||
+            p.createdAt
+          );
+
+
+        const author =
+          p.author ||
+          p.authorName ||
+          "Admin";
+
+
         return `
 
-          <div class="post-row">
+          <div class="post-item">
 
-            ${cover}
+            <div class="post-title">
 
-            <div class="post-info">
+              <div class="post-title-main">
 
-              <h3>
                 ${escapeHtml(
                   p.title ||
-                  "(untitled)"
+                  "(Untitled post)"
                 )}
-              </h3>
-
-              <div class="meta">
-
-                <span
-                  class="status ${status}"
-                >
-                  ${status}
-                </span>
-
-                <span>·</span>
-
-                <span>
-                  ${date}
-                </span>
 
               </div>
+
+              <div class="post-slug">
+
+                ${escapeHtml(
+                  p.slug ||
+                  p.id
+                )}
+
+              </div>
+
+            </div>
+
+
+            <div class="post-author">
+
+              ${escapeHtml(
+                author
+              )}
+
+            </div>
+
+
+            <div>
+
+              <span
+                class="
+                  status-pill
+                  ${
+                    status ===
+                    "published"
+                      ? "status-published"
+                      : "status-draft"
+                  }
+                "
+              >
+
+                ${status}
+
+              </span>
+
+            </div>
+
+
+            <div class="post-date">
+
+              ${date}
 
             </div>
 
@@ -1724,7 +2084,9 @@ function renderPostList(){
                   p.id
                 )}"
               >
+
                 Edit
+
               </button>
 
             </div>
@@ -1734,7 +2096,8 @@ function renderPostList(){
         `;
 
       }
-    ).join("");
+    )
+    .join("");
 
 
   document
@@ -1756,10 +2119,83 @@ function renderPostList(){
 }
 
 
+/* =========================================================
+   FORMAT DATE
+========================================================= */
 
-/* =====================================================
-   OPEN EDITOR
-===================================================== */
+function formatDate(value){
+
+  const timestamp =
+    getTimestamp(value);
+
+
+  if(!timestamp)
+    return "—";
+
+
+  return new Date(
+    timestamp
+  ).toLocaleDateString(
+    undefined,
+    {
+      year:"numeric",
+      month:"short",
+      day:"numeric"
+    }
+  );
+
+}
+
+
+/* =========================================================
+   REFRESH / FILTER
+========================================================= */
+
+$("refreshBtn")
+  .onclick =
+  async () => {
+
+    await loadPosts();
+
+    await loadReportCount();
+
+    showToast(
+      "Posts refreshed"
+    );
+
+  };
+
+
+$("filterPosts")
+  .onchange =
+  () =>
+    renderPosts();
+
+
+/* =========================================================
+   EDITOR
+========================================================= */
+
+$("newPostBtn")
+  .onclick =
+  () =>
+    openEditor(null);
+
+
+$("backBtn")
+  .onclick =
+  () => {
+
+    $("editorScreen")
+      .style.display =
+      "none";
+
+    $("dashboard")
+      .style.display =
+      "block";
+
+  };
+
 
 function openEditor(id){
 
@@ -1767,103 +2203,103 @@ function openEditor(id){
     id;
 
 
-  const p =
+  const post =
     id
       ? posts.find(
-          x => x.id === id
+          p =>
+            p.id === id
         )
       : null;
 
 
   $("editorTitle")
     .textContent =
-    p
+    post
       ? "Edit post"
       : "New post";
 
 
   $("title").value =
-    p?.title ||
+    post?.title ||
     "";
 
 
   $("slug").value =
-    p?.slug ||
+    post?.slug ||
     "";
 
 
-  $("slug").dataset.manual =
-    p
-      ? "1"
-      : "";
-
-
   $("excerpt").value =
-    p?.excerpt ||
+    post?.excerpt ||
     "";
 
 
   $("content").value =
-    p?.content ||
+    post?.content ||
     "";
 
 
   $("status").value =
-    p?.status ||
+    post?.status ||
     "draft";
 
 
   $("tags").value =
-    Array.isArray(p?.tags)
-      ? p.tags.join(", ")
+    Array.isArray(
+      post?.tags
+    )
+      ? post.tags.join(", ")
       : "";
 
 
   $("coverImageUrl").value =
-    p?.coverImageUrl ||
+    post?.coverImageUrl ||
     "";
 
 
   $("metaTitle").value =
-    p?.metaTitle ||
+    post?.metaTitle ||
     "";
 
 
   $("metaDescription").value =
-    p?.metaDescription ||
+    post?.metaDescription ||
     "";
 
 
   $("deleteBtn")
     .style.display =
-    p
+    post
       ? "inline-flex"
       : "none";
 
 
-  $("saveStatus")
+  updateCounts();
+
+  updateSeo();
+
+  updateCover();
+
+
+  $("dashboard")
     .style.display =
     "none";
 
-
-  updateCoverPreview();
-  updateCounts();
-  updateSerpPreview();
-
-  showEditor();
+  $("editorScreen")
+    .style.display =
+    "block";
 
 }
 
 
-
-/* =====================================================
+/* =========================================================
    SLUG
-===================================================== */
+========================================================= */
 
-function slugify(str){
+function slugify(value){
 
   return (
-    str ||
+    value ||
     ""
   )
   .toLowerCase()
@@ -1889,144 +2325,111 @@ function slugify(str){
 
 
 $("title")
-  .addEventListener(
-    "input",
-    () => {
+  .oninput =
+  () => {
 
-      if(
-        !editingId &&
-        !$("slug").dataset.manual
-      ){
-
-        $("slug").value =
-          slugify(
-            $("title").value
-          );
-
-      }
-
-      updateSerpPreview();
-
-    }
-  );
-
-
-$("slug")
-  .addEventListener(
-    "input",
-    () => {
-
-      $("slug").dataset.manual =
-        "1";
+    if(
+      !editingId &&
+      !$("slug").dataset.manual
+    ){
 
       $("slug").value =
         slugify(
-          $("slug").value
+          $("title").value
         );
 
-      updateSerpPreview();
-
     }
-  );
 
 
+    updateSeo();
 
-/* =====================================================
-   COUNTS
-===================================================== */
+  };
+
+
+$("slug")
+  .oninput =
+  () => {
+
+    $("slug").dataset.manual =
+      "1";
+
+    $("slug").value =
+      slugify(
+        $("slug").value
+      );
+
+    updateSeo();
+
+  };
+
 
 $("excerpt")
-  .addEventListener(
-    "input",
-    () => {
+  .oninput =
+  () => {
 
-      updateCounts();
-      updateSerpPreview();
+    updateCounts();
 
-    }
-  );
+    updateSeo();
+
+  };
 
 
 $("metaTitle")
-  .addEventListener(
-    "input",
-    () => {
+  .oninput =
+  () => {
 
-      updateCounts();
-      updateSerpPreview();
+    updateCounts();
 
-    }
-  );
+    updateSeo();
+
+  };
 
 
 $("metaDescription")
-  .addEventListener(
-    "input",
-    () => {
+  .oninput =
+  () => {
 
-      updateCounts();
-      updateSerpPreview();
+    updateCounts();
 
-    }
-  );
+    updateSeo();
+
+  };
 
 
 $("coverImageUrl")
-  .addEventListener(
-    "input",
-    updateCoverPreview
-  );
+  .oninput =
+  () =>
+    updateCover();
 
+
+/* =========================================================
+   COUNTS
+========================================================= */
 
 function updateCounts(){
 
-  setCount(
-    "excerptCount",
-    $("excerpt").value.length,
-    200
-  );
+  $("excerptCount")
+    .textContent =
+    `${$("excerpt").value.length} / 200`;
 
-  setCount(
-    "metaTitleCount",
-    $("metaTitle").value.length,
-    70
-  );
 
-  setCount(
-    "metaDescCount",
-    $("metaDescription").value.length,
-    160
-  );
+  $("metaTitleCount")
+    .textContent =
+    `${$("metaTitle").value.length} / 70`;
+
+
+  $("metaDescCount")
+    .textContent =
+    `${$("metaDescription").value.length} / 160`;
 
 }
 
 
-function setCount(
-  id,
-  length,
-  max
-){
+/* =========================================================
+   SEO
+========================================================= */
 
-  const el =
-    $(id);
-
-  el.textContent =
-    `${length} / ${max}`;
-
-  el.classList.toggle(
-    "over",
-    length > max
-  );
-
-}
-
-
-
-/* =====================================================
-   SEO PREVIEW
-===================================================== */
-
-function updateSerpPreview(){
+function updateSeo(){
 
   const slug =
     $("slug").value ||
@@ -2059,12 +2462,11 @@ function updateSerpPreview(){
 }
 
 
+/* =========================================================
+   COVER
+========================================================= */
 
-/* =====================================================
-   COVER PREVIEW
-===================================================== */
-
-function updateCoverPreview(){
+function updateCover(){
 
   const url =
     $("coverImageUrl")
@@ -2072,43 +2474,40 @@ function updateCoverPreview(){
       .trim();
 
 
-  const wrap =
-    $("coverPreviewWrap");
-
-
   if(!url){
 
-    wrap.innerHTML = `
-      <span class="placeholder">
-        No image URL yet
-      </span>
-    `;
+    $("coverPreview")
+      .innerHTML = `
+        <span class="placeholder">
+          No image URL yet
+        </span>
+      `;
 
     return;
 
   }
 
 
-  wrap.innerHTML = `
+  $("coverPreview")
+    .innerHTML = `
 
-    <img
-      src="${escapeHtml(url)}"
-      alt=""
-      onerror="
-        this.parentElement.innerHTML=
-        '<span class=&quot;placeholder&quot;>Could not load image</span>'
-      "
-    >
+      <img
+        src="${escapeHtml(url)}"
+        alt=""
+        onerror="
+          this.parentElement.innerHTML =
+          '<span class=&quot;placeholder&quot;>Could not load image</span>'
+        "
+      >
 
-  `;
+    `;
 
 }
 
 
-
-/* =====================================================
+/* =========================================================
    SAVE
-===================================================== */
+========================================================= */
 
 $("saveDraftBtn")
   .onclick =
@@ -2150,7 +2549,9 @@ async function savePost(status){
   const existing =
     editingId
       ? posts.find(
-          x => x.id === editingId
+          p =>
+            p.id ===
+            editingId
         )
       : null;
 
@@ -2177,7 +2578,8 @@ async function savePost(status){
         .value
         .split(",")
         .map(
-          x => x.trim()
+          x =>
+            x.trim()
         )
         .filter(Boolean),
 
@@ -2212,7 +2614,6 @@ async function savePost(status){
       serverTimestamp();
 
   }
-
   else if(
     existing?.publishedAt
   ){
@@ -2224,12 +2625,6 @@ async function savePost(status){
 
 
   try{
-
-    /*
-      IMPORTANT:
-      Posts are saved to blogPosts,
-      matching your existing site.
-    */
 
     const docId =
       editingId ||
@@ -2278,12 +2673,13 @@ async function savePost(status){
   catch(error){
 
     console.error(
+      "SAVE ERROR:",
       error
     );
 
 
     showToast(
-      "Couldn't save. Check your Firestore rules."
+      "Couldn't save. Check Firestore rules."
     );
 
   }
@@ -2291,10 +2687,9 @@ async function savePost(status){
 }
 
 
-
-/* =====================================================
-   DELETE POST
-===================================================== */
+/* =========================================================
+   DELETE
+========================================================= */
 
 $("deleteBtn")
   .onclick =
@@ -2334,7 +2729,14 @@ $("deleteBtn")
 
       await loadPosts();
 
-      showDashboard();
+
+      $("editorScreen")
+        .style.display =
+        "none";
+
+      $("dashboard")
+        .style.display =
+        "block";
 
     }
 
@@ -2343,7 +2745,6 @@ $("deleteBtn")
       console.error(
         error
       );
-
 
       showToast(
         "Couldn't delete post."
@@ -2354,14 +2755,11 @@ $("deleteBtn")
   };
 
 
-
-/* =====================================================
+/* =========================================================
    ESCAPE HTML
-===================================================== */
+========================================================= */
 
-function escapeHtml(
-  str
-){
+function escapeHtml(value){
 
   const div =
     document.createElement(
@@ -2370,7 +2768,9 @@ function escapeHtml(
 
 
   div.textContent =
-    str || "";
+    value == null
+      ? ""
+      : String(value);
 
 
   return div.innerHTML;
@@ -2378,14 +2778,11 @@ function escapeHtml(
 }
 
 
-
-/* =====================================================
+/* =========================================================
    TOAST
-===================================================== */
+========================================================= */
 
-function showToast(
-  message
-){
+function showToast(message){
 
   const toast =
     $("toast");
