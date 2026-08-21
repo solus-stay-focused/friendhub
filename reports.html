@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — FriendHub Reports</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0F1A;--panel:#121A2C;--panel-2:#0D1322;--line:#212C42;--text:#EDE7DA;--muted:#8B96AC;--violet:#9C8CFB;--violet-dim:#5142C4;--mint:#5EEAD4;--red:#F87171;}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(640px 420px at 12% -6%,rgba(156,140,251,.13),transparent 60%),radial-gradient(560px 380px at 96% 8%,rgba(94,234,212,.08),transparent 60%),var(--bg)}
+a{color:inherit} button{font-family:inherit;cursor:pointer}
+.topnav{position:sticky;top:0;z-index:50;background:rgba(11,15,26,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topnav-inner{max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none} .brand svg{width:28px;height:28px}
+.brand span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;color:#fff} .brand em{font-style:normal;color:var(--mint)}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--violet);background:rgba(156,140,251,.1);border:1px solid rgba(156,140,251,.25);padding:2px 8px;border-radius:20px;margin-left:8px}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--text);transition:.15s}
+.btn:hover{border-color:var(--violet-dim);background:rgba(156,140,251,.07)} .btn-primary{background:linear-gradient(135deg,var(--violet),var(--violet-dim));border-color:transparent;color:#fff}
+.btn-danger{color:var(--red);border-color:rgba(248,113,113,.3)}
+main{max-width:1180px;margin:0 auto;padding:40px 24px 90px}
+.page-head{display:flex;align-items:center;gap:14px;margin-bottom:26px;flex-wrap:wrap}
+.back{width:38px;height:38px;display:flex;align-items:center;justify-content:center;padding:0}
+.page-head-copy{flex:1} .page-head h1{font-family:'Space Grotesk',sans-serif;font-size:28px;margin:0} .page-head p{color:var(--muted);font-size:13px;margin:5px 0 0}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px} .count{font:12px 'IBM Plex Mono',monospace;color:var(--muted)}
+.report-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px 18px;margin-bottom:10px}
+.report-card:hover{border-color:rgba(248,113,113,.35)} .report-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:10px}
+.reason{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px} .time{font:10.5px 'IBM Plex Mono',monospace;color:var(--muted);white-space:nowrap}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:7px 22px;margin-bottom:10px} .meta div{font:10.5px 'IBM Plex Mono',monospace;color:var(--muted);overflow-wrap:anywhere} .meta strong{color:var(--text);font-weight:500}
+.details{font-size:12.5px;line-height:1.55;background:rgba(255,255,255,.03);border-radius:9px;padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.empty,.error{padding:55px 20px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:13.5px} .error{color:var(--red)}
+#loginScreen,#notAdmin{max-width:430px;margin:80px auto;padding:32px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+#loginScreen h2,#notAdmin h2{font-family:'Space Grotesk',sans-serif;margin:0 0 8px} #loginScreen p,#notAdmin p{color:var(--muted);font-size:13.5px;line-height:1.6}
+#loginError{display:none;color:var(--red);font-size:13px;margin-top:12px} #notAdmin{display:none;border-color:var(--red)}
+@media(max-width:650px){.topnav-inner,main{padding-left:15px;padding-right:15px}.meta{grid-template-columns:1fr}.report-top{flex-direction:column;gap:5px}}
+</style>
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+<a class="brand" href="/">
+<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#9C8CFB"/><stop offset="100%" stop-color="#5142C4"/></linearGradient></defs><rect width="100" height="100" rx="22" fill="url(#g)"/><path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#fff"/><path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity=".88"/></svg>
+<span>Friend<em>Hub</em></span><span class="tag">ADMIN</span></a>
+<div class="nav-actions"><a class="btn" href="./">← Blog admin</a><button class="btn" id="signOutBtn">Sign out</button></div>
+</div></nav>
+
+<main>
+<div id="loginScreen"><h2>Admin sign in</h2><p>Sign in with your FriendHub Google account to view user reports.</p><button class="btn btn-primary" id="googleSignInBtn" style="width:100%;justify-content:center">Continue with Google</button><div id="loginError"></div></div>
+<div id="notAdmin"><h2>This account isn't an admin</h2><p>You are signed in, but this Google account is not on the FriendHub admin list.</p></div>
+<div id="reportsPage" style="display:none">
+<div class="page-head"><a class="btn back" href="./" aria-label="Back to admin">←</a><div class="page-head-copy"><h1>🚩 User reports</h1><p>Review reports submitted by FriendHub users.</p></div></div>
+<div class="toolbar"><span class="count" id="reportsCount">Loading reports…</span><button class="btn" id="refreshBtn">Refresh</button></div>
+<div id="reportsList"></div>
+</div>
+</main>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,getDocs} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
+  authDomain: "friendhub-9f934.firebaseapp.com",
+  projectId: "friendhub-9f934",
+  storageBucket: "friendhub-9f934.firebasestorage.app",
+  messagingSenderId: "97544296104",
+  appId: "1:97544296104:web:d7f7d27e86f1af748e949d"
+};
+const ADMIN_EMAILS = [
+  "anowar531237@gmail.com"
+];
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),provider=new GoogleAuthProvider();
+const $=id=>document.getElementById(id);
+const labels={nudity_sexual_content:'Nudity or sexual content',harassment_abuse:'Harassment or abusive behavior',underage:'Appears to be a minor',spam_scam:'Spam, scam, or advertising',violence_threats:'Violence or threats',other:'Something else'};
+function esc(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]))}
+function date(ts){try{const d=ts?.toDate?ts.toDate():new Date(ts);return d.toLocaleString(undefined,{year:'numeric',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}catch{return 'Unknown time'}}
+async function loadReports(){const list=$('reportsList'),count=$('reportsCount');list.innerHTML='<div class="empty">Loading reports…</div>';try{const snap=await getDocs(collection(db,'reports'));const reports=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));count.textContent=reports.length===1?'1 report':`${reports.length} reports`;if(!reports.length){list.innerHTML='<div class="empty">No reports yet. You’re all clear. ✓</div>';return}list.innerHTML=reports.map(r=>`<div class="report-card"><div class="report-top"><div class="reason">🚩 ${esc(labels[r.reason]||r.reason||'Unknown reason')}</div><div class="time">${esc(date(r.createdAt))}</div></div><div class="meta"><div>Reporter: <strong>${esc(r.reporterUid||'Unknown')}</strong></div><div>Reported user: <strong>${esc(r.reportedUid||'Unknown')}</strong></div><div>Call ID: <strong>${esc(r.callId||'Unknown')}</strong></div><div>Report ID: <strong>${esc(r.id)}</strong></div></div><div class="details">${esc((r.details||'').trim()||'No additional details provided.')}</div></div>`).join('')}catch(err){console.error(err);count.textContent='Could not load reports';list.innerHTML='<div class="error">Could not load reports. Check your Firestore rules and make sure this admin can read the reports collection.</div>'}}
+$('googleSignInBtn').onclick=async()=>{try{await signInWithPopup(auth,provider)}catch(e){$('loginError').textContent=e.message||'Sign-in failed';$('loginError').style.display='block'}};
+$('signOutBtn').onclick=()=>signOut(auth);$('refreshBtn').onclick=loadReports;
+onAuthStateChanged(auth,async user=>{if(user && ADMIN_EMAILS.includes(user.email)){$('loginScreen').style.display='none';$('notAdmin').style.display='none';$('reportsPage').style.display='block';await loadReports()}else if(user){$('loginScreen').style.display='none';$('reportsPage').style.display='none';$('notAdmin').style.display='block'}else{$('loginScreen').style.display='block';$('notAdmin').style.display='none';$('reportsPage').style.display='none'}});
+</script>
+</body></html>
