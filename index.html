@@ -783,42 +783,6 @@
     background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.18);
   }
   .vcinfo-btn-outline:hover{ border-color:rgba(255,255,255,0.34); background:rgba(255,255,255,0.07); transform:translateY(-1px); }
-  .vcinfo-country-row{
-    display:flex; align-items:center; gap:10px; margin-top:22px; flex-wrap:wrap;
-  }
-  @media (max-width:900px){ .vcinfo-country-row{ justify-content:center; } }
-  .vcinfo-country-row label{ font-size:13px; font-weight:600; color:var(--ink-soft); }
-  .vcinfo-country-select{
-    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); color:var(--ink);
-    border-radius:999px; padding:9px 34px 9px 16px; font-size:13.5px; font-weight:500;
-    font-family:'Inter',sans-serif; appearance:none; -webkit-appearance:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235E9EFF'><path d='M5 8l5 5 5-5H5z'/></svg>");
-    background-repeat:no-repeat; background-position:right 12px center;
-  }
-  .vcinfo-country-btn{
-    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); color:var(--ink);
-    border-radius:999px; padding:9px 34px 9px 16px; font-size:13.5px; font-weight:500;
-    font-family:'Inter',sans-serif; cursor:pointer; text-align:left; position:relative;
-  }
-  .vcinfo-country-btn::after{
-    content:'';
-    position:absolute; right:14px; top:50%; transform:translateY(-50%);
-    width:10px; height:10px;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235E9EFF'><path d='M5 8l5 5 5-5H5z'/></svg>");
-    background-repeat:no-repeat; background-size:contain;
-  }
-  .vcinfo-country-btn:hover{ border-color:rgba(255,255,255,0.3); }
-  .vcinfo-stats{ display:flex; align-items:center; gap:14px; margin-top:34px; }
-  @media (max-width:900px){ .vcinfo-stats{ justify-content:center; } }
-  .vcinfo-avatar-stack{ display:flex; }
-  .vcinfo-avatar-stack img{
-    width:38px; height:38px; border-radius:50%; border:3px solid var(--hp-bg);
-    margin-left:-12px; display:block;
-    object-fit:cover; background:var(--hp-blue-light);
-  }
-  .vcinfo-avatar-stack img:first-child{ margin-left:0; }
-  .vcinfo-stats-text{ font-size:14px; color:var(--ink-soft); line-height:1.4; }
-  .vcinfo-stats-text strong{ color:var(--ink); }
   .vcinfo-note{ margin-top:22px; font-size:13px; color:var(--ink-soft); opacity:0.8; }
 
   /* hero preview mockup */
@@ -1596,14 +1560,6 @@
       <div class="vcinfo-cta-row">
         <a href="/" class="vcinfo-btn vcinfo-btn-primary">▶ Start Random Chat</a>
         <a href="#safety" class="vcinfo-btn vcinfo-btn-outline">🛡️ Safety First</a>
-      </div>
-      <div class="vcinfo-country-row">
-        <label for="vcHeroCountryBtn">Match me with:</label>
-        <button type="button" class="vcinfo-country-btn" id="vcHeroCountryBtn" aria-haspopup="dialog" aria-label="Preferred country to match with" onclick="openCountryModal('hero')">Any country</button>
-      </div>
-      <div class="vcinfo-stats">
-        <div class="vcinfo-avatar-stack"><img src="p1.png" alt=""><img src="p2.png" alt=""><img src="p3.png" alt=""><img src="p4.png" alt=""></div>
-        <div class="vcinfo-stats-text"><strong id="vcInfoOnlineCount">…</strong> people are online chatting right now</div>
       </div>
       <div class="vcinfo-note">18+ only · Video is opt-in for both people · Leave any conversation instantly</div>
     </div>
