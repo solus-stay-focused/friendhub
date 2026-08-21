@@ -384,7 +384,7 @@ main{
 
 .table-head{
   display:grid;
-  grid-template-columns:1.7fr .8fr .7fr .7fr .7fr;
+  grid-template-columns:1.9fr .8fr .7fr .7fr .7fr;
   gap:10px;
   padding:12px 18px;
   color:var(--muted);
@@ -395,7 +395,7 @@ main{
 
 .post-item{
   display:grid;
-  grid-template-columns:1.7fr .8fr .7fr .7fr .7fr;
+  grid-template-columns:1.9fr .8fr .7fr .7fr .7fr;
   gap:10px;
   align-items:center;
   padding:13px 18px;
@@ -406,7 +406,47 @@ main{
   border-bottom:0;
 }
 
+
+/* =========================================================
+   POST TITLE + BANNER
+========================================================= */
+
 .post-title{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.post-cover{
+  width:76px;
+  height:48px;
+  flex:0 0 76px;
+  overflow:hidden;
+  border-radius:7px;
+  background:var(--panel2);
+  border:1px solid var(--line);
+}
+
+.post-cover img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.post-cover-empty{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+  font-size:9px;
+  text-align:center;
+}
+
+.post-title-text{
   min-width:0;
 }
 
@@ -671,6 +711,32 @@ textarea#excerpt{
 
 
 /* =========================================================
+   TABLET
+========================================================= */
+
+@media(max-width:900px){
+
+  .table-head{
+    grid-template-columns:1.8fr .7fr .7fr;
+  }
+
+  .table-head div:nth-child(4),
+  .table-head div:nth-child(5){
+    display:none;
+  }
+
+  .post-item{
+    grid-template-columns:1.8fr .7fr .7fr;
+  }
+
+  .post-date{
+    display:none;
+  }
+
+}
+
+
+/* =========================================================
    MOBILE
 ========================================================= */
 
@@ -689,8 +755,7 @@ textarea#excerpt{
     gap:8px;
   }
 
-  .post-author,
-  .post-date{
+  .post-author{
     display:none;
   }
 
@@ -704,6 +769,7 @@ textarea#excerpt{
   }
 
 }
+
 
 @media(max-width:600px){
 
@@ -754,6 +820,24 @@ textarea#excerpt{
     flex:1;
   }
 
+  .post-cover{
+    width:64px;
+    height:42px;
+    flex-basis:64px;
+  }
+
+  .post-title{
+    gap:9px;
+  }
+
+  .post-title-main{
+    font-size:13px;
+  }
+
+  .post-slug{
+    font-size:9px;
+  }
+
 }
 
 </style>
@@ -764,7 +848,7 @@ textarea#excerpt{
 
 
 <!-- =====================================================
-     NAV
+     NAVIGATION
 ===================================================== -->
 
 <nav class="topnav">
@@ -927,7 +1011,9 @@ textarea#excerpt{
   </div>
 
 
-  <!-- STATS -->
+  <!-- ===================================================
+       STATS
+  ==================================================== -->
 
   <div class="stats">
 
@@ -981,7 +1067,9 @@ textarea#excerpt{
   </div>
 
 
-  <!-- POSTS -->
+  <!-- ===================================================
+       POSTS
+  ==================================================== -->
 
   <div class="posts-panel">
 
@@ -1088,7 +1176,7 @@ textarea#excerpt{
   <div class="editor-grid">
 
 
-    <!-- LEFT -->
+    <!-- LEFT SIDE -->
 
     <div>
 
@@ -1176,10 +1264,9 @@ textarea#excerpt{
     </div>
 
 
-    <!-- RIGHT -->
+    <!-- RIGHT SIDE -->
 
     <div>
-
 
       <div class="panel-card">
 
@@ -1681,21 +1768,6 @@ async function loadReportCount(){
    LOAD POSTS
 ========================================================= */
 
-/*
-  IMPORTANT FIX:
-
-  Do NOT use:
-
-      orderBy("updatedAt", "desc")
-
-  because old blog documents may not have updatedAt.
-
-  Instead we load every document from blogPosts and
-  sort them in JavaScript.
-
-  This means old and new posts will both appear.
-*/
-
 async function loadPosts(){
 
   $("postList")
@@ -1721,6 +1793,17 @@ async function loadPosts(){
 
   try{
 
+    /*
+      IMPORTANT:
+
+      We intentionally DO NOT use orderBy()
+      here.
+
+      Some older posts may not contain
+      updatedAt. Loading the collection
+      directly makes all old posts appear.
+    */
+
     const snap =
       await getDocs(
         collection(
@@ -1733,13 +1816,14 @@ async function loadPosts(){
     posts =
       snap.docs.map(
         item => ({
+
           id:item.id,
+
           ...item.data()
+
         })
       );
 
-
-    /* Sort safely even if updatedAt is missing */
 
     posts.sort(
       (a,b) => {
@@ -1751,12 +1835,14 @@ async function loadPosts(){
             a.createdAt
           );
 
+
         const bTime =
           getTimestamp(
             b.updatedAt ||
             b.publishedAt ||
             b.createdAt
           );
+
 
         return bTime - aTime;
 
@@ -1767,8 +1853,6 @@ async function loadPosts(){
     updateStats();
 
     renderPosts();
-
-    return true;
 
   }
 
@@ -1782,14 +1866,20 @@ async function loadPosts(){
 
     $("postList")
       .innerHTML = `
+
         <div class="error-state">
+
           Failed to load blog posts.
+
           <br><br>
+
           ${escapeHtml(
             error.message ||
             "Unknown Firestore error"
           )}
+
         </div>
+
       `;
 
 
@@ -1797,16 +1887,15 @@ async function loadPosts(){
       .textContent =
       "0";
 
+
     $("publishedPosts")
       .textContent =
       "0";
 
+
     $("draftPosts")
       .textContent =
       "0";
-
-
-    return false;
 
   }
 
@@ -1814,7 +1903,7 @@ async function loadPosts(){
 
 
 /* =========================================================
-   TIMESTAMP HELPER
+   TIMESTAMP
 ========================================================= */
 
 function getTimestamp(value){
@@ -2012,32 +2101,84 @@ function renderPosts(){
           "Admin";
 
 
+        /*
+          Banner image:
+
+          The code checks coverImageUrl.
+          This is the same field used by
+          the editor when saving a cover.
+        */
+
+        const cover =
+          p.coverImageUrl
+            ? `
+
+              <img
+                src="${escapeHtml(
+                  p.coverImageUrl
+                )}"
+                alt=""
+                loading="lazy"
+                onerror="
+                  this.style.display='none';
+                  this.parentElement.innerHTML =
+                  '<div class=&quot;post-cover-empty&quot;>No image</div>';
+                "
+              >
+
+            `
+            : `
+
+              <div class="post-cover-empty">
+                No image
+              </div>
+
+            `;
+
+
         return `
 
           <div class="post-item">
 
+
+            <!-- TITLE + BANNER -->
+
             <div class="post-title">
 
-              <div class="post-title-main">
+              <div class="post-cover">
 
-                ${escapeHtml(
-                  p.title ||
-                  "(Untitled post)"
-                )}
+                ${cover}
 
               </div>
 
-              <div class="post-slug">
 
-                ${escapeHtml(
-                  p.slug ||
-                  p.id
-                )}
+              <div class="post-title-text">
+
+                <div class="post-title-main">
+
+                  ${escapeHtml(
+                    p.title ||
+                    "(Untitled post)"
+                  )}
+
+                </div>
+
+
+                <div class="post-slug">
+
+                  ${escapeHtml(
+                    p.slug ||
+                    p.id
+                  )}
+
+                </div>
 
               </div>
 
             </div>
 
+
+            <!-- AUTHOR -->
 
             <div class="post-author">
 
@@ -2047,6 +2188,8 @@ function renderPosts(){
 
             </div>
 
+
+            <!-- STATUS -->
 
             <div>
 
@@ -2069,12 +2212,16 @@ function renderPosts(){
             </div>
 
 
+            <!-- DATE -->
+
             <div class="post-date">
 
               ${date}
 
             </div>
 
+
+            <!-- ACTION -->
 
             <div class="post-actions">
 
@@ -2090,6 +2237,7 @@ function renderPosts(){
               </button>
 
             </div>
+
 
           </div>
 
@@ -2120,7 +2268,7 @@ function renderPosts(){
 
 
 /* =========================================================
-   FORMAT DATE
+   DATE
 ========================================================= */
 
 function formatDate(value){
@@ -2148,7 +2296,7 @@ function formatDate(value){
 
 
 /* =========================================================
-   REFRESH / FILTER
+   REFRESH
 ========================================================= */
 
 $("refreshBtn")
@@ -2173,7 +2321,7 @@ $("filterPosts")
 
 
 /* =========================================================
-   EDITOR
+   NEW POST
 ========================================================= */
 
 $("newPostBtn")
@@ -2196,6 +2344,10 @@ $("backBtn")
 
   };
 
+
+/* =========================================================
+   OPEN EDITOR
+========================================================= */
 
 function openEditor(id){
 
@@ -2227,6 +2379,12 @@ function openEditor(id){
   $("slug").value =
     post?.slug ||
     "";
+
+
+  $("slug").dataset.manual =
+    post
+      ? "1"
+      : "";
 
 
   $("excerpt").value =
@@ -2284,6 +2442,7 @@ function openEditor(id){
   $("dashboard")
     .style.display =
     "none";
+
 
   $("editorScreen")
     .style.display =
@@ -2353,10 +2512,12 @@ $("slug")
     $("slug").dataset.manual =
       "1";
 
+
     $("slug").value =
       slugify(
         $("slug").value
       );
+
 
     updateSeo();
 
@@ -2463,7 +2624,7 @@ function updateSeo(){
 
 
 /* =========================================================
-   COVER
+   COVER PREVIEW
 ========================================================= */
 
 function updateCover(){
@@ -2478,9 +2639,11 @@ function updateCover(){
 
     $("coverPreview")
       .innerHTML = `
+
         <span class="placeholder">
           No image URL yet
         </span>
+
       `;
 
     return;
@@ -2496,7 +2659,7 @@ function updateCover(){
         alt=""
         onerror="
           this.parentElement.innerHTML =
-          '<span class=&quot;placeholder&quot;>Could not load image</span>'
+          '<span class=&quot;placeholder&quot;>Could not load image</span>';
         "
       >
 
@@ -2506,7 +2669,7 @@ function updateCover(){
 
 
 /* =========================================================
-   SAVE
+   SAVE POST
 ========================================================= */
 
 $("saveDraftBtn")
@@ -2535,7 +2698,10 @@ async function savePost(status){
       .trim();
 
 
-  if(!title || !slug){
+  if(
+    !title ||
+    !slug
+  ){
 
     showToast(
       "Title and slug are required."
@@ -2582,6 +2748,11 @@ async function savePost(status){
             x.trim()
         )
         .filter(Boolean),
+
+    /*
+      IMPORTANT:
+      Save the banner URL.
+    */
 
     coverImageUrl:
       $("coverImageUrl")
@@ -2734,6 +2905,7 @@ $("deleteBtn")
         .style.display =
         "none";
 
+
       $("dashboard")
         .style.display =
         "block";
@@ -2745,6 +2917,7 @@ $("deleteBtn")
       console.error(
         error
       );
+
 
       showToast(
         "Couldn't delete post."
