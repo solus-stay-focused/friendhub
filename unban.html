@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Banned Users | FriendHub</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{--bg:#0B0F1A;--panel:#121A2C;--panel2:#0D1322;--line:#212C42;--text:#EDE7DA;--muted:#8B96AC;--violet:#9C8CFB;--violet2:#5142C4;--mint:#5EEAD4;--amber:#FFB84D;--red:#F87171}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(640px 420px at 12% -6%,rgba(156,140,251,.13),transparent 60%),radial-gradient(560px 380px at 96% 8%,rgba(94,234,212,.08),transparent 60%),var(--bg)}
+.topnav{position:sticky;top:0;z-index:20;background:rgba(11,15,26,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.navin{max-width:1180px;margin:auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-weight:700;font-size:17px;color:#fff;text-decoration:none}.brand em{font-style:normal;color:var(--mint)}
+.actions{display:flex;gap:9px;align-items:center}.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:13.5px;font-weight:600;padding:9px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer}.btn:hover{border-color:var(--violet2);background:rgba(156,140,251,.07)}.danger{color:var(--red);border-color:rgba(248,113,113,.3)}
+main{max-width:1180px;margin:auto;padding:40px 24px 90px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}.head h1{margin:0;font-size:27px}.head p{margin:5px 0 0;color:var(--muted);font-size:13.5px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+.controls{display:grid;grid-template-columns:1fr 180px auto;gap:10px;align-items:end}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px;font-family:monospace;text-transform:uppercase}.field input,.field select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:10px 12px;font-size:14px;outline:none}.field input:focus,.field select:focus{border-color:var(--violet)}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.quick button{font-size:12px;padding:7px 10px}
+.summary{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}.pill{padding:5px 10px;border-radius:999px;border:1px solid var(--line);font:12px monospace;color:var(--muted)}
+.table-wrap{overflow:auto}.row{display:grid;grid-template-columns:1.2fr 1.1fr .8fr .8fr auto;gap:14px;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line);min-width:800px}.row:last-child{border-bottom:0}.th{font:11px monospace;color:var(--muted);text-transform:uppercase}.name{font-weight:600}.sub{font:11px monospace;color:var(--muted);margin-top:4px;word-break:break-all}.badge{display:inline-block;font:11px monospace;padding:3px 8px;border-radius:999px;color:var(--red);background:rgba(248,113,113,.09);border:1px solid rgba(248,113,113,.25)}
+.empty{text-align:center;color:var(--muted);padding:45px 20px}.notice{font-size:12.5px;color:var(--muted);line-height:1.55}.hidden{display:none!important}
+@media(max-width:760px){.controls{grid-template-columns:1fr}.navin{padding:14px 16px}main{padding:28px 16px}.row{min-width:720px}}
+</style>
+</head>
+<body>
+<nav class="topnav"><div class="navin">
+  <a class="brand" href="admin-blog-updated.html">Friend<em>Hub</em> <span style="color:var(--violet);font-size:11px;margin-left:7px">ADMIN</span></a>
+  <div class="actions">
+    <a class="btn" href="reports.html">Reports</a>
+    <button class="btn" id="signOut">Sign out</button>
+  </div>
+</div></nav>
+
+<main>
+  <div id="authError" class="card hidden"></div>
+  <section id="page" class="hidden">
+    <div class="head">
+      <div><h1>Banned users</h1><p>Search, filter, and unban users from one place.</p></div>
+      <div class="summary"><span class="pill" id="countPill">0 banned</span><span class="pill" id="filteredPill">0 shown</span></div>
+    </div>
+
+    <div class="card">
+      <div class="controls">
+        <div class="field"><label>Search by IP</label><input id="ipSearch" placeholder="e.g. 192.168.1.20"></div>
+        <div class="field"><label>Banned for</label>
+          <select id="duration">
+            <option value="all">All ban durations</option>
+            <option value="1h">1 hour</option><option value="6h">6 hours</option><option value="12h">12 hours</option>
+            <option value="24h">24 hours</option><option value="3d">3 days</option><option value="7d">7 days</option>
+            <option value="30d">30 days</option><option value="permanent">Permanent</option>
+          </select>
+        </div>
+        <button class="btn" id="clearBtn">Clear filters</button>
+      </div>
+      <div class="quick">
+        <button class="btn quick" data-duration="1h">1h</button><button class="btn quick" data-duration="6h">6h</button>
+        <button class="btn quick" data-duration="12h">12h</button><button class="btn quick" data-duration="24h">24h</button>
+        <button class="btn quick" data-duration="3d">3d</button><button class="btn quick" data-duration="7d">7d</button>
+        <button class="btn quick" data-duration="30d">30d</button><button class="btn quick" data-duration="permanent">Permanent</button>
+        <button class="btn danger" id="unbanFiltered">Unban all shown</button>
+      </div>
+      <p class="notice">The duration filter matches the stored <code>banDuration</code> value. If your ban system uses a different field/value, adjust <code>getDuration()</code> below.</p>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <div class="row th"><div>User</div><div>IP address</div><div>Ban duration</div><div>Banned at</div><div>Action</div></div>
+        <div id="list"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,getDocs,doc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",authDomain:"friendhub-9f934.firebaseapp.com",projectId:"friendhub-9f934",storageBucket:"friendhub-9f934.firebasestorage.app",messagingSenderId:"97544296104",appId:"1:97544296104:web:d7f7d27e86f1af748e949d"};
+const ADMIN_EMAILS=["anowar531237@gmail.com"];
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const provider=new GoogleAuthProvider(); const $=id=>document.getElementById(id);
+let bans=[];
+
+$("signOut").onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){$("page").classList.add("hidden");$("authError").classList.remove("hidden");$("authError").innerHTML="<b>Please sign in as an admin.</b><br><br><button class='btn' id='login'>Continue with Google</button>";$("login").onclick=()=>signInWithPopup(auth,provider);return;}
+  if(!ADMIN_EMAILS.includes(user.email)){ $("page").classList.add("hidden");$("authError").classList.remove("hidden");$("authError").innerHTML="<b>This account isn't an admin.</b><br><br>"+user.email;return;}
+  $("authError").classList.add("hidden");$("page").classList.remove("hidden"); await loadBans();
+});
+
+async function loadBans(){
+  try{
+    const snap=await getDocs(collection(db,"bans"));
+    bans=snap.docs.map(d=>({id:d.id,...d.data()}));
+    render();
+  }catch(e){
+    console.error(e);
+    $("list").innerHTML="<div class='empty'>Couldn't load banned users. Check your Firestore rules and the collection name.</div>";
+  }
+}
+
+function getDuration(b){
+  const raw=String(b.banDuration ?? b.duration ?? b.bannedFor ?? b.banType ?? "").toLowerCase();
+  if(raw.includes("permanent")||raw==="perm") return "permanent";
+  if(raw.includes("30")) return "30d"; if(raw.includes("7")) return "7d"; if(raw.includes("3")) return "3d";
+  if(raw.includes("24")||raw.includes("day")) return "24h";
+  if(raw.includes("12")) return "12h"; if(raw.includes("6")) return "6h"; if(raw.includes("1")) return "1h";
+  return raw||"unknown";
+}
+function getIP(b){return String(b.ip ?? b.ipAddress ?? b.IP ?? b.address ?? "—")}
+function getUser(b){return b.username ?? b.displayName ?? b.email ?? b.uid ?? b.userId ?? "Unknown user"}
+function getTime(b){const v=b.bannedAt ?? b.createdAt ?? b.timestamp; if(v?.toDate)return v.toDate().toLocaleString(); if(v)return new Date(v).toLocaleString(); return "—"}
+
+function filtered(){
+  const ip=$("ipSearch").value.trim().toLowerCase(), dur=$("duration").value;
+  return bans.filter(b=>(!ip||getIP(b).toLowerCase().includes(ip))&&(dur==="all"||getDuration(b)===dur));
+}
+function render(){
+  const rows=filtered(); $("countPill").textContent=`${bans.length} banned`;$("filteredPill").textContent=`${rows.length} shown`;
+  if(!rows.length){$("list").innerHTML="<div class='empty'>No banned users match the current filters.</div>";return}
+  $("list").innerHTML=rows.map(b=>`<div class="row">
+    <div><div class="name">${esc(getUser(b))}</div><div class="sub">${esc(b.uid??b.userId??b.id)}</div></div>
+    <div class="mono">${esc(getIP(b))}</div>
+    <div><span class="badge">${esc(getDuration(b))}</span></div>
+    <div class="sub">${esc(getTime(b))}</div>
+    <div><button class="btn danger" data-unban="${esc(b.id)}">Unban</button></div>
+  </div>`).join("");
+  document.querySelectorAll("[data-unban]").forEach(x=>x.onclick=()=>unban(x.dataset.unban));
+}
+async function unban(id){
+  if(!confirm("Unban this user?"))return;
+  try{await deleteDoc(doc(db,"bans",id));bans=bans.filter(x=>x.id!==id);render()}catch(e){console.error(e);alert("Couldn't unban this user. Check Firestore rules.");}
+}
+$("ipSearch").oninput=render;$("duration").onchange=render;
+$("clearBtn").onclick=()=>{$("ipSearch").value="";$("duration").value="all";render()};
+document.querySelectorAll("[data-duration]").forEach(b=>b.onclick=()=>{$("duration").value=b.dataset.duration;render()});
+$("unbanFiltered").onclick=async()=>{
+  const rows=filtered(); if(!rows.length)return;
+  if(!confirm(`Unban ${rows.length} shown user(s)?`))return;
+  for(const b of rows){try{await deleteDoc(doc(db,"bans",b.id))}catch(e){console.error(e)}}
+  bans=bans.filter(b=>!rows.some(x=>x.id===b.id));render();
+};
+function esc(s){const d=document.createElement("div");d.textContent=s??"";return d.innerHTML}
+</script>
+</body>
+</html>
