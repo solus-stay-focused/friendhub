@@ -3460,278 +3460,638 @@
 })();
 </script>
 \n\n<!-- ============================================================
-  FriendHub Profile + Notifications
-  Uses the existing Firebase Auth/Firestore instance.
-  Profile photos are resized and stored as a compact data URL in
-  users/{uid}.avatarData, so no extra Storage rules are required.
-============================================================= -->
+  FriendHub Profile + Notifications — FIXED
+  - Profile menu opens reliably
+  - Edit username
+  - Change profile picture
+  - Show/copy Firebase UID
+  - Notification bell beside profile
+  - Works even when the page already has an authenticated user
+============================================================ -->
 <script>
-(function(){
-  const profileOverlay = document.getElementById('vcProfileOverlay');
-  const profileAvatar = document.getElementById('vcProfileAvatar');
-  const profileAvatarInput = document.getElementById('vcProfileAvatarInput');
-  const profileNameInput = document.getElementById('vcProfileNameInput');
-  const profileUid = document.getElementById('vcProfileUid');
-  const profileEmail = document.getElementById('vcProfileEmail');
-  const profileHeroName = document.getElementById('vcProfileHeroName');
-  const profileHeroEmail = document.getElementById('vcProfileHeroEmail');
-  const profileCreatedAt = document.getElementById('vcProfileCreatedAt');
-  const profileCopyUid = document.getElementById('vcProfileCopyUid');
-  const profileSaveBtn = document.getElementById('vcProfileSaveBtn');
-  const profileError = document.getElementById('vcProfileError');
-  const navProfileBtn = document.getElementById('vcNavProfileBtn');
-  const navAccount = document.getElementById('vcNavAccount');
-  const navAvatar = document.getElementById('vcNavAvatar');
-  const navName = document.getElementById('vcNavName');
-  const notificationWrap = document.getElementById('vcNavNotificationWrap');
-  const notificationBtn = document.getElementById('vcNavNotificationBtn');
-  const notificationPanel = document.getElementById('vcNavNotificationPanel');
-  const notificationDot = document.getElementById('vcNavNotificationDot');
-  const notificationList = document.getElementById('vcNavNotificationList');
-  const markReadBtn = document.getElementById('vcNavMarkReadBtn');
+(function () {
+  'use strict';
 
-  if (!profileOverlay || typeof firebase === 'undefined') return;
-
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  let currentUser = null;
-  let profileData = {};
-  let selectedAvatarData = null;
-
-  const NOTIFY_KEY = (uid) => 'friendhub_notifications_' + uid;
-
-  function esc(v){
-    return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  }
-
-  function avatarFallback(name, photo){
-    return photo || ('https://ui-avatars.com/api/?background=1E4FD8&color=fff&name=' + encodeURIComponent(name || 'U'));
-  }
-
-  function formatDate(value){
-    if (!value) return 'Unknown';
-    try {
-      const d = value && value.toDate ? value.toDate() : new Date(value);
-      if (Number.isNaN(d.getTime())) return 'Unknown';
-      return d.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
-    } catch(e){ return 'Unknown'; }
-  }
-
-  function getNotifications(uid){
-    try {
-      const raw = localStorage.getItem(NOTIFY_KEY(uid));
-      const parsed = raw ? JSON.parse(raw) : null;
-      if (Array.isArray(parsed)) return parsed;
-    } catch(e){}
-    const now = Date.now();
-    const initial = [
-      {id:'welcome', title:'Welcome to FriendHub', body:'Your profile is ready. Add your name and a profile picture anytime.', time:now, read:false},
-      {id:'safety', title:'Stay safe while chatting', body:'Never share passwords, financial information, or private addresses with strangers.', time:now - 60000, read:false}
-    ];
-    try { localStorage.setItem(NOTIFY_KEY(uid), JSON.stringify(initial)); } catch(e){}
-    return initial;
-  }
-
-  function saveNotifications(items){
-    if (!currentUser) return;
-    try { localStorage.setItem(NOTIFY_KEY(currentUser.uid), JSON.stringify(items)); } catch(e){}
-  }
-
-  function renderNotifications(){
-    if (!currentUser || !notificationList) return;
-    const items = getNotifications(currentUser.uid).sort((a,b)=>(b.time||0)-(a.time||0));
-    const unread = items.filter(n => !n.read).length;
-    notificationDot.classList.toggle('show', unread > 0);
-    if (!items.length){
-      notificationList.innerHTML = '<div class="vcnav-notification-empty">You’re all caught up. ✓</div>';
+  function initFriendHubProfileUI() {
+    if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) {
+      console.error('[FriendHub] Firebase is not ready for profile UI.');
       return;
     }
-    notificationList.innerHTML = items.map(n => `
-      <div class="vcnav-notification-item ${n.read ? '' : 'unread'}">
-        <div class="n-title">${esc(n.title)}</div>
-        <div class="n-body">${esc(n.body)}</div>
-        <div class="n-time">${esc(formatDate(n.time))}</div>
-      </div>`).join('');
-  }
 
-  function showProfileError(message){
-    profileError.textContent = message || '';
-    profileError.classList.toggle('show', !!message);
-  }
+    const $ = (id) => document.getElementById(id);
 
-  function updateNavProfile(name, photo){
-    const clean = (name || 'Account').trim() || 'Account';
-    if (navName) navName.textContent = clean.split(' ')[0];
-    if (navAvatar) navAvatar.src = avatarFallback(clean, photo);
-  }
+    const profileOverlay   = $('vcProfileOverlay');
+    const profileAvatar    = $('vcProfileAvatar');
+    const avatarInput      = $('vcProfileAvatarInput');
+    const nameInput        = $('vcProfileNameInput');
+    const uidEl             = $('vcProfileUid');
+    const emailEl           = $('vcProfileEmail');
+    const heroName          = $('vcProfileHeroName');
+    const heroEmail         = $('vcProfileHeroEmail');
+    const createdAtEl       = $('vcProfileCreatedAt');
+    const copyUidBtn        = $('vcProfileCopyUid');
+    const saveBtn           = $('vcProfileSaveBtn');
+    const errorEl           = $('vcProfileError');
 
-  async function loadProfile(user){
-    if (!user || user.isAnonymous) return;
-    currentUser = user;
-    try {
-      const snap = await db.collection('users').doc(user.uid).get();
-      profileData = snap.exists ? snap.data() : {};
-    } catch(e){
-      console.error('[FriendHub] profile load failed:', e);
-      profileData = {};
+    const account           = $('vcNavAccount');
+    const accountMenu       = $('vcNavAccountMenu');
+    const profileBtn        = $('vcNavProfileBtn');
+    const avatarNav         = $('vcNavAvatar');
+    const nameNav           = $('vcNavName');
+
+    const notificationWrap  = $('vcNavNotificationWrap');
+    const notificationBtn   = $('vcNavNotificationBtn');
+    const notificationPanel = $('vcNavNotificationPanel');
+    const notificationDot   = $('vcNavNotificationDot');
+    const notificationList  = $('vcNavNotificationList');
+    const markReadBtn       = $('vcNavMarkReadBtn');
+
+    if (!profileOverlay || !profileBtn || !account || !accountMenu ||
+        !notificationBtn || !notificationPanel) {
+      console.error('[FriendHub] Profile/notification HTML elements are missing.');
+      return;
     }
 
-    const customName = (profileData.profileName || '').trim();
-    const name = customName || user.displayName || user.email || 'FriendHub user';
-    const photo = profileData.avatarData || profileData.photoURL || user.photoURL || '';
-    updateNavProfile(name, photo);
-    if (notificationWrap) notificationWrap.classList.add('show');
-    if (notificationBtn) notificationBtn.classList.add('show');
-    renderNotifications();
-  }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-  function openProfile(){
-    if (!currentUser || currentUser.isAnonymous) return;
-    showProfileError('');
-    selectedAvatarData = null;
-    const name = (profileData.profileName || currentUser.displayName || currentUser.email || '').trim();
-    const photo = profileData.avatarData || profileData.photoURL || currentUser.photoURL || '';
-    profileNameInput.value = name;
-    profileUid.textContent = currentUser.uid;
-    profileEmail.textContent = currentUser.email || '—';
-    profileHeroEmail.textContent = currentUser.email || 'Signed in with Google';
-    profileHeroName.textContent = name || 'FriendHub user';
-    profileAvatar.src = avatarFallback(name, photo);
-    profileCreatedAt.textContent = formatDate(profileData.createdAt || currentUser.metadata?.creationTime);
-    profileOverlay.classList.add('active');
-    if (navAccount) navAccount.querySelector('.vcnav-account-menu')?.classList.remove('open');
-  }
+    let currentUser = null;
+    let profileData = {};
+    let selectedAvatarData = null;
 
-  window.closeVcProfile = function(e){
-    if (e && e.target && e.target.id !== 'vcProfileOverlay') return;
-    profileOverlay.classList.remove('active');
-    showProfileError('');
-  };
+    const notifyKey = (uid) => 'friendhub_notifications_' + uid;
 
-  if (navProfileBtn) navProfileBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openProfile(); });
-
-  profileNameInput?.addEventListener('input', ()=>{
-    profileHeroName.textContent = profileNameInput.value.trim() || 'FriendHub user';
-  });
-
-  profileAvatarInput?.addEventListener('change', ()=>{
-    const file = profileAvatarInput.files && profileAvatarInput.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { showProfileError('Please choose an image file.'); return; }
-    if (file.size > 5 * 1024 * 1024) { showProfileError('Please choose an image smaller than 5 MB.'); return; }
-    showProfileError('');
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const size = 320;
-        const canvas = document.createElement('canvas');
-        canvas.width = size; canvas.height = size;
-        const ctx = canvas.getContext('2d');
-        const scale = Math.max(size / img.width, size / img.height);
-        const w = img.width * scale, h = img.height * scale;
-        ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
-        selectedAvatarData = canvas.toDataURL('image/jpeg', 0.82);
-        profileAvatar.src = selectedAvatarData;
-      };
-      img.onerror = () => showProfileError('Could not read that image.');
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  });
-
-  profileCopyUid?.addEventListener('click', async ()=>{
-    if (!currentUser) return;
-    try {
-      await navigator.clipboard.writeText(currentUser.uid);
-      profileCopyUid.textContent = 'Copied ✓';
-      setTimeout(()=>profileCopyUid.textContent='Copy', 1400);
-    } catch(e){
-      profileCopyUid.textContent = 'Select UID';
+    function esc(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[c];
+      });
     }
-  });
 
-  profileSaveBtn?.addEventListener('click', async ()=>{
-    if (!currentUser || currentUser.isAnonymous) return;
-    const name = profileNameInput.value.trim();
-    if (name.length < 2) { showProfileError('Please enter a name with at least 2 characters.'); return; }
-    if (name.length > 30) { showProfileError('Your name can be up to 30 characters.'); return; }
-    showProfileError('');
-    profileSaveBtn.disabled = true;
-    profileSaveBtn.textContent = 'Saving…';
-    try {
-      const updates = { profileName:name, updatedAt:firebase.firestore.FieldValue.serverTimestamp() };
-      if (selectedAvatarData) updates.avatarData = selectedAvatarData;
-      await db.collection('users').doc(currentUser.uid).set(updates, {merge:true});
-      profileData = Object.assign({}, profileData, updates, selectedAvatarData ? {avatarData:selectedAvatarData} : {});
-      const photo = profileData.avatarData || profileData.photoURL || currentUser.photoURL || '';
+    function avatarFallback(name, photo) {
+      if (photo) return photo;
+      return 'https://ui-avatars.com/api/?background=1E4FD8&color=fff&name=' +
+        encodeURIComponent(name || 'U');
+    }
+
+    function formatDate(value) {
+      if (!value) return 'Unknown';
+
+      try {
+        const d = value && typeof value.toDate === 'function'
+          ? value.toDate()
+          : new Date(value);
+
+        if (Number.isNaN(d.getTime())) return 'Unknown';
+
+        return d.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch (e) {
+        return 'Unknown';
+      }
+    }
+
+    function showError(message) {
+      if (!errorEl) return;
+      errorEl.textContent = message || '';
+      errorEl.classList.toggle('show', !!message);
+    }
+
+    function getNotifications(uid) {
+      if (!uid) return [];
+
+      try {
+        const raw = localStorage.getItem(notifyKey(uid));
+        const parsed = raw ? JSON.parse(raw) : null;
+
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {}
+
+      const now = Date.now();
+
+      const initial = [
+        {
+          id: 'welcome',
+          title: 'Welcome to FriendHub',
+          body: 'Your profile is ready. Add your name and a profile picture anytime.',
+          time: now,
+          read: false
+        },
+        {
+          id: 'safety',
+          title: 'Stay safe while chatting',
+          body: 'Never share passwords, financial information, or private addresses with strangers.',
+          time: now - 60000,
+          read: false
+        }
+      ];
+
+      try {
+        localStorage.setItem(notifyKey(uid), JSON.stringify(initial));
+      } catch (e) {}
+
+      return initial;
+    }
+
+    function saveNotifications(items) {
+      if (!currentUser) return;
+
+      try {
+        localStorage.setItem(
+          notifyKey(currentUser.uid),
+          JSON.stringify(items)
+        );
+      } catch (e) {}
+    }
+
+    function renderNotifications() {
+      if (!currentUser || !notificationList || !notificationDot) return;
+
+      const items = getNotifications(currentUser.uid)
+        .sort((a, b) => (b.time || 0) - (a.time || 0));
+
+      const unread = items.filter(n => !n.read).length;
+
+      notificationDot.classList.toggle('show', unread > 0);
+
+      if (!items.length) {
+        notificationList.innerHTML =
+          '<div class="vcnav-notification-empty">You’re all caught up. ✓</div>';
+        return;
+      }
+
+      notificationList.innerHTML = items.map(n => `
+        <div class="vcnav-notification-item ${n.read ? '' : 'unread'}">
+          <div class="n-title">${esc(n.title)}</div>
+          <div class="n-body">${esc(n.body)}</div>
+          <div class="n-time">${esc(formatDate(n.time))}</div>
+        </div>
+      `).join('');
+    }
+
+    function updateNavProfile(name, photo) {
+      const cleanName = (name || 'Account').trim() || 'Account';
+
+      if (nameNav) {
+        nameNav.textContent = cleanName.split(/\s+/)[0];
+      }
+
+      if (avatarNav) {
+        avatarNav.src = avatarFallback(cleanName, photo);
+      }
+
+      // Always show notification + account for a real signed-in account.
+      if (notificationWrap) notificationWrap.classList.add('show');
+      if (notificationBtn) notificationBtn.classList.add('show');
+      if (account) account.classList.add('show');
+    }
+
+    async function loadProfile(user) {
+      if (!user || user.isAnonymous) return;
+
+      currentUser = user;
+
+      // Make the controls visible immediately. Do not wait for Firestore.
+      if (notificationWrap) notificationWrap.classList.add('show');
+      if (notificationBtn) notificationBtn.classList.add('show');
+      if (account) account.classList.add('show');
+
+      const fallbackName =
+        user.displayName ||
+        user.email ||
+        'FriendHub user';
+
+      updateNavProfile(fallbackName, user.photoURL || '');
+
+      try {
+        const snap = await db.collection('users').doc(user.uid).get();
+        profileData = snap.exists ? snap.data() : {};
+      } catch (err) {
+        console.error('[FriendHub] profile read failed:', err);
+        profileData = {};
+      }
+
+      const name =
+        (profileData.profileName || '').trim() ||
+        user.displayName ||
+        user.email ||
+        'FriendHub user';
+
+      const photo =
+        profileData.avatarData ||
+        profileData.photoURL ||
+        user.photoURL ||
+        '';
+
       updateNavProfile(name, photo);
-      profileAvatar.src = avatarFallback(name, photo);
-      profileHeroName.textContent = name;
-      profileOverlay.classList.remove('active');
-      addProfileNotification('Profile updated', 'Your FriendHub profile was updated successfully.');
-    } catch(e){
-      console.error('[FriendHub] profile save failed:', e);
-      showProfileError('Could not save your profile. Please try again.');
-    } finally {
-      profileSaveBtn.disabled = false;
-      profileSaveBtn.textContent = 'Save profile';
-    }
-  });
-
-  function addProfileNotification(title, body){
-    if (!currentUser) return;
-    const items = getNotifications(currentUser.uid);
-    items.unshift({id:'profile-' + Date.now(), title, body, time:Date.now(), read:false});
-    saveNotifications(items.slice(0,20));
-    renderNotifications();
-  }
-
-  notificationBtn?.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    if (!currentUser) return;
-    const open = notificationPanel.classList.toggle('open');
-    notificationBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) {
-      const items = getNotifications(currentUser.uid).map(n=>Object.assign({},n,{read:true}));
-      saveNotifications(items);
       renderNotifications();
     }
-  });
 
-  markReadBtn?.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    if (!currentUser) return;
-    const items = getNotifications(currentUser.uid).map(n=>Object.assign({},n,{read:true}));
-    saveNotifications(items);
-    renderNotifications();
-  });
+    function getActiveUser() {
+      if (currentUser && !currentUser.isAnonymous) return currentUser;
 
-  document.addEventListener('click', (e)=>{
-    if (notificationPanel && !notificationPanel.contains(e.target) && notificationBtn && !notificationBtn.contains(e.target)) {
+      const user = auth.currentUser;
+
+      if (user && !user.isAnonymous) {
+        currentUser = user;
+        return user;
+      }
+
+      return null;
+    }
+
+    function openProfile() {
+      const user = getActiveUser();
+
+      if (!user) {
+        console.warn('[FriendHub] No signed-in Google account is available.');
+        return;
+      }
+
+      showError('');
+      selectedAvatarData = null;
+
+      const name =
+        (profileData.profileName || '').trim() ||
+        user.displayName ||
+        user.email ||
+        'FriendHub user';
+
+      const photo =
+        profileData.avatarData ||
+        profileData.photoURL ||
+        user.photoURL ||
+        '';
+
+      nameInput.value = name;
+      uidEl.textContent = user.uid;
+      emailEl.textContent = user.email || '—';
+      heroEmail.textContent = user.email || 'Signed in with Google';
+      heroName.textContent = name;
+      profileAvatar.src = avatarFallback(name, photo);
+      createdAtEl.textContent =
+        formatDate(profileData.createdAt || user.metadata?.creationTime);
+
+      accountMenu.classList.remove('open');
+      profileOverlay.classList.add('active');
+      document.body.classList.add('vc-profile-open');
+    }
+
+    window.openFriendHubProfile = openProfile;
+
+    window.closeVcProfile = function (event) {
+      if (
+        event &&
+        event.target &&
+        event.target.id !== 'vcProfileOverlay'
+      ) {
+        return;
+      }
+
+      profileOverlay.classList.remove('active');
+      document.body.classList.remove('vc-profile-open');
+      showError('');
+    };
+
+    // Profile menu item.
+    profileBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      openProfile();
+    });
+
+    // Keep the account menu itself clickable.
+    accountMenu.addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
+
+    // Account chip opens/closes its dropdown.
+    account.addEventListener('click', function (event) {
+      if (event.target.closest('#vcNavProfileBtn') ||
+          event.target.closest('#vcNavSignOutBtn')) {
+        return;
+      }
+
+      event.stopPropagation();
+      accountMenu.classList.toggle('open');
+    });
+
+    // Avatar selection.
+    avatarInput.addEventListener('change', function () {
+      const file = avatarInput.files && avatarInput.files[0];
+
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showError('Please choose an image file.');
+        avatarInput.value = '';
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showError('Please choose an image smaller than 5 MB.');
+        avatarInput.value = '';
+        return;
+      }
+
+      showError('');
+
+      const reader = new FileReader();
+
+      reader.onload = function () {
+        const img = new Image();
+
+        img.onload = function () {
+          const size = 320;
+          const canvas = document.createElement('canvas');
+
+          canvas.width = size;
+          canvas.height = size;
+
+          const ctx = canvas.getContext('2d');
+
+          const scale = Math.max(
+            size / img.width,
+            size / img.height
+          );
+
+          const width = img.width * scale;
+          const height = img.height * scale;
+
+          ctx.drawImage(
+            img,
+            (size - width) / 2,
+            (size - height) / 2,
+            width,
+            height
+          );
+
+          selectedAvatarData =
+            canvas.toDataURL('image/jpeg', 0.82);
+
+          profileAvatar.src = selectedAvatarData;
+        };
+
+        img.onerror = function () {
+          showError('Could not read that image.');
+        };
+
+        img.src = reader.result;
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    // Copy UID.
+    copyUidBtn.addEventListener('click', async function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const user = getActiveUser();
+
+      if (!user) return;
+
+      try {
+        await navigator.clipboard.writeText(user.uid);
+        copyUidBtn.textContent = 'Copied ✓';
+
+        setTimeout(function () {
+          copyUidBtn.textContent = 'Copy';
+        }, 1400);
+      } catch (e) {
+        // Clipboard API can be blocked on some browsers.
+        const range = document.createRange();
+        range.selectNodeContents(uidEl);
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        copyUidBtn.textContent = 'Select UID';
+
+        setTimeout(function () {
+          copyUidBtn.textContent = 'Copy';
+        }, 1400);
+      }
+    });
+
+    // Save profile.
+    saveBtn.addEventListener('click', async function () {
+      const user = getActiveUser();
+
+      if (!user) {
+        showError('Please sign in before editing your profile.');
+        return;
+      }
+
+      const name = nameInput.value.trim();
+
+      if (name.length < 2) {
+        showError('Please enter a name with at least 2 characters.');
+        return;
+      }
+
+      if (name.length > 30) {
+        showError('Your name can be up to 30 characters.');
+        return;
+      }
+
+      showError('');
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+
+      try {
+        const updates = {
+          profileName: name,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (selectedAvatarData) {
+          updates.avatarData = selectedAvatarData;
+        }
+
+        await db.collection('users')
+          .doc(user.uid)
+          .set(updates, { merge: true });
+
+        profileData = Object.assign({}, profileData, updates);
+
+        const photo =
+          selectedAvatarData ||
+          profileData.avatarData ||
+          profileData.photoURL ||
+          user.photoURL ||
+          '';
+
+        updateNavProfile(name, photo);
+
+        profileAvatar.src = avatarFallback(name, photo);
+        heroName.textContent = name;
+
+        addNotification(
+          'Profile updated',
+          'Your FriendHub profile was updated successfully.'
+        );
+
+        profileOverlay.classList.remove('active');
+        document.body.classList.remove('vc-profile-open');
+
+      } catch (err) {
+        console.error('[FriendHub] profile save failed:', err);
+
+        let message = 'Could not save your profile. Please try again.';
+
+        if (err && err.code === 'permission-denied') {
+          message = 'Firestore permission denied. Check your users/{uid} write rule.';
+        }
+
+        showError(message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save profile';
+      }
+    });
+
+    function addNotification(title, body) {
+      const user = getActiveUser();
+
+      if (!user) return;
+
+      const items = getNotifications(user.uid);
+
+      items.unshift({
+        id: 'notice-' + Date.now(),
+        title: title,
+        body: body,
+        time: Date.now(),
+        read: false
+      });
+
+      saveNotifications(items.slice(0, 20));
+      renderNotifications();
+    }
+
+    // Notification bell.
+    notificationBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const user = getActiveUser();
+
+      if (!user) return;
+
+      const open = !notificationPanel.classList.contains('open');
+
+      // Close profile/account menu when notifications open.
+      accountMenu.classList.remove('open');
+
+      notificationPanel.classList.toggle('open', open);
+      notificationBtn.setAttribute(
+        'aria-expanded',
+        open ? 'true' : 'false'
+      );
+
+      if (open) {
+        const items = getNotifications(user.uid).map(function (n) {
+          return Object.assign({}, n, { read: true });
+        });
+
+        saveNotifications(items);
+        renderNotifications();
+      }
+    });
+
+    markReadBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const user = getActiveUser();
+
+      if (!user) return;
+
+      const items = getNotifications(user.uid).map(function (n) {
+        return Object.assign({}, n, { read: true });
+      });
+
+      saveNotifications(items);
+      renderNotifications();
+    });
+
+    // Close menus when clicking elsewhere.
+    document.addEventListener('click', function () {
+      accountMenu.classList.remove('open');
       notificationPanel.classList.remove('open');
-      notificationBtn?.setAttribute('aria-expanded','false');
-    }
-  });
+      notificationBtn.setAttribute('aria-expanded', 'false');
+    });
 
-  document.addEventListener('keydown', (e)=>{
-    if (e.key === 'Escape') {
-      notificationPanel?.classList.remove('open');
-      notificationBtn?.setAttribute('aria-expanded','false');
-      if (profileOverlay?.classList.contains('active')) window.closeVcProfile();
-    }
-  });
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
 
-  auth.onAuthStateChanged((user)=>{
-    if (!user || user.isAnonymous) {
-      currentUser = null;
-      profileData = {};
-      notificationWrap?.classList.remove('show');
-      notificationBtn?.classList.remove('show');
-      notificationPanel?.classList.remove('open');
-      profileOverlay?.classList.remove('active');
-      return;
+      accountMenu.classList.remove('open');
+      notificationPanel.classList.remove('open');
+      notificationBtn.setAttribute('aria-expanded', 'false');
+
+      if (profileOverlay.classList.contains('active')) {
+        window.closeVcProfile();
+      }
+    });
+
+    // IMPORTANT:
+    // Use the current Firebase user immediately. This fixes the case where
+    // the main authentication script already finished before this UI script
+    // registered its auth listener.
+    const existingUser = auth.currentUser;
+
+    if (existingUser && !existingUser.isAnonymous) {
+      currentUser = existingUser;
+      loadProfile(existingUser);
     }
-    loadProfile(user);
-  });
+
+    auth.onAuthStateChanged(function (user) {
+      if (!user || user.isAnonymous) {
+        currentUser = null;
+        profileData = {};
+
+        if (notificationWrap) notificationWrap.classList.remove('show');
+        if (notificationBtn) notificationBtn.classList.remove('show');
+        notificationPanel.classList.remove('open');
+        accountMenu.classList.remove('open');
+        profileOverlay.classList.remove('active');
+
+        return;
+      }
+
+      currentUser = user;
+      loadProfile(user);
+    });
+
+    // Also initialize from an already-rendered account chip if Firebase
+    // persistence restores the user a moment later.
+    setTimeout(function () {
+      const user = auth.currentUser;
+
+      if (user && !user.isAnonymous) {
+        currentUser = user;
+        loadProfile(user);
+      }
+    }, 500);
+  }
+
+  // Firebase scripts are already loaded in this file, but wait for DOM just
+  // in case the page is moved or loaded differently.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFriendHubProfileUI);
+  } else {
+    initFriendHubProfileUI();
+  }
 })();
+</script>
