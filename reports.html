@@ -1,15 +1,26 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Admin — FriendHub Reports</title>
+
 <meta name="robots" content="noindex, nofollow">
 
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%239C8CFB'/%3E%3Cstop offset='100%25' stop-color='%235142C4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M14 44a22 22 0 1 1 22 26l-7 10-2-12a22 22 0 0 1-13-24z' fill='%23fff'/%3E%3Cpath d='M86 48a22 22 0 1 0-22 26l7 10 2-12a22 22 0 0 0 13-24z' fill='%235EEAD4' fill-opacity='.88'/%3E%3C/svg%3E">
+<link
+  rel="icon"
+  type="image/svg+xml"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%239C8CFB'/%3E%3Cstop offset='100%25' stop-color='%235142C4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M14 44a22 22 0 1 1 22 26l-7 10-2-12a22 22 0 0 1-13-24z' fill='%23fff'/%3E%3Cpath d='M86 48a22 22 0 1 0-22 26l7 10 2-12a22 22 0 0 0 13-24z' fill='%235EEAD4' fill-opacity='.88'/%3E%3C/svg%3E"
+>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+>
 
 <style>
 
@@ -244,8 +255,6 @@ main{
   white-space:nowrap;
 }
 
-/* INFORMATION BOX */
-
 .info-box{
   background:var(--panel-2);
   border:1px solid var(--line);
@@ -287,8 +296,6 @@ main{
   overflow-wrap:anywhere;
 }
 
-/* DETAILS */
-
 .details{
   font-size:12.5px;
   line-height:1.55;
@@ -299,8 +306,6 @@ main{
   overflow-wrap:anywhere;
   margin-top:10px;
 }
-
-/* SCREENSHOT */
 
 .screenshot-box{
   background:var(--panel-2);
@@ -347,8 +352,6 @@ main{
   font-family:'IBM Plex Mono',monospace;
 }
 
-/* ACTIONS */
-
 .report-actions{
   display:flex;
   align-items:center;
@@ -376,8 +379,6 @@ main{
   color:var(--red);
   border-color:rgba(248,113,113,.35);
 }
-
-/* LOGIN */
 
 .empty,
 .error{
@@ -468,9 +469,15 @@ main{
 
   <div class="topnav-inner">
 
-    <a class="brand" href="/">
+    <a
+      class="brand"
+      href="/"
+    >
 
-      <svg viewBox="0 0 100 100" aria-hidden="true">
+      <svg
+        viewBox="0 0 100 100"
+        aria-hidden="true"
+      >
 
         <defs>
 
@@ -528,8 +535,13 @@ main{
 
     <div class="nav-actions">
 
-      <a class="btn" href="./">
-        ← Blog admin
+      <!-- FIXED: GO TO ADMIN PANEL -->
+
+      <a
+        class="btn"
+        href="https://friendhub.space/admin-blog.html"
+      >
+        ← Admin panel
       </a>
 
       <button
@@ -544,7 +556,6 @@ main{
   </div>
 
 </nav>
-
 
 <main>
 
@@ -599,9 +610,11 @@ main{
 
     <div class="page-head">
 
+      <!-- FIXED: GO TO ADMIN PANEL -->
+
       <a
         class="btn back"
-        href="./"
+        href="https://friendhub.space/admin-blog.html"
         aria-label="Back to admin"
       >
         ←
@@ -1178,7 +1191,9 @@ async function loadReports(){
 
               ${
                 screenshotUrl !== "Unknown"
-                  ? `
+                  ?
+
+                    `
 
                     <div class="report-shot-wrap">
 
@@ -1199,8 +1214,11 @@ async function loadReports(){
 
                     </div>
 
-                  `
-                  : `
+                    `
+
+                  :
+
+                    `
 
                     <div class="no-screenshot">
 
@@ -1208,7 +1226,7 @@ async function loadReports(){
 
                     </div>
 
-                  `
+                    `
               }
 
             </div>
@@ -1388,11 +1406,6 @@ async function removeReport(reportId){
       )
     );
 
-
-    /*
-      Remove the card immediately
-      instead of reloading everything.
-    */
 
     if(card){
 
@@ -1591,10 +1604,6 @@ $("reportsList").addEventListener(
   "click",
   event => {
 
-    /*
-      REMOVE REPORT
-    */
-
     const removeButton =
       event.target.closest(
         "[data-remove-report]"
@@ -1608,6 +1617,7 @@ $("reportsList").addEventListener(
           "data-remove-report"
         );
 
+
       removeReport(
         reportId
       );
@@ -1616,10 +1626,6 @@ $("reportsList").addEventListener(
 
     }
 
-
-    /*
-      BAN USER
-    */
 
     const banButton =
       event.target.closest(
@@ -1781,3 +1787,4 @@ onAuthStateChanged(
 
 </body>
 </html>
+```
