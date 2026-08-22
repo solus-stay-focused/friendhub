@@ -87,7 +87,7 @@
     overflow:hidden;
     background:linear-gradient(135deg,#0B2638,#0C3148);
   }
-  .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }
+  .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }}
   @media (max-width:600px){
     .vcbox-half + .vcbox-half{ border-left:none; border-top:1px solid var(--line); }
   }
@@ -1755,8 +1755,11 @@
           <div class="vcbox-settings-panel" id="vcSettingsPanel">
             <h4>Settings</h4>
             <div class="vcbox-settings-row">
-              <span>Mirror my video</span>
-              <button type="button" class="vcbox-toggle on" onclick="this.classList.toggle('on')"></button>
+              <span>Mirror my preview</span>
+              <button type="button" class="vcbox-toggle" id="vcMirrorToggle"
+                  aria-label="Toggle mirror my video"
+                  aria-pressed="false"
+                  onclick="toggleLocalVideoMirror(this)"></button>
             </div>
             <div class="vcbox-settings-row">
               <span>Match sound</span>
@@ -2927,6 +2930,16 @@
     if (myUid) db.collection('presence').doc(myUid).delete().catch(() => {});
   });
 
+  // Mirror the local preview by default (like a real mirror), so head movement
+  // reads naturally to the user. The setting lets them opt into the raw, unmirrored feed.
+window.toggleLocalVideoMirror = function(btn){
+  const mirrored = btn.classList.toggle('on');
+  btn.setAttribute('aria-pressed', String(mirrored));
+  if (localVideo) {
+    localVideo.style.transform = mirrored ? 'scaleX(-1)' : 'scaleX(1)';
+  }
+};
+
   // ---- Enable Camera (pre-call preview): grabs the stream early so "You" shows live video ----
   enableCameraBtn.addEventListener('click', async () => {
     if (localStream) return;
@@ -2935,6 +2948,7 @@
       localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localVideo.srcObject = localStream;
       localVideo.style.display = 'block';
+      localVideo.style.transform = 'scaleX(1)';
       localPlaceholder.style.display = 'none';
       setStatus('CAMERA/MIC READY', false);
     } catch (err) {
@@ -2958,6 +2972,7 @@
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         localVideo.srcObject = localStream;
         localVideo.style.display = 'block';
+        localVideo.style.transform = 'scaleX(1)';
         localPlaceholder.style.display = 'none';
         setStatus('CAMERA/MIC READY', false);
       } catch (err) {
@@ -3424,17 +3439,16 @@
     matchInProgress = false;
 
     if (pc) { pc.close(); pc = null; }
-    // Keep the local camera stream alive so reconnecting does not require
-    // another permission prompt or another getUserMedia negotiation.
+    
+    // Stop all media tracks (camera and mic)
     if (localStream) {
-      localVideo.srcObject = localStream;
-      localVideo.style.display = 'block';
-      localPlaceholder.style.display = 'none';
-    } else {
-      localVideo.srcObject = null;
-      localVideo.style.display = 'none';
-      localPlaceholder.style.display = 'flex';
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = null;
     }
+    
+    localVideo.srcObject = null;
+    localVideo.style.display = 'none';
+    localPlaceholder.style.display = 'flex';
     remoteVideo.srcObject = null;
     setPlaceholder('idle');
     chatLog.innerHTML = '';
@@ -3446,7 +3460,7 @@
     }
 
     callId = null; role = null; otherUid = null; matching = false; inCall = false;
-    setStatus(localStream ? 'CAMERA/MIC READY' : 'CAMERA/MIC BLOCKED', !localStream);
+    setStatus('CAMERA/MIC READY', false);
     startBtn.disabled = false;
   }
 
@@ -4097,4 +4111,3 @@
     initFriendHubProfileUI();
   }
 })();
-</script>
