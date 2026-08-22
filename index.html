@@ -89,9 +89,10 @@
   }
   .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }
 
-  /* Camera orientation: show the user's video in real-world left/right order. */
+  /* Camera orientation: mirror the local preview by default, like a real mirror,
+     so moving your head left keeps you on the left side of your own screen. */
   #vcLocalVideo{
-    transform:scaleX(1) !important;
+    transform:scaleX(-1) !important;
   }
   @media (max-width:600px){
     .vcbox-half + .vcbox-half{ border-left:none; border-top:1px solid var(--line); }
@@ -1761,9 +1762,9 @@
             <h4>Settings</h4>
             <div class="vcbox-settings-row">
               <span>Mirror my preview</span>
-              <button type="button" class="vcbox-toggle" id="vcMirrorToggle"
+              <button type="button" class="vcbox-toggle on" id="vcMirrorToggle"
                   aria-label="Toggle mirror my video"
-                  aria-pressed="false"
+                  aria-pressed="true"
                   onclick="toggleLocalVideoMirror(this)"></button>
             </div>
             <div class="vcbox-settings-row">
@@ -2935,7 +2936,8 @@
     if (myUid) db.collection('presence').doc(myUid).delete().catch(() => {});
   });
 
-  // Keep the local preview unmirrored by default. The setting can opt into a mirror.
+  // Mirror the local preview by default (like a real mirror), so head movement
+  // reads naturally to the user. The setting lets them opt into the raw, unmirrored feed.
   window.toggleLocalVideoMirror = function(btn){
     const mirrored = btn.classList.toggle('on');
     btn.setAttribute('aria-pressed', String(mirrored));
@@ -4114,4 +4116,3 @@
     initFriendHubProfileUI();
   }
 })();
-</script>
