@@ -1758,7 +1758,7 @@
               <span>Mirror my preview</span>
               <button type="button" class="vcbox-toggle" id="vcMirrorToggle"
                   aria-label="Toggle mirror my video"
-                  aria-pressed="false"
+                aria-pressed="false"  aria-pressed="true"
                   onclick="toggleLocalVideoMirror(this)"></button>
             </div>
             <div class="vcbox-settings-row">
@@ -2948,7 +2948,6 @@ window.toggleLocalVideoMirror = function(btn){
       localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localVideo.srcObject = localStream;
       localVideo.style.display = 'block';
-      localVideo.style.transform = 'scaleX(1)';
       localPlaceholder.style.display = 'none';
       setStatus('CAMERA/MIC READY', false);
     } catch (err) {
@@ -2972,7 +2971,6 @@ window.toggleLocalVideoMirror = function(btn){
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         localVideo.srcObject = localStream;
         localVideo.style.display = 'block';
-        localVideo.style.transform = 'scaleX(1)';
         localPlaceholder.style.display = 'none';
         setStatus('CAMERA/MIC READY', false);
       } catch (err) {
@@ -3444,7 +3442,6 @@ window.toggleLocalVideoMirror = function(btn){
     if (localStream) {
       localVideo.srcObject = localStream;
       localVideo.style.display = 'block';
-      localVideo.style.transform = 'scaleX(1)';
       localPlaceholder.style.display = 'none';
     } else {
       localVideo.srcObject = null;
