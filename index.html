@@ -1585,7 +1585,7 @@
         <img id="vcNavAvatar" src="" alt="Profile picture">
         <span id="vcNavName"></span>
         <div class="vcnav-account-menu" id="vcNavAccountMenu">
-          <button type="button" id="vcNavProfileBtn">👤 My Profile</button>
+          <button type="button" id="vcNavProfileBtn" onclick="event.preventDefault(); event.stopPropagation(); window.openFriendHubProfile && window.openFriendHubProfile();">👤 My Profile</button>
           <button type="button" id="vcNavSignOutBtn">↪ Sign out</button>
         </div>
       </div>
@@ -3508,7 +3508,8 @@
 
     if (!profileOverlay || !profileBtn || !account || !accountMenu ||
         !notificationBtn || !notificationPanel) {
-      console.error('[FriendHub] Profile/notification HTML elements are missing.');
+      console.error('[FriendHub] Profile/notification HTML elements are missing. Retrying...');
+      setTimeout(initFriendHubProfileUI, 300);
       return;
     }
 
@@ -3696,13 +3697,15 @@
     }
 
     function getActiveUser() {
-      if (currentUser && !currentUser.isAnonymous) return currentUser;
-
       const user = auth.currentUser;
 
       if (user && !user.isAnonymous) {
         currentUser = user;
         return user;
+      }
+
+      if (currentUser && !currentUser.isAnonymous) {
+        return currentUser;
       }
 
       return null;
@@ -3713,6 +3716,17 @@
 
       if (!user) {
         console.warn('[FriendHub] No signed-in Google account is available.');
+        // If the account chip is visible but auth has not restored yet,
+        // try once more shortly after the click.
+        setTimeout(function () {
+          const retryUser = auth.currentUser;
+          if (retryUser && !retryUser.isAnonymous) {
+            currentUser = retryUser;
+            loadProfile(retryUser).then(function () {
+              openProfile();
+            });
+          }
+        }, 300);
         return;
       }
 
@@ -3771,17 +3785,6 @@
     // Keep the account menu itself clickable.
     accountMenu.addEventListener('click', function (event) {
       event.stopPropagation();
-    });
-
-    // Account chip opens/closes its dropdown.
-    account.addEventListener('click', function (event) {
-      if (event.target.closest('#vcNavProfileBtn') ||
-          event.target.closest('#vcNavSignOutBtn')) {
-        return;
-      }
-
-      event.stopPropagation();
-      accountMenu.classList.toggle('open');
     });
 
     // Avatar selection.
