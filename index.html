@@ -87,7 +87,7 @@
     overflow:hidden;
     background:linear-gradient(135deg,#0B2638,#0C3148);
   }
-  .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }}
+  .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }
   @media (max-width:600px){
     .vcbox-half + .vcbox-half{ border-left:none; border-top:1px solid var(--line); }
   }
@@ -1755,11 +1755,8 @@
           <div class="vcbox-settings-panel" id="vcSettingsPanel">
             <h4>Settings</h4>
             <div class="vcbox-settings-row">
-              <span>Mirror my preview</span>
-              <button type="button" class="vcbox-toggle" id="vcMirrorToggle"
-                  aria-label="Toggle mirror my video"
-                aria-pressed="false"  aria-pressed="true"
-                  onclick="toggleLocalVideoMirror(this)"></button>
+              <span>Mirror my video</span>
+              <button type="button" class="vcbox-toggle on" onclick="this.classList.toggle('on')"></button>
             </div>
             <div class="vcbox-settings-row">
               <span>Match sound</span>
@@ -2929,16 +2926,6 @@
   window.addEventListener('pagehide', () => {
     if (myUid) db.collection('presence').doc(myUid).delete().catch(() => {});
   });
-
-  // Mirror the local preview by default (like a real mirror), so head movement
-  // reads naturally to the user. The setting lets them opt into the raw, unmirrored feed.
-window.toggleLocalVideoMirror = function(btn){
-  const mirrored = btn.classList.toggle('on');
-  btn.setAttribute('aria-pressed', String(mirrored));
-  if (localVideo) {
-    localVideo.style.transform = mirrored ? 'scaleX(-1)' : 'scaleX(1)';
-  }
-};
 
   // ---- Enable Camera (pre-call preview): grabs the stream early so "You" shows live video ----
   enableCameraBtn.addEventListener('click', async () => {
@@ -4110,3 +4097,4 @@ window.toggleLocalVideoMirror = function(btn){
     initFriendHubProfileUI();
   }
 })();
+</script>
