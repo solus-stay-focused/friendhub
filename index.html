@@ -87,13 +87,7 @@
     overflow:hidden;
     background:linear-gradient(135deg,#0B2638,#0C3148);
   }
-  .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }
-
-  /* Camera orientation: mirror the local preview by default, like a real mirror,
-     so moving your head left keeps you on the left side of your own screen. */
-  #vcLocalVideo{
-    transform:scaleX(-1) !important;
-  }
+  .vcbox-half + .vcbox-half{ border-left:1px solid var(--line); }}
   @media (max-width:600px){
     .vcbox-half + .vcbox-half{ border-left:none; border-top:1px solid var(--line); }
   }
@@ -1762,7 +1756,7 @@
             <h4>Settings</h4>
             <div class="vcbox-settings-row">
               <span>Mirror my preview</span>
-              <button type="button" class="vcbox-toggle on" id="vcMirrorToggle"
+              <button type="button" class="vcbox-toggle" id="vcMirrorToggle"
                   aria-label="Toggle mirror my video"
                   aria-pressed="true"
                   onclick="toggleLocalVideoMirror(this)"></button>
@@ -2938,13 +2932,13 @@
 
   // Mirror the local preview by default (like a real mirror), so head movement
   // reads naturally to the user. The setting lets them opt into the raw, unmirrored feed.
-  window.toggleLocalVideoMirror = function(btn){
-    const mirrored = btn.classList.toggle('on');
-    btn.setAttribute('aria-pressed', String(mirrored));
-    if (localVideo) {
-      localVideo.style.setProperty('transform', mirrored ? 'scaleX(-1)' : 'scaleX(1)', 'important');
-    }
-  };
+window.toggleLocalVideoMirror = function(btn){
+  const mirrored = btn.classList.toggle('on');
+  btn.setAttribute('aria-pressed', String(mirrored));
+  if (localVideo) {
+    localVideo.style.transform = mirrored ? 'scaleX(-1)' : 'scaleX(1)';
+  }
+};
 
   // ---- Enable Camera (pre-call preview): grabs the stream early so "You" shows live video ----
   enableCameraBtn.addEventListener('click', async () => {
