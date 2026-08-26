@@ -550,7 +550,14 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({
 }[c]));
 
 const params=new URLSearchParams(location.search);
-const slug=(params.get("slug")||"").trim();
+let slug=(params.get("slug")||"").trim();
+
+// Also support /blog/<slug>/ if the host/router sends that path here.
+if(!slug){
+ const parts=location.pathname.split("/").filter(Boolean);
+ const blogIndex=parts.indexOf("blog");
+ if(blogIndex>=0 && parts[blogIndex+1]) slug=decodeURIComponent(parts[blogIndex+1]);
+}
 
 const minutes=html=>Math.max(
   1,
