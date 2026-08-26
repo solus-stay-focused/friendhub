@@ -23,236 +23,481 @@
 <meta id="twImage" name="twitter:image" content="https://www.friendhub.space/og-image.png">
 
 <script type="application/ld+json" id="articleLd"></script>
+
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --purple:#6f4ee8;
-  --purple-dark:#5d3fd1;
-  --purple-light:#8b6cf2;
-  --nav:#eef0fb;
-  --text:#202035;
-  --muted:#68708a;
-  --line:#e7e8f0;
-  --footer:#18182d;
-  --footer-text:#aeb1c7;
-  --white:#fff;
+  --hp-blue:#3B7BFF;
+  --hp-blue-light:#5E9EFF;
+  --hp-blue-deep:#1E4FD8;
+  --hp-black:#070B1C;
+  --hp-bg:#070B1C;
+  --hp-card:rgba(255,255,255,0.05);
+  --hp-card-border:rgba(255,255,255,0.09);
+  --ink:#F5F4FB;
+  --ink-soft:rgba(245,244,251,0.62);
+  --mint:#5EEAD4;
+  --coral:#FF6B5B;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  margin:0;background:#fff;color:var(--text);
+  margin:0;background:var(--hp-bg);color:var(--ink);
   font-family:'Inter',sans-serif;
   -webkit-font-smoothing:antialiased;
 }
 a{color:inherit}
 button{font:inherit}
 
-.site-header{
-  position:sticky;top:0;z-index:100;
-  background:rgba(238,240,251,.96);
-  border-bottom:1px solid rgba(75,68,130,.08);
-  backdrop-filter:blur(12px);
+/* ============================================================
+   Top nav — same design system as the FriendHub homepage.
+============================================================= */
+.vcnav{
+  background:rgba(9,13,32,0.92);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  position:sticky; top:0; z-index:100;
+  font-family:'Inter',sans-serif;
 }
-.header-inner{
-  max-width:1160px;margin:0 auto;height:72px;padding:0 24px;
-  display:flex;align-items:center;gap:26px;
+.vcnav-inner{
+  max-width:1400px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 6vw;
 }
-.brand{
-  display:flex;align-items:center;gap:10px;text-decoration:none;
-  flex-shrink:0;
+.vcnav-brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+.vcnav-brand svg{ width:30px; height:30px; flex:none; }
+.vcnav-brand span{
+  font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; color:#fff;
 }
-.brand-logo{width:36px;height:36px;display:block}
-.brand-name{
-  font-family:'Space Grotesk',sans-serif;font-size:21px;
-  font-weight:700;color:#6848df;letter-spacing:-.03em;
+.vcnav-brand span em{ font-style:normal; color:var(--hp-blue-light); }
+.vcnav-left{ display:flex; align-items:center; gap:14px; }
+.vcnav-status{
+  display:flex; align-items:center; gap:7px;
+  background:rgba(94,234,212,0.08);
+  border:1px solid rgba(94,234,212,0.25);
+  border-radius:999px;
+  padding:7px 14px;
+  font-size:12.5px; font-weight:600; color:#5EEAD4;
+  font-family:'Inter',sans-serif;
+  white-space:nowrap;
+  margin-left:-6vw;
 }
-.main-nav{
-  margin-left:auto;display:flex;align-items:center;gap:5px;
+.vcnav-status .dot{
+  width:7px; height:7px; border-radius:50%;
+  background:#5EEAD4;
+  box-shadow:0 0 0 3px rgba(94,234,212,0.15);
+  flex:none;
 }
-.main-nav a,.nav-button{
-  text-decoration:none;border:0;background:transparent;
-  color:#51566c;font-size:14px;font-weight:500;
-  padding:10px 13px;border-radius:22px;cursor:pointer;
+@media (max-width:640px){ .vcnav-status span.label{ display:none; } }
+.vcnav-links{ display:flex; align-items:center; gap:34px; list-style:none; margin:0; padding:0; }
+.vcnav-links a{
+  color:rgba(255,255,255,0.72); text-decoration:none; font-size:14.5px; font-weight:500;
+  padding-bottom:4px; border-bottom:2px solid transparent;
+  transition:color .15s ease, border-color .15s ease;
 }
-.main-nav a:hover,.main-nav a.active,.nav-button:hover{
-  color:#25233a;background:#fff;
-  box-shadow:0 2px 8px rgba(54,42,116,.07);
+.vcnav-links a:hover{ color:#fff; }
+.vcnav-links a.active{ color:#fff; border-color:var(--hp-blue-light); }
+.vcnav-links li.vcnav-community-item{ display:flex; align-items:center; }
+.vcnav-links a.vcnav-community{
+  display:inline-flex; align-items:center; gap:7px;
+  color:#fff !important; font-weight:600;
+  padding:7px 14px 7px 11px; border:1px solid transparent; border-radius:999px;
+  background:
+    linear-gradient(#0B0C1E,#0B0C1E) padding-box,
+    linear-gradient(120deg,#FF6B5B,#5E9EFF 55%,#5EEAD4) border-box;
+  position:relative; overflow:hidden;
+  transition:transform .15s ease, box-shadow .2s ease;
 }
-.nav-dropdown{position:relative}
-.nav-dropdown-menu{
-  position:absolute;top:46px;left:0;min-width:170px;
-  background:#fff;border:1px solid var(--line);border-radius:12px;
-  padding:7px;box-shadow:0 15px 35px rgba(30,27,70,.12);
-  display:none;
+.vcnav-links a.vcnav-community::before{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(120deg, rgba(255,107,91,0.22), rgba(94,158,255,0.22) 55%, rgba(94,234,212,0.22));
+  opacity:0.9;
 }
-.nav-dropdown:hover .nav-dropdown-menu{display:block}
-.nav-dropdown-menu a{display:block;border-radius:8px;padding:9px 11px}
-.lang{display:flex;align-items:center;gap:6px}
-.lang-icon{font-size:16px}
-.search-link{font-size:20px!important;padding:7px 10px!important}
-.start-chat{
-  margin-left:8px;text-decoration:none!important;
-  color:#fff!important;background:linear-gradient(135deg,var(--purple),var(--purple-light))!important;
-  padding:12px 23px!important;border-radius:13px!important;
-  box-shadow:0 8px 18px rgba(111,78,232,.20)!important;
-  font-weight:700!important;
+.vcnav-links a.vcnav-community:hover{ transform:translateY(-1px); box-shadow:0 8px 20px -6px rgba(94,158,255,0.55); }
+.vcnav-links a.vcnav-community .vcnav-community-label{ position:relative; z-index:1; }
+.vcnav-links a.vcnav-community .vcnav-community-dot{
+  position:relative; z-index:1; width:7px; height:7px; border-radius:50%;
+  background:#5EEAD4; box-shadow:0 0 0 0 rgba(94,234,212,0.6);
+  animation:vcnav-community-pulse 1.8s ease-out infinite; flex:none;
 }
-.start-chat:hover{transform:translateY(-1px)}
+@keyframes vcnav-community-pulse{
+  0%{ box-shadow:0 0 0 0 rgba(94,234,212,0.55); }
+  70%{ box-shadow:0 0 0 7px rgba(94,234,212,0); }
+  100%{ box-shadow:0 0 0 0 rgba(94,234,212,0); }
+}
+.vcnav-actions{ display:flex; align-items:center; gap:12px; }
+.vcnav-signin{
+  display:inline-flex; align-items:center; gap:8px;
+  background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.22);
+  border-radius:10px; padding:9px 18px; font-size:14px; font-weight:600;
+  font-family:'Inter',sans-serif; text-decoration:none; cursor:pointer;
+  transition:border-color .15s ease, background .15s ease;
+}
+.vcnav-signin:hover{ border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.04); }
+.vcnav-getstarted{
+  display:inline-flex; align-items:center; gap:8px;
+  background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+  color:#fff; border:none; border-radius:10px; padding:10px 20px;
+  font-size:14px; font-weight:600; font-family:'Inter',sans-serif; text-decoration:none;
+  cursor:pointer; box-shadow:0 10px 24px rgba(59,123,255,0.35);
+  transition:transform .15s ease, box-shadow .2s ease;
+}
+.vcnav-getstarted:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(59,123,255,0.45); }
+@media (max-width:900px){
+  .vcnav-links{ display:none; }
+  .vcnav-signin{ display:none; }
+}
 
-.mobile-menu{display:none;margin-left:auto}
-.mobile-menu button{
-  border:0;background:#fff;border-radius:10px;padding:9px 11px;
-  color:#4c4b63;cursor:pointer;
+/* nav account chip + notifications + profile modal (site-wide) */
+.vcnav-account{
+  display:none; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+  padding:5px 12px 5px 5px; border-radius:999px;
+  color:#EDE7DA; font-size:13px; cursor:pointer; position:relative;
+}
+.vcnav-account.show{ display:flex; }
+.vcnav-account img{ width:24px; height:24px; border-radius:50%; }
+.vcnav-account-menu{
+  position:absolute; top:calc(100% + 8px); right:0; z-index:30;
+  background:#0A1D31; border:1px solid rgba(237,231,218,0.14);
+  border-radius:10px; padding:6px; min-width:150px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.4); display:none;
+}
+.vcnav-account-menu.open{ display:block; }
+.vcnav-account-menu button{
+  width:100%; text-align:left; background:none; border:none;
+  color:#EDE7DA; font-family:'Inter',sans-serif; font-size:13px;
+  padding:9px 10px; border-radius:6px; cursor:pointer;
+}
+.vcnav-account-menu button:hover{ background:rgba(255,255,255,0.06); }
+
+.vcnav-notification-wrap{ position:relative; display:none; }
+.vcnav-notification-wrap.show{ display:block; }
+.vcnav-notification{
+  position:relative; width:40px; height:40px;
+  display:none; align-items:center; justify-content:center;
+  background:rgba(255,255,255,0.05); color:#EDE7DA;
+  border:1px solid rgba(255,255,255,0.12); border-radius:11px; cursor:pointer;
+  transition:background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.vcnav-notification.show{ display:flex; }
+.vcnav-notification:hover{ background:rgba(255,255,255,0.09); border-color:rgba(94,158,255,0.38); transform:translateY(-1px); }
+.vcnav-notification svg{ width:19px; height:19px; }
+.vcnav-notification-dot{
+  position:absolute; top:7px; right:7px; width:7px; height:7px; border-radius:50%;
+  background:#FF6B5B; box-shadow:0 0 0 2px #090D20; display:none;
+}
+.vcnav-notification-dot.show{ display:block; }
+.vcnav-notification-panel{
+  position:absolute; top:calc(100% + 10px); right:0; z-index:450;
+  width:330px; max-width:calc(100vw - 28px);
+  background:#0A1D31; border:1px solid rgba(237,231,218,0.14);
+  border-radius:15px; box-shadow:0 22px 50px rgba(0,0,0,0.5);
+  overflow:hidden; display:none;
+}
+.vcnav-notification-panel.open{ display:block; }
+.vcnav-notification-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:13px 14px; border-bottom:1px solid rgba(237,231,218,0.1);
+}
+.vcnav-notification-head strong{ font:600 14px 'Space Grotesk',sans-serif; color:#fff; }
+.vcnav-notification-head button{ background:none; border:0; color:#5E9EFF; font-size:11px; cursor:pointer; }
+.vcnav-notification-list{ max-height:330px; overflow:auto; }
+.vcnav-notification-item{ padding:13px 14px; border-bottom:1px solid rgba(237,231,218,0.07); }
+.vcnav-notification-item:last-child{ border-bottom:0; }
+.vcnav-notification-item.unread{ background:rgba(94,158,255,0.07); }
+.vcnav-notification-item .n-title{ color:#fff; font-weight:600; font-size:12.5px; margin-bottom:4px; }
+.vcnav-notification-item .n-body{ color:rgba(237,231,218,0.55); font-size:11.5px; line-height:1.45; }
+.vcnav-notification-item .n-time{ margin-top:6px; color:rgba(237,231,218,0.32); font:9.5px 'IBM Plex Mono',monospace; }
+.vcnav-notification-empty{ padding:28px 15px; text-align:center; color:rgba(237,231,218,0.42); font-size:12px; }
+
+.vcauth-overlay{
+  position:fixed; inset:0; z-index:200;
+  background:rgba(7,11,28,0.82); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; padding:20px;
+  font-family:'Inter',sans-serif;
+}
+.vcauth-overlay.open{ display:flex; }
+.vcauth-card{
+  width:100%; max-width:380px; background:#0A1D31;
+  border:1px solid rgba(237,231,218,0.14); border-radius:18px;
+  padding:28px 26px 24px; box-shadow:0 30px 70px rgba(0,0,0,0.5); text-align:center;
+}
+.vcauth-card h3{ margin:14px 0 6px; font-family:'Space Grotesk',sans-serif; font-size:19px; color:#EDE7DA; }
+.vcauth-card p{ margin:0 0 20px; font-size:13.5px; line-height:1.5; color:rgba(237,231,218,0.6); }
+.vcauth-logo{ width:40px; height:40px; margin:0 auto; }
+.vcauth-google-btn{
+  width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+  background:#EDE7DA; color:#14152B; border:none; padding:12px 16px; border-radius:10px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+  cursor:pointer; transition:transform .15s, box-shadow .15s;
+}
+.vcauth-google-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 24px rgba(0,0,0,0.35); }
+.vcauth-google-btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
+.vcauth-google-btn svg{ width:18px; height:18px; flex:none; }
+.vcauth-age{
+  display:flex; align-items:flex-start; gap:9px; margin:18px 0 16px; text-align:left;
+  font-size:12.5px; line-height:1.45; color:rgba(237,231,218,0.7);
+}
+.vcauth-age input{ margin-top:2px; flex:none; width:15px; height:15px; accent-color:#5EEAD4; }
+.vcauth-error{ display:none; margin-top:14px; font-size:12.5px; color:var(--coral); }
+.vcauth-error.show{ display:block; }
+
+.vc-profile-overlay{
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(7,11,28,0.84); backdrop-filter:blur(7px);
+  align-items:center; justify-content:center; padding:18px;
+  font-family:'Inter',sans-serif;
+}
+.vc-profile-overlay.active{ display:flex; }
+.vc-profile-modal{
+  width:100%; max-width:470px; max-height:90vh; overflow:auto;
+  background:#0A1D31; border:1px solid rgba(237,231,218,0.15);
+  border-radius:22px; box-shadow:0 35px 90px rgba(0,0,0,0.55);
+}
+.vc-profile-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; border-bottom:1px solid rgba(237,231,218,0.11);
+}
+.vc-profile-head h3{ margin:0; font-family:'Space Grotesk',sans-serif; font-size:18px; color:#fff; }
+.vc-profile-close{
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(237,231,218,0.08); border:1px solid rgba(237,231,218,0.14);
+  color:#EDE7DA; cursor:pointer; font-size:16px;
+}
+.vc-profile-body{ padding:22px; }
+.vc-profile-hero{
+  display:flex; align-items:center; gap:16px; margin-bottom:22px; padding:16px;
+  background:linear-gradient(135deg,rgba(94,158,255,0.12),rgba(94,234,212,0.06));
+  border:1px solid rgba(94,158,255,0.18); border-radius:16px;
+}
+.vc-profile-avatar-wrap{ position:relative; flex:none; }
+.vc-profile-avatar{
+  width:78px; height:78px; border-radius:50%; object-fit:cover; display:block;
+  background:#101A30; border:2px solid rgba(94,234,212,0.45); box-shadow:0 8px 25px rgba(0,0,0,0.3);
+}
+.vc-profile-avatar-edit{
+  position:absolute; right:-2px; bottom:-2px; width:29px; height:29px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:#4C8DFF; color:#fff; border:2px solid #0A1D31; cursor:pointer; font-size:13px;
+}
+.vc-profile-hero h4{ margin:0 0 5px; font-family:'Space Grotesk',sans-serif; font-size:20px; color:#fff; overflow-wrap:anywhere; }
+.vc-profile-hero p{ margin:0; color:rgba(237,231,218,0.55); font-size:12px; line-height:1.45; }
+.vc-profile-field{ margin-bottom:16px; }
+.vc-profile-label{
+  display:block; margin-bottom:7px; font:10.5px 'IBM Plex Mono',monospace; letter-spacing:.07em;
+  text-transform:uppercase; color:rgba(237,231,218,0.45);
+}
+.vc-profile-input{
+  width:100%; box-sizing:border-box; background:#080F20; border:1px solid rgba(237,231,218,0.14);
+  color:#EDE7DA; border-radius:11px; padding:12px 13px; font:14px 'Inter',sans-serif;
+}
+.vc-profile-input:focus{ outline:none; border-color:#5E9EFF; }
+.vc-profile-readonly{
+  display:flex; align-items:center; gap:9px; background:#080F20; border:1px solid rgba(237,231,218,0.1);
+  border-radius:11px; padding:11px 12px;
+}
+.vc-profile-uid{
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  color:rgba(237,231,218,0.65); font:11.5px 'IBM Plex Mono',monospace;
+}
+.vc-profile-copy{
+  flex:none; border:1px solid rgba(94,158,255,0.25); background:rgba(94,158,255,0.08);
+  color:#5E9EFF; border-radius:8px; padding:7px 9px; cursor:pointer; font-size:11px;
+}
+.vc-profile-meta{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:4px 0 18px; }
+.vc-profile-meta-card{ padding:12px; border-radius:11px; background:rgba(237,231,218,0.04); border:1px solid rgba(237,231,218,0.09); }
+.vc-profile-meta-card span{ display:block; font:10px 'IBM Plex Mono',monospace; color:rgba(237,231,218,0.42); margin-bottom:5px; }
+.vc-profile-meta-card strong{ display:block; color:#EDE7DA; font-size:12px; overflow-wrap:anywhere; }
+.vc-profile-actions{ display:flex; gap:9px; }
+.vc-profile-btn{ flex:1; border-radius:10px; padding:11px 14px; font:600 13px 'Inter',sans-serif; cursor:pointer; }
+.vc-profile-btn.cancel{ background:rgba(237,231,218,0.07); color:#EDE7DA; border:1px solid rgba(237,231,218,0.13); }
+.vc-profile-btn.save{ background:linear-gradient(135deg,#4C8DFF,#1E4FD8); color:#fff; border:0; }
+.vc-profile-btn:disabled{ opacity:.5; cursor:not-allowed; }
+.vc-profile-note{ margin:11px 0 0; color:rgba(237,231,218,0.38); font-size:11px; line-height:1.45; }
+.vc-profile-error{ display:none; color:#FF6B5B; font-size:12px; margin:0 0 10px; }
+.vc-profile-error.show{ display:block; }
+@media(max-width:640px){
+  .vcnav-notification{ width:37px; height:37px; }
+  .vcnav-account{ max-width:125px; }
+  .vcnav-account > span{ max-width:62px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .vc-profile-meta{ grid-template-columns:1fr; }
 }
 
-main{max-width:900px;margin:0 auto;padding:52px 24px 80px}
+/* ============================================================
+   Blog post content — dark theme matching the homepage.
+============================================================= */
+main.blog-main{ max-width:900px; margin:0 auto; padding:64px 6vw 100px; }
 .loading,.empty{
-  text-align:center;color:var(--muted);padding:90px 20px;
-  border:1px dashed var(--line);border-radius:16px;
+  text-align:center;color:var(--ink-soft);padding:90px 20px;
+  border:1px dashed var(--hp-card-border);border-radius:16px;
 }
 .loading .spin{
   width:22px;height:22px;margin:0 auto 14px;border-radius:50%;
-  border:2px solid #e3e3ee;border-top-color:var(--purple);
+  border:2px solid rgba(255,255,255,0.12);border-top-color:var(--hp-blue-light);
   animation:spin .85s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 article{display:none}
 article.show{display:block}
 
-.article-shell{max-width:820px;margin:0 auto}
+.article-shell{max-width:800px;margin:0 auto}
 .post-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
 .tag-pill{
-  color:var(--purple-dark);background:#f0ecff;border:1px solid #ddd4ff;
-  padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;
+  color:var(--hp-blue-light);background:rgba(94,158,255,0.1);
+  border:1px solid rgba(94,158,255,0.28);
+  padding:5px 11px;border-radius:999px;font-size:11px;font-weight:700;
+  font-family:'IBM Plex Mono',monospace; letter-spacing:.02em;
 }
 .post-title{
   font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,5vw,52px);
-  line-height:1.08;letter-spacing:-.035em;margin:0 0 17px;color:#24233a;
+  line-height:1.08;letter-spacing:-.035em;margin:0 0 17px;color:#fff;
 }
 .post-meta{
-  display:flex;align-items:center;gap:10px;color:#7a8094;
+  display:flex;align-items:center;gap:10px;color:var(--ink-soft);
   font-size:13px;margin-bottom:28px;
 }
-.post-meta .dot-sep{width:4px;height:4px;border-radius:50%;background:#aeb2c2}
+.post-meta .dot-sep{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.25)}
 .post-cover{
-  width:100%;overflow:hidden;border-radius:18px;border:1px solid #e8e8ef;
-  margin-bottom:38px;background:#f5f5fa;box-shadow:0 14px 35px rgba(36,31,76,.07);
+  width:100%;overflow:hidden;border-radius:18px;border:1px solid var(--hp-card-border);
+  margin-bottom:38px;background:var(--hp-card);
+  box-shadow:0 25px 60px -25px rgba(59,123,255,0.35);
 }
 .post-cover img{width:100%;display:block;object-fit:cover;max-height:500px}
 
-.post-body{font-size:17px;line-height:1.82;color:#44465a}
+.post-body{font-size:17px;line-height:1.82;color:var(--ink-soft)}
 .post-body h2{
-  font-family:'Space Grotesk',sans-serif;color:#25243a;
+  font-family:'Space Grotesk',sans-serif;color:#fff;
   font-size:29px;line-height:1.2;margin:42px 0 14px;letter-spacing:-.02em;
 }
 .post-body h3{
-  font-family:'Space Grotesk',sans-serif;color:#29283f;
+  font-family:'Space Grotesk',sans-serif;color:#fff;
   font-size:21px;margin:30px 0 12px;
 }
 .post-body p{margin:0 0 20px}
-.post-body a{color:var(--purple-dark);font-weight:600;text-underline-offset:3px}
+.post-body a{color:var(--hp-blue-light);font-weight:600;text-underline-offset:3px}
 .post-body ul,.post-body ol{margin:0 0 20px;padding-left:25px}
 .post-body li{margin-bottom:9px}
-.post-body strong{color:#25243a}
+.post-body strong{color:#fff}
 .post-body img{max-width:100%;border-radius:12px;margin:12px 0}
 .post-body blockquote{
-  margin:26px 0;padding:14px 20px;border-left:4px solid var(--purple);
-  background:#f6f3ff;color:#65677b;border-radius:0 10px 10px 0;
+  margin:26px 0;padding:14px 20px;border-left:4px solid var(--mint);
+  background:rgba(94,234,212,0.06);color:var(--ink-soft);border-radius:0 10px 10px 0;
 }
 .post-body code{
-  background:#f3f3f7;border:1px solid #e4e4ec;border-radius:5px;
-  padding:2px 6px;font-size:.9em;
+  background:rgba(255,255,255,0.06);border:1px solid var(--hp-card-border);border-radius:5px;
+  padding:2px 6px;font-size:.9em;color:var(--mint);
 }
 
 .end-cta{
   margin-top:58px;padding:36px 24px;text-align:center;border-radius:18px;
-  color:#fff;background:linear-gradient(135deg,#6848df,#8968eb);
-  box-shadow:0 15px 35px rgba(111,78,232,.16);
+  color:#fff;background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+  box-shadow:0 20px 45px rgba(59,123,255,0.28);
 }
 .end-cta h2{font-family:'Space Grotesk',sans-serif;font-size:26px;margin:0 0 10px}
 .end-cta p{margin:0 0 22px;color:rgba(255,255,255,.82);font-size:14px}
 .end-cta a{
   display:inline-flex;align-items:center;gap:8px;
-  background:#fff;color:#6848df;text-decoration:none;
+  background:#fff;color:var(--hp-blue-deep);text-decoration:none;
   font-weight:700;padding:13px 24px;border-radius:999px;
   transition:transform .15s,box-shadow .15s;
 }
-.end-cta a:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
+.end-cta a:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.3)}
 
-.site-footer{
-  background:var(--footer);color:#fff;
-  padding:52px 24px 24px;
+/* ============================================================
+   Footer — same design system as the FriendHub homepage.
+============================================================= */
+.vcfoot{
+  position:relative; background:var(--hp-black); color:rgba(255,255,255,0.55);
+  padding:72px 6vw 0; font-family:'Inter',sans-serif; overflow:hidden;
 }
-.footer-inner{
-  max-width:1160px;margin:0 auto;
-  display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:60px;
+.vcfoot::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--coral), var(--hp-blue-light) 55%, var(--mint), transparent);
+  opacity:0.55;
 }
-.footer-brand{max-width:300px}
-.footer-brand .brand-name{color:#fff}
-.footer-description{
-  color:var(--footer-text);font-size:14px;line-height:1.7;margin:15px 0 20px;
+.vcfoot::after{
+  content:''; position:absolute; top:-120px; left:50%; width:640px; height:240px;
+  transform:translateX(-50%);
+  background:radial-gradient(closest-side, rgba(59,123,255,0.14), transparent 70%);
+  pointer-events:none;
 }
-.socials{display:flex;gap:9px}
-.socials a{
-  width:40px;height:40px;border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.07);border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  text-decoration:none;color:#b9bdd0;font-size:15px;font-weight:700;
+.vcfoot-inner{
+  position:relative; z-index:1; max-width:1180px; margin:0 auto;
+  display:grid; grid-template-columns:1.3fr 0.9fr 0.9fr 1fr; gap:40px; padding-bottom:48px;
 }
-.socials a:hover{background:rgba(255,255,255,.13);color:#fff}
-.footer-col h3{
-  margin:4px 0 15px;color:#8f96bd;font-size:12px;
-  letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+@media (max-width:860px){
+  .vcfoot-inner{ grid-template-columns:1fr 1fr; row-gap:36px; }
+  .vcfoot-brand-col{ grid-column:1 / -1; }
 }
-.footer-col a{
-  display:block;text-decoration:none;color:#e1e2eb;font-size:14px;
-  margin:0 0 12px;
+@media (max-width:480px){ .vcfoot-inner{ grid-template-columns:1fr; } }
+.vcfoot-brand{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.vcfoot-brand svg{ width:30px; height:30px; flex:none; }
+.vcfoot-brand span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; color:#fff; }
+.vcfoot-brand span em{ font-style:normal; color:var(--hp-blue-light); }
+.vcfoot-tagline-card{ border:1px solid rgba(255,255,255,0.09); border-radius:14px; padding:20px 22px 22px; margin:0 0 24px; }
+.vcfoot-accent-line{ display:block; width:36px; height:2px; background:linear-gradient(90deg,var(--hp-blue-light),var(--mint)); margin-bottom:16px; }
+.vcfoot-tagline{ font-size:16px; line-height:1.55; color:rgba(255,255,255,0.6); margin:0; max-width:none; }
+.vcfoot-tagline .hl{ color:transparent; background:linear-gradient(135deg,var(--hp-blue-light),var(--mint)); -webkit-background-clip:text; background-clip:text; font-weight:600; }
+.vcfoot-social{ display:flex; flex-wrap:wrap; gap:10px; }
+.vcfoot-social a{
+  width:46px; height:46px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.65); display:flex; align-items:center; justify-content:center; text-decoration:none;
+  transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
 }
-.footer-col a:hover{color:#a990ff}
-.footer-bottom{
-  max-width:1160px;margin:42px auto 0;padding-top:24px;
-  border-top:1px solid rgba(255,255,255,.10);
-  text-align:center;color:#737a9e;font-size:12px;
+.vcfoot-social a:hover{ background:rgba(59,123,255,0.18); border-color:rgba(59,123,255,0.4); color:#fff; transform:translateY(-2px); }
+.vcfoot-social a.c-ig{ border-color:rgba(225,48,108,0.4); }
+.vcfoot-social a.c-fb{ border-color:rgba(24,119,242,0.4); }
+.vcfoot-social a.c-x{ border-color:rgba(255,255,255,0.16); }
+.vcfoot-social a.c-yt{ border-color:rgba(255,0,0,0.35); }
+.vcfoot-social a.c-tt{ border-color:rgba(255,255,255,0.16); }
+.vcfoot-social a svg{ width:17px; height:17px; }
+.vcfoot-col h4{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.09em; text-transform:uppercase;
+  color:rgba(255,255,255,0.38); margin:0 0 18px; font-weight:500; padding-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.vcfoot-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.vcfoot-col a{ color:rgba(255,255,255,0.6); text-decoration:none; font-size:14px; display:inline-flex; align-items:center; gap:0; transition:color .15s ease; }
+.vcfoot-col a::before{ content:''; width:0; height:1px; background:var(--hp-blue-light); margin-right:0; opacity:0; transition:width .18s ease, margin-right .18s ease, opacity .18s ease; }
+.vcfoot-col a:hover{ color:#fff; }
+.vcfoot-col a:hover::before{ width:10px; margin-right:8px; opacity:1; }
+.vcfoot-community{
+  border:1px solid transparent; border-radius:14px; padding:18px;
+  background:
+    linear-gradient(#0B0C1E,#0B0C1E) padding-box,
+    linear-gradient(135deg, rgba(255,107,91,0.5), rgba(94,158,255,0.5) 55%, rgba(94,234,212,0.5)) border-box;
+}
+.vcfoot-community p{ margin:0 0 14px; font-size:13px; line-height:1.55; color:rgba(255,255,255,0.55); }
+.vcfoot-community a{
+  display:inline-flex; align-items:center; gap:7px;
+  background:linear-gradient(135deg,var(--hp-blue-light),var(--hp-blue-deep));
+  color:#fff; text-decoration:none; font-size:13px; font-weight:600;
+  padding:9px 16px; border-radius:8px; box-shadow:0 8px 18px rgba(59,123,255,0.3);
+  transition:transform .15s ease, box-shadow .2s ease;
+}
+.vcfoot-community a:hover{ transform:translateY(-1px); box-shadow:0 12px 22px rgba(59,123,255,0.4); }
+.vcfoot-bottom{
+  position:relative; z-index:1; border-top:1px solid rgba(255,255,255,0.08); padding:20px 0;
+  max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:12px; font-size:12.5px; color:rgba(255,255,255,0.35);
+}
+.vcfoot-bottom-right{ display:flex; align-items:center; gap:18px; }
+.vcfoot-bottom-right a{ color:rgba(255,255,255,0.4); text-decoration:none; transition:color .15s ease; }
+.vcfoot-bottom-right a:hover{ color:rgba(255,255,255,0.75); }
+.vcfoot-badge{
+  display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+  color:rgba(255,255,255,0.4); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:4px 10px;
 }
 
-.floating-chat{
-  position:fixed;right:28px;bottom:28px;z-index:80;
-  display:inline-flex;align-items:center;gap:9px;
-  padding:14px 23px;border-radius:999px;text-decoration:none;
-  color:#fff;font-size:14px;font-weight:700;
-  background:linear-gradient(135deg,#6d4ce6,#966eea);
-  box-shadow:0 12px 28px rgba(91,61,205,.30);
-}
-.floating-chat:hover{transform:translateY(-1px)}
-
-@media(max-width:900px){
-  .main-nav{gap:0}
-  .main-nav a,.nav-button{padding:9px 8px}
-  .start-chat{padding:11px 15px!important}
-  .footer-inner{gap:35px}
-}
-@media(max-width:720px){
-  .header-inner{height:64px;padding:0 17px}
-  .brand-name{font-size:19px}
-  .main-nav{display:none}
-  .mobile-menu{display:block}
-  main{padding:38px 18px 65px}
-  .post-title{font-size:35px}
-  .post-body{font-size:16px}
-  .footer-inner{grid-template-columns:1fr 1fr;gap:35px}
-  .footer-brand{grid-column:1/-1}
-  .floating-chat{right:14px;bottom:14px;padding:12px 18px}
-}
-@media(max-width:470px){
-  .footer-inner{grid-template-columns:1fr}
-  .footer-brand{grid-column:auto}
-  .floating-chat{font-size:13px}
-}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .loading .spin{animation:none}
@@ -261,49 +506,141 @@ article.show{display:block}
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="/">
-      <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="fhLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#9C8CFB"/>
-            <stop offset="100%" stop-color="#5142C4"/>
-          </linearGradient>
-        </defs>
-        <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#fhLogoGrad)"/>
-        <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
-        <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
-        <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
-      </svg>
-      <span class="brand-name">FriendHub</span>
-    </a>
-
-    <nav class="main-nav" aria-label="Main navigation">
-      <a href="/">Home</a>
-      <a href="/blog" class="active">Blog</a>
-      <a href="/about">About</a>
-      <div class="nav-dropdown">
-        <button class="nav-button" type="button">Pages⌄</button>
-        <div class="nav-dropdown-menu">
-          <a href="/safety">Safety</a>
-          <a href="/privacy">Privacy Policy</a>
-          <a href="/terms">Terms of Service</a>
-          <a href="/contact">Contact</a>
+<!-- ============= Top nav ============= -->
+<nav class="vcnav">
+  <div class="vcnav-inner">
+    <div class="vcnav-left">
+      <span class="vcnav-status"><span class="dot"></span><span id="vcNavOnlineCount">…</span><span class="label">&nbsp;active</span></span>
+      <a class="vcnav-brand" href="/">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="navLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5E9EFF"/>
+              <stop offset="100%" stop-color="#1E4FD8"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#navLogoGrad)"/>
+          <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+          <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+          <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+        </svg>
+        <span>Friend<em>Hub</em></span>
+      </a>
+    </div>
+    <ul class="vcnav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/">About</a></li>
+      <li><a href="/#safety">Safety</a></li>
+      <li><a href="/#faq">FAQ</a></li>
+      <li><a href="/blog" class="active">Blog</a></li>
+      <li class="vcnav-community-item"><a href="/community" id="vcNavCommunityLink" class="vcnav-community"><span class="vcnav-community-dot"></span><span class="vcnav-community-label">Community Chat</span></a></li>
+    </ul>
+    <div class="vcnav-actions">
+      <a href="/" class="vcnav-signin" id="vcNavSignIn">👤 Sign in</a>
+      <a href="/" class="vcnav-getstarted" id="vcNavGetStarted">Get Started</a>
+      <div class="vcnav-notification-wrap" id="vcNavNotificationWrap">
+        <button type="button" class="vcnav-notification" id="vcNavNotificationBtn" aria-label="Notifications" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+            <path d="M10 21h4"/>
+          </svg>
+          <span class="vcnav-notification-dot" id="vcNavNotificationDot"></span>
+        </button>
+        <div class="vcnav-notification-panel" id="vcNavNotificationPanel">
+          <div class="vcnav-notification-head">
+            <strong>Notifications</strong>
+            <button type="button" id="vcNavMarkReadBtn">Mark all read</button>
+          </div>
+          <div class="vcnav-notification-list" id="vcNavNotificationList"></div>
         </div>
       </div>
-      <a href="#" class="lang" onclick="return false"><span class="lang-icon">◎</span> English⌄</a>
-      <a href="#" class="search-link" aria-label="Search" onclick="return false">⌕</a>
-      <a href="/" class="start-chat">Start Chat</a>
-    </nav>
-
-    <div class="mobile-menu">
-      <button type="button" onclick="document.querySelector('.main-nav').style.display='flex'">Menu</button>
+      <div class="vcnav-account" id="vcNavAccount">
+        <img id="vcNavAvatar" src="" alt="Profile picture">
+        <span id="vcNavName"></span>
+        <div class="vcnav-account-menu" id="vcNavAccountMenu">
+          <button type="button" id="vcNavProfileBtn" onclick="event.preventDefault(); event.stopPropagation(); window.openFriendHubProfile && window.openFriendHubProfile();">👤 My Profile</button>
+          <button type="button" id="vcNavSignOutBtn">↪ Sign out</button>
+        </div>
+      </div>
     </div>
   </div>
-</header>
+</nav>
 
-<main>
+<!-- ============= Google sign-in overlay ============= -->
+<div class="vcauth-overlay" id="vcAuthOverlay">
+  <div class="vcauth-card">
+    <svg class="vcauth-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="authLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#5E9EFF"/>
+          <stop offset="100%" stop-color="#1E4FD8"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#authLogoGrad)"/>
+      <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+      <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+      <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+    </svg>
+    <h3 id="vcAuthTitle">Sign in to FriendHub</h3>
+    <p id="vcAuthSubtitle">Create a free account with Google to start meeting new people.</p>
+    <button type="button" class="vcauth-google-btn" id="vcAuthGoogleBtn" disabled>
+      <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.4c-2.1 1.6-4.8 2.5-7.7 2.5-5.3 0-9.7-3.1-11.3-7.6l-6.7 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.6 5.4C41.9 35.9 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+      Continue with Google
+    </button>
+    <label class="vcauth-age">
+      <input type="checkbox" id="vcAuthAgeCheck">
+      <span>I confirm I am 18 years of age or older and agree to the <a href="/terms" target="_blank" rel="noopener">Terms</a> and <a href="/community-rules" target="_blank" rel="noopener">Community Rules</a>. FriendHub is not for anyone under 18.</span>
+    </label>
+    <div class="vcauth-error" id="vcAuthError"></div>
+  </div>
+</div>
+
+<!-- ============= Profile modal ============= -->
+<div class="vc-profile-overlay" id="vcProfileOverlay" onclick="closeVcProfile(event)">
+  <div class="vc-profile-modal" role="dialog" aria-modal="true" aria-label="My FriendHub profile">
+    <div class="vc-profile-head">
+      <h3>My Profile</h3>
+      <button type="button" class="vc-profile-close" onclick="closeVcProfile()" aria-label="Close">✕</button>
+    </div>
+    <div class="vc-profile-body">
+      <div class="vc-profile-hero">
+        <div class="vc-profile-avatar-wrap">
+          <img class="vc-profile-avatar" id="vcProfileAvatar" src="" alt="Profile picture">
+          <label class="vc-profile-avatar-edit" for="vcProfileAvatarInput" title="Change profile picture">✎</label>
+          <input id="vcProfileAvatarInput" type="file" accept="image/*" style="display:none">
+        </div>
+        <div>
+          <h4 id="vcProfileHeroName">Your Profile</h4>
+          <p id="vcProfileHeroEmail">Signed in with Google</p>
+        </div>
+      </div>
+      <div class="vc-profile-field">
+        <label class="vc-profile-label" for="vcProfileNameInput">Your name</label>
+        <input class="vc-profile-input" id="vcProfileNameInput" maxlength="30" placeholder="Enter your name" autocomplete="nickname">
+      </div>
+      <div class="vc-profile-field">
+        <span class="vc-profile-label">FriendHub UID</span>
+        <div class="vc-profile-readonly">
+          <span class="vc-profile-uid" id="vcProfileUid">—</span>
+          <button type="button" class="vc-profile-copy" id="vcProfileCopyUid">Copy</button>
+        </div>
+      </div>
+      <div class="vc-profile-meta">
+        <div class="vc-profile-meta-card"><span>FRIENDHUB MEMBER SINCE</span><strong id="vcProfileCreatedAt">—</strong></div>
+        <div class="vc-profile-meta-card"><span>ACCOUNT EMAIL</span><strong id="vcProfileEmail">—</strong></div>
+      </div>
+      <div class="vc-profile-error" id="vcProfileError"></div>
+      <div class="vc-profile-actions">
+        <button type="button" class="vc-profile-btn cancel" onclick="closeVcProfile()">Cancel</button>
+        <button type="button" class="vc-profile-btn save" id="vcProfileSaveBtn">Save profile</button>
+      </div>
+      <p class="vc-profile-note">Your custom name and profile picture are saved to your FriendHub profile. Your UID cannot be changed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============= Blog post content ============= -->
+<main class="blog-main">
   <div class="loading" id="loadingState">
     <div class="spin"></div>
     Loading post…
@@ -339,190 +676,763 @@ article.show{display:block}
   </article>
 </main>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <a class="brand" href="/">
-        <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<!-- ============= Footer ============= -->
+<footer class="vcfoot">
+  <div class="vcfoot-inner">
+    <div class="vcfoot-brand-col">
+      <a class="vcfoot-brand" href="/" style="text-decoration:none;">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
-            <linearGradient id="fhFooterLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#9C8CFB"/>
-              <stop offset="100%" stop-color="#5142C4"/>
+            <linearGradient id="footLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5E9EFF"/>
+              <stop offset="100%" stop-color="#1E4FD8"/>
             </linearGradient>
           </defs>
-          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#fhFooterLogoGrad)"/>
+          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#footLogoGrad)"/>
           <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
           <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
           <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
         </svg>
-        <span class="brand-name">FriendHub</span>
+        <span>Friend<em>Hub</em></span>
       </a>
-      <p class="footer-description">
-        Anonymous chat platform built for privacy, real connections, and conversations that actually matter.
-      </p>
-      <div class="socials" aria-label="Social links">
-        <a href="#" aria-label="Instagram">◎</a>
-        <a href="#" aria-label="Facebook">f</a>
-        <a href="#" aria-label="X">𝕏</a>
-        <a href="#" aria-label="YouTube">▶</a>
-        <a href="#" aria-label="Discord">◉</a>
+
+      <div class="vcfoot-tagline-card">
+        <span class="vcfoot-accent-line"></span>
+        <p class="vcfoot-tagline">FriendHub brings <span class="hl">millions of people together</span> from around the world.</p>
+      </div>
+
+      <div class="vcfoot-social">
+        <a href="https://www.instagram.com/friend_hubsp/" target="_blank" rel="noopener" aria-label="Instagram" class="c-ig">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#E1306C"><path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47a4.9 4.9 0 0 1 1.77 1.15c.51.5.9 1.1 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43a4.9 4.9 0 0 1 1.15-1.77A4.9 4.9 0 0 1 5.45 2.53c.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zm5.2-8.4a1.17 1.17 0 1 1 0-2.34 1.17 1.17 0 0 1 0 2.34z"/></svg>
+        </a>
+        <a href="#" aria-label="Facebook" class="c-fb">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2"><path d="M13.5 21v-7.6h2.55l.38-2.96h-2.93V8.55c0-.86.24-1.44 1.47-1.44h1.57V4.46C16.24 4.4 15.36 4.32 14.33 4.32c-2.15 0-3.62 1.31-3.62 3.72v2.4H8.15v2.96h2.56V21z"/></svg>
+        </a>
+        <a href="https://x.com/friend_hubSP" target="_blank" rel="noopener" aria-label="X / Twitter" class="c-x">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M18.9 3H21l-6.7 7.66L22.2 21h-6.2l-4.85-6.34L5.6 21H3.5l7.17-8.2L2.8 3h6.35l4.38 5.8zM17.8 19.2h1.72L8.3 4.72H6.45z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/@friend_hubSP" target="_blank" rel="noopener" aria-label="YouTube" class="c-yt">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#FF0000"><path d="M22 12s0-3.1-.4-4.6a2.9 2.9 0 0 0-2-2C17.9 5 12 5 12 5s-5.9 0-7.6.4a2.9 2.9 0 0 0-2 2C2 8.9 2 12 2 12s0 3.1.4 4.6a2.9 2.9 0 0 0 2 2C6.1 19 12 19 12 19s5.9 0 7.6-.4a2.9 2.9 0 0 0 2-2C22 15.1 22 12 22 12z"/><path d="M10 15.2V8.8L15.5 12z" fill="#0A1224"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@friend_hub_sp" target="_blank" rel="noopener" aria-label="TikTok" class="c-tt">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M16.6 5.8a4.6 4.6 0 0 1-3.8-4.6h-3.2v14.6a2.8 2.8 0 1 1-2-2.7v-3.3a6 6 0 1 0 5.2 6V9.9a7.8 7.8 0 0 0 4.5 1.4V8.1a4.6 4.6 0 0 1-.7-2.3z"/></svg>
+        </a>
       </div>
     </div>
 
-    <div class="footer-col">
-      <h3>Navigation</h3>
-      <a href="/">Home</a>
-      <a href="/features">Features</a>
-      <a href="/safety">Safety</a>
-      <a href="/blog">Blog</a>
-      <a href="/about">About</a>
-      <a href="/support">Support</a>
+    <div class="vcfoot-col">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/#top">Features</a></li>
+        <li><a href="/#safety">Safety</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/">About</a></li>
+        <li><a href="/support">Support</a></li>
+      </ul>
     </div>
 
-    <div class="footer-col">
-      <h3>Legal</h3>
-      <a href="/privacy">Privacy Policy</a>
-      <a href="/terms">Terms of Service</a>
-      <a href="/community-guidelines">Community Guidelines</a>
-      <a href="/cookies">Cookie Policy</a>
-      <a href="/contact">Contact</a>
+    <div class="vcfoot-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms of Service</a></li>
+        <li><a href="/community-rules">Community Rules</a></li>
+        <li><a href="/cookies">Cookie Policy</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="vcfoot-col">
+      <h4>Community</h4>
+      <div class="vcfoot-community">
+        <p>Join the group chat — swap tips, meet regulars, talk between video calls.</p>
+        <a href="/community">Open Community Chat →</a>
+      </div>
     </div>
   </div>
 
-  <div class="footer-bottom">
-    © <span id="year"></span> FriendHub. All rights reserved.
+  <div class="vcfoot-bottom">
+    <span>© <span id="year"></span> FriendHub. All rights reserved.</span>
+    <div class="vcfoot-bottom-right">
+      <span class="vcfoot-badge">🔒 Nothing saved</span>
+      <span class="vcfoot-badge">18+ only</span>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </div>
   </div>
 </footer>
 
-<a class="floating-chat" href="/" aria-label="Talk to strangers now">
-  ▢&nbsp; Talk to Strangers Now →
-</a>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+
+<!-- ============= Firebase (compat) — shared by nav auth + blog fetch ============= -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
 <script>
-document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore, collection, query, where, limit, getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+(function(){
+  // Same FriendHub Firebase project as index.html / admin-blog.html.
+  const firebaseConfig = {
+    apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
+    authDomain: "friendhub-9f934.firebaseapp.com",
+    projectId: "friendhub-9f934",
+    storageBucket: "friendhub-9f934.firebasestorage.app",
+    messagingSenderId: "97544296104",
+    appId: "1:97544296104:web:d7f7d27e86f1af748e949d"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const FieldValue = firebase.firestore.FieldValue;
+  const googleProvider = new firebase.auth.GoogleAuthProvider();
+  window.__fhAuth = auth;
+  window.__fhDb = db;
 
-// Same FriendHub Firebase project as index.html / admin-blog.html / blog.html.
-const firebaseConfig = {
-  apiKey: "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
-  authDomain: "friendhub-9f934.firebaseapp.com",
-  projectId: "friendhub-9f934",
-  storageBucket: "friendhub-9f934.firebasestorage.app",
-  messagingSenderId: "97544296104",
-  appId: "1:97544296104:web:d7f7d27e86f1af748e949d"
-};
+  const PRESENCE_HEARTBEAT_MS = 8000;
+  const PRESENCE_STALE_MS = 22000;
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  const navSignIn = document.getElementById('vcNavSignIn');
+  const navGetStarted = document.getElementById('vcNavGetStarted');
+  const navAccount = document.getElementById('vcNavAccount');
+  const navAvatar = document.getElementById('vcNavAvatar');
+  const navName = document.getElementById('vcNavName');
+  const navAccountMenu = document.getElementById('vcNavAccountMenu');
+  const navSignOutBtn = document.getElementById('vcNavSignOutBtn');
+  const navCommunityLink = document.getElementById('vcNavCommunityLink');
+  const navOnlineCountEl = document.getElementById('vcNavOnlineCount');
 
-function escapeHtml(str) {
-  const d = document.createElement("div");
-  d.textContent = str || "";
-  return d.innerHTML;
-}
-function readMinutes(html) {
-  const words = (html || "").replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 200));
-}
+  const authOverlay = document.getElementById('vcAuthOverlay');
+  const authGoogleBtn = document.getElementById('vcAuthGoogleBtn');
+  const authAgeCheck = document.getElementById('vcAuthAgeCheck');
+  const authError = document.getElementById('vcAuthError');
 
-const params = new URLSearchParams(window.location.search);
-const slug = (params.get("slug") || "").trim();
+  let myUid = null;
+  let myUser = null;
+  let authReady = false;
+  let authReadyResolve;
+  const authReadyPromise = new Promise((res) => { authReadyResolve = res; });
+  let uidResolved = false;
+  let uidReadyResolve;
+  const uidReadyPromise = new Promise((res) => { uidReadyResolve = res; });
+  let signingInAnon = false;
+  let pendingCommunityRedirect = false;
 
-async function loadPost() {
-  const loadingEl = document.getElementById("loadingState");
-  const emptyEl = document.getElementById("emptyState");
-  const articleEl = document.getElementById("postArticle");
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      myUid = user.uid;
+      myUser = user;
+      if (!uidResolved) { uidResolved = true; uidReadyResolve(myUid); }
 
-  if (!slug) {
-    loadingEl.style.display = "none";
-    emptyEl.style.display = "block";
-    return;
+      if (!user.isAnonymous) {
+        const userRef = db.collection('users').doc(user.uid);
+        userRef.get().then((snap) => {
+          const existing = snap.exists ? snap.data() : {};
+          const profile = {
+            displayName: user.displayName || null,
+            email: user.email || null,
+            photoURL: user.photoURL || null,
+            lastSignInAt: FieldValue.serverTimestamp()
+          };
+          if (!existing.createdAt) profile.createdAt = FieldValue.serverTimestamp();
+          if (!existing.profileName && user.displayName) profile.profileName = user.displayName;
+          return userRef.set(profile, { merge: true });
+        }).catch((err) => console.error('user profile write failed:', err));
+        renderSignedIn(user);
+        closeAuthOverlay();
+        if (pendingCommunityRedirect) {
+          pendingCommunityRedirect = false;
+          window.location.href = '/community';
+        }
+      } else {
+        renderSignedOut();
+      }
+    } else {
+      myUid = null;
+      myUser = null;
+      renderSignedOut();
+      if (!signingInAnon) {
+        signingInAnon = true;
+        auth.signInAnonymously()
+          .catch((err) => console.error('anonymous sign-in failed:', err))
+          .finally(() => { signingInAnon = false; });
+      }
+    }
+    if (!authReady) { authReady = true; authReadyResolve(); }
+  });
+
+  function renderSignedIn(user){
+    navSignIn.style.display = 'none';
+    navGetStarted.style.display = 'none';
+    navAccount.classList.add('show');
+    navAvatar.src = user.photoURL || ('https://ui-avatars.com/api/?background=1E4FD8&color=fff&name=' + encodeURIComponent(user.displayName || user.email || 'U'));
+    navName.textContent = (user.displayName || user.email || 'Account').split(' ')[0];
+  }
+  function renderSignedOut(){
+    navSignIn.style.display = '';
+    navGetStarted.style.display = '';
+    navAccount.classList.remove('show');
+    navAccountMenu.classList.remove('open');
   }
 
-  try {
-    const q = query(
-      collection(db, "blogPosts"),
-      where("slug", "==", slug),
-      where("status", "==", "published"),
-      limit(1)
-    );
-    const snap = await getDocs(q);
-    if (snap.empty) {
+  function openAuthOverlay(message){
+    authError.classList.remove('show');
+    if (message) { authError.textContent = message; authError.classList.add('show'); }
+    authOverlay.classList.add('open');
+  }
+  function closeAuthOverlay(){
+    authOverlay.classList.remove('open');
+    pendingCommunityRedirect = false;
+  }
+
+  authAgeCheck.addEventListener('change', () => { authGoogleBtn.disabled = !authAgeCheck.checked; });
+
+  authGoogleBtn.addEventListener('click', async () => {
+    if (!authAgeCheck.checked) return;
+    authGoogleBtn.disabled = true;
+    authError.classList.remove('show');
+    try {
+      if (myUser && myUser.isAnonymous) {
+        try {
+          await myUser.linkWithPopup(googleProvider);
+        } catch (linkErr) {
+          if (linkErr && linkErr.code === 'auth/credential-already-in-use') {
+            await auth.signInWithPopup(googleProvider);
+          } else {
+            throw linkErr;
+          }
+        }
+      } else {
+        await auth.signInWithPopup(googleProvider);
+      }
+    } catch (err) {
+      console.error('Google sign-in failed:', err);
+      const code = err && err.code ? err.code : '';
+      let msg = 'Sign-in failed. Please try again.';
+      if (code === 'auth/popup-closed-by-user') msg = 'Sign-in window closed — try again.';
+      else if (code === 'auth/popup-blocked') msg = 'Your browser blocked the sign-in popup — allow popups and try again.';
+      else if (code === 'auth/unauthorized-domain') msg = 'This domain isn\'t authorized for sign-in yet.';
+      openAuthOverlay(msg);
+    } finally {
+      authGoogleBtn.disabled = !authAgeCheck.checked;
+    }
+  });
+
+  navSignIn.addEventListener('click', (e) => { e.preventDefault(); openAuthOverlay(); });
+  navGetStarted.addEventListener('click', (e) => { e.preventDefault(); openAuthOverlay(); });
+  navAccount.addEventListener('click', (e) => { e.stopPropagation(); navAccountMenu.classList.toggle('open'); });
+  document.addEventListener('click', () => navAccountMenu.classList.remove('open'));
+  navSignOutBtn.addEventListener('click', async (e) => { e.stopPropagation(); auth.signOut(); });
+
+  if (navCommunityLink) {
+    navCommunityLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!authReady) await authReadyPromise;
+      if (myUid && myUser && !myUser.isAnonymous) { window.location.href = '/community'; return; }
+      pendingCommunityRedirect = true;
+      document.getElementById('vcAuthTitle').textContent = 'Sign in to join Community Chat';
+      document.getElementById('vcAuthSubtitle').textContent = 'Create a free account with Google to join the community conversation.';
+      openAuthOverlay();
+    });
+  }
+
+  // ---- live presence / online count (matches the pill shown in the nav) ----
+  let presenceWriteInFlight = false;
+  async function touchPresence(){
+    const uid = await uidReadyPromise;
+    if (!uid || presenceWriteInFlight) return;
+    presenceWriteInFlight = true;
+    try {
+      await db.collection('presence').doc(uid).set({ state: 'browsing', updatedAt: Date.now() }, { merge: true });
+    } catch (err) {
+      console.error('presence heartbeat failed:', err);
+    } finally {
+      presenceWriteInFlight = false;
+    }
+  }
+  let onlineCountRequestId = 0;
+  async function refreshOnlineCount(){
+    if (!navOnlineCountEl) return;
+    const requestId = ++onlineCountRequestId;
+    const cutoff = Date.now() - PRESENCE_STALE_MS;
+    try {
+      const snap = await db.collection('presence').where('updatedAt', '>', cutoff).get();
+      if (requestId !== onlineCountRequestId) return;
+      navOnlineCountEl.textContent = snap.size.toLocaleString();
+    } catch (err) {
+      navOnlineCountEl.textContent = '—';
+      if (!myUid && err && err.code === 'permission-denied') return;
+      console.error('[FriendHub] online count query failed:', err);
+    }
+  }
+  touchPresence().then(refreshOnlineCount);
+  setInterval(touchPresence, PRESENCE_HEARTBEAT_MS);
+  setInterval(refreshOnlineCount, 4000);
+})();
+</script>
+
+<!-- ============================================================
+  Profile + Notifications (same behavior as the homepage)
+============================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  function initFriendHubProfileUI() {
+    if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) {
+      console.error('[FriendHub] Firebase is not ready for profile UI.');
+      return;
+    }
+
+    const $ = (id) => document.getElementById(id);
+
+    const profileOverlay   = $('vcProfileOverlay');
+    const profileAvatar    = $('vcProfileAvatar');
+    const avatarInput      = $('vcProfileAvatarInput');
+    const nameInput        = $('vcProfileNameInput');
+    const uidEl             = $('vcProfileUid');
+    const emailEl           = $('vcProfileEmail');
+    const heroName          = $('vcProfileHeroName');
+    const heroEmail         = $('vcProfileHeroEmail');
+    const createdAtEl       = $('vcProfileCreatedAt');
+    const copyUidBtn        = $('vcProfileCopyUid');
+    const saveBtn           = $('vcProfileSaveBtn');
+    const errorEl           = $('vcProfileError');
+
+    const account           = $('vcNavAccount');
+    const accountMenu       = $('vcNavAccountMenu');
+    const profileBtn        = $('vcNavProfileBtn');
+    const avatarNav         = $('vcNavAvatar');
+    const nameNav           = $('vcNavName');
+
+    const notificationWrap  = $('vcNavNotificationWrap');
+    const notificationBtn   = $('vcNavNotificationBtn');
+    const notificationPanel = $('vcNavNotificationPanel');
+    const notificationDot   = $('vcNavNotificationDot');
+    const notificationList  = $('vcNavNotificationList');
+    const markReadBtn       = $('vcNavMarkReadBtn');
+
+    if (!profileOverlay || !profileBtn || !account || !accountMenu ||
+        !notificationBtn || !notificationPanel) {
+      console.error('[FriendHub] Profile/notification HTML elements are missing. Retrying...');
+      setTimeout(initFriendHubProfileUI, 300);
+      return;
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let profileData = {};
+    let selectedAvatarData = null;
+
+    const notifyKey = (uid) => 'friendhub_notifications_' + uid;
+
+    function esc(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c];
+      });
+    }
+    function avatarFallback(name, photo) {
+      if (photo) return photo;
+      return 'https://ui-avatars.com/api/?background=1E4FD8&color=fff&name=' + encodeURIComponent(name || 'U');
+    }
+    function formatDate(value) {
+      if (!value) return 'Unknown';
+      try {
+        const d = value && typeof value.toDate === 'function' ? value.toDate() : new Date(value);
+        if (Number.isNaN(d.getTime())) return 'Unknown';
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) { return 'Unknown'; }
+    }
+    function showError(message) {
+      if (!errorEl) return;
+      errorEl.textContent = message || '';
+      errorEl.classList.toggle('show', !!message);
+    }
+    function getNotifications(uid) {
+      if (!uid) return [];
+      try {
+        const raw = localStorage.getItem(notifyKey(uid));
+        const parsed = raw ? JSON.parse(raw) : null;
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {}
+      const now = Date.now();
+      const initial = [
+        { id: 'welcome', title: 'Welcome to FriendHub', body: 'Your profile is ready. Add your name and a profile picture anytime.', time: now, read: false },
+        { id: 'safety', title: 'Stay safe while chatting', body: 'Never share passwords, financial information, or private addresses with strangers.', time: now - 60000, read: false }
+      ];
+      try { localStorage.setItem(notifyKey(uid), JSON.stringify(initial)); } catch (e) {}
+      return initial;
+    }
+    function saveNotifications(items) {
+      if (!currentUser) return;
+      try { localStorage.setItem(notifyKey(currentUser.uid), JSON.stringify(items)); } catch (e) {}
+    }
+    function renderNotifications() {
+      if (!currentUser || !notificationList || !notificationDot) return;
+      const items = getNotifications(currentUser.uid).sort((a, b) => (b.time || 0) - (a.time || 0));
+      const unread = items.filter(n => !n.read).length;
+      notificationDot.classList.toggle('show', unread > 0);
+      if (!items.length) {
+        notificationList.innerHTML = '<div class="vcnav-notification-empty">You’re all caught up. ✓</div>';
+        return;
+      }
+      notificationList.innerHTML = items.map(n => `
+        <div class="vcnav-notification-item ${n.read ? '' : 'unread'}">
+          <div class="n-title">${esc(n.title)}</div>
+          <div class="n-body">${esc(n.body)}</div>
+          <div class="n-time">${esc(formatDate(n.time))}</div>
+        </div>
+      `).join('');
+    }
+    function updateNavProfile(name, photo) {
+      const cleanName = (name || 'Account').trim() || 'Account';
+      if (nameNav) nameNav.textContent = cleanName.split(/\s+/)[0];
+      if (avatarNav) avatarNav.src = avatarFallback(cleanName, photo);
+      if (notificationWrap) notificationWrap.classList.add('show');
+      if (notificationBtn) notificationBtn.classList.add('show');
+      if (account) account.classList.add('show');
+    }
+    async function loadProfile(user) {
+      if (!user || user.isAnonymous) return;
+      currentUser = user;
+      if (notificationWrap) notificationWrap.classList.add('show');
+      if (notificationBtn) notificationBtn.classList.add('show');
+      if (account) account.classList.add('show');
+      const fallbackName = user.displayName || user.email || 'FriendHub user';
+      updateNavProfile(fallbackName, user.photoURL || '');
+      try {
+        const snap = await db.collection('users').doc(user.uid).get();
+        profileData = snap.exists ? snap.data() : {};
+      } catch (err) {
+        console.error('[FriendHub] profile read failed:', err);
+        profileData = {};
+      }
+      const name = (profileData.profileName || '').trim() || user.displayName || user.email || 'FriendHub user';
+      const photo = profileData.avatarData || profileData.photoURL || user.photoURL || '';
+      updateNavProfile(name, photo);
+      renderNotifications();
+    }
+    function getActiveUser() {
+      const user = auth.currentUser;
+      if (user && !user.isAnonymous) { currentUser = user; return user; }
+      if (currentUser && !currentUser.isAnonymous) return currentUser;
+      return null;
+    }
+    function openProfile() {
+      const user = getActiveUser();
+      if (!user) {
+        console.warn('[FriendHub] No signed-in Google account is available.');
+        setTimeout(function () {
+          const retryUser = auth.currentUser;
+          if (retryUser && !retryUser.isAnonymous) {
+            currentUser = retryUser;
+            loadProfile(retryUser).then(function () { openProfile(); });
+          }
+        }, 300);
+        return;
+      }
+      showError('');
+      selectedAvatarData = null;
+      const name = (profileData.profileName || '').trim() || user.displayName || user.email || 'FriendHub user';
+      const photo = profileData.avatarData || profileData.photoURL || user.photoURL || '';
+      nameInput.value = name;
+      uidEl.textContent = user.uid;
+      emailEl.textContent = user.email || '—';
+      heroEmail.textContent = user.email || 'Signed in with Google';
+      heroName.textContent = name;
+      profileAvatar.src = avatarFallback(name, photo);
+      createdAtEl.textContent = formatDate(profileData.createdAt || user.metadata?.creationTime);
+      accountMenu.classList.remove('open');
+      profileOverlay.classList.add('active');
+      document.body.classList.add('vc-profile-open');
+    }
+    window.openFriendHubProfile = openProfile;
+    window.closeVcProfile = function (event) {
+      if (event && event.target && event.target.id !== 'vcProfileOverlay') return;
+      profileOverlay.classList.remove('active');
+      document.body.classList.remove('vc-profile-open');
+      showError('');
+    };
+
+    profileBtn.addEventListener('click', function (event) { event.preventDefault(); event.stopPropagation(); openProfile(); });
+    accountMenu.addEventListener('click', function (event) { event.stopPropagation(); });
+
+    avatarInput.addEventListener('change', function () {
+      const file = avatarInput.files && avatarInput.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showError('Please choose an image file.'); avatarInput.value = ''; return; }
+      if (file.size > 5 * 1024 * 1024) { showError('Please choose an image smaller than 5 MB.'); avatarInput.value = ''; return; }
+      showError('');
+      const reader = new FileReader();
+      reader.onload = function () {
+        const img = new Image();
+        img.onload = function () {
+          const size = 320;
+          const canvas = document.createElement('canvas');
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          const scale = Math.max(size / img.width, size / img.height);
+          const width = img.width * scale, height = img.height * scale;
+          ctx.drawImage(img, (size - width) / 2, (size - height) / 2, width, height);
+          selectedAvatarData = canvas.toDataURL('image/jpeg', 0.82);
+          profileAvatar.src = selectedAvatarData;
+        };
+        img.onerror = function () { showError('Could not read that image.'); };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    copyUidBtn.addEventListener('click', async function (event) {
+      event.preventDefault(); event.stopPropagation();
+      const user = getActiveUser();
+      if (!user) return;
+      try {
+        await navigator.clipboard.writeText(user.uid);
+        copyUidBtn.textContent = 'Copied ✓';
+        setTimeout(function () { copyUidBtn.textContent = 'Copy'; }, 1400);
+      } catch (e) {
+        const range = document.createRange();
+        range.selectNodeContents(uidEl);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        copyUidBtn.textContent = 'Select UID';
+        setTimeout(function () { copyUidBtn.textContent = 'Copy'; }, 1400);
+      }
+    });
+
+    saveBtn.addEventListener('click', async function () {
+      const user = getActiveUser();
+      if (!user) { showError('Please sign in before editing your profile.'); return; }
+      const name = nameInput.value.trim();
+      if (name.length < 2) { showError('Please enter a name with at least 2 characters.'); return; }
+      if (name.length > 30) { showError('Your name can be up to 30 characters.'); return; }
+      showError('');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+      try {
+        const updates = { profileName: name, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if (selectedAvatarData) updates.avatarData = selectedAvatarData;
+        await db.collection('users').doc(user.uid).set(updates, { merge: true });
+        profileData = Object.assign({}, profileData, updates);
+        const photo = selectedAvatarData || profileData.avatarData || profileData.photoURL || user.photoURL || '';
+        updateNavProfile(name, photo);
+        profileAvatar.src = avatarFallback(name, photo);
+        heroName.textContent = name;
+        addNotification('Profile updated', 'Your FriendHub profile was updated successfully.');
+        profileOverlay.classList.remove('active');
+        document.body.classList.remove('vc-profile-open');
+      } catch (err) {
+        console.error('[FriendHub] profile save failed:', err);
+        let message = 'Could not save your profile. Please try again.';
+        if (err && err.code === 'permission-denied') message = 'Firestore permission denied. Check your users/{uid} write rule.';
+        showError(message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save profile';
+      }
+    });
+
+    function addNotification(title, body) {
+      const user = getActiveUser();
+      if (!user) return;
+      const items = getNotifications(user.uid);
+      items.unshift({ id: 'notice-' + Date.now(), title: title, body: body, time: Date.now(), read: false });
+      saveNotifications(items.slice(0, 20));
+      renderNotifications();
+    }
+
+    notificationBtn.addEventListener('click', function (event) {
+      event.preventDefault(); event.stopPropagation();
+      const user = getActiveUser();
+      if (!user) return;
+      const open = !notificationPanel.classList.contains('open');
+      accountMenu.classList.remove('open');
+      notificationPanel.classList.toggle('open', open);
+      notificationBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) {
+        const items = getNotifications(user.uid).map(function (n) { return Object.assign({}, n, { read: true }); });
+        saveNotifications(items);
+        renderNotifications();
+      }
+    });
+
+    markReadBtn.addEventListener('click', function (event) {
+      event.preventDefault(); event.stopPropagation();
+      const user = getActiveUser();
+      if (!user) return;
+      const items = getNotifications(user.uid).map(function (n) { return Object.assign({}, n, { read: true }); });
+      saveNotifications(items);
+      renderNotifications();
+    });
+
+    document.addEventListener('click', function () {
+      accountMenu.classList.remove('open');
+      notificationPanel.classList.remove('open');
+      notificationBtn.setAttribute('aria-expanded', 'false');
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      accountMenu.classList.remove('open');
+      notificationPanel.classList.remove('open');
+      notificationBtn.setAttribute('aria-expanded', 'false');
+      if (profileOverlay.classList.contains('active')) window.closeVcProfile();
+    });
+
+    const existingUser = auth.currentUser;
+    if (existingUser && !existingUser.isAnonymous) { currentUser = existingUser; loadProfile(existingUser); }
+
+    auth.onAuthStateChanged(function (user) {
+      if (!user || user.isAnonymous) {
+        currentUser = null;
+        profileData = {};
+        if (notificationWrap) notificationWrap.classList.remove('show');
+        if (notificationBtn) notificationBtn.classList.remove('show');
+        notificationPanel.classList.remove('open');
+        accountMenu.classList.remove('open');
+        profileOverlay.classList.remove('active');
+        return;
+      }
+      currentUser = user;
+      loadProfile(user);
+    });
+
+    setTimeout(function () {
+      const user = auth.currentUser;
+      if (user && !user.isAnonymous) { currentUser = user; loadProfile(user); }
+    }, 500);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFriendHubProfileUI);
+  } else {
+    initFriendHubProfileUI();
+  }
+})();
+</script>
+
+<!-- ============================================================
+  Load and render the blog post (Firestore, compat SDK)
+============================================================ -->
+<script>
+(function(){
+  const db = window.__fhDb || firebase.firestore();
+
+  function escapeHtml(str) {
+    const d = document.createElement("div");
+    d.textContent = str || "";
+    return d.innerHTML;
+  }
+  function readMinutes(html) {
+    const words = (html || "").replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const slug = (params.get("slug") || "").trim();
+
+  async function loadPost() {
+    const loadingEl = document.getElementById("loadingState");
+    const emptyEl = document.getElementById("emptyState");
+    const articleEl = document.getElementById("postArticle");
+
+    if (!slug) {
       loadingEl.style.display = "none";
       emptyEl.style.display = "block";
       return;
     }
 
-    const p = snap.docs[0].data();
-    const url = `https://www.friendhub.space/blog-post?slug=${encodeURIComponent(p.slug)}`;
-    const title = p.title || "FriendHub Blog";
-    const metaTitle = p.metaTitle || title;
-    const metaDesc = p.metaDescription || p.excerpt || "";
-    const dateObj = p.publishedAt?.toDate ? p.publishedAt.toDate() : null;
-    const dateStr = dateObj ? dateObj.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "";
+    try {
+      const snap = await db.collection("blogPosts")
+        .where("slug", "==", slug)
+        .where("status", "==", "published")
+        .limit(1)
+        .get();
 
-    // ---- SEO tags ----
-    document.title = `${metaTitle} — FriendHub Blog`;
-    document.getElementById("metaTitleTag").textContent = `${metaTitle} — FriendHub Blog`;
-    document.getElementById("metaDescTag").setAttribute("content", metaDesc);
-    document.getElementById("canonicalTag").setAttribute("href", url);
-    document.getElementById("ogTitle").setAttribute("content", metaTitle);
-    document.getElementById("ogDesc").setAttribute("content", metaDesc);
-    document.getElementById("ogUrl").setAttribute("content", url);
-    document.getElementById("twTitle").setAttribute("content", metaTitle);
-    document.getElementById("twDesc").setAttribute("content", metaDesc);
-    if (p.coverImageUrl) {
-      document.getElementById("ogImage").setAttribute("content", p.coverImageUrl);
-      document.getElementById("twImage").setAttribute("content", p.coverImageUrl);
+      if (snap.empty) {
+        loadingEl.style.display = "none";
+        emptyEl.style.display = "block";
+        return;
+      }
+
+      const p = snap.docs[0].data();
+      const url = `https://www.friendhub.space/blog-post?slug=${encodeURIComponent(p.slug)}`;
+      const title = p.title || "FriendHub Blog";
+      const metaTitle = p.metaTitle || title;
+      const metaDesc = p.metaDescription || p.excerpt || "";
+      const dateObj = p.publishedAt && p.publishedAt.toDate ? p.publishedAt.toDate() : null;
+      const dateStr = dateObj ? dateObj.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "";
+
+      document.title = `${metaTitle} — FriendHub Blog`;
+      document.getElementById("metaTitleTag").textContent = `${metaTitle} — FriendHub Blog`;
+      document.getElementById("metaDescTag").setAttribute("content", metaDesc);
+      document.getElementById("canonicalTag").setAttribute("href", url);
+      document.getElementById("ogTitle").setAttribute("content", metaTitle);
+      document.getElementById("ogDesc").setAttribute("content", metaDesc);
+      document.getElementById("ogUrl").setAttribute("content", url);
+      document.getElementById("twTitle").setAttribute("content", metaTitle);
+      document.getElementById("twDesc").setAttribute("content", metaDesc);
+      if (p.coverImageUrl) {
+        document.getElementById("ogImage").setAttribute("content", p.coverImageUrl);
+        document.getElementById("twImage").setAttribute("content", p.coverImageUrl);
+      }
+
+      const articleLd = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": title,
+        "description": metaDesc,
+        "url": url,
+        "image": p.coverImageUrl || undefined,
+        "datePublished": dateObj ? dateObj.toISOString() : undefined,
+        "author": { "@type": "Organization", "name": "FriendHub" },
+        "publisher": { "@type": "Organization", "name": "FriendHub", "url": "https://www.friendhub.space/" }
+      };
+      document.getElementById("articleLd").textContent = JSON.stringify(articleLd);
+
+      document.getElementById("postTags").innerHTML = (p.tags || []).slice(0, 3)
+        .map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("");
+      document.getElementById("postTitle").textContent = title;
+      document.getElementById("postDate").textContent = dateStr;
+      document.getElementById("postReadTime").textContent = `${readMinutes(p.content)} min read`;
+
+      if (p.coverImageUrl) {
+        document.getElementById("postCoverImg").src = p.coverImageUrl;
+        document.getElementById("postCoverImg").alt = title;
+        document.getElementById("postCoverWrap").style.display = "block";
+      }
+
+      // Content is authored as trusted HTML by admins in admin-blog.html (Firestore
+      // rules restrict writes to approved admin emails), so it's rendered directly.
+      document.getElementById("postBody").innerHTML = p.content || "";
+
+      loadingEl.style.display = "none";
+      articleEl.classList.add("show");
+    } catch (err) {
+      console.error(err);
+      document.getElementById("loadingState").style.display = "none";
+      const emptyEl = document.getElementById("emptyState");
+      emptyEl.textContent = "Couldn't load this post. Try refreshing.";
+      emptyEl.style.display = "block";
     }
-
-    const articleLd = {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "headline": title,
-      "description": metaDesc,
-      "url": url,
-      "image": p.coverImageUrl || undefined,
-      "datePublished": dateObj ? dateObj.toISOString() : undefined,
-      "author": { "@type": "Organization", "name": "FriendHub" },
-      "publisher": { "@type": "Organization", "name": "FriendHub", "url": "https://www.friendhub.space/" }
-    };
-    document.getElementById("articleLd").textContent = JSON.stringify(articleLd);
-
-    // ---- Render ----
-    document.getElementById("postTags").innerHTML = (p.tags || []).slice(0, 3)
-      .map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("");
-    document.getElementById("postTitle").textContent = title;
-    document.getElementById("postDate").textContent = dateStr;
-    document.getElementById("postReadTime").textContent = `${readMinutes(p.content)} min read`;
-
-    if (p.coverImageUrl) {
-      document.getElementById("postCoverImg").src = p.coverImageUrl;
-      document.getElementById("postCoverImg").alt = title;
-      document.getElementById("postCoverWrap").style.display = "block";
-    }
-
-    // Content is authored as trusted HTML by admins in admin-blog.html (Firestore
-    // rules restrict writes to approved admin emails), so it's rendered directly —
-    // same trust model as admin-blog.html's own editor preview.
-    document.getElementById("postBody").innerHTML = p.content || "";
-
-    loadingEl.style.display = "none";
-    articleEl.classList.add("show");
-  } catch (err) {
-    console.error(err);
-    loadingEl.style.display = "none";
-    emptyEl.textContent = "Couldn't load this post. Try refreshing.";
-    emptyEl.style.display = "block";
   }
-}
 
-loadPost();
+  // Firebase auth in the other script initializes anonymously; Firestore
+  // rules for blogPosts typically allow public reads, but if yours require
+  // request.auth != null, wait briefly for the anon sign-in to land.
+  if (firebase.auth().currentUser) {
+    loadPost();
+  } else {
+    const unsub = firebase.auth().onAuthStateChanged((user) => {
+      unsub();
+      loadPost();
+    });
+  }
+})();
 </script>
 
 </body>
