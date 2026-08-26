@@ -534,6 +534,7 @@ footer{
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script>
 firebase.initializeApp({
   apiKey:"AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
@@ -545,6 +546,41 @@ firebase.initializeApp({
 });
 
 const db=firebase.firestore();
+const auth=firebase.auth();
+const signInBtn=document.querySelector(".signin");
+
+// Explicitly use LOCAL Firebase Auth persistence so the same signed-in
+// account is restored across tabs/windows on the same origin.
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(()=>{
+    auth.onAuthStateChanged(user=>{
+      if(!signInBtn) return;
+
+      if(user && !user.isAnonymous){
+        signInBtn.textContent="Signed In ✓";
+        signInBtn.setAttribute("aria-label","You are signed in");
+      }else{
+        signInBtn.textContent="Sign In";
+        signInBtn.setAttribute("aria-label","Sign in to FriendHub");
+      }
+    });
+  })
+  .catch(err=>{
+    console.warn("[FriendHub Auth] persistence setup failed:",err);
+
+    // Still listen for auth state if persistence cannot be configured.
+    auth.onAuthStateChanged(user=>{
+      if(!signInBtn) return;
+
+      if(user && !user.isAnonymous){
+        signInBtn.textContent="Signed In ✓";
+        signInBtn.setAttribute("aria-label","You are signed in");
+      }else{
+        signInBtn.textContent="Sign In";
+        signInBtn.setAttribute("aria-label","Sign in to FriendHub");
+      }
+    });
+  });
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({
  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
 }[c]));
@@ -578,14 +614,11 @@ async function load(){
  }
 
  try{
-  const snap=await Promise.race([
-   db.collection("blogPosts")
-    .where("slug","==",slug)
-    .where("status","==","published")
-    .limit(1)
-    .get(),
-   new Promise((_,reject)=>setTimeout(()=>reject(new Error("timeout")),10000))
-  ]);
+  const snap=await db.collection("blogPosts")
+   .where("slug","==",slug)
+   .where("status","==","published")
+   .limit(1)
+   .get();
 
   if(snap.empty){
    loading.hidden=true;
@@ -649,9 +682,7 @@ async function load(){
   console.error("[FriendHub Blog]",err);
   loading.hidden=true;
   empty.hidden=false;
-  empty.textContent=err&&err.message==="timeout"
-   ?"This is taking longer than expected. Please check your connection and refresh."
-   :"Couldn't load this article. Please refresh and try again.";
+  empty.textContent="Couldn't load this article. Please refresh and try again.";
  }
 }
 
