@@ -154,6 +154,52 @@ footer{
  main{padding:48px 17px 70px}.title{font-size:39px}.body{font-size:16px}
  .cover{border-radius:14px}.end{flex-direction:column;gap:12px}
 }
+
+/* Floating "Talk to Strangers" CTA */
+.stranger-cta{
+  position:fixed;
+  right:24px;
+  bottom:20px;
+  z-index:1000;
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:14px 22px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#7C4DFF,#9B6CFF);
+  color:#fff;
+  text-decoration:none;
+  font:700 14px/1 "Inter",sans-serif;
+  box-shadow:0 12px 30px rgba(124,77,255,.32);
+  border:1px solid rgba(255,255,255,.18);
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+
+.stranger-cta svg{
+  width:17px;
+  height:17px;
+  flex:none;
+}
+
+.stranger-cta:hover{
+  transform:translateY(-3px);
+  box-shadow:0 16px 38px rgba(124,77,255,.42);
+  filter:brightness(1.06);
+}
+
+.stranger-cta:active{
+  transform:translateY(-1px);
+}
+
+@media(max-width:600px){
+  .stranger-cta{
+    right:14px;
+    bottom:14px;
+    padding:13px 17px;
+    font-size:13px;
+  }
+}
+
 </style>
 </head>
 <body>
