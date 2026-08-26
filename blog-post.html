@@ -56,13 +56,10 @@ a{color:inherit}
 }
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
 .mark{
- width:34px;height:34px;border-radius:11px;
- background:transparent;
- display:grid;place-items:center;
- box-shadow:none;
- overflow:hidden;
+ width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--blue),#1E4FD8);
+ display:grid;place-items:center;box-shadow:0 7px 20px rgba(59,123,255,.22)
 }
-.mark svg{width:34px;height:34px;display:block}
+.mark svg{width:21px}
 .brand b{font:700 19px "Space Grotesk"}
 .brand em{font-style:normal;color:var(--mint)}
 .navlinks{display:flex;align-items:center;gap:25px;margin-left:auto}
@@ -86,28 +83,6 @@ a{color:inherit}
 @media(max-width:600px){
  .nav{padding:13px 17px}.brand b{font-size:17px}
  .signin{display:none}.start{padding:8px 11px}
-}
-
-/* Signed-in nav state: bell + profile avatar pill */
-.bell{
- width:34px;height:34px;border-radius:50%;
- display:flex;align-items:center;justify-content:center;
- border:1px solid var(--line);color:var(--muted);
- text-decoration:none;flex:none;
-}
-.bell:hover{color:#fff;border-color:rgba(94,158,255,.5)}
-.profile-pill{
- display:flex;align-items:center;gap:9px;
- border:1px solid var(--line);border-radius:999px;
- padding:5px 12px 5px 5px;text-decoration:none;color:#fff;
- font-size:13px;font-weight:600;
-}
-.profile-pill:hover{border-color:rgba(94,158,255,.5)}
-.avatar{
- width:30px;height:30px;border-radius:50%;
- background:linear-gradient(135deg,var(--blue2),var(--blue));
- display:flex;align-items:center;justify-content:center;
- font:700 12px "Inter";color:#fff;flex:none;
 }
 
 main{max-width:980px;margin:auto;padding:70px 22px 100px}
@@ -363,6 +338,18 @@ footer{
   .vcfoot{padding:55px 20px 0}
   .vcfoot-bottom-right{gap:10px;flex-wrap:wrap}
 }
+
+
+/* Main FriendHub logo used by the homepage */
+.mark{
+  width:34px;height:34px;border-radius:11px;
+  background:transparent;
+  display:grid;place-items:center;
+  box-shadow:none;
+  overflow:hidden;
+}
+.mark svg{width:34px;height:34px;display:block}
+
 </style>
 </head>
 <body>
@@ -397,10 +384,8 @@ footer{
   </div>
 
   <div class="navactions">
-   <span id="authActions">
-    <a class="signin" href="/login.html">Sign In</a>
-    <a class="start" href="/">Get Started →</a>
-   </span>
+   <a class="signin" href="/login.html">Sign In</a>
+   <a class="start" href="/">Get Started →</a>
    <a class="back" href="/blog/">← All articles</a>
   </div>
  </div>
@@ -548,7 +533,6 @@ footer{
 </a>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 firebase.initializeApp({
@@ -561,52 +545,9 @@ firebase.initializeApp({
 });
 
 const db=firebase.firestore();
-const auth=firebase.auth();
-
-// Explicit persistence so a signed-in session is reliably restored
-// across tabs/windows of the same origin.
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
-  console.error("[FriendHub] failed to set auth persistence:",err);
-});
-
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({
  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
 }[c]));
-
-function initials(name){
- return (name||"?").trim().split(/\s+/).slice(0,2)
-  .map(w=>w[0]?.toUpperCase()).join("");
-}
-
-// Swap Sign In / Get Started for a bell + profile avatar once a real
-// (non-anonymous) user is signed in. Anonymous sessions — used for the
-// site's online-visitor / stranger-chat features — are intentionally
-// left showing the signed-out state.
-auth.onAuthStateChanged(user=>{
- const el=document.getElementById("authActions");
- if(!el) return;
-
- const isRealUser=user && !user.isAnonymous;
-
- if(isRealUser){
-  const name=user.displayName||user.email||"You";
-  el.innerHTML=`
-   <a class="bell" href="/notifications.html" aria-label="Notifications">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-     <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
-     <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-    </svg>
-   </a>
-   <a class="profile-pill" href="/profile.html">
-    <span class="avatar">${esc(initials(name))}</span>
-    <span>${esc(name.split(" ")[0])}</span>
-   </a>`;
- } else {
-  el.innerHTML=`
-   <a class="signin" href="/login.html">Sign In</a>
-   <a class="start" href="/">Get Started →</a>`;
- }
-});
 
 const params=new URLSearchParams(location.search);
 const slug=(params.get("slug")||"").trim();
