@@ -1,100 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Loading… — FriendHub Blog</title>
-<meta id="metaDesc" name="description" content="FriendHub Blog">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<link id="canonical" rel="canonical" href="https://www.friendhub.space/blog-post.html">
-<meta property="og:type" content="article">
-<meta property="og:site_name" content="FriendHub">
-<meta id="ogTitle" property="og:title" content="FriendHub Blog">
-<meta id="ogDesc" property="og:description" content="FriendHub Blog">
-<meta id="ogUrl" property="og:url" content="https://www.friendhub.space/blog-post.html">
-<meta id="ogImage" property="og:image" content="https://www.friendhub.space/og-image.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta id="twTitle" name="twitter:title" content="FriendHub Blog">
-<meta id="twDesc" name="twitter:description" content="FriendHub Blog">
-<meta id="twImage" name="twitter:image" content="https://www.friendhub.space/og-image.png">
-<script type="application/ld+json" id="articleLd"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#070B1C;--panel:#0F1730;--line:rgba(255,255,255,.10);--text:#F5F4FB;--muted:rgba(245,244,251,.62);--blue:#3B7BFF;--blue2:#5E9EFF;--mint:#5EEAD4}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,sans-serif;line-height:1.75}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(700px 450px at 10% -5%,rgba(59,123,255,.17),transparent 62%),radial-gradient(600px 400px at 96% 8%,rgba(94,234,212,.08),transparent 62%),var(--bg)}
-a{color:inherit}.topnav{position:sticky;top:0;z-index:20;background:rgba(7,11,28,.84);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.nav{max-width:1040px;margin:auto;padding:15px 22px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;text-decoration:none}.mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--blue),#1E4FD8);display:grid;place-items:center}.mark svg{width:21px}.brand b{font:700 19px "Space Grotesk"}.brand em{font-style:normal;color:var(--mint)}.back{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:8px 13px;border-radius:999px}.back:hover{color:#fff;border-color:rgba(94,158,255,.5)}
-main{max-width:900px;margin:auto;padding:70px 22px 100px}.loading,.empty{padding:80px 20px;text-align:center;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}article{display:none}article.show{display:block}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}.tag{font:500 10px "IBM Plex Mono";color:var(--blue2);background:rgba(59,123,255,.09);border:1px solid rgba(94,158,255,.20);padding:5px 9px;border-radius:999px}.title{font:700 clamp(38px,6vw,64px)/1.07 "Space Grotesk";letter-spacing:-.04em;margin:0 0 18px;color:#fff}.meta{display:flex;gap:10px;align-items:center;color:var(--muted);font:500 11px "IBM Plex Mono";margin-bottom:32px}.sep{width:3px;height:3px;border-radius:50%;background:var(--muted)}.cover{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#0B1227;margin-bottom:38px}.cover img{width:100%;max-height:520px;object-fit:cover;display:block}.body{font-size:17px;color:rgba(245,244,251,.82)}.body h2,.body h3,.body h4{font-family:"Space Grotesk";color:#fff;line-height:1.25;margin-top:40px}.body h2{font-size:30px}.body h3{font-size:24px}.body p{margin:0 0 22px}.body a{color:var(--blue2)}.body strong{color:#fff}.body ul,.body ol{padding-left:24px;margin-bottom:24px}.body li{margin:8px 0}.body img{max-width:100%;height:auto;border-radius:14px}.body blockquote{margin:28px 0;padding:18px 20px;border-left:3px solid var(--blue);background:rgba(59,123,255,.07);border-radius:0 12px 12px 0;color:var(--muted)}.body pre{overflow:auto;background:#050817;border:1px solid var(--line);border-radius:12px;padding:16px}.body code{font-family:"IBM Plex Mono";font-size:.9em}.end{margin-top:55px;padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px}.end a{color:var(--mint);text-decoration:none;font-weight:600}.spinner{width:24px;height:24px;border:2px solid rgba(255,255,255,.12);border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}footer{border-top:1px solid var(--line);padding:28px 22px;text-align:center;color:var(--muted);font-size:12px}
-@media(max-width:600px){main{padding:48px 17px 70px}.title{font-size:38px}.body{font-size:16px}.cover{border-radius:14px}.nav{padding:13px 17px}.brand b{font-size:17px}}
-</style>
-</head>
-<body>
-<nav class="topnav"><div class="nav">
-<a class="brand" href="/"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 11a6 6 0 0 1 10-4.4"/><path d="M20 13a6 6 0 0 1-10 4.4"/><path d="M8 8l-3 3 3 3"/><path d="M16 16l3-3-3-3"/></svg></span><b>Friend<em>Hub</em></b></a>
-<a class="back" href="/blog/">← All articles</a>
-</div></nav>
-<main>
-<div id="loading" class="loading"><div class="spinner"></div>Loading article…</div>
-<div id="empty" class="empty" hidden>We couldn't find this article. It may have been unpublished or the link is incorrect.</div>
-<article id="article">
-<div class="tags" id="tags"></div>
-<h1 class="title" id="title"></h1>
-<div class="meta"><span id="date"></span><span class="sep"></span><span id="read"></span></div>
-<div class="cover" id="cover" hidden><img id="coverImg" alt=""></div>
-<div class="body" id="body"></div>
-<div class="end"><a href="/blog/">← More from the FriendHub Blog</a><a href="/">Go to FriendHub →</a></div>
+<main class="blog-main">
+...
+<article id="postArticle">
+  <div class="article-shell">
+    <div class="post-tags" id="postTags"></div>
+    <h1 class="post-title" id="postTitle"></h1>
+    ...
+    <div class="post-cover" id="postCoverWrap">
+    ...
+    <div class="post-body" id="postBody"></div>
+
+    <section class="end-cta">
+      <h2>Ready to chat with someone?</h2>
+      <p>Connect with a real person on FriendHub and start a conversation.</p>
+      <a href="/">Start Chatting Free →</a>
+    </section>
+  </div>
 </article>
 </main>
-<footer>© <span id="year"></span> FriendHub. All rights reserved.</footer>
-
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script>
-firebase.initializeApp({
-  apiKey:"AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
-  authDomain:"friendhub-9f934.firebaseapp.com",
-  projectId:"friendhub-9f934",
-  storageBucket:"friendhub-9f934.firebasestorage.app",
-  messagingSenderId:"97544296104",
-  appId:"1:97544296104:web:d7f7d27e86f1af748e949d"
-});
-const db=firebase.firestore();
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-const params=new URLSearchParams(location.search);
-const slug=(params.get("slug")||"").trim();
-const minutes=html=>Math.max(1,Math.round((html||"").replace(/<[^>]*>/g," ").split(/\s+/).filter(Boolean).length/200));
-function dateOf(v){try{const d=v?.toDate?v.toDate():new Date(v);return isNaN(d)?"":d.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})}catch(e){return""}}
-async function load(){
-  const loading=document.getElementById("loading"),empty=document.getElementById("empty"),article=document.getElementById("article");
-  if(!slug){loading.hidden=true;empty.hidden=false;return}
-  try{
-    const snap=await db.collection("blogPosts").where("slug","==",slug).where("status","==","published").limit(1).get();
-    if(snap.empty){loading.hidden=true;empty.hidden=false;return}
-    const p=snap.docs[0].data();
-    const title=p.title||"FriendHub Blog",desc=p.metaDescription||p.excerpt||"FriendHub Blog";
-    const canonical=location.origin+"/blog-post.html?slug="+encodeURIComponent(p.slug||slug);
-    document.title=title+" — FriendHub Blog";
-    document.getElementById("metaDesc").content=desc;
-    document.getElementById("canonical").href=canonical;
-    document.getElementById("ogTitle").content=title;
-    document.getElementById("ogDesc").content=desc;
-    document.getElementById("ogUrl").content=canonical;
-    if(p.coverImageUrl){document.getElementById("ogImage").content=p.coverImageUrl;document.getElementById("twImage").content=p.coverImageUrl}
-    document.getElementById("twTitle").content=title;
-    document.getElementById("twDesc").content=desc;
-    document.getElementById("articleLd").textContent=JSON.stringify({"@context":"https://schema.org","@type":"BlogPosting","headline":title,"description":desc,"url":canonical,"image":p.coverImageUrl||undefined,"datePublished":p.publishedAt?.toDate?p.publishedAt.toDate().toISOString():undefined,"author":{"@type":"Organization","name":"FriendHub"},"publisher":{"@type":"Organization","name":"FriendHub","url":"https://www.friendhub.space/"}})
-    document.getElementById("tags").innerHTML=(p.tags||[]).slice(0,5).map(t=>`<span class="tag">${esc(t)}</span>`).join("");
-    document.getElementById("title").textContent=title;
-    document.getElementById("date").textContent=dateOf(p.publishedAt);
-    document.getElementById("read").textContent=minutes(p.content)+" min read";
-    if(p.coverImageUrl){document.getElementById("coverImg").src=p.coverImageUrl;document.getElementById("coverImg").alt=title;document.getElementById("cover").hidden=false}
-    document.getElementById("body").innerHTML=p.content||"";
-    loading.hidden=true;article.classList.add("show");
-  }catch(err){console.error("[FriendHub Blog]",err);loading.hidden=true;empty.hidden=false;empty.textContent="Couldn't load this article. Please refresh and try again."}
-}
-document.getElementById("year").textContent=new Date().getFullYear();
-load();
-</script>
-</body>
-</html>
