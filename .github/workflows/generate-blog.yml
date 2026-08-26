@@ -1,42 +1,32 @@
 name: Generate static blog pages
-
 on:
-  # Run automatically every 30 minutes so newly published posts go live
-  # without any manual step.
-  schedule:
-    - cron: "*/30 * * * *"
-  # Also let you trigger it manually from the Actions tab right after
-  # publishing a post, instead of waiting for the schedule.
+  # Trigger this manually from the Actions tab right after publishing a
+  # post, instead of running on a fixed schedule.
   workflow_dispatch: {}
-  # Optional: also run on pushes to main in case you ever hand-edit the
+  # Also run on pushes to main in case you ever hand-edit the
   # generator script itself.
   push:
     branches: [main]
     paths:
       - "scripts/generate-blog.js"
-
 permissions:
   contents: write
   # Needed so this workflow can trigger the Pages deploy workflow below.
   actions: write
   pages: write
   id-token: write
-
 jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-
       - name: Generate blog pages
         run: node scripts/generate-blog.js
-
       - name: Commit and push if changed
         id: commit
         run: |
@@ -51,7 +41,6 @@ jobs:
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-
       # Bot commits made with the default GITHUB_TOKEN don't trigger other
       # workflows (this prevents infinite workflow loops), so the normal
       # "Deploy static content to Pages" workflow never fires on its own
