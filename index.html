@@ -3518,17 +3518,19 @@
       pc = null;
     }
 
-    // Keep the local camera stream alive so reconnecting does not require
-    // another permission prompt or another getUserMedia negotiation.
+    // STOP should also turn off the user's camera and microphone.
+    // This releases the actual MediaStream tracks, not just the video UI.
     if (localStream) {
-      localVideo.srcObject = localStream;
-      localVideo.style.display = 'block';
-      localPlaceholder.style.display = 'none';
-    } else {
-      localVideo.srcObject = null;
-      localVideo.style.display = 'none';
-      localPlaceholder.style.display = 'flex';
+      localStream.getTracks().forEach((track) => {
+        try { track.stop(); } catch (_) {}
+      });
+      localStream = null;
     }
+
+    localVideo.pause?.();
+    localVideo.srcObject = null;
+    localVideo.style.display = 'none';
+    localPlaceholder.style.display = 'flex';
 
     remoteVideo.pause?.();
     remoteVideo.srcObject = null;
@@ -3554,7 +3556,7 @@
     matching = false;
     inCall = false;
 
-    setStatus(localStream ? 'CAMERA/MIC READY' : 'CAMERA/MIC BLOCKED', !localStream);
+    setStatus('CAMERA/MIC OFF', false);
     startBtn.disabled = false;
     endingCall = false;
     updateCallButtons();
