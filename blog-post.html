@@ -69,6 +69,14 @@ a{color:inherit}
 }
 .navlinks a:hover,.navlinks a.active{color:#fff;border-color:var(--blue2)}
 .navactions{display:flex;align-items:center;gap:9px}
+.auth-user{display:none;align-items:center;gap:9px}
+.auth-bell{width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.025);color:#fff;display:grid;place-items:center;text-decoration:none}
+.auth-bell svg{width:18px;height:18px}
+.auth-profile{height:40px;padding:0 12px 0 7px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.045);color:#fff;display:flex;align-items:center;gap:8px;text-decoration:none;font-size:12px;font-weight:700}
+.auth-avatar{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#1d6fe8,#16365f);color:#9de7ff;font-size:10px;font-weight:800}
+.nav.signed-in .auth-user{display:flex}
+.nav.signed-in .signin,.nav.signed-in .start{display:none}
+@media(max-width:600px){.auth-bell{width:36px;height:36px}.auth-profile{height:36px}.auth-avatar{width:25px;height:25px}}
 .signin,.start{
  font-size:12px;font-weight:700;text-decoration:none;border-radius:9px;padding:8px 13px
 }
@@ -387,6 +395,18 @@ footer{
    <a class="signin" href="/login.html">Sign In</a>
    <a class="start" href="/">Get Started →</a>
    <a class="back" href="/blog/">← All articles</a>
+   <div class="auth-user" id="authUser" aria-label="Signed in account">
+    <a class="auth-bell" href="/notifications.html" aria-label="Notifications">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+      <path d="M10 21h4"/>
+     </svg>
+    </a>
+    <a class="auth-profile" id="authProfile" href="/profile.html" aria-label="Your profile">
+     <span class="auth-avatar" id="authAvatar">MD</span>
+     <span id="authInitials">MD</span>
+    </a>
+   </div>
   </div>
  </div>
 </nav>
@@ -554,33 +574,30 @@ const signInBtn=document.querySelector(".signin");
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   .then(()=>{
     auth.onAuthStateChanged(user=>{
-      if(!signInBtn) return;
+  const nav=document.querySelector(".nav");
+  const authUser=document.getElementById("authUser");
+  const authAvatar=document.getElementById("authAvatar");
+  const authInitials=document.getElementById("authInitials");
+  if(!nav) return;
 
-      if(user && !user.isAnonymous){
-        signInBtn.textContent="Signed In ✓";
-        signInBtn.setAttribute("aria-label","You are signed in");
-      }else{
-        signInBtn.textContent="Sign In";
-        signInBtn.setAttribute("aria-label","Sign in to FriendHub");
-      }
-    });
-  })
-  .catch(err=>{
-    console.warn("[FriendHub Auth] persistence setup failed:",err);
+  const signedIn=!!(user && !user.isAnonymous);
+  nav.classList.toggle("signed-in",signedIn);
+  if(authUser) authUser.style.display=signedIn ? "flex" : "none";
 
-    // Still listen for auth state if persistence cannot be configured.
-    auth.onAuthStateChanged(user=>{
-      if(!signInBtn) return;
+  if(signedIn){
+    const name=(user.displayName||"").trim();
+    const parts=name.split(/\s+/).filter(Boolean);
+    let initials="";
+    if(parts.length>=2) initials=(parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+    else if(parts.length===1) initials=parts[0].slice(0,2).toUpperCase();
+    else if(user.email) initials=user.email.slice(0,2).toUpperCase();
+    else initials="MD";
 
-      if(user && !user.isAnonymous){
-        signInBtn.textContent="Signed In ✓";
-        signInBtn.setAttribute("aria-label","You are signed in");
-      }else{
-        signInBtn.textContent="Sign In";
-        signInBtn.setAttribute("aria-label","Sign in to FriendHub");
-      }
-    });
-  });
+    if(authAvatar) authAvatar.textContent=initials;
+    if(authInitials) authInitials.textContent=initials;
+  }
+});
+
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({
  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
 }[c]));
