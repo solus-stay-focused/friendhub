@@ -549,38 +549,23 @@ const db=firebase.firestore();
 const auth=firebase.auth();
 const signInBtn=document.querySelector(".signin");
 
-// Explicitly use LOCAL Firebase Auth persistence so the same signed-in
-// account is restored across tabs/windows on the same origin.
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .then(()=>{
-    auth.onAuthStateChanged(user=>{
-      if(!signInBtn) return;
+// Keep the same Firebase login session available across tabs/windows
+// on the same FriendHub origin.
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
+  console.warn("[FriendHub Auth] persistence setup failed:",err);
+});
 
-      if(user && !user.isAnonymous){
-        signInBtn.textContent="Signed In ✓";
-        signInBtn.setAttribute("aria-label","You are signed in");
-      }else{
-        signInBtn.textContent="Sign In";
-        signInBtn.setAttribute("aria-label","Sign in to FriendHub");
-      }
-    });
-  })
-  .catch(err=>{
-    console.warn("[FriendHub Auth] persistence setup failed:",err);
+auth.onAuthStateChanged(user=>{
+  if(!signInBtn) return;
 
-    // Still listen for auth state if persistence cannot be configured.
-    auth.onAuthStateChanged(user=>{
-      if(!signInBtn) return;
-
-      if(user && !user.isAnonymous){
-        signInBtn.textContent="Signed In ✓";
-        signInBtn.setAttribute("aria-label","You are signed in");
-      }else{
-        signInBtn.textContent="Sign In";
-        signInBtn.setAttribute("aria-label","Sign in to FriendHub");
-      }
-    });
-  });
+  if(user && !user.isAnonymous){
+    signInBtn.textContent="Signed In ✓";
+    signInBtn.setAttribute("aria-label","You are signed in");
+  }else{
+    signInBtn.textContent="Sign In";
+    signInBtn.setAttribute("aria-label","Sign in to FriendHub");
+  }
+});
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({
  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
 }[c]));
