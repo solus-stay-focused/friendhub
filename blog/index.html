@@ -25,7 +25,7 @@
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","name":"FriendHub Blog","url":"https://www.friendhub.space/blog/","description":"Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.","publisher":{"@type":"Organization","name":"FriendHub","url":"https://www.friendhub.space/"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.friendhub.space/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://www.friendhub.space/blog/"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"url":"https://www.friendhub.space/blog/rastgele-goruntulu-sohbet-uygulamalari-tr/","name":"Yeni İnsanlarla Tanışmak İçin En İyi Ücretsiz Rastgele Görüntülü Sohbet Uygulamaları"},{"@type":"ListItem","position":2,"url":"https://www.friendhub.space/blog/video-chat-apps-neue-leute-kennenlernen-de/","name":"Die besten kostenlosen Video-Chat-Apps, um neue Leute kennenzulernen"},{"@type":"ListItem","position":3,"url":"https://www.friendhub.space/blog/random-video-chat-apps-india-hindi/","name":"भारत में नए लोगों से मिलने के लिए बेस्ट फ्री रैंडम वीडियो चैट ऐप्स"},{"@type":"ListItem","position":4,"url":"https://www.friendhub.space/blog/contact-someone-professionally-without-private-email/","name":"How to Contact Someone Professionally Without Sharing Your Private Email-Friend Hub"},{"@type":"ListItem","position":5,"url":"https://www.friendhub.space/blog/hoe-professioneel-contact-opnemen-zonder-privegegevens/","name":"Hoe neem je professioneel contact op zonder privégegevens te delen?"},{"@type":"ListItem","position":6,"url":"https://www.friendhub.space/blog/how-to-contact-someone-professionally-without-sharing-private-contact-info-friend-hub/","name":"how to contact someone professionally without sharing private contact info-Friend Hub"},{"@type":"ListItem","position":7,"url":"https://www.friendhub.space/blog/friendhub-vs-other-video-chat-websites/","name":"FriendHub vs Other Video Chat Websites: Which One Is Actually Better in 2026?"},{"@type":"ListItem","position":8,"url":"https://www.friendhub.space/blog/friendhub-omegle-alternative/","name":"FriendHub vs Omegle: The Best Free Omegle Alternative in 2026"},{"@type":"ListItem","position":9,"url":"https://www.friendhub.space/blog/privacy-tips-no-personal-info/","name":"FriendHub Privacy Tips: How to Meet New People Without Sharing Personal Info"},{"@type":"ListItem","position":10,"url":"https://www.friendhub.space/blog/beginner-guide-first-call/","name":"FriendHub Beginner Guide: What to Expect on Your First Call"},{"@type":"ListItem","position":11,"url":"https://www.friendhub.space/blog/safety-and-privacy-guide-2026/","name":"FriendHub Safety and Privacy Guide for 2026"},{"@type":"ListItem","position":12,"url":"https://www.friendhub.space/blog/friendhub-coding-community/","name":"Welcome to FriendHub Coding: Build, Debug, Learn, and Connect"},{"@type":"ListItem","position":13,"url":"https://www.friendhub.space/blog/how-friendhub-helps-you-find-friends/","name":"How FriendHub Helps You Find Real Friends"},{"@type":"ListItem","position":14,"url":"https://www.friendhub.space/blog/why-we-built-friendhub/","name":"Why We Built FriendHub: Friendship as a Noble Cause"},{"@type":"ListItem","position":15,"url":"https://www.friendhub.space/blog/staying-safe-on-video-chat/","name":"10 Tips for Staying Safe on Random Video Chat"}]}</script>
+
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -82,6 +82,9 @@ main{max-width:1100px;margin:0 auto;padding:8px 24px 90px;}
 .card-meta .read-link{margin-left:auto;color:var(--mint);}
 .empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:14px;border:1px dashed var(--line);border-radius:14px;margin-top:36px;}
 @media (max-width:520px){.topnav-inner{padding:14px 18px;}header.hero{padding:44px 18px 32px;}main{padding:8px 18px 70px;}}
+
+.blog-loading,.blog-empty,.blog-error{grid-column:1/-1;text-align:center;padding:50px 20px;color:#8b96ac;font-size:14px}
+.blog-error{color:#f87171}
 </style>
 </head>
 <body>
@@ -367,5 +370,106 @@ main{max-width:1100px;margin:0 auto;padding:8px 24px 90px;}
   
 </main>
 <footer class="site-footer">© 2026 FriendHub. All rights reserved.</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs",
+  authDomain:"friendhub-9f934.firebaseapp.com",
+  projectId:"friendhub-9f934",
+  storageBucket:"friendhub-9f934.firebasestorage.app",
+  messagingSenderId:"97544296104",
+  appId:"1:97544296104:web:d7f7d27e86f1af748e949d"
+});
+
+const db=firebase.firestore();
+const grid=document.getElementById("blogGrid");
+
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",""":"&quot;","'":"&#039;"
+}[c]));
+
+function getMillis(v){
+  try{
+    if(!v) return 0;
+    if(typeof v.toMillis==="function") return v.toMillis();
+    if(typeof v.toDate==="function") return v.toDate().getTime();
+    const n=Number(v);
+    if(!Number.isNaN(n) && n>0) return n;
+    const d=new Date(v);
+    return Number.isNaN(d.getTime())?0:d.getTime();
+  }catch(e){return 0;}
+}
+
+function dateOf(p){
+  const value=p.publishedAt||p.updatedAt||p.createdAt;
+  const ms=getMillis(value);
+  if(!ms) return "";
+  return new Date(ms).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});
+}
+
+function readTime(content){
+  const text=String(content||"").replace(/<[^>]*>/g," ").replace(/&[^;]+;/g," ");
+  const words=text.split(/\s+/).filter(Boolean).length;
+  return Math.max(1,Math.round(words/200))+" min read";
+}
+
+function renderPosts(posts){
+  if(!posts.length){
+    grid.innerHTML='<div class="blog-empty">No published posts yet.</div>';
+    return;
+  }
+
+  grid.innerHTML=posts.map(p=>{
+    const slug=p.slug||p.id;
+    const title=p.title||"Untitled post";
+    const excerpt=p.excerpt||"";
+    const tags=Array.isArray(p.tags)?p.tags.slice(0,4):[];
+    const image=p.coverImageUrl||"";
+    const href="/blog-post.html?slug="+encodeURIComponent(slug);
+
+    return `
+      <article>
+        <a class="card" href="${esc(href)}">
+          <span class="accent-bar"></span>
+          <div class="cover-wrap">
+            ${image
+              ? `<img class="cover" src="${esc(image)}" alt="${esc(title)}" loading="lazy" onerror="this.style.display='none'">`
+              : `<div class="cover cover-placeholder" aria-hidden="true"></div>`}
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              ${tags.map(t=>`<span class="tag-pill">${esc(t)}</span>`).join("")}
+            </div>
+            <h2>${esc(title)}</h2>
+            <p>${esc(excerpt)}</p>
+            <div class="card-meta">
+              <span>${esc(dateOf(p))}</span>
+              <span class="dot-sep"></span>
+              <span>${readTime(p.content)}</span>
+              <span class="read-link">Read →</span>
+            </div>
+          </div>
+        </a>
+      </article>`;
+  }).join("");
+}
+
+async function loadBlog(){
+  try{
+    const snap=await db.collection("blogPosts").where("status","==","published").get();
+    const posts=snap.docs.map(d=>({id:d.id,...d.data()}));
+    posts.sort((a,b)=>getMillis(b.publishedAt||b.updatedAt||b.createdAt)-getMillis(a.publishedAt||a.updatedAt||a.createdAt));
+    renderPosts(posts);
+  }catch(error){
+    console.error("[FriendHub Blog]",error);
+    grid.innerHTML=`<div class="blog-error">Couldn't load blog posts. Please refresh and try again.</div>`;
+  }
+}
+
+loadBlog();
+</script>
+
 </body>
 </html>
