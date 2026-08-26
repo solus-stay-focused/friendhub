@@ -578,11 +578,14 @@ async function load(){
  }
 
  try{
-  const snap=await db.collection("blogPosts")
-   .where("slug","==",slug)
-   .where("status","==","published")
-   .limit(1)
-   .get();
+  const snap=await Promise.race([
+   db.collection("blogPosts")
+    .where("slug","==",slug)
+    .where("status","==","published")
+    .limit(1)
+    .get(),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error("timeout")),10000))
+  ]);
 
   if(snap.empty){
    loading.hidden=true;
@@ -646,11 +649,12 @@ async function load(){
   console.error("[FriendHub Blog]",err);
   loading.hidden=true;
   empty.hidden=false;
-  empty.textContent="Couldn't load this article. Please refresh and try again.";
+  empty.textContent=err&&err.message==="timeout"
+   ?"This is taking longer than expected. Please check your connection and refresh."
+   :"Couldn't load this article. Please refresh and try again.";
  }
 }
 
-document.getElementById("year").textContent=new Date().getFullYear();
 load();
 </script>
 </body>
