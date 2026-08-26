@@ -333,6 +333,19 @@
     box-shadow:0 6px 20px -4px rgba(255,90,80,0.5), 0 0 0 1px rgba(255,255,255,0.12) inset;
   }
   .vcbtn.stop:hover{ box-shadow:0 8px 26px -4px rgba(255,90,80,0.65), 0 0 0 1px rgba(255,255,255,0.16) inset; }
+  .vcbtn.skip{
+    background:linear-gradient(135deg,#4C8DFF,#1E4FD8);
+    color:#fff;
+    box-shadow:0 6px 20px -4px rgba(76,141,255,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset;
+  }
+  .vcbtn.skip:hover{ box-shadow:0 8px 26px -4px rgba(76,141,255,0.62), 0 0 0 1px rgba(255,255,255,0.16) inset; }
+  .vcbtn:disabled{
+    opacity:0.45;
+    cursor:not-allowed;
+    filter:none;
+    transform:none;
+    box-shadow:none;
+  }
 
   .vcselect-wrap{
     flex:1 1 160px;
@@ -1733,6 +1746,9 @@
                 </svg>
               </div>
               <span id="vcPlaceholderText">looking for someone to chat with…</span>
+              <button type="button" class="vcbox-ph-skip" id="vcSearchingSkipBtn">
+                Skip
+              </button>
             </div>
           </div>
           <div class="vcbox-half-label">Stranger</div>
@@ -1776,9 +1792,15 @@
         <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M2 1.5v11l10-5.5z"/></svg>
         Start
       </button>
-      <button class="vcbtn stop" id="vcStopBtn">
+      <button type="button" class="vcbtn stop" id="vcStopBtn">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><rect x="1" y="1" width="11" height="11" rx="1.5"/></svg>
         Stop
+      </button>
+      <button type="button" class="vcbtn skip" id="vcSkipBtn" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 4l10 8-10 8V4z"/><path d="M19 5v14"/>
+        </svg>
+        Skip
       </button>
       <div class="vcselect-wrap">
         <span class="vcselect-icon" id="vcHeaderCountryIcon" aria-hidden="true">
@@ -2567,6 +2589,8 @@
   // ---- DOM refs ----
   const startBtn = document.getElementById('vcStartBtn');
   const stopBtn = document.getElementById('vcStopBtn');
+  const skipBtn = document.getElementById('vcSkipBtn');
+  const searchingSkipBtn = document.getElementById('vcSearchingSkipBtn');
   const leaveBtn = document.getElementById('vcLeaveBtn');
   const localVideo = document.getElementById('vcLocalVideo');
   const remoteVideo = document.getElementById('vcRemoteVideo');
@@ -2617,6 +2641,12 @@
   let unsubMessages = null;
   let matching = false;
   let inCall = false;
+
+  // Every Start/Stop/Skip cycle gets a new session number.
+  // This prevents an old async Firebase/WebRTC operation from resurrecting
+  // a call after the user has already pressed Stop or Skip.
+  let sessionToken = 0;
+  let endingCall = false;
 
   function setStatus(text, blocked){
     statusText.textContent = text;
@@ -2927,6 +2957,16 @@
     if (myUid) db.collection('presence').doc(myUid).delete().catch(() => {});
   });
 
+  function updateCallButtons(){
+    const active = !!matching || !!inCall;
+    if (stopBtn) stopBtn.disabled = !active;
+    if (skipBtn) skipBtn.disabled = !active;
+  }
+
+  function isSessionActive(token){
+    return token === sessionToken && !endingCall;
+  }
+
   // ---- Enable Camera (pre-call preview): grabs the stream early so "You" shows live video ----
   enableCameraBtn.addEventListener('click', async () => {
     if (localStream) return;
@@ -2950,37 +2990,52 @@
 
   // ---- start button: get camera/mic, mark presence, join the waiting pool ----
   startBtn.addEventListener('click', async () => {
-    if (inCall || matching) return;
+    if (inCall || matching || endingCall) return;
+
+    const mySession = ++sessionToken;
     startBtn.disabled = true;
+    updateCallButtons();
 
     if (!localStream) {
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (!isSessionActive(mySession)) return;
+
         localVideo.srcObject = localStream;
         localVideo.style.display = 'block';
         localPlaceholder.style.display = 'none';
         setStatus('CAMERA/MIC READY', false);
       } catch (err) {
-        setStatus('CAMERA/MIC BLOCKED', true);
-        startBtn.disabled = false;
+        if (isSessionActive(mySession)) {
+          setStatus('CAMERA/MIC BLOCKED', true);
+          startBtn.disabled = false;
+          updateCallButtons();
+        }
         console.error('getUserMedia failed:', err);
         return;
       }
     }
 
-    // Fast path: anonymous auth is already running for every visitor.
     try {
       await ensureAnyAuth();
-      if (!myUid) throw new Error('uid-not-ready');
+      if (!isSessionActive(mySession) || !myUid) return;
     } catch (err) {
-      startBtn.disabled = false;
+      if (isSessionActive(mySession)) {
+        startBtn.disabled = false;
+        updateCallButtons();
+      }
       console.error('[FriendHub] anonymous auth is not ready:', err);
       return;
     }
 
+    if (!isSessionActive(mySession)) return;
+
     setPlaceholder('searching', 'looking for someone to chat with…');
     matching = true;
+    updateCallButtons();
     await touchPresence('waiting');
+
+    if (!isSessionActive(mySession)) return;
 
     try {
       await db.collection('waitingPool').doc(myUid).set({
@@ -2988,51 +3043,63 @@
       });
     } catch (err) {
       console.error('[FriendHub] waiting pool write failed:', err);
-      matching = false;
-      startBtn.disabled = false;
-      setPlaceholder('idle');
+      if (isSessionActive(mySession)) {
+        matching = false;
+        startBtn.disabled = false;
+        setPlaceholder('idle');
+        updateCallButtons();
+      }
       return;
     }
 
-    // Someone else may match this user. The call is only marked "active"
-    // after the caller has written the offer, so the callee never races an
-    // incomplete call document.
+    if (!isSessionActive(mySession)) {
+      db.collection('waitingPool').doc(myUid).delete().catch(() => {});
+      return;
+    }
+
+    // Someone else may match this user. Ignore any callback belonging to an
+    // older Start cycle after Stop/Skip has been pressed.
     unsubIncomingCalls = db.collection('calls')
       .where('participants', 'array-contains', myUid)
       .where('status', '==', 'active')
       .onSnapshot((snap) => {
+        if (!isSessionActive(mySession)) return;
+
         snap.docChanges().forEach((change) => {
-          if (change.type !== 'added' || inCall) return;
+          if (change.type !== 'added' || inCall || !matching || !isSessionActive(mySession)) return;
           const data = change.doc.data();
           const isCaller = data.caller === myUid;
           enterCall(
             change.doc.id,
             isCaller ? 'caller' : 'callee',
-            isCaller ? data.callee : data.caller
+            isCaller ? data.callee : data.caller,
+            mySession
           ).catch((err) => console.error('[FriendHub] enterCall failed:', err));
         });
       }, (err) => console.error('[FriendHub] incoming call listener failed:', err));
 
     // Do not run overlapping match queries. One snapshot can fire several
     // times while Firestore is updating the pool.
-    tryMatch();
+    tryMatch(mySession);
 
     unsubWaitingPool = db.collection('waitingPool')
       .onSnapshot(() => {
-        if (matching && !inCall) scheduleTryMatch();
+        if (matching && !inCall && isSessionActive(mySession)) scheduleTryMatch(mySession);
       }, (err) => console.error('[FriendHub] waiting pool listener failed:', err));
+
+    updateCallButtons();
   });
 
-  function scheduleTryMatch() {
-    if (matchRetryTimer || matchInProgress || !matching || inCall) return;
+  function scheduleTryMatch(token = sessionToken) {
+    if (matchRetryTimer || matchInProgress || !matching || inCall || !isSessionActive(token)) return;
     matchRetryTimer = setTimeout(() => {
       matchRetryTimer = null;
-      tryMatch().catch((err) => console.error('[FriendHub] match retry failed:', err));
+      tryMatch(token).catch((err) => console.error('[FriendHub] match retry failed:', err));
     }, 50);
   }
 
-  async function tryMatch() {
-    if (!matching || inCall || matchInProgress || !myUid) return;
+  async function tryMatch(token = sessionToken) {
+    if (!isSessionActive(token) || !matching || inCall || matchInProgress || !myUid) return;
     matchInProgress = true;
 
     try {
@@ -3042,8 +3109,10 @@
         .limit(20)
         .get();
 
+      if (!isSessionActive(token) || !matching || inCall) return;
+
       for (const doc of candidates.docs) {
-        if (!matching || inCall) break;
+        if (!isSessionActive(token) || !matching || inCall) break;
         if (doc.id === myUid) continue;
 
         const data = doc.data();
@@ -3065,8 +3134,6 @@
 
             const callRef = db.collection('calls').doc();
 
-            // Keep the call hidden from the callee until the caller has
-            // completed WebRTC offer creation.
             tx.set(callRef, {
               participants: [myUid, otherUid],
               caller: myUid,
@@ -3080,7 +3147,13 @@
             return callRef.id;
           });
 
-          await enterCall(newCallId, 'caller', otherUid);
+          // Stop/Skip may have happened while the transaction was running.
+          if (!isSessionActive(token) || !matching || inCall) {
+            db.collection('calls').doc(newCallId).update({ status: 'ended' }).catch(() => {});
+            break;
+          }
+
+          await enterCall(newCallId, 'caller', otherUid, token);
           return;
         } catch (e) {
           // Another browser won the race; immediately try the next candidate.
@@ -3089,12 +3162,12 @@
       }
     } finally {
       matchInProgress = false;
-      if (matching && !inCall) scheduleTryMatch();
+      if (isSessionActive(token) && matching && !inCall) scheduleTryMatch(token);
     }
   }
 
-  async function enterCall(id, myRole, matchedUid) {
-    if (inCall) return;
+  async function enterCall(id, myRole, matchedUid, token = sessionToken) {
+    if (!isSessionActive(token) || inCall || !matching) return;
 
     inCall = true;
     matching = false;
@@ -3130,7 +3203,7 @@
       } else if (state === 'failed') {
         addChatMsg('system', 'Connection failed. Trying another person…');
         endCall(true).then(() => {
-          startBtn.click();
+          if (!endingCall) startBtn.click();
         }).catch(() => {});
       }
     };
@@ -3414,7 +3487,13 @@
     reportSubmitBtn.textContent = 'Submit report';
   };
 
-  async function endCall(goIdle){
+  async function endCall(goIdle, reason = 'stop'){
+    if (endingCall) return;
+
+    endingCall = true;
+    ++sessionToken; // Immediately invalidate every pending Start/match callback.
+    matching = false;
+
     if (unsubIncomingCalls) { unsubIncomingCalls(); unsubIncomingCalls = null; }
     if (unsubCallDoc) { unsubCallDoc(); unsubCallDoc = null; }
     if (unsubCandidates) { unsubCandidates(); unsubCandidates = null; }
@@ -3423,7 +3502,16 @@
     if (matchRetryTimer) { clearTimeout(matchRetryTimer); matchRetryTimer = null; }
     matchInProgress = false;
 
-    if (pc) { pc.close(); pc = null; }
+    const endingCallId = callId;
+
+    if (pc) {
+      try { pc.onconnectionstatechange = null; } catch (_) {}
+      try { pc.oniceconnectionstatechange = null; } catch (_) {}
+      try { pc.onicecandidate = null; } catch (_) {}
+      try { pc.close(); } catch (_) {}
+      pc = null;
+    }
+
     // Keep the local camera stream alive so reconnecting does not require
     // another permission prompt or another getUserMedia negotiation.
     if (localStream) {
@@ -3435,26 +3523,88 @@
       localVideo.style.display = 'none';
       localPlaceholder.style.display = 'flex';
     }
+
+    remoteVideo.pause?.();
     remoteVideo.srcObject = null;
     setPlaceholder('idle');
     chatLog.innerHTML = '';
 
     if (myUid) {
       db.collection('waitingPool').doc(myUid).delete().catch(() => {});
-      if (callId) db.collection('calls').doc(callId).update({ status: 'ended' }).catch(() => {});
+      if (endingCallId) {
+        db.collection('calls').doc(endingCallId).update({
+          status: 'ended',
+          endedAt: FieldValue.serverTimestamp(),
+          endedBy: myUid,
+          endReason: reason
+        }).catch(() => {});
+      }
       touchPresence('browsing');
     }
 
-    callId = null; role = null; otherUid = null; matching = false; inCall = false;
+    callId = null;
+    role = null;
+    otherUid = null;
+    matching = false;
+    inCall = false;
+
     setStatus(localStream ? 'CAMERA/MIC READY' : 'CAMERA/MIC BLOCKED', !localStream);
     startBtn.disabled = false;
+    endingCall = false;
+    updateCallButtons();
   }
 
-  stopBtn.addEventListener('click', () => endCall());
-  leaveBtn.addEventListener('click', () => endCall());
+  // STOP = completely cancel the current search/call.
+  stopBtn.addEventListener('click', async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    await endCall(false, 'stop');
+  });
+
+  // SKIP = end the current search/call, then immediately find another person.
+  async function skipCurrent(){
+    if (endingCall || (!matching && !inCall)) return;
+
+    await endCall(false, 'skip');
+
+    // Give Firestore/listeners one tick to settle before starting the next search.
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    if (!endingCall && !inCall && !matching) {
+      startBtn.click();
+    }
+  }
+
+  if (skipBtn) {
+    skipBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      skipCurrent().catch((err) => console.error('[FriendHub] skip failed:', err));
+    });
+  }
+
+  if (searchingSkipBtn) {
+    searchingSkipBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      skipCurrent().catch((err) => console.error('[FriendHub] searching skip failed:', err));
+    });
+  }
+
+  leaveBtn.addEventListener('click', async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    await endCall(false, 'leave');
+  });
+
+  updateCallButtons();
+
   window.addEventListener('beforeunload', () => {
     if (myUid) {
-      navigator.sendBeacon && db.collection('waitingPool').doc(myUid).delete().catch(() => {});
+      db.collection('waitingPool').doc(myUid).delete().catch(() => {});
+      if (callId) {
+        db.collection('calls').doc(callId).update({ status: 'ended' }).catch(() => {});
+      }
     }
   });
 })();
