@@ -3030,7 +3030,7 @@
 
     if (!isSessionActive(mySession)) return;
 
-    setPlaceholder('searching', 'looking for someone to chat with…');
+    setPlaceholder('searching', 'finding someone for you…');
     matching = true;
     updateCallButtons();
     await touchPresence('waiting');
@@ -3039,7 +3039,7 @@
 
     try {
       await db.collection('waitingPool').doc(myUid).set({
-        createdAt: FieldValue.serverTimestamp()
+        createdAt: Date.now()
       });
     } catch (err) {
       console.error('[FriendHub] waiting pool write failed:', err);
@@ -3056,6 +3056,12 @@
       db.collection('waitingPool').doc(myUid).delete().catch(() => {});
       return;
     }
+
+    // Start matching immediately. The waitingPool listener below is only a
+    // backup trigger; it should not be responsible for the first match.
+    tryMatch(mySession).catch((err) =>
+      console.error('[FriendHub] initial match failed:', err)
+    );
 
     // Someone else may match this user. Ignore any callback belonging to an
     // older Start cycle after Stop/Skip has been pressed.
@@ -3080,8 +3086,6 @@
 
     // Do not run overlapping match queries. One snapshot can fire several
     // times while Firestore is updating the pool.
-    tryMatch(mySession);
-
     unsubWaitingPool = db.collection('waitingPool')
       .onSnapshot(() => {
         if (matching && !inCall && isSessionActive(mySession)) scheduleTryMatch(mySession);
@@ -3105,8 +3109,9 @@
     try {
       const cutoff = Date.now() - WAITING_STALE_MS;
       const candidates = await db.collection('waitingPool')
+        .where('createdAt', '>', cutoff)
         .orderBy('createdAt')
-        .limit(20)
+        .limit(10)
         .get();
 
       if (!isSessionActive(token) || !matching || inCall) return;
@@ -3139,7 +3144,7 @@
               caller: myUid,
               callee: otherUid,
               status: 'waiting',
-              createdAt: FieldValue.serverTimestamp()
+              createdAt: Date.now()
             });
             tx.delete(meRef);
             tx.delete(otherRef);
@@ -3276,7 +3281,8 @@
       // old race where the callee could read the call before "offer" existed.
       await callRef.update({
         offer: { type: offer.type, sdp: offer.sdp },
-        status: 'active'
+        status: 'active',
+        activeAt: Date.now()
       });
 
       unsubCallDoc = callRef.onSnapshot(async (snap) => {
@@ -3294,7 +3300,7 @@
       let data = (await callRef.get()).data();
       let attempts = 0;
 
-      while ((!data || !data.offer) && attempts < 20 && !inCall) {
+      while ((!data || !data.offer) && attempts < 10 && !inCall) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         data = (await callRef.get()).data();
         attempts++;
