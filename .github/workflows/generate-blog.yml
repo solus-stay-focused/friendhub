@@ -1,11 +1,18 @@
 name: Generate Blog
 
 on:
-  # Adjust to match your existing triggers — e.g. a schedule, or a
-  # repository_dispatch fired when a post is published in Firestore.
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'   # example: hourly — change/remove as needed
+    - cron: '0 * * * *'   # adjust/remove to match your original trigger
+
+# ---------------------------------------------------------------------
+# THIS WAS THE MISSING PIECE. Without it, the built-in GITHUB_TOKEN
+# only has read access to the repo, so the "git push" step in
+# "Commit and push if changed" gets rejected with a 403 — which is
+# exactly what causes the "exit code 128" failure you're seeing.
+# ---------------------------------------------------------------------
+permissions:
+  contents: write
 
 jobs:
   generate:
@@ -13,6 +20,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          # Make sure checkout uses a token that can push. actions/checkout
+          # uses GITHUB_TOKEN by default, which is fine now that we've
+          # granted contents: write above.
+          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -31,8 +43,12 @@ jobs:
           git push
 
       # ---------------------------------------------------------------
-      # THIS STEP WAS MISSING — without it, the generated files get
-      # committed to the repo but never actually reach your live site.
+      # Only keep this step if you've actually created the
+      # FIREBASE_SERVICE_ACCOUNT_FRIENDHUB_9F934 secret in
+      # Settings → Secrets and variables → Actions.
+      # If you haven't set that up yet, DELETE this step for now —
+      # it will fail the whole run otherwise, and generate + commit
+      # will still work fine without it.
       # ---------------------------------------------------------------
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
