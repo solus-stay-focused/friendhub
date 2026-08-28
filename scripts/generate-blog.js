@@ -154,6 +154,50 @@ function safeJsonLd(value) {
 }
 
 
+/**
+ * Removes Firebase-related <script> tags from the generated static page.
+ *
+ * IMPORTANT: this replaces the old approach, which used a single regex
+ * with an unbounded `[\s\S]*?` that could span across MULTIPLE <script>
+ * tags (and everything in between them — nav, main, footer, etc.) before
+ * finding a keyword like "initializeApp" further down the page. That bug
+ * deleted the entire visible body of every generated post/index page.
+ *
+ * This version instead matches ONE <script>...</script> block at a time
+ * (a real script tag's content can never contain a literal "</script>",
+ * so this can't cross tag boundaries) and only removes a given block if
+ * ITS OWN content references Firebase. The JSON-LD structured-data
+ * script is explicitly left alone.
+ */
+function stripFirebaseScripts(html) {
+  // Remove the external Firebase SDK includes:
+  // <script src="https://www.gstatic.com/firebasejs/.../firebase-....js"></script>
+  // These are self-closed (no content between open/close tags), so this
+  // is safe and can't accidentally span into other tags.
+  html = html.replace(/<script[^>]+firebase[^>]*><\/script>/gi, "");
+
+  // Remove any remaining inline <script>...</script> block whose OWN
+  // content references Firebase setup/usage. Matched one tag at a time.
+  html = html.replace(
+    /<script([^>]*)>([\s\S]*?)<\/script>/gi,
+    (match, attrs, inner) => {
+      // Never touch the JSON-LD structured data script.
+      if (/application\/ld\+json/i.test(attrs)) {
+        return match;
+      }
+
+      if (/firebaseConfig|initializeApp|firebase\.firestore|onSnapshot|docSnap/.test(inner)) {
+        return "";
+      }
+
+      return match;
+    }
+  );
+
+  return html;
+}
+
+
 /* =========================================================
    TEMPLATE
    ========================================================= */
@@ -477,24 +521,7 @@ function renderPostPage(post) {
      REMOVE FIREBASE/DYNAMIC LOADING
      ======================================================= */
 
-  html = html.replace(
-    /<script[^>]+firebase[^>]*><\/script>/gi,
-    ""
-  );
-
-
-  /*
-   * Remove common Firebase configuration/loading scripts
-   * that were used by the dynamic blog-post.html.
-   *
-   * The generated page already contains the article,
-   * therefore Firestore is not needed on the static page.
-   */
-
-  html = html.replace(
-    /<script[^>]*>\s*[\s\S]*?(firebaseConfig|initializeApp|firebase\.firestore|onSnapshot|docSnap)[\s\S]*?<\/script>/gi,
-    ""
-  );
+  html = stripFirebaseScripts(html);
 
 
   return html;
@@ -1002,16 +1029,7 @@ function renderIndexPage(posts) {
 
   /* ---------- Remove Firebase ---------- */
 
-  html = html.replace(
-    /<script[^>]+firebase[^>]*><\/script>/gi,
-    ""
-  );
-
-
-  html = html.replace(
-    /<script[^>]*>\s*[\s\S]*?(firebaseConfig|initializeApp|firebase\.firestore|onSnapshot|docSnap)[\s\S]*?<\/script>/gi,
-    ""
-  );
+  html = stripFirebaseScripts(html);
 
 
   return html;
