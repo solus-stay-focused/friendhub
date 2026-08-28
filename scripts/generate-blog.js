@@ -1,67 +1,63 @@
 #!/usr/bin/env node
-
 /**
  * generate-blog.js
  *
- * Generates static blog pages from Firestore.
+ * Fetches published posts from Firestore (public REST read — same access
+ * level as blog.html / blog-post.html already use client-side) and writes
+ * static, pre-rendered HTML for each post plus a static blog index and
+ * sitemap.xml. This exists so crawlers and link-preview bots that don't
+ * execute JavaScript (Bing, most social platforms, and Googlebot's first
+ * pass) see real titles/descriptions/content instead of "Loading…".
  *
- * IMPORTANT:
- * The current blog-post.html is used as the design template.
- * This means generated posts keep the same design as your current
- * FriendHub blog page instead of using the old generator design.
+ * Run manually:   node scripts/generate-blog.js
+ * Run in CI:       see .github/workflows/generate-blog.yml
+ *
+ * Output:
+ *   /blog/index.html            (static post grid)
+ *   /blog/<slug>/index.html     (one per published post)
+ *   /sitemap.xml
  */
 
 const fs = require("fs");
 const path = require("path");
 
 const PROJECT_ID = "friendhub-9f934";
+// Public Firebase Web API key (already exposed client-side in index.html /
+// admin-blog.html / blog.html — not a secret; access is governed by
+// Firestore security rules, not this key).
 const API_KEY = "AIzaSyAGq-OE8k2tfF0xIQHMYWIfAQ4JVS69gKs";
 const SITE_URL = "https://www.friendhub.space";
+const OUT_ROOT = path.join(__dirname, "..");
 
-const ROOT = path.join(__dirname, "..");
-const TEMPLATE_FILE = path.join(ROOT, "blog-post.html");
-const BLOG_DIR = path.join(ROOT, "blog");
+const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
-const FIRESTORE_BASE =
-  `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
-
-
-/* =========================================================
-   FIRESTORE
-   ========================================================= */
+// ---------- Firestore REST helpers ----------
 
 function fsValueToJs(value) {
   if (value == null) return null;
-
   if ("stringValue" in value) return value.stringValue;
   if ("integerValue" in value) return parseInt(value.integerValue, 10);
   if ("doubleValue" in value) return value.doubleValue;
   if ("booleanValue" in value) return value.booleanValue;
   if ("timestampValue" in value) return new Date(value.timestampValue);
   if ("nullValue" in value) return null;
-
   if ("arrayValue" in value) {
-    return (value.arrayValue.values || []).map(fsValueToJs);
+    const vals = value.arrayValue.values || [];
+    return vals.map(fsValueToJs);
   }
-
   if ("mapValue" in value) {
     return fsFieldsToJs(value.mapValue.fields || {});
   }
-
   return null;
 }
 
-
 function fsFieldsToJs(fields) {
   const out = {};
-
-  for (const [key, value] of Object.entries(fields || {})) {
-    out[key] = fsValueToJs(value);
+  for (const [k, v] of Object.entries(fields || {})) {
+    out[k] = fsValueToJs(v);
   }
-
   return out;
 }
-
 
 async function fetchAllPosts() {
   const posts = [];
@@ -69,44 +65,31 @@ async function fetchAllPosts() {
 
   do {
     const url = new URL(`${FIRESTORE_BASE}/blogPosts`);
-
     url.searchParams.set("key", API_KEY);
     url.searchParams.set("pageSize", "300");
-
-    if (pageToken) {
-      url.searchParams.set("pageToken", pageToken);
-    }
+    if (pageToken) url.searchParams.set("pageToken", pageToken);
 
     const res = await fetch(url.toString());
-
     if (!res.ok) {
       const body = await res.text();
-
-      throw new Error(
-        `Firestore fetch failed: ${res.status} ${body}`
-      );
+      throw new Error(`Firestore fetch failed: ${res.status} ${body}`);
     }
-
     const data = await res.json();
 
     for (const doc of data.documents || []) {
-      posts.push(fsFieldsToJs(doc.fields));
+      const fields = fsFieldsToJs(doc.fields);
+      posts.push(fields);
     }
-
     pageToken = data.nextPageToken || null;
-
   } while (pageToken);
 
   return posts;
 }
 
+// ---------- Content helpers ----------
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
-
-function escapeHtml(value) {
-  return String(value ?? "")
+function escapeHtml(str) {
+  return (str || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -114,1149 +97,393 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
-
 function readMinutes(html) {
-  const words = String(html || "")
-    .replace(/<[^>]*>/g, " ")
-    .split(/\s+/)
-    .filter(Boolean)
-    .length;
-
+  const words = (html || "").replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
 
+function formatDate(d) {
+  if (!(d instanceof Date) || isNaN(d)) return "";
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
 
-function formatDate(value) {
-  if (!value) return "";
+function slugify(s) {
+  return (s || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
-  const date =
-    value instanceof Date
-      ? value
-      : new Date(value);
+// ---------- Shared page chrome (matches existing dark theme) ----------
 
-  if (Number.isNaN(date.getTime())) {
-    return "";
+const BASE_STYLE = `
+  :root{
+    --bg:#0B0F1A; --bg-2:#0E1424; --panel:#121A2C; --panel-2:#0D1322; --line:#212C42;
+    --text:#EDE7DA; --muted:#8B96AC; --violet:#9C8CFB; --violet-dim:#5142C4;
+    --mint:#5EEAD4; --amber:#FFB84D;
   }
-
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  });
-}
-
-
-function safeJsonLd(value) {
-  return JSON.stringify(value)
-    .replace(/</g, "\\u003c")
-    .replace(/>/g, "\\u003e")
-    .replace(/&/g, "\\u0026");
-}
-
-
-/**
- * Removes Firebase-related <script> tags from the generated static page.
- *
- * IMPORTANT: this replaces the old approach, which used a single regex
- * with an unbounded `[\s\S]*?` that could span across MULTIPLE <script>
- * tags (and everything in between them — nav, main, footer, etc.) before
- * finding a keyword like "initializeApp" further down the page. That bug
- * deleted the entire visible body of every generated post/index page.
- *
- * This version instead matches ONE <script>...</script> block at a time
- * (a real script tag's content can never contain a literal "</script>",
- * so this can't cross tag boundaries) and only removes a given block if
- * ITS OWN content references Firebase. The JSON-LD structured-data
- * script is explicitly left alone.
- */
-function stripFirebaseScripts(html) {
-  // Remove the external Firebase SDK includes:
-  // <script src="https://www.gstatic.com/firebasejs/.../firebase-....js"></script>
-  // These are self-closed (no content between open/close tags), so this
-  // is safe and can't accidentally span into other tags.
-  html = html.replace(/<script[^>]+firebase[^>]*><\/script>/gi, "");
-
-  // Remove any remaining inline <script>...</script> block whose OWN
-  // content references Firebase setup/usage. Matched one tag at a time.
-  html = html.replace(
-    /<script([^>]*)>([\s\S]*?)<\/script>/gi,
-    (match, attrs, inner) => {
-      // Never touch the JSON-LD structured data script.
-      if (/application\/ld\+json/i.test(attrs)) {
-        return match;
-      }
-
-      if (/firebaseConfig|initializeApp|firebase\.firestore|onSnapshot|docSnap/.test(inner)) {
-        return "";
-      }
-
-      return match;
-    }
-  );
-
-  return html;
-}
-
-
-/* =========================================================
-   TEMPLATE
-   ========================================================= */
-
-function loadTemplate() {
-  if (!fs.existsSync(TEMPLATE_FILE)) {
-    throw new Error(
-      `blog-post.html was not found at: ${TEMPLATE_FILE}`
-    );
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(640px 420px at 12% -6%, rgba(156,140,251,0.16), transparent 60%),
+      radial-gradient(560px 380px at 96% 8%, rgba(94,234,212,0.10), transparent 60%),
+      var(--bg);
   }
-
-  return fs.readFileSync(TEMPLATE_FILE, "utf8");
-}
-
-
-/* =========================================================
-   STATIC ARTICLE CONTENT
-   ========================================================= */
-
-function buildStaticMain(post) {
-
-  const title = post.title || "FriendHub Blog";
-
-  const date = formatDate(post.publishedAt);
-
-  const content = post.content || "";
-
-  const tags = Array.isArray(post.tags)
-    ? post.tags.slice(0, 5)
-    : [];
-
-
-  const tagsHtml = tags
-    .map(
-      tag =>
-        `<span class="tag">${escapeHtml(tag)}</span>`
-    )
-    .join("");
-
-
-  const coverHtml = post.coverImageUrl
-    ? `
-  <div class="cover" id="cover">
-    <img
-      id="coverImg"
-      src="${escapeHtml(post.coverImageUrl)}"
-      alt="${escapeHtml(title)}"
-    >
-  </div>
-`
-    : "";
-
-
-  return `
-<main>
-
-  <article id="article" class="show">
-
-    <div class="article-head">
-
-      <div class="kicker">
-        FRIENDHUB BLOG
-      </div>
-
-      <div class="tags" id="tags">
-        ${tagsHtml}
-      </div>
-
-      <h1 class="title" id="title">
-        ${escapeHtml(title)}
-      </h1>
-
-      <div class="meta">
-
-        <span id="date">
-          ${escapeHtml(date)}
-        </span>
-
-        <span class="sep"></span>
-
-        <span id="read">
-          ${readMinutes(content)} min read
-        </span>
-
-      </div>
-
-    </div>
-
-    ${coverHtml}
-
-    <div class="body" id="body">
-      ${content}
-    </div>
-
-    <div class="end">
-
-      <a href="/blog/">
-        ← More from the FriendHub Blog
-      </a>
-
-      <a href="/">
-        Go to FriendHub →
-      </a>
-
-    </div>
-
-  </article>
-
-</main>
+  nav.topnav{position:sticky;top:0;z-index:50;background:rgba(11,15,26,0.78);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topnav-inner{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand svg{width:30px;height:30px;flex-shrink:0;}
+  .brand span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;color:#fff;}
+  .brand span em{font-style:normal;color:var(--mint);}
+  .topnav a.back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--muted);font-size:13.5px;font-weight:500;padding:8px 14px;border-radius:20px;border:1px solid var(--line);}
+  .topnav a.back:hover{color:var(--text);border-color:var(--violet-dim);background:rgba(156,140,251,0.06);}
+  .topnav a.back svg{width:14px;height:14px;}
+  footer.site-footer{border-top:1px solid var(--line);padding:28px 24px;text-align:center;color:var(--muted);font-size:12.5px;}
+  .tag-pill{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--violet);background:rgba(156,140,251,0.1);border:1px solid rgba(156,140,251,0.2);padding:3px 9px;border-radius:20px;letter-spacing:.02em;}
 `;
+
+const LOGO_SVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs><linearGradient id="navBgGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#9C8CFB"/><stop offset="100%" stop-color="#5142C4"/></linearGradient></defs>
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#navBgGrad)"/>
+  <path d="M14,44 a22,22 0 1,1 22,26 l-7,10 l-2,-12 a22,22 0 0,1 -13,-24 z" fill="#FFFFFF"/>
+  <path d="M86,48 a22,22 0 1,0 -22,26 l7,10 l2,-12 a22,22 0 0,0 13,-24 z" fill="#5EEAD4" fill-opacity="0.88"/>
+  <path d="M79,17 l2.6,6.4 6.4,2.6 -6.4,2.6 -2.6,6.4 -2.6,-6.4 -6.4,-2.6 6.4,-2.6 z" fill="#FFB84D"/>
+</svg>`;
+
+const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">`;
+
+// Same favicon as the homepage, so blog pages show the FriendHub logo in
+// the browser tab instead of a generic globe icon.
+const FAVICON_TAG = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${encodeURIComponent(LOGO_SVG)}">`;
+
+function navBar(backHref, backLabel) {
+  return `<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="/">${LOGO_SVG}<span>Friend<em>Hub</em></span></a>
+    <a href="${backHref}" class="back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      ${backLabel}
+    </a>
+  </div>
+</nav>`;
 }
 
+function siteFooter() {
+  return `<footer class="site-footer">© ${new Date().getFullYear()} FriendHub. All rights reserved.</footer>`;
+}
 
-/* =========================================================
-   GENERATE POST PAGE
-   ========================================================= */
+// ---------- Post page template ----------
 
-function renderPostPage(post) {
-
-  const template = loadTemplate();
-
-  const title =
-    post.title || "FriendHub Blog";
-
-  const description =
-    post.metaDescription ||
-    post.excerpt ||
-    "FriendHub Blog";
-
-  const slug =
-    String(post.slug).trim();
-
-  const canonical =
-    `${SITE_URL}/blog/${slug}/`;
-
-  const image =
-    post.coverImageUrl ||
-    `${SITE_URL}/og-image.png`;
-
-
-  let publishedDate;
-
-  if (post.publishedAt) {
-
-    const d =
-      post.publishedAt instanceof Date
-        ? post.publishedAt
-        : new Date(post.publishedAt);
-
-    if (!Number.isNaN(d.getTime())) {
-      publishedDate = d.toISOString();
-    }
-
-  }
-
+function renderPostPage(p) {
+  const title = p.title || "FriendHub Blog";
+  const metaTitle = p.metaTitle || title;
+  const metaDesc = p.metaDescription || p.excerpt || "";
+  const url = `${SITE_URL}/blog/${p.slug}/`;
+  const dateObj = p.publishedAt instanceof Date ? p.publishedAt : null;
+  const dateStr = formatDate(dateObj);
+  const tags = (p.tags || []).slice(0, 3);
 
   const articleLd = {
-
     "@context": "https://schema.org",
-
     "@type": "BlogPosting",
-
-    headline: title,
-
-    description: description,
-
-    url: canonical,
-
-    image: image,
-
-    datePublished: publishedDate,
-
-    author: {
-      "@type": "Organization",
-      "name": "FriendHub"
-    },
-
-    publisher: {
-      "@type": "Organization",
-      "name": "FriendHub",
-      "url": `${SITE_URL}/`
-    }
-
+    "headline": title,
+    "description": metaDesc,
+    "url": url,
+    "image": p.coverImageUrl || undefined,
+    "datePublished": dateObj ? dateObj.toISOString() : undefined,
+    "author": { "@type": "Organization", "name": "FriendHub" },
+    "publisher": { "@type": "Organization", "name": "FriendHub", "url": SITE_URL + "/" }
   };
 
+  const coverBlock = p.coverImageUrl
+    ? `<div class="post-cover"><img src="${escapeHtml(p.coverImageUrl)}" alt="${escapeHtml(title)}"></div>`
+    : "";
 
-  let html = template;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+${FAVICON_TAG}
+<title>${escapeHtml(metaTitle)} — FriendHub Blog</title>
+<meta name="description" content="${escapeHtml(metaDesc)}">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="FriendHub">
+<link rel="canonical" href="${url}">
 
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="FriendHub">
+<meta property="og:title" content="${escapeHtml(metaTitle)}">
+<meta property="og:description" content="${escapeHtml(metaDesc)}">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${escapeHtml(p.coverImageUrl || SITE_URL + "/og-image.png")}">
+<meta property="og:locale" content="en_US">
 
-  /* ---------- SEO ---------- */
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(metaTitle)}">
+<meta name="twitter:description" content="${escapeHtml(metaDesc)}">
+<meta name="twitter:image" content="${escapeHtml(p.coverImageUrl || SITE_URL + "/og-image.png")}">
 
-  html = html.replace(
-    /<title>[\s\S]*?<\/title>/i,
+<script type="application/ld+json">${JSON.stringify(articleLd)}</script>
 
-    `<title>
-      ${escapeHtml(title)} — FriendHub Blog
-    </title>`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*name=["']description["'][^>]*>/i,
-
-    `<meta
-      name="description"
-      content="${escapeHtml(description)}"
-    >`
-  );
-
-
-  html = html.replace(
-    /<link[^>]*rel=["']canonical["'][^>]*>/i,
-
-    `<link
-      rel="canonical"
-      href="${escapeHtml(canonical)}"
-    >`
-  );
-
-
-  /* ---------- Open Graph ---------- */
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:title["'][^>]*>/i,
-
-    `<meta
-      property="og:title"
-      content="${escapeHtml(title)}"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:description["'][^>]*>/i,
-
-    `<meta
-      property="og:description"
-      content="${escapeHtml(description)}"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:url["'][^>]*>/i,
-
-    `<meta
-      property="og:url"
-      content="${escapeHtml(canonical)}"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:image["'][^>]*>/i,
-
-    `<meta
-      property="og:image"
-      content="${escapeHtml(image)}"
-    >`
-  );
-
-
-  /* ---------- Twitter ---------- */
-
-  html = html.replace(
-    /<meta[^>]*name=["']twitter:title["'][^>]*>/i,
-
-    `<meta
-      name="twitter:title"
-      content="${escapeHtml(title)}"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*name=["']twitter:description["'][^>]*>/i,
-
-    `<meta
-      name="twitter:description"
-      content="${escapeHtml(description)}"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*name=["']twitter:image["'][^>]*>/i,
-
-    `<meta
-      name="twitter:image"
-      content="${escapeHtml(image)}"
-    >`
-  );
-
-
-  /* ---------- Structured data ---------- */
-
-  html = html.replace(
-    /<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/i,
-
-    `<script type="application/ld+json">
-      ${safeJsonLd(articleLd)}
-    </script>`
-  );
-
-
-  /* =======================================================
-     VERY IMPORTANT
-     
-     Replace the dynamic blog content with static HTML.
-     The design/CSS/header/footer remain from blog-post.html.
-     ======================================================= */
-
-  html = html.replace(
-    /<main>[\s\S]*?<\/main>/i,
-
-    buildStaticMain(post)
-  );
-
-
-  /* =======================================================
-     REMOVE FIREBASE/DYNAMIC LOADING
-     ======================================================= */
-
-  html = stripFirebaseScripts(html);
-
-
-  return html;
+${FONTS}
+<style>
+${BASE_STYLE}
+main{max-width:760px;margin:0 auto;padding:52px 24px 100px;}
+.post-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.post-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,42px);font-weight:700;letter-spacing:-0.02em;line-height:1.12;margin:0 0 16px;background:linear-gradient(100deg,#fff 40%, var(--violet) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.post-meta{display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:28px;}
+.post-meta .dot-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.post-cover{width:100%;border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-bottom:34px;background:var(--panel-2);}
+.post-cover img{width:100%;display:block;object-fit:cover;max-height:420px;}
+.post-body{font-size:16.5px;line-height:1.75;color:#DCD6C9;}
+.post-body h2{font-family:'Space Grotesk',sans-serif;color:#fff;font-size:24px;margin:36px 0 14px;letter-spacing:-0.01em;}
+.post-body h3{font-family:'Space Grotesk',sans-serif;color:#fff;font-size:19px;margin:28px 0 12px;}
+.post-body p{margin:0 0 18px;}
+.post-body a{color:var(--mint);text-decoration:underline;text-underline-offset:2px;}
+.post-body ul, .post-body ol{margin:0 0 18px;padding-left:22px;}
+.post-body li{margin-bottom:8px;}
+.post-body strong{color:#fff;}
+.post-body img{max-width:100%;border-radius:10px;margin:10px 0;}
+.post-body blockquote{margin:22px 0;padding:4px 20px;border-left:3px solid var(--violet);color:var(--muted);font-style:italic;}
+.post-body code{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:2px 6px;font-size:0.9em;font-family:'IBM Plex Mono',monospace;}
+.post-footer{margin-top:56px;padding-top:28px;border-top:1px solid var(--line);text-align:center;}
+.post-footer a.cta{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-weight:600;font-size:14.5px;background:linear-gradient(135deg, var(--violet), var(--violet-dim));padding:12px 24px;border-radius:999px;}
+@media (max-width:520px){.topnav-inner{padding:14px 18px;}main{padding:36px 18px 80px;}}
+</style>
+</head>
+<body>
+${navBar("/blog/", "All posts")}
+<main>
+  <article>
+    <div class="post-tags">${tags.map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("")}</div>
+    <h1 class="post-title">${escapeHtml(title)}</h1>
+    <div class="post-meta">
+      <span>${dateStr}</span>
+      <span class="dot-sep"></span>
+      <span>${readMinutes(p.content)} min read</span>
+    </div>
+    ${coverBlock}
+    <div class="post-body">${p.content || ""}</div>
+    <div class="post-footer">
+      <a class="cta" href="/">Start a chat on FriendHub →</a>
+    </div>
+  </article>
+</main>
+${siteFooter()}
+</body>
+</html>`;
 }
 
-
-/* =========================================================
-   BLOG INDEX
-   ========================================================= */
+// ---------- Blog index template ----------
 
 function renderIndexPage(posts) {
-
-  const template = loadTemplate();
-
-
-  const cards = posts
-    .map(post => {
-
-      const title =
-        escapeHtml(
-          post.title || "FriendHub Blog"
-        );
-
-      const excerpt =
-        escapeHtml(
-          post.excerpt || ""
-        );
-
-      const slug =
-        escapeHtml(
-          post.slug
-        );
-
-      const date =
-        escapeHtml(
-          formatDate(post.publishedAt)
-        );
-
-      const minutes =
-        readMinutes(post.content);
-
-
-      const tags =
-        (Array.isArray(post.tags)
-          ? post.tags
-          : []
-        )
-          .slice(0, 3)
-          .map(
-            tag =>
-              `<span class="tag">
-                ${escapeHtml(tag)}
-              </span>`
-          )
-          .join("");
-
-
-      const cover =
-        post.coverImageUrl
-
-          ? `
-            <div class="cover-wrap">
-
-              <img
-                class="cover"
-                src="${escapeHtml(post.coverImageUrl)}"
-                alt="${title}"
-                loading="lazy"
-              >
-
-            </div>
-          `
-
-          : "";
-
-
-      return `
-<article class="index-card">
-
-  <a
-    href="/blog/${slug}/"
-    class="index-card-link"
-  >
-
-    ${cover}
-
-    <div class="index-card-body">
-
-      <div class="index-tags">
-        ${tags}
+  const cards = posts.map(p => {
+    const dateStr = formatDate(p.publishedAt instanceof Date ? p.publishedAt : null);
+    const cover = p.coverImageUrl
+      ? `<div class="cover-wrap"><img class="cover" src="${escapeHtml(p.coverImageUrl)}" alt="${escapeHtml(p.title)}" loading="lazy"></div>`
+      : "";
+    const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("");
+    return `<article>
+    <a class="card" href="/blog/${escapeHtml(p.slug)}/">
+      <span class="accent-bar"></span>
+      ${cover}
+      <div class="card-body">
+        <div class="card-tags">${tags}</div>
+        <h2>${escapeHtml(p.title)}</h2>
+        <p>${escapeHtml(p.excerpt || "")}</p>
+        <div class="card-meta">
+          <span>${dateStr}</span>
+          <span class="dot-sep"></span>
+          <span>${readMinutes(p.content)} min read</span>
+          <span class="read-link">Read →</span>
+        </div>
       </div>
+    </a>
+    </article>`;
+  }).join("\n");
 
-      <h2>
-        ${title}
-      </h2>
-
-      <p>
-        ${excerpt}
-      </p>
-
-      <div class="index-meta">
-
-        <span>
-          ${date}
-        </span>
-
-        <span class="sep"></span>
-
-        <span>
-          ${minutes} min read
-        </span>
-
-        <span class="read-link">
-          Read →
-        </span>
-
-      </div>
-
-    </div>
-
-  </a>
-
-</article>
-`;
-
-    })
-    .join("\n");
-
-
-  let html = template;
-
-
-  /* ---------- Index SEO ---------- */
-
-  html = html.replace(
-    /<title>[\s\S]*?<\/title>/i,
-
-    `<title>
-      Blog — FriendHub | Video Chat Tips, Safety & Updates
-    </title>`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*name=["']description["'][^>]*>/i,
-
-    `<meta
-      name="description"
-      content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people."
-    >`
-  );
-
-
-  html = html.replace(
-    /<link[^>]*rel=["']canonical["'][^>]*>/i,
-
-    `<link
-      rel="canonical"
-      href="${SITE_URL}/blog/"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:title["'][^>]*>/i,
-
-    `<meta
-      property="og:title"
-      content="FriendHub Blog — Video Chat Tips, Safety & Updates"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:description["'][^>]*>/i,
-
-    `<meta
-      property="og:description"
-      content="Guides, safety tips, and updates from FriendHub."
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:url["'][^>]*>/i,
-
-    `<meta
-      property="og:url"
-      content="${SITE_URL}/blog/"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*property=["']og:image["'][^>]*>/i,
-
-    `<meta
-      property="og:image"
-      content="${SITE_URL}/og-image.png"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*name=["']twitter:title["'][^>]*>/i,
-
-    `<meta
-      name="twitter:title"
-      content="FriendHub Blog — Video Chat Tips, Safety & Updates"
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*name=["']twitter:description["'][^>]*>/i,
-
-    `<meta
-      name="twitter:description"
-      content="Guides, safety tips, and updates from FriendHub."
-    >`
-  );
-
-
-  html = html.replace(
-    /<meta[^>]*name=["']twitter:image["'][^>]*>/i,
-
-    `<meta
-      name="twitter:image"
-      content="${SITE_URL}/og-image.png"
-    >`
-  );
-
-
-  /* ---------- Blog structured data ---------- */
-
-  const blogLd = {
-
+  const itemListLd = {
     "@context": "https://schema.org",
-
-    "@type": "Blog",
-
-    "name": "FriendHub Blog",
-
-    "url": `${SITE_URL}/blog/`,
-
-    "description":
-      "Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.",
-
-    "publisher": {
-      "@type": "Organization",
-      "name": "FriendHub",
-      "url": `${SITE_URL}/`
-    }
-
+    "@type": "ItemList",
+    "itemListElement": posts.map((p, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "url": `${SITE_URL}/blog/${p.slug}/`,
+      "name": p.title
+    }))
   };
 
+  const blogLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "FriendHub Blog",
+    "url": `${SITE_URL}/blog/`,
+    "description": "Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.",
+    "publisher": { "@type": "Organization", "name": "FriendHub", "url": SITE_URL + "/" }
+  };
 
-  html = html.replace(
-    /<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/i,
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL + "/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${SITE_URL}/blog/` }
+    ]
+  };
 
-    `<script type="application/ld+json">
-      ${safeJsonLd(blogLd)}
-    </script>`
-  );
+  const emptyBlock = posts.length === 0
+    ? `<div class="empty">No posts published yet — check back soon.</div>`
+    : "";
 
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+${FAVICON_TAG}
+<title>Blog — FriendHub | Video Chat Tips, Safety & Updates</title>
+<meta name="description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="FriendHub">
+<link rel="canonical" href="${SITE_URL}/blog/">
 
-  /* ---------- Replace main ---------- */
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FriendHub">
+<meta property="og:title" content="FriendHub Blog — Video Chat Tips, Safety & Updates">
+<meta property="og:description" content="Guides, safety tips, and updates from FriendHub — the free random video chat platform for meeting new people.">
+<meta property="og:url" content="${SITE_URL}/blog/">
+<meta property="og:image" content="${SITE_URL}/og-image.png">
+<meta property="og:locale" content="en_US">
 
-  const indexMain = `
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FriendHub Blog — Video Chat Tips, Safety & Updates">
+<meta name="twitter:description" content="Guides, safety tips, and updates from FriendHub.">
+<meta name="twitter:image" content="${SITE_URL}/og-image.png">
 
-<main class="blog-index-main">
+<script type="application/ld+json">${JSON.stringify(blogLd)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
+<script type="application/ld+json">${JSON.stringify(itemListLd)}</script>
 
-  <section class="index-hero">
-
-    <div class="kicker">
-      FRIENDHUB BLOG
-    </div>
-
-    <h1 class="index-title">
-      The FriendHub Blog
-    </h1>
-
-    <p class="index-description">
-      Guides, safety tips, random video chat advice,
-      and updates from FriendHub.
-    </p>
-
+${FONTS}
+<style>
+${BASE_STYLE}
+header.hero{max-width:1100px;margin:0 auto;padding:64px 24px 44px;}
+header.hero .eyebrow{display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.06em;color:var(--mint);background:rgba(94,234,212,0.08);border:1px solid rgba(94,234,212,0.28);padding:5px 12px;border-radius:20px;margin-bottom:20px;}
+header.hero .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint);}
+header.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(34px,6vw,56px);margin:0 0 14px;font-weight:700;letter-spacing:-0.02em;line-height:1.05;background:linear-gradient(100deg,#fff 40%, var(--violet) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+header.hero p{color:var(--muted);font-size:16px;max-width:540px;line-height:1.65;margin:0;}
+header.hero .rule{margin-top:40px;height:1px;background:linear-gradient(90deg, var(--line), transparent);}
+main{max-width:1100px;margin:0 auto;padding:8px 24px 90px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:22px;margin-top:36px;}
+.card{background:linear-gradient(180deg, var(--panel), var(--panel-2));border:1px solid var(--line);border-radius:14px;overflow:hidden;text-decoration:none;display:flex;flex-direction:column;position:relative;}
+.card:hover{border-color:rgba(156,140,251,0.4);}
+.card .accent-bar{position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg, var(--violet), var(--mint));opacity:0;}
+.card:hover .accent-bar{opacity:1;}
+.card .cover-wrap{position:relative;width:100%;height:172px;background:var(--panel-2);overflow:hidden;}
+.card img.cover{width:100%;height:100%;object-fit:cover;display:block;}
+.card-body{padding:19px 21px 21px;flex:1;display:flex;flex-direction:column;}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px;}
+.card h2{font-family:'Space Grotesk',sans-serif;font-size:18.5px;margin:0 0 9px;line-height:1.32;font-weight:600;color:#fff;}
+.card p{color:var(--muted);font-size:13.5px;line-height:1.62;margin:0 0 16px;flex:1;}
+.card-meta{display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px;}
+.card-meta .dot-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.card-meta .read-link{margin-left:auto;color:var(--mint);}
+.empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:14px;border:1px dashed var(--line);border-radius:14px;margin-top:36px;}
+@media (max-width:520px){.topnav-inner{padding:14px 18px;}header.hero{padding:44px 18px 32px;}main{padding:8px 18px 70px;}}
+</style>
+</head>
+<body>
+${navBar("/", "Back to app")}
+<header class="hero">
+  <span class="eyebrow"><span class="dot"></span>FROM THE TEAM</span>
+  <h1>The FriendHub Blog</h1>
+  <p>Notes on meeting people online safely, making the most of random video chat, and what we're building next.</p>
+  <div class="rule"></div>
+</header>
+<main>
+  <section class="grid" aria-label="Blog posts">
+    ${cards}
   </section>
-
-
-  <section
-    class="index-grid"
-    aria-label="Blog posts"
-  >
-
-    ${
-      cards ||
-      `
-      <div class="index-empty">
-        No posts published yet — check back soon.
-      </div>
-      `
-    }
-
-  </section>
-
+  ${emptyBlock}
 </main>
-`;
-
-
-  html = html.replace(
-    /<main>[\s\S]*?<\/main>/i,
-    indexMain
-  );
-
-
-  /* ---------- Index CSS ---------- */
-
-  const indexCss = `
-
-/* =====================================================
-   STATIC BLOG INDEX
-   Uses the current blog-post.html visual design
-   ===================================================== */
-
-.blog-index-main{
-  max-width:1180px !important;
-  padding:70px 22px 100px !important;
+${siteFooter()}
+</body>
+</html>`;
 }
 
-.index-hero{
-  max-width:850px;
-  margin-bottom:45px;
-}
-
-.index-hero .kicker{
-  margin-bottom:14px;
-}
-
-.index-title{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:clamp(42px,6vw,68px);
-  line-height:1.06;
-  letter-spacing:-.045em;
-  font-weight:700;
-  margin:0 0 16px;
-  color:#fff;
-}
-
-.index-description{
-  max-width:650px;
-  color:var(--muted);
-  font-size:17px;
-  line-height:1.7;
-  margin:0;
-}
-
-.index-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:22px;
-}
-
-.index-card{
-  min-width:0;
-}
-
-.index-card-link{
-  display:flex;
-  flex-direction:column;
-  height:100%;
-  overflow:hidden;
-  text-decoration:none;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:18px;
-  transition:
-    transform .2s ease,
-    border-color .2s ease,
-    box-shadow .2s ease;
-}
-
-.index-card-link:hover{
-  transform:translateY(-4px);
-  border-color:rgba(94,158,255,.45);
-  box-shadow:0 18px 45px rgba(0,0,0,.22);
-}
-
-.index-card .cover-wrap{
-  height:190px;
-  background:#0B1227;
-  overflow:hidden;
-}
-
-.index-card .cover{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-  border:0;
-  border-radius:0;
-  margin:0;
-}
-
-.index-card-body{
-  display:flex;
-  flex-direction:column;
-  flex:1;
-  padding:20px;
-}
-
-.index-tags{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-.index-card h2{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:21px;
-  line-height:1.28;
-  font-weight:600;
-  color:#fff;
-  margin:0 0 10px;
-}
-
-.index-card p{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.6;
-  margin:0 0 18px;
-  flex:1;
-}
-
-.index-meta{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  padding-top:13px;
-  border-top:1px solid var(--line);
-  font-family:"IBM Plex Mono",monospace;
-  font-size:10.5px;
-  font-weight:500;
-  color:var(--muted);
-}
-
-.index-meta .sep{
-  width:3px;
-  height:3px;
-  border-radius:50%;
-  background:var(--muted);
-}
-
-.index-meta .read-link{
-  margin-left:auto;
-  color:var(--mint);
-}
-
-.index-empty{
-  grid-column:1/-1;
-  padding:70px 20px;
-  text-align:center;
-  border:1px dashed var(--line);
-  border-radius:16px;
-  color:var(--muted);
-}
-
-@media(max-width:900px){
-
-  .index-grid{
-    grid-template-columns:
-      repeat(2,minmax(0,1fr));
-  }
-
-}
-
-@media(max-width:600px){
-
-  .blog-index-main{
-    padding:
-      48px
-      17px
-      70px !important;
-  }
-
-  .index-grid{
-    grid-template-columns:1fr;
-  }
-
-  .index-title{
-    font-size:40px;
-  }
-
-}
-
-`;
-
-
-  html = html.replace(
-    "</style>",
-    `${indexCss}\n</style>`
-  );
-
-
-  /* ---------- Remove Firebase ---------- */
-
-  html = stripFirebaseScripts(html);
-
-
-  return html;
-}
-
-
-/* =========================================================
-   SITEMAP
-   ========================================================= */
+// ---------- Sitemap ----------
 
 function renderSitemap(posts) {
-
-  const urls = [
-
-    {
-      loc: `${SITE_URL}/`,
-      priority: "1.0"
-    },
-
-    {
-      loc: `${SITE_URL}/blog/`,
-      priority: "0.8"
-    },
-
-    ...posts.map(post => ({
-
-      loc:
-        `${SITE_URL}/blog/${post.slug}/`,
-
-      lastmod:
-        post.publishedAt instanceof Date
-          ? post.publishedAt
-              .toISOString()
-              .slice(0, 10)
-          : undefined,
-
-      priority: "0.6"
-
-    }))
-
+  const staticUrls = [
+    { loc: `${SITE_URL}/`, priority: "1.0" },
+    { loc: `${SITE_URL}/blog/`, priority: "0.8" }
   ];
+  const postUrls = posts.map(p => ({
+    loc: `${SITE_URL}/blog/${p.slug}/`,
+    lastmod: p.publishedAt instanceof Date ? p.publishedAt.toISOString().slice(0, 10) : undefined,
+    priority: "0.6"
+  }));
 
-
-  const entries = urls
-
-    .map(
-      url => `  <url>
-    <loc>${escapeHtml(url.loc)}</loc>
-    ${
-      url.lastmod
-        ? `<lastmod>${url.lastmod}</lastmod>`
-        : ""
-    }
-    <priority>${url.priority}</priority>
-  </url>`
-    )
-
-    .join("\n");
-
+  const all = [...staticUrls, ...postUrls];
+  const entries = all.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}
+    <priority>${u.priority}</priority>
+  </url>`).join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${entries}
-</urlset>
-`;
-
+</urlset>`;
 }
 
-
-/* =========================================================
-   MAIN
-   ========================================================= */
+// ---------- Main ----------
 
 async function main() {
-
-  console.log(
-    "Fetching published posts from Firestore..."
-  );
-
-
-  const rawPosts =
-    await fetchAllPosts();
-
+  console.log("Fetching posts from Firestore...");
+  const rawPosts = await fetchAllPosts();
 
   const posts = rawPosts
+    .filter(p => p.status === "published" && p.slug)
+    .map(p => ({ ...p, slug: p.slug || slugify(p.title) }))
+    .sort((a, b) => {
+      const ad = a.publishedAt instanceof Date ? a.publishedAt.getTime() : 0;
+      const bd = b.publishedAt instanceof Date ? b.publishedAt.getTime() : 0;
+      return bd - ad;
+    });
 
-    .filter(
-      post =>
-        post.status === "published" &&
-        post.slug
-    )
+  console.log(`Found ${posts.length} published post(s).`);
 
-    .map(
-      post => ({
-        ...post,
-        slug:
-          String(post.slug).trim()
-      })
-    )
+  const blogDir = path.join(OUT_ROOT, "blog");
+  fs.mkdirSync(blogDir, { recursive: true });
 
-    .sort(
-      (a, b) => {
-
-        const ad =
-          a.publishedAt instanceof Date
-            ? a.publishedAt.getTime()
-            : 0;
-
-        const bd =
-          b.publishedAt instanceof Date
-            ? b.publishedAt.getTime()
-            : 0;
-
-        return bd - ad;
-
-      }
-    );
-
-
-  console.log(
-    `Found ${posts.length} published post(s).`
-  );
-
-
-  fs.mkdirSync(
-    BLOG_DIR,
-    { recursive: true }
-  );
-
-
-  /* =====================================================
-     GENERATE ALL POSTS
-
-     This intentionally regenerates ALL posts every time.
-     Therefore if you change blog-post.html, every old
-     article gets the new design too.
-     ===================================================== */
-
-  for (const post of posts) {
-
-    const postDir =
-      path.join(
-        BLOG_DIR,
-        post.slug
-      );
-
-
-    fs.mkdirSync(
-      postDir,
-      { recursive: true }
-    );
-
-
-    fs.writeFileSync(
-
-      path.join(
-        postDir,
-        "index.html"
-      ),
-
-      renderPostPage(post),
-
-      "utf8"
-
-    );
-
-
-    console.log(
-      `  wrote /blog/${post.slug}/index.html`
-    );
-
+  // Individual post pages
+  for (const p of posts) {
+    const postDir = path.join(blogDir, p.slug);
+    fs.mkdirSync(postDir, { recursive: true });
+    fs.writeFileSync(path.join(postDir, "index.html"), renderPostPage(p), "utf8");
+    console.log(`  wrote /blog/${p.slug}/index.html`);
   }
 
+  // Blog index
+  fs.writeFileSync(path.join(blogDir, "index.html"), renderIndexPage(posts), "utf8");
+  console.log("  wrote /blog/index.html");
 
-  /* ---------- Blog index ---------- */
+  // Sitemap
+  fs.writeFileSync(path.join(OUT_ROOT, "sitemap.xml"), renderSitemap(posts), "utf8");
+  console.log("  wrote /sitemap.xml");
 
-  fs.writeFileSync(
-
-    path.join(
-      BLOG_DIR,
-      "index.html"
-    ),
-
-    renderIndexPage(posts),
-
-    "utf8"
-
-  );
-
-
-  console.log(
-    "  wrote /blog/index.html"
-  );
-
-
-  /* ---------- Sitemap ---------- */
-
-  fs.writeFileSync(
-
-    path.join(
-      ROOT,
-      "sitemap.xml"
-    ),
-
-    renderSitemap(posts),
-
-    "utf8"
-
-  );
-
-
-  console.log(
-    "  wrote /sitemap.xml"
-  );
-
-
-  console.log(
-    "Done."
-  );
-
+  console.log("Done.");
 }
 
-
-main().catch(error => {
-
-  console.error(error);
-
+main().catch(err => {
+  console.error(err);
   process.exit(1);
-
 });
