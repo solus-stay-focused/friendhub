@@ -5,12 +5,6 @@ on:
   schedule:
     - cron: '0 * * * *'   # adjust/remove to match your original trigger
 
-# ---------------------------------------------------------------------
-# THIS WAS THE MISSING PIECE. Without it, the built-in GITHUB_TOKEN
-# only has read access to the repo, so the "git push" step in
-# "Commit and push if changed" gets rejected with a 403 — which is
-# exactly what causes the "exit code 128" failure you're seeing.
-# ---------------------------------------------------------------------
 permissions:
   contents: write
 
@@ -21,9 +15,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          # Make sure checkout uses a token that can push. actions/checkout
-          # uses GITHUB_TOKEN by default, which is fine now that we've
-          # granted contents: write above.
           persist-credentials: true
 
       - name: Setup Node
@@ -43,14 +34,16 @@ jobs:
           git push
 
       # ---------------------------------------------------------------
-      # Only keep this step if you've actually created the
-      # FIREBASE_SERVICE_ACCOUNT_FRIENDHUB_9F934 secret in
-      # Settings → Secrets and variables → Actions.
-      # If you haven't set that up yet, DELETE this step for now —
-      # it will fail the whole run otherwise, and generate + commit
-      # will still work fine without it.
+      # continue-on-error: true means this step won't fail the whole
+      # run while FIREBASE_SERVICE_ACCOUNT_FRIENDHUB_9F934 is missing.
+      # Generate + commit + push will always succeed regardless.
+      #
+      # Once you add that secret (Settings → Secrets and variables →
+      # Actions → New repository secret), this step will start
+      # actually deploying — no other changes needed.
       # ---------------------------------------------------------------
       - name: Deploy to Firebase Hosting
+        continue-on-error: true
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
