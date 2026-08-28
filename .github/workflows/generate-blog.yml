@@ -1,38 +1,52 @@
 name: Generate static blog pages
+
 on:
-  # Trigger this manually from the Actions tab right after publishing a
-  # post, instead of running on a fixed schedule.
+  # Run automatically after a post is published in Firestore.
+  # GitHub Actions cannot directly receive a Firestore trigger, so this
+  # scheduled check keeps the static pages updated automatically.
+  schedule:
+    - cron: "*/5 * * * *"
+
+  # Keep manual generation available from the Actions tab.
   workflow_dispatch: {}
-  # Also run on pushes to main in case you ever hand-edit the
-  # generator script itself.
+
+  # Also regenerate when the generator or blog template changes.
   push:
     branches: [main]
     paths:
       - "scripts/generate-blog.js"
+      - "blog-post.html"
+
 permissions:
   contents: write
-  # Needed so this workflow can trigger the Pages deploy workflow below.
   actions: write
   pages: write
   id-token: write
+
 jobs:
   generate:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
       - name: Generate blog pages
         run: node scripts/generate-blog.js
+
       - name: Commit and push if changed
         id: commit
         run: |
           git config user.name "friendhub-blog-bot"
           git config user.email "actions@users.noreply.github.com"
+
           git add blog/ sitemap.xml
+
           if git diff --cached --quiet; then
             echo "No changes to commit."
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -41,11 +55,7 @@ jobs:
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-      # Bot commits made with the default GITHUB_TOKEN don't trigger other
-      # workflows (this prevents infinite workflow loops), so the normal
-      # "Deploy static content to Pages" workflow never fires on its own
-      # after this bot pushes new blog files. Trigger it manually here so
-      # the new pages actually go live without a manual click.
+
       - name: Trigger Pages deploy
         if: steps.commit.outputs.changed == 'true'
         env:
