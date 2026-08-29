@@ -1,118 +1,170 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+>
+
+
   <url>
     <loc>https://www.friendhub.space/</loc>
     
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/</loc>
     
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/how-to-contact-someone-professionally-without-sharing-private-contact-info-friendhub/</loc>
     <lastmod>2026-08-28</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/aplikasi-sembang-video-belajar-bahasa-inggeris-malaysia/</loc>
     <lastmod>2026-08-27</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/paano-makakilala-foreigners-online-kaibigan-philippines/</loc>
     <lastmod>2026-08-27</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/alternatif-omegle-indonesia-video-chat-aman/</loc>
     <lastmod>2026-08-27</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/omegle-alternatives-arabic-safe-video-chat/</loc>
     <lastmod>2026-08-27</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/rastgele-goruntulu-sohbet-turkiye/</loc>
     <lastmod>2026-08-27</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/rastgele-goruntulu-sohbet-uygulamalari-tr/</loc>
     <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/video-chat-apps-neue-leute-kennenlernen-de/</loc>
     <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/random-video-chat-apps-india-hindi/</loc>
     <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/contact-someone-professionally-without-private-email/</loc>
     <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/hoe-professioneel-contact-opnemen-zonder-privegegevens/</loc>
     <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/how-to-contact-someone-professionally-without-sharing-private-contact-info-friend-hub/</loc>
     <lastmod>2026-08-24</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/friendhub-vs-other-video-chat-websites/</loc>
     <lastmod>2026-08-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/friendhub-omegle-alternative/</loc>
     <lastmod>2026-08-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/privacy-tips-no-personal-info/</loc>
     <lastmod>2026-08-20</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/beginner-guide-first-call/</loc>
     <lastmod>2026-08-20</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/safety-and-privacy-guide-2026/</loc>
     <lastmod>2026-08-20</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/friendhub-coding-community/</loc>
     <lastmod>2026-08-20</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/how-friendhub-helps-you-find-friends/</loc>
     <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/why-we-built-friendhub/</loc>
     <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
     <loc>https://www.friendhub.space/blog/staying-safe-on-video-chat/</loc>
     <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
+
 </urlset>
