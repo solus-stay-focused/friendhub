@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solus Social — SOLUS</title>
+<link rel="icon" type="image/png" href="solus.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0c0c0e;
+    --near-black:#15151a;
+    --panel:#1b1b22;
+    --purple:#8b85e8;
+    --purple-dark:#6f68d9;
+    --purple-light:#b9b3f5;
+    --ink:#0c0c0e;
+    --paper:#f4f4f6;
+    --paper-2:#ffffff;
+    --muted:#8a8a93;
+    --line:rgba(255,255,255,0.12);
+    --line-dark:rgba(0,0,0,0.08);
+  }
+  html[data-theme="evening"]{
+    --black:#1a120b; --near-black:#241b14; --panel:#2e2116;
+    --purple:#d99a4e; --purple-dark:#b97e38; --purple-light:#e8b976;
+    --ink:#f0e6d8; --paper:#241b14; --paper-2:#2e2116; --muted:#a89484;
+    --line:rgba(255,220,180,0.15); --line-dark:rgba(255,220,180,0.1);
+  }
+  html[data-theme="night"]{
+    --black:#000000; --near-black:#0a0a0d; --panel:#131318;
+    --purple:#8b85e8; --purple-dark:#6f68d9; --purple-light:#b9b3f5;
+    --ink:#f4f4f6; --paper:#0c0c0e; --paper-2:#15151a; --muted:#9a9aa3;
+    --line:rgba(255,255,255,0.1); --line-dark:rgba(255,255,255,0.06);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{transition:background-color .4s ease;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .4s ease, color .4s ease;
+  }
+  a{text-decoration:none; color:inherit;}
+  button{font-family:inherit; border:none; cursor:pointer;}
+
+  /* ---------- HEADER ---------- */
+  header{background:var(--black); position:sticky; top:0; z-index:100;}
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 48px; max-width:760px; margin:0 auto;
+  }
+  .logo{display:flex; align-items:center; color:#fff; gap:10px;}
+  .logo .crown{width:34px; height:34px; opacity:0.95; object-fit:contain; filter:brightness(0) invert(1);}
+  .logo .logo-text{display:flex; flex-direction:column; gap:2px;}
+  .logo .wordmark{font-family:'Archivo',sans-serif; font-weight:800; font-size:17px; letter-spacing:4px;}
+  .logo .tagline{font-size:8px; letter-spacing:1.5px; color:var(--muted); font-weight:500;}
+  .nav-right{display:flex; align-items:center; gap:14px;}
+  .back-link{color:#fff; font-size:12.5px; font-weight:700; letter-spacing:0.4px; opacity:0.85;}
+  .back-link:hover{opacity:1;}
+  .theme-switch{display:flex; align-items:center; gap:2px; background:rgba(255,255,255,0.06); border:1px solid var(--line); border-radius:999px; padding:3px;}
+  .theme-btn{width:26px; height:26px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:transparent; color:rgba(255,255,255,0.55); transition:background .25s ease, color .25s ease;}
+  .theme-btn:hover{color:#fff;}
+  .theme-btn.active{background:var(--purple); color:#0c0c0e;}
+  .theme-btn svg{width:14px; height:14px;}
+
+  /* ---------- PAGE HEADER ---------- */
+  .feed-title-block{max-width:1100px; margin:36px auto 22px; padding:0 40px;}
+  .feed-title-block h1{font-family:'Archivo',sans-serif; font-size:26px; font-weight:800; letter-spacing:-0.3px; margin-bottom:6px;}
+  .feed-title-block p{color:var(--muted); font-size:13.5px; line-height:1.6;}
+
+  /* ---------- COMPOSE ---------- */
+  .compose-wrap{max-width:1100px; margin:0 auto 28px; padding:0 40px;}
+  .compose-card{
+    background:var(--paper-2); border:1px solid var(--line-dark); border-radius:12px; padding:16px;
+  }
+  .compose-top{display:flex; gap:12px;}
+  .compose-avatar{
+    width:40px; height:40px; border-radius:50%; flex-shrink:0; overflow:hidden;
+    background:var(--purple); color:#fff; font-weight:700; font-size:15px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .compose-avatar img{width:100%; height:100%; object-fit:cover;}
+  .compose-body{flex:1;}
+  #composeCaption{
+    width:100%; border:none; resize:vertical; min-height:48px; font-family:inherit; font-size:14.5px;
+    color:var(--ink); background:transparent; padding-top:8px;
+  }
+  #composeCaption:focus{outline:none;}
+  .compose-preview-wrap{position:relative; margin-top:10px; display:none;}
+  .compose-preview-wrap img{width:100%; max-height:320px; object-fit:cover; border-radius:10px; display:block;}
+  .compose-remove-img{
+    position:absolute; top:8px; right:8px; width:26px; height:26px; border-radius:50%;
+    background:rgba(0,0,0,0.65); color:#fff; font-size:14px; line-height:1;
+  }
+  .compose-footer{
+    display:flex; align-items:center; justify-content:space-between; margin-top:12px;
+    border-top:1px solid var(--line-dark); padding-top:12px;
+  }
+  .compose-photo-btn{
+    display:flex; align-items:center; gap:6px; color:var(--purple); background:none; font-size:12.5px; font-weight:700;
+    padding:6px 8px; border-radius:6px;
+  }
+  .compose-photo-btn:hover{background:var(--line-dark);}
+  .compose-photo-btn svg{width:18px; height:18px;}
+  .compose-post-btn{
+    background:var(--purple); color:#0c0c0e; font-size:12px; font-weight:800; letter-spacing:0.6px;
+    padding:9px 22px; border-radius:999px; transition:background .18s ease, transform .18s ease;
+  }
+  .compose-post-btn:hover{background:var(--purple-light); transform:translateY(-1px);}
+  .compose-post-btn:disabled{opacity:0.5; cursor:not-allowed; transform:none;}
+  .compose-login-note{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    color:var(--muted); font-size:13px;
+  }
+  .compose-login-note a{color:var(--purple); font-weight:700;}
+
+  /* ---------- FEED ---------- */
+  .feed-wrap{max-width:1100px; margin:0 auto; padding:0 40px 80px; display:flex; flex-direction:column; gap:18px;}
+  .feed-empty{text-align:center; color:var(--muted); font-size:14px; padding:60px 0;}
+  .cp-card{
+    background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; overflow:hidden;
+    --ink:#0c0c0e; --muted:#8a8a93; --line-dark:rgba(0,0,0,0.08);
+  }
+  html[data-theme] .cp-card{ --ink:#0c0c0e; --muted:#8a8a93; --line-dark:rgba(0,0,0,0.08); }
+  .cp-image{width:100%; background:var(--near-black); display:flex; align-items:center; justify-content:center; max-height:640px; overflow:hidden;}
+  .cp-image img{width:100%; height:100%; display:block; object-fit:contain; max-height:640px; cursor:zoom-in;}
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox-overlay{
+    display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.92);
+    align-items:center; justify-content:center; padding:32px;
+    animation:lightboxFade .18s ease;
+  }
+  .lightbox-overlay.open{display:flex;}
+  .lightbox-overlay img{
+    max-width:100%; max-height:100%; object-fit:contain; display:block;
+    border-radius:6px; cursor:zoom-out;
+  }
+  .lightbox-close{
+    position:fixed; top:20px; right:24px; width:42px; height:42px; border-radius:50%;
+    background:rgba(255,255,255,0.08); color:#fff; display:flex; align-items:center; justify-content:center;
+    font-size:20px; border:1px solid rgba(255,255,255,0.15); transition:background .15s ease;
+  }
+  .lightbox-close:hover{background:rgba(255,255,255,0.18);}
+  @keyframes lightboxFade{ from{opacity:0;} to{opacity:1;} }
+  .cp-header{display:flex; align-items:center; gap:10px; padding:14px 16px;}
+  .cp-avatar{width:38px; height:38px; border-radius:50%; flex-shrink:0; overflow:hidden;}
+  .cp-header-text{display:flex; flex-direction:column; line-height:1.3;}
+  .cp-username{font-weight:700; font-size:13.5px; color:var(--ink);}
+  .cp-time{font-size:11px; color:var(--muted);}
+  .cp-actions{display:flex; align-items:center; gap:18px; padding:12px 16px 4px;}
+  .cp-like-btn{background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; color:var(--muted); font-size:12.5px; font-weight:700; padding:0;}
+  .cp-like-btn svg{width:20px; height:20px; stroke:var(--ink); fill:none; stroke-width:1.8; transition:fill .15s ease, stroke .15s ease;}
+  .cp-like-btn.liked svg{fill:#e0455f; stroke:#e0455f;}
+  .cp-like-btn.liked{color:#e0455f;}
+  .cp-caption{padding:8px 16px 18px; font-size:13.5px; line-height:1.55; color:var(--ink);}
+  .cp-caption .cp-username{margin-right:6px;}
+
+  @media (max-width:640px){
+    .nav{padding:14px 20px;}
+    .feed-title-block, .compose-wrap, .feed-wrap{padding-left:14px; padding-right:14px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="index.html" class="logo">
+      <img src="solus.png" alt="SOLUS" class="crown">
+      <span class="logo-text">
+        <span class="wordmark">SOLUS</span>
+        <span class="tagline">STAY FOCUSED</span>
+      </span>
+    </a>
+    <div class="nav-right">
+      <div class="theme-switch" id="themeSwitch">
+        <button class="theme-btn" data-theme-btn="day" aria-label="Day mode" title="Day">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <button class="theme-btn" data-theme-btn="evening" aria-label="Evening mode" title="Evening">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="23" y2="18"/><line x1="23" y1="22" x2="1" y2="22"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/></svg>
+        </button>
+        <button class="theme-btn" data-theme-btn="night" aria-label="Night mode" title="Night">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+      <a href="index.html" class="back-link">← BACK TO SHOP</a>
+    </div>
+  </nav>
+</header>
+
+<div class="feed-title-block">
+  <h1>Solus Social</h1>
+  <p>Every moment shared by the community, in one place. Like, comment, repost — or just write something, no photo required.</p>
+</div>
+
+<div class="compose-wrap">
+  <div class="compose-card" id="composeCard">
+    <!-- Filled in by JS depending on login state -->
+  </div>
+</div>
+
+<div class="feed-wrap" id="feedWrap">
+  <div class="feed-empty" id="feedEmpty" style="display:none;">No moments shared yet — be the first to post!</div>
+</div>
+
+<div class="lightbox-overlay" id="lightboxOverlay">
+  <button type="button" class="lightbox-close" id="lightboxClose" title="Close">&times;</button>
+  <img id="lightboxImg" src="" alt="Full screen post">
+</div>
+
+<!-- ---------- FIREBASE ---------- -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCXdaJNIEuG80ZSPk9OiLmpNNvHP5QGTLI",
+    authDomain: "solus-8be4d.firebaseapp.com",
+    projectId: "solus-8be4d",
+    storageBucket: "solus-8be4d.firebasestorage.app",
+    messagingSenderId: "958325567134",
+    appId: "1:958325567134:web:3478f492330620ae83d58f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ---------- Theme (shared with the main site via localStorage) ----------
+  (function(){
+    const root = document.documentElement;
+    const buttons = document.querySelectorAll('.theme-btn');
+    const saved = localStorage.getItem('solus-theme') || 'day';
+    function applyTheme(theme){
+      if(theme === 'day') root.removeAttribute('data-theme');
+      else root.setAttribute('data-theme', theme);
+      buttons.forEach(b => b.classList.toggle('active', b.dataset.themeBtn === theme));
+    }
+    applyTheme(saved);
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.themeBtn;
+        applyTheme(theme);
+        localStorage.setItem('solus-theme', theme);
+      });
+    });
+  })();
+
+  // ---------- Social feed ----------
+  (function(){
+    const composeCard = document.getElementById('composeCard');
+    const feedWrap = document.getElementById('feedWrap');
+    const feedEmpty = document.getElementById('feedEmpty');
+
+    // ---------- Lightbox (fullscreen post image) ----------
+    const lightboxOverlay = document.getElementById('lightboxOverlay');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    function openLightbox(src){
+      lightboxImg.src = src;
+      lightboxOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(){
+      lightboxOverlay.classList.remove('open');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+    }
+    lightboxOverlay.addEventListener('click', (e) => {
+      if(e.target === lightboxOverlay) closeLightbox();
+    });
+    lightboxClose.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') closeLightbox();
+    });
+    // Delegated click on any post image opens it fullscreen
+    feedWrap.addEventListener('click', (e) => {
+      const img = e.target.closest('.cp-image img');
+      if(img) openLightbox(img.src);
+    });
+    const postsCol = db.collection('communityPosts');
+
+    let posts = [];
+    let myPhoto = null;
+    let pendingImageData = null;
+
+    function escapeHtml(str){
+      const div = document.createElement('div');
+      div.textContent = str == null ? '' : str;
+      return div.innerHTML;
+    }
+
+    function timeAgo(date){
+      if(!date) return 'Just now';
+      const diffMs = Date.now() - date.getTime();
+      const mins = Math.floor(diffMs / 60000);
+      if(mins < 1) return 'Just now';
+      if(mins < 60) return `${mins}m ago`;
+      const hrs = Math.floor(mins / 60);
+      if(hrs < 24) return `${hrs}h ago`;
+      const days = Math.floor(hrs / 24);
+      return `${days}d ago`;
+    }
+
+    function getIdentity(){
+      const user = auth.currentUser;
+      if(!user) return null;
+      return {
+        id: user.uid,
+        name: user.displayName || (user.email ? user.email.split('@')[0] : 'User'),
+        photo: myPhoto
+      };
+    }
+
+    // Sends people to log in on the main site, then straight back here
+    function requireAuth(message){
+      if(auth.currentUser) return true;
+      if(confirm((message || 'Please log in to continue.') + '\n\nGo to login now?')){
+        location.href = 'index.html?login=1&returnTo=social';
+      }
+      return false;
+    }
+
+    // ---------- Compose box ----------
+    function renderCompose(){
+      const identity = getIdentity();
+      if(!identity){
+        composeCard.innerHTML = `
+          <div class="compose-login-note">
+            <span>Log in to post, like, and comment on the feed.</span>
+            <a href="index.html?login=1&returnTo=social">LOG IN →</a>
+          </div>
+        `;
+        return;
+      }
+      composeCard.innerHTML = `
+        <div class="compose-top">
+          <div class="compose-avatar" id="composeAvatar">${identity.photo ? `<img src="${identity.photo}" alt="">` : escapeHtml(identity.name.charAt(0).toUpperCase())}</div>
+          <div class="compose-body">
+            <textarea id="composeCaption" placeholder="Share a moment, or just say something..."></textarea>
+            <div class="compose-preview-wrap" id="composePreviewWrap">
+              <img id="composePreviewImg" alt="">
+              <button type="button" class="compose-remove-img" id="composeRemoveImg" aria-label="Remove photo">✕</button>
+            </div>
+          </div>
+        </div>
+        <div class="compose-footer">
+          <label class="compose-photo-btn" for="composeFileInput">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span id="composeFileLabel">Photo</span>
+          </label>
+          <input type="file" id="composeFileInput" accept="image/*" style="display:none;">
+          <button type="button" class="compose-post-btn" id="composePostBtn">POST</button>
+        </div>
+      `;
+
+      const captionEl = document.getElementById('composeCaption');
+      const fileInput = document.getElementById('composeFileInput');
+      const fileLabel = document.getElementById('composeFileLabel');
+      const previewWrap = document.getElementById('composePreviewWrap');
+      const previewImg = document.getElementById('composePreviewImg');
+      const removeImgBtn = document.getElementById('composeRemoveImg');
+      const postBtn = document.getElementById('composePostBtn');
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        if(!file.type.startsWith('image/')){
+          alert('Please choose an image file.');
+          return;
+        }
+        fileLabel.textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 900;
+            const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            pendingImageData = canvas.toDataURL('image/jpeg', 0.82);
+            previewImg.src = pendingImageData;
+            previewWrap.style.display = 'block';
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      removeImgBtn.addEventListener('click', () => {
+        pendingImageData = null;
+        fileInput.value = '';
+        fileLabel.textContent = 'Photo';
+        previewWrap.style.display = 'none';
+        previewImg.src = '';
+      });
+
+      postBtn.addEventListener('click', () => {
+        if(!requireAuth('Log in to post.')) return;
+        const caption = captionEl.value.trim();
+        if(!caption && !pendingImageData){
+          alert('Write something or add a photo before posting.');
+          return;
+        }
+        const identity = getIdentity();
+        postBtn.disabled = true;
+        postsCol.add({
+          name: identity.name,
+          caption: caption,
+          image: pendingImageData || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          likes: [],
+          comments: [],
+          reposts: [],
+          authorId: identity.id,
+          authorPhoto: identity.photo || null
+        }).then(() => {
+          pendingImageData = null;
+          renderCompose();
+        }).catch(err => {
+          alert('Could not post: ' + err.message);
+          postBtn.disabled = false;
+        });
+      });
+    }
+
+    // ---------- Feed ----------
+    function renderFeed(){
+      if(posts.length === 0){
+        feedWrap.innerHTML = '';
+        feedWrap.appendChild(feedEmpty);
+        feedEmpty.style.display = 'block';
+        return;
+      }
+      feedEmpty.style.display = 'none';
+      const identity = getIdentity();
+      const myId = identity ? identity.id : null;
+
+      feedWrap.innerHTML = posts.map((post) => {
+        const likes = post.likes || [];
+        const reposts = post.reposts || [];
+        const comments = post.comments || [];
+        const iLiked = likes.includes(myId);
+        const iReposted = reposts.includes(myId);
+        const createdDate = post.createdAt && post.createdAt.toDate ? post.createdAt.toDate() : null;
+
+        const repostBanner = post.repostOf
+          ? `<div style="padding:10px 16px 0; font-size:11.5px; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:5px;">
+               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+               Reposted by ${escapeHtml(post.repostedByName)}
+             </div>`
+          : '';
+
+        const commentsHtml = comments.map(c => `
+          <div style="margin-bottom:6px;"><span class="cp-username">${escapeHtml(c.name)}</span> <span style="font-size:13px;">${escapeHtml(c.text)}</span></div>
+        `).join('');
+
+        return `
+        <div class="cp-card" data-id="${post.id}">
+          ${repostBanner}
+          <div class="cp-header">
+            <div class="cp-avatar" style="display:flex;align-items:center;justify-content:center;background:var(--purple);color:#fff;font-weight:700;font-size:14px;overflow:hidden;">${post.authorPhoto ? `<img src="${post.authorPhoto}" style="width:100%;height:100%;object-fit:cover;" alt="">` : escapeHtml((post.name || '?').charAt(0).toUpperCase())}</div>
+            <div class="cp-header-text">
+              <span class="cp-username">${escapeHtml(post.name)}</span>
+              <span class="cp-time">${timeAgo(createdDate)}${post.editedAt ? ' · edited' : ''}</span>
+            </div>
+            ${(myId && (!post.authorId || post.authorId === myId)) ? `
+            <div style="margin-left:auto; display:flex; gap:2px;">
+              <button type="button" class="cp-edit-btn" title="Edit post" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:5px;display:flex;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+              <button type="button" class="cp-delete-btn" title="Delete post" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:5px;display:flex;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              </button>
+            </div>` : ''}
+          </div>
+          ${post.image ? `<div class="cp-image"><img src="${post.image}" alt="Community post"></div>` : ''}
+          <div class="cp-actions">
+            <button type="button" class="cp-like-btn cp-like-action ${iLiked ? 'liked' : ''}">
+              <svg viewBox="0 0 24 24"><path d="M20.8 4.6c-1.9-1.6-4.7-1.4-6.4.4L12 7.5l-2.4-2.5c-1.7-1.8-4.5-2-6.4-.4-2.1 1.8-2.2 5-.3 7l9 9.4 9-9.4c1.9-2 1.8-5.2-.1-7z"/></svg>
+              <span>${likes.length}</span>
+            </button>
+            <button type="button" class="cp-like-btn cp-comment-toggle">
+              <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.7 8.7 0 0 1-3.6-.8L3 21l1.9-5.5A8.4 8.4 0 0 1 3.6 11 8.5 8.5 0 0 1 12.1 3a8.4 8.4 0 0 1 8.9 8.5z"/></svg>
+              <span>${comments.length}</span>
+            </button>
+            <button type="button" class="cp-like-btn cp-repost-action ${iReposted ? 'liked' : ''}">
+              <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              <span>${reposts.length}</span>
+            </button>
+          </div>
+          <div class="cp-caption">${post.name ? `<span class="cp-username">${escapeHtml(post.name)}</span>` : ''}${escapeHtml(post.caption)}</div>
+          <div class="cp-comments" style="display:none; padding:0 16px 16px;">
+            <div class="cp-comments-list" style="max-height:180px; overflow-y:auto; margin-bottom:10px;">${commentsHtml || '<div style="font-size:12.5px;color:var(--muted);">No comments yet.</div>'}</div>
+            <form class="cp-comment-form" style="display:flex; gap:6px;">
+              <input type="text" placeholder="Add a comment..." required style="flex:1; padding:8px 10px; border:1px solid var(--line-dark); border-radius:6px; font-size:12.5px; font-family:inherit;">
+              <button type="submit" style="background:var(--purple); color:#fff; border:none; border-radius:6px; padding:0 14px; font-size:12px; font-weight:700;">POST</button>
+            </form>
+          </div>
+        </div>
+        `;
+      }).join('');
+
+      // Like
+      feedWrap.querySelectorAll('.cp-like-action').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if(!requireAuth('Log in to like posts.')) return;
+          const id = btn.closest('.cp-card').dataset.id;
+          const identity = getIdentity();
+          const post = posts.find(p => p.id === id);
+          const alreadyLiked = (post.likes || []).includes(identity.id);
+          postsCol.doc(id).update({
+            likes: alreadyLiked
+              ? firebase.firestore.FieldValue.arrayRemove(identity.id)
+              : firebase.firestore.FieldValue.arrayUnion(identity.id)
+          }).catch(err => console.error('Could not update like:', err));
+        });
+      });
+
+      // Toggle comments (viewing doesn't require login)
+      feedWrap.querySelectorAll('.cp-comment-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const panel = btn.closest('.cp-card').querySelector('.cp-comments');
+          panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        });
+      });
+
+      // Add comment
+      feedWrap.querySelectorAll('.cp-comment-form').forEach(form => {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if(!requireAuth('Log in to comment.')) return;
+          const id = form.closest('.cp-card').dataset.id;
+          const input = form.querySelector('input');
+          const text = input.value.trim();
+          if(!text) return;
+          const identity = getIdentity();
+          postsCol.doc(id).update({
+            comments: firebase.firestore.FieldValue.arrayUnion({
+              name: identity.name,
+              text: text,
+              date: new Date().toISOString()
+            })
+          }).then(() => { input.value = ''; })
+            .catch(err => alert('Could not post your comment: ' + err.message));
+        });
+      });
+
+      // Repost
+      feedWrap.querySelectorAll('.cp-repost-action').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if(!requireAuth('Log in to repost.')) return;
+          const id = btn.closest('.cp-card').dataset.id;
+          const identity = getIdentity();
+          const post = posts.find(p => p.id === id);
+          const alreadyReposted = (post.reposts || []).includes(identity.id);
+          if(alreadyReposted) return;
+          postsCol.doc(id).update({
+            reposts: firebase.firestore.FieldValue.arrayUnion(identity.id)
+          }).catch(err => console.error('Could not update repost count:', err));
+          postsCol.add({
+            name: post.name,
+            caption: post.caption,
+            image: post.image || null,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            likes: [],
+            comments: [],
+            reposts: [],
+            authorId: identity.id,
+            authorPhoto: identity.photo || null,
+            repostOf: post.repostOf ? post.repostOf : { id: post.id, name: post.name },
+            repostedByName: identity.name
+          }).catch(err => console.error('Could not create repost:', err));
+        });
+      });
+
+      // Edit (owner only)
+      feedWrap.querySelectorAll('.cp-edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if(!requireAuth('Log in to edit your post.')) return;
+          const card = btn.closest('.cp-card');
+          const id = card.dataset.id;
+          const post = posts.find(p => p.id === id);
+          const captionEl = card.querySelector('.cp-caption');
+          captionEl.innerHTML = `
+            <textarea class="cp-edit-textarea" style="width:100%; padding:8px 10px; border:1px solid var(--line-dark); border-radius:6px; font-size:13px; font-family:inherit; min-height:60px; margin-bottom:8px; box-sizing:border-box;">${post.caption}</textarea>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="cp-edit-save" style="background:var(--purple); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:700;">SAVE</button>
+              <button type="button" class="cp-edit-cancel" style="background:none; border:1px solid var(--line-dark); border-radius:6px; padding:6px 14px; font-size:12px; font-weight:700; color:var(--muted);">CANCEL</button>
+            </div>
+          `;
+          captionEl.querySelector('.cp-edit-save').addEventListener('click', () => {
+            const newCaption = captionEl.querySelector('.cp-edit-textarea').value.trim();
+            postsCol.doc(id).update({
+              caption: newCaption,
+              editedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(err => alert('Could not save changes: ' + err.message));
+          });
+          captionEl.querySelector('.cp-edit-cancel').addEventListener('click', () => {
+            renderFeed();
+          });
+        });
+      });
+
+      // Delete (owner only)
+      feedWrap.querySelectorAll('.cp-delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if(!requireAuth('Log in to delete your post.')) return;
+          const id = btn.closest('.cp-card').dataset.id;
+          if(!confirm('Delete this post? This cannot be undone.')) return;
+          postsCol.doc(id).delete().catch(err => alert('Could not delete post: ' + err.message));
+        });
+      });
+    }
+
+    // ---------- Auth state ----------
+    auth.onAuthStateChanged(user => {
+      if(user){
+        db.collection('users').doc(user.uid).get().then(doc => {
+          const data = doc.exists ? doc.data() : {};
+          myPhoto = data.photoBase64 || user.photoURL || null;
+          renderCompose();
+          renderFeed();
+        }).catch(() => {
+          myPhoto = user.photoURL || null;
+          renderCompose();
+          renderFeed();
+        });
+      } else {
+        myPhoto = null;
+        renderCompose();
+        renderFeed();
+      }
+    });
+
+    // Live updates: full feed, no cap
+    postsCol.orderBy('createdAt', 'desc').limit(200).onSnapshot(snapshot => {
+      posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderFeed();
+    }, err => console.error('Could not load community posts:', err));
+  })();
+</script>
+</body>
+</html>
