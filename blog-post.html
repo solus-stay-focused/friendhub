@@ -134,6 +134,42 @@ article.show{display:block}
  margin:28px 0;padding:18px 20px;border-left:3px solid var(--blue);
  background:rgba(59,123,255,.07);border-radius:0 12px 12px 0;color:var(--muted)
 }
+.article-content-missing{
+  margin:20px 0 10px;
+  padding:32px 28px;
+  border:1px solid rgba(94,158,255,.25);
+  border-radius:18px;
+  background:linear-gradient(135deg,rgba(59,123,255,.08),rgba(94,234,212,.04));
+  text-align:center;
+}
+.article-content-missing .missing-icon{
+  width:42px;height:42px;margin:0 auto 14px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:rgba(255,184,77,.14);
+  color:#FFB84D;
+  font:700 22px "Space Grotesk";
+}
+.article-content-missing h2{
+  margin:0 0 10px !important;
+  font-size:25px !important;
+}
+.article-content-missing p{
+  margin:0 auto !important;
+  max-width:650px;
+  color:var(--muted);
+}
+.body > article,
+.body > section{
+  max-width:100%;
+}
+.body > article{
+  display:block;
+}
+.body [style*="max-width"]{
+  max-width:100% !important;
+}
+
 .body pre{
  overflow:auto;background:#050817;border:1px solid var(--line);
  border-radius:12px;padding:16px
@@ -647,7 +683,32 @@ async function load(){
    document.getElementById("cover").hidden=false;
   }
 
-  document.getElementById("body").innerHTML=p.content||"";
+  // Render the saved article HTML reliably.
+  // Support the normal "content" field plus common legacy field names.
+  const articleBody = document.getElementById("body");
+  const savedContent =
+    typeof p.content === "string" ? p.content :
+    typeof p.contentHtml === "string" ? p.contentHtml :
+    typeof p.contentHTML === "string" ? p.contentHTML :
+    typeof p.body === "string" ? p.body :
+    typeof p.html === "string" ? p.html : "";
+
+  if(savedContent.trim()){
+    articleBody.innerHTML = savedContent;
+  }else{
+    articleBody.innerHTML = `
+      <div class="article-content-missing">
+        <div class="missing-icon">!</div>
+        <h2>Article content is empty</h2>
+        <p>
+          The article was loaded successfully, but no HTML content was found
+          in the published post. Open the post in the FriendHub admin panel,
+          add the article inside <strong>Content (HTML)</strong>, and publish
+          it again.
+        </p>
+      </div>
+    `;
+  }
 
   loading.hidden=true;
   article.classList.add("show");
