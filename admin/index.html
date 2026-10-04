@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — ConvertKit Lite Blog</title>
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f8fc;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#121a2c;--text:#e8edf6;--muted:#93a0b8;--line:#223049;--blue:#5b8cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 Poppins,system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:auto;padding:0 20px}
+.top{background:var(--card);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;height:60px}
+.logo{font-weight:700;font-size:18px}.logo b{color:var(--blue)}
+.top nav a{margin-left:18px;color:var(--muted);font-size:14px}
+.top nav a:hover{color:var(--blue)}
+h1.page{font-size:32px;margin:40px 0 4px;line-height:1.2}
+.sub{color:var(--muted);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px;padding-bottom:60px}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card:hover{border-color:var(--blue)}
+.card img,.card .ph{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--line)}
+.card .b{padding:16px}
+.card h2{font-size:17px;line-height:1.35;margin:0 0 8px}
+.card p{color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 10px}
+.meta{color:var(--muted);font-size:12px}
+.msg{color:var(--muted);text-align:center;padding:60px 0;grid-column:1/-1}
+article{max-width:760px;margin:0 auto;padding:36px 20px 70px}
+article h1{font-size:34px;line-height:1.25;margin:0 0 10px}
+.cover{width:100%;border-radius:14px;margin:20px 0}
+.body h2{margin-top:2em}
+.body img{max-width:100%;border-radius:10px}
+.body a{color:var(--blue);text-decoration:underline}
+.tags span{font-size:12px;background:var(--line);padding:2px 10px;border-radius:20px;margin-right:6px}
+</style>
+<style>
+main{padding:30px 20px 80px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;border-radius:9px;font:600 13px Poppins,sans-serif;cursor:pointer}
+.btn:hover{border-color:var(--blue)}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.d{color:#ef4444}
+label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:14px Poppins,sans-serif}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--blue);outline-offset:-1px}
+textarea#content{min-height:340px;font:13px/1.6 ui-monospace,Consolas,monospace}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.head h1{margin:0;font-size:24px}
+.row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.row img,.row .ph{width:64px;height:40px;object-fit:cover;border-radius:6px;background:var(--line);flex:none}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
+.pill.pub{color:#16a34a;border-color:#16a34a}
+.cols{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+@media(max-width:800px){.cols{grid-template-columns:1fr}}
+.tb{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.foot{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+#st{margin-right:auto;font-size:12px;color:var(--blue)}
+#prev{height:130px;margin-top:8px;border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px}
+#prev img{width:100%;height:100%;object-fit:cover}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="/">ConvertKit <b>Lite</b> <small style="color:var(--muted);font-weight:500">Admin</small></a>
+  <nav><a href="/blog/" target="_blank">View blog ↗</a><a href="#" id="out" class="hide">Sign out</a></nav>
+</div></header>
+
+<main class="wrap">
+
+<div id="login" class="box hide" style="max-width:380px;margin:60px auto;text-align:center">
+  <h1 style="font-size:22px;margin:0 0 8px">Admin sign in</h1>
+  <p class="sub">Sign in with your Google account to manage blog posts.</p>
+  <button class="btn p" id="google" style="width:100%">Continue with Google</button>
+  <p id="err" class="hide" style="color:#ef4444;font-size:13px"></p>
+</div>
+
+<div id="denied" class="box hide" style="max-width:420px;margin:60px auto">
+  <h1 style="font-size:20px;margin:0 0 8px">This account isn't an admin</h1>
+  <p class="sub">Signed in as <b id="who"></b>. Sign out and use the admin account.</p>
+</div>
+
+<div id="list" class="hide">
+  <div class="head">
+    <h1>Blog posts</h1>
+    <div><button class="btn" id="refresh">Refresh</button> <button class="btn p" id="new">+ New post</button></div>
+  </div>
+  <div class="box" id="rows">Loading…</div>
+</div>
+
+<div id="editor" class="hide">
+  <div class="head">
+    <h1 id="etitle">New post</h1>
+    <button class="btn" id="back">← All posts</button>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <label>Title</label><input id="title" placeholder="How to merge PDF files">
+      <label>URL slug (can't be changed after saving)</label><input id="slug" placeholder="how-to-merge-pdf-files">
+      <div class="meta">Post URL: /blog/post.html?slug=<span id="sp">your-slug</span></div>
+      <label>Excerpt <span id="ec" class="meta"></span></label><textarea id="excerpt" rows="3" maxlength="200"></textarea>
+      <label>Content (HTML)</label>
+      <div class="tb">
+        <button class="btn" data-i="h2">H2</button><button class="btn" data-i="h3">H3</button>
+        <button class="btn" data-i="p">Paragraph</button><button class="btn" data-i="b">Bold</button>
+        <button class="btn" data-i="ul">List</button><button class="btn" data-i="a">Link</button><button class="btn" data-i="img">Image</button>
+      </div>
+      <textarea id="content" placeholder="<p>Write your post…</p>"></textarea>
+    </div>
+    <div>
+      <div class="box">
+        <label style="margin-top:0">Status</label>
+        <select id="status"><option value="draft">Draft</option><option value="published">Published</option></select>
+        <label>Tags (comma separated)</label><input id="tags" placeholder="pdf, tips">
+        <label>Cover image URL</label><input id="cover" placeholder="https://…">
+        <div id="prev">No image yet</div>
+      </div>
+      <div class="box">
+        <label style="margin-top:0">Meta title <span id="mtc" class="meta"></span></label><input id="mt" maxlength="70">
+        <label>Meta description <span id="mdc" class="meta"></span></label><textarea id="md" rows="3" maxlength="160"></textarea>
+      </div>
+      <div class="foot">
+        <span id="st"></span>
+        <button class="btn d hide" id="del">Delete</button>
+        <button class="btn" id="draft">Save draft</button>
+        <button class="btn p" id="pub">Save &amp; publish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script type="module">
+import { auth, db, COL, ADMIN_EMAILS } from "../blog/firebase.js";
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const $ = id => document.getElementById(id);
+const esc = v => { const d = document.createElement("div"); d.textContent = v ?? ""; return d.innerHTML; };
+const ms = v => v?.toMillis ? v.toMillis() : (Number(v) || Date.parse(v) || 0);
+const show = id => { ["login", "denied", "list", "editor"].forEach(x => $(x).classList.toggle("hide", x !== id)); };
+let posts = [], editingId = null;
+
+/* ---------- auth ---------- */
+onAuthStateChanged(auth, async user => {
+  $("out").classList.toggle("hide", !user);
+  if (!user) return show("login");
+  if (!ADMIN_EMAILS.includes(user.email)) { $("who").textContent = user.email; return show("denied"); }
+  show("list");
+  await load();
+});
+$("google").onclick = async () => {
+  $("err").classList.add("hide");
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch (e) { console.error(e); $("err").textContent = "Couldn't sign in. Check that this domain is in Firebase authorized domains."; $("err").classList.remove("hide"); }
+};
+$("out").onclick = e => { e.preventDefault(); signOut(auth); };
+
+/* ---------- list ---------- */
+async function load() {
+  $("rows").textContent = "Loading…";
+  try {
+    const snap = await getDocs(collection(db, COL));
+    posts = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => ms(b.updatedAt || b.createdAt) - ms(a.updatedAt || a.createdAt));
+    $("rows").innerHTML = posts.length ? posts.map(p => `
+      <div class="row">
+        ${p.coverImageUrl ? `<img src="${esc(p.coverImageUrl)}" alt="">` : `<div class="ph"></div>`}
+        <div class="t"><b>${esc(p.title || "(Untitled)")}</b><span class="meta">${esc(p.id)}</span></div>
+        <span class="pill ${p.status === "published" ? "pub" : ""}">${p.status === "published" ? "published" : "draft"}</span>
+        <button class="btn" data-edit="${esc(p.id)}">Edit</button>
+      </div>`).join("") : "No posts yet. Click “New post” to write your first one.";
+    document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => open(b.dataset.edit));
+  } catch (e) {
+    console.error(e);
+    $("rows").innerHTML = `<span style="color:#ef4444">Couldn't load posts: ${esc(e.message)}. Check your Firestore rules.</span>`;
+  }
+}
+$("refresh").onclick = load;
+$("new").onclick = () => open(null);
+$("back").onclick = () => show("list");
+
+/* ---------- editor ---------- */
+function open(id) {
+  editingId = id;
+  const p = id ? posts.find(x => x.id === id) : null;
+  $("etitle").textContent = p ? "Edit post" : "New post";
+  $("title").value = p?.title || "";
+  $("slug").value = p?.slug || id || "";
+  $("slug").disabled = !!p;
+  $("excerpt").value = p?.excerpt || "";
+  $("content").value = p?.content || "";
+  $("status").value = p?.status || "draft";
+  $("tags").value = (p?.tags || []).join(", ");
+  $("cover").value = p?.coverImageUrl || "";
+  $("mt").value = p?.metaTitle || "";
+  $("md").value = p?.metaDescription || "";
+  $("del").classList.toggle("hide", !p);
+  $("st").textContent = "";
+  refresh();
+  show("editor");
+}
+const slugify = v => (v || "").toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+function refresh() {
+  $("sp").textContent = $("slug").value || "your-slug";
+  $("ec").textContent = $("excerpt").value.length + " / 200";
+  $("mtc").textContent = $("mt").value.length + " / 70";
+  $("mdc").textContent = $("md").value.length + " / 160";
+  const u = $("cover").value.trim();
+  $("prev").innerHTML = u ? `<img src="${esc(u)}" alt="" onerror="this.parentElement.textContent='Could not load image'">` : "No image yet";
+}
+$("title").oninput = () => { if (!editingId && !$("slug").dataset.manual) $("slug").value = slugify($("title").value); refresh(); };
+$("slug").oninput = () => { $("slug").dataset.manual = "1"; $("slug").value = slugify($("slug").value); refresh(); };
+["excerpt", "mt", "md", "cover"].forEach(id => $(id).oninput = refresh);
+
+/* HTML helper buttons */
+const snippets = {
+  h2: s => `<h2>${s || "Heading"}</h2>`, h3: s => `<h3>${s || "Heading"}</h3>`,
+  p: s => `<p>${s || "Text"}</p>`, b: s => `<strong>${s || "bold"}</strong>`,
+  ul: s => `<ul>\n  <li>${s || "Item"}</li>\n  <li>Item</li>\n</ul>`,
+  a: s => `<a href="https://www.convertkitlite.site/tools/">${s || "link text"}</a>`,
+  img: () => `<img src="https://" alt="Describe the image">`
+};
+document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => {
+  const t = $("content"), s = t.selectionStart, e = t.selectionEnd;
+  const html = snippets[b.dataset.i](t.value.slice(s, e));
+  t.value = t.value.slice(0, s) + html + t.value.slice(e);
+  t.focus(); t.selectionStart = t.selectionEnd = s + html.length;
+});
+
+/* ---------- save / delete ---------- */
+async function save(status) {
+  const title = $("title").value.trim(), slug = $("slug").value.trim();
+  if (!title || !slug) { $("st").textContent = "Title and slug are required."; return; }
+  const existing = editingId ? posts.find(p => p.id === editingId) : null;
+  const data = {
+    title, slug,
+    excerpt: $("excerpt").value.trim(),
+    content: $("content").value,
+    status,
+    tags: $("tags").value.split(",").map(x => x.trim()).filter(Boolean),
+    coverImageUrl: $("cover").value.trim(),
+    metaTitle: $("mt").value.trim(),
+    metaDescription: $("md").value.trim(),
+    updatedAt: serverTimestamp()
+  };
+  if (!existing) data.createdAt = serverTimestamp();
+  if (status === "published" && !existing?.publishedAt) data.publishedAt = serverTimestamp();
+  try {
+    const id = editingId || slug;
+    await setDoc(doc(db, COL, id), data, { merge: true });
+    editingId = id;
+    $("slug").disabled = true;
+    $("del").classList.remove("hide");
+    $("status").value = status;
+    $("st").textContent = status === "published" ? "Published ✓" : "Draft saved ✓";
+    await load();
+  } catch (e) {
+    console.error(e);
+    $("st").textContent = "Couldn't save. Check your Firestore rules.";
+  }
+}
+$("draft").onclick = () => save("draft");
+$("pub").onclick = () => save("published");
+$("del").onclick = async () => {
+  if (!editingId || !confirm("Delete this post? This can't be undone.")) return;
+  try { await deleteDoc(doc(db, COL, editingId)); editingId = null; await load(); show("list"); }
+  catch (e) { console.error(e); $("st").textContent = "Couldn't delete post."; }
+};
+</script>
+</body>
+</html>
